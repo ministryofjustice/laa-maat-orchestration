@@ -1,28 +1,174 @@
-# Ministry of Justice Template Repository
+# laa-maat-orchestration
 
-[![repo standards badge](https://img.shields.io/endpoint?labelColor=231f20&color=005ea5&style=for-the-badge&label=MoJ%20Compliant&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fendpoint%2Ftemplate-repository&logo=data:image/png;base64,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)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-github-repositories.html#template-repository)
+This is a Java based Spring Boot Application which will be hosted on AWS Environment (Cloud Platform). The application is being deployed on to the AWS ECS container service. This is a Facade application to the existing LAA legacy Applications MAAT/MLRA.
 
-Use this template to [create a repository] with the default initial files for a Ministry of Justice Github repository, including:
+[High level design](https://dsdmoj.atlassian.net/wiki/spaces/LAACP/pages/3673751570/Means+Assessment+-+High+level+Design+Approach)
 
-- The correct LICENSE
-- Github Action example
-- A .gitignore file
-- A CODEOWNERS file
-- A dependabot.yml file
-- The MoJ Compliant Badge (Public repositories only)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/ministryofjustice/laa-maat-orchestration/tree/main.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/ministryofjustice/laa-maat-orchestration/tree/main)
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Once you have created your repository, please:
+## Developer setup
 
-- Edit the copy of this README.md file to document your project.
-- Grant permission/s to the appropriate MoJ team/s with at least one team having Admin permissions.
-- Try not to add individual users to the repository, instead use a team.
-- To add an Outside Collaborator to the repository follow the guidelines on the [GitHub-collaborator repository](https://github.com/ministryofjustice/github-collaborators).
-- Ensure branch protection is set up on the main branch.
-- [Optional] Modify the CODEOWNERS file and state the team or users that can authorise PR's.
-- Modify the Dependabot file to suit the [dependency manager](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#package-ecosystem) you plan to use and for [automated pull requests for package updates](https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically/enabling-and-disabling-dependabot-version-updates#enabling-dependabot-version-updates). Dependabot is enabled in the settings by default.
-- Modify the short description found on the right side of the README.md file.
-- Ensure as many of the [GitHub Standards](https://github.com/ministryofjustice/github-repository-standards) rules are maintained as possibly can.
-- Modify the MoJ Compliant Badge url using these [instructions](https://github.com/orgs/ministryofjustice/teams/operations-engineering/discussions). If the repository is internal or private then the badge can removed as it will not work.
-- For a private repo with no GitHub Advanced Security license remove the .github/workflows/dependency-review.yml file.
+1. Go through with this [Java Developer On-boarding Check List](https://dsdmoj.atlassian.net/wiki/spaces/ASLST/pages/3738468667/Java+Developer+Onboarding+Check+List/) and complete all tasks.
+2. Request a team member to be added to the repository.
+3. Create a GPG (more detail further down on the page) key and create a PR. Someone from the team will approve the PR.
+4. This is a document to outline the general guideline [Developer Guidelines](https://dsdmoj.atlassian.net/wiki/spaces/ASLST/pages/3896049821/Developer+Guidelines).
+5. This project has its own dedicated Jira Scrum board, and you can access [from here](https://dsdmoj.atlassian.net/jira/software/projects/LCAM/boards/881) and [project backlog](https://dsdmoj.atlassian.net/jira/software/projects/LCAM/boards/881/backlog)
 
-[create a repository]: https://github.com/ministryofjustice/template-repository/generate
+### Pre-requisites
+
+1. Docker
+2. SSH
+3. An editor/IDE of some sort - preferably Intellij/Eclipse
+4. Gradle
+5. aws cli
+6. kubectl
+7. Helm
+8. CircleCI CLI (optional)
+
+We're using [Gradle](https://gradle.org/) to build the application. This also includes plugins for generating IntelliJ configuration.
+
+### Decrypting docker-compose.override.yml
+
+The `docker-compose.override.yml` is encrypted using [git-crypt](https://github.com/AGWA/git-crypt).
+
+To run the app locally you need to be able to decrypt this file.
+
+You will first need to create a GPG key. See [Create a GPG Key](https://docs.publishing.service.gov.uk/manual/create-a-gpg-key.html) for details on how to do this with `GPGTools` (GUI) or `gpg` (command line).
+You can install either from a terminal or just download the UI version.
+
+```
+brew update
+brew install gpg
+brew install git-crypt
+```
+
+Once you have done this, a team member who already has access can add your key by running `git-crypt add-gpg-user USER_ID`\* and creating a pull request to this repo.
+
+Once this has been merged you can decrypt your local copy of the repository by running `git-crypt unlock`.
+
+\*`USER_ID` can be your key ID, a full fingerprint, an email address, or anything else that uniquely identifies a public key to GPG (see "HOW TO SPECIFY A USER ID" in the gpg man page).
+
+### DB Configuration
+
+For database changes, we are using [liquibase]() and all the sql scripts stored in the directory (resources/db/changelog/).
+This project does not direct access to any of the database (togdata or mla) and all the database calls should be made through the [MAAT-API](https://github.com/ministryofjustice/laa-maat-court-data-api) project.
+
+### Application Set up
+
+Clone Repository
+
+```sh
+git clone git@github.com:ministryofjustice/laa-maat-orchestration.git
+
+cd maat-orchestration
+```
+
+Makesure tests all testes are passed by running following ‘gradle’ Command
+
+```sh
+./gradlew clean test
+```
+
+You will need to build the artifacts for the source code, using `gradle`.
+
+```sh
+./gradlew clean build
+```
+
+The apps should then startup cleanly if you run
+
+```sh
+docker-compose build
+docker-compose up
+```
+
+laa-maat-orchestration application will be running on http://localhost:8290
+
+### Cloud Platform Set Up
+
+It is advisable to have the cloud platform set up locally.
+
+Follow this link to on board yourself with the LAA cloud platform environment. - https://user-guide.cloud-platform.service.justice.gov.uk/documentation/getting-started/kubectl-config.html#how-to-use-kubectl-to-connect-to-the-cluster
+
+Configure AWS details using aws cli (command - `aws configure`) Set up AWS Access Key ID & AWS Secret Access Key. All other values can be default.
+
+More detail can be found on https://dsdmoj.atlassian.net/wiki/spaces/LAACP/pages/edit-v2/1756201359.
+
+The terraform scripts for the SQS can be found on https://github.com/ministryofjustice/cloud-platform-environments/tree/master/namespaces/live-1.cloud-platform.service.justice.gov.uk/laa-court-data-adaptor-dev
+
+### Deployment
+
+We have configured a CircleCI code pipelines. You can [log in](https://app.circleci.com/pipelines/github/ministryofjustice/laa-maat-orchestration) from here to access the pipeline.
+
+### Open API
+
+We have implemented the Open API standard (with Swagger 3). The web link provides a details Rest API with a schema definition. The link can only from local or from dev environment. The swagger link can be found from [here](http://localhost:8300/open-api/docs.html)
+
+### Debugging Application
+
+Speak to one of the team member and get the docker-compose-debug.yml which will have relevant credentials to run the application on remote Debug Mode.
+
+Run the following command
+
+```sh
+ docker-compose -f docker-compose-debug.yml up
+```
+
+Make sure Remote Debug Option is set up on your preferred Editor.
+
+### Application Monitoring and Logs
+
+The LAA Crime Means Assessment API has been configured to send the application logs to both AWS Cloud Watch and Sentry.
+
+####Cloud Watch Logs:
+To see the Cloud watch logs, you need to have the right user groups and permission. More details about this available here. (link) The application logs are configured with the followings log groups (names).
+The application deployed as a Docker container, and the logs can also be found from the AWS ECS logs.
+
+####Sentry
+Sentry is a 3rd party application logging and monitoring platform. The platform provides easier searching based on meta-data as well as application monitoring. You can learn more about ['how we have integrated Sentry to improve application logging and monitoring'](https://dsdmoj.atlassian.net/wiki/spaces/LAACP/pages/2139914261/Integrate+Sentry+to+improve+application+logging+and+monitoring)
+There are several alert rules configured on Sentry that will push notification to both email and Slack channel. We have created a dedicated slack channel (named 'laa-crime-apps-logs-alert'). Sentry will push the alert to this channel for a specific type of exceptions. The configuration for Slack alert can be change from a [Sentry dashboard](https://sentry.io/settings/ministryofjustice/projects/laa-maat-orchestration/alerts/).
+
+### Mutation PI testing
+
+Mutation testing providing test coverage for Java applications.
+Faults (or mutations) are automatically seeded into the code, then your tests are run. If your tests fail then the mutation is killed, if your tests pass then the mutation lived.
+Here are some of the key benefits for this type of testing.
+
+- High coverage of testing
+- New kinds of test scenarios
+- Validate unit test scripts
+
+Once we build the project then run the following command. This will generate a test report under build/reports/pitest/
+We want to make sure that the Mutation Coverage for new classes are covered properly
+
+```sh
+./gradlew pitest
+```
+
+### Further reading
+
+- [Diagrams for LAA and the common platform](https://dsdmoj.atlassian.net/wiki/spaces/LAACP/pages/1513128006/Diagrams)
+- [New Starter Guild](https://dsdmoj.atlassian.net/wiki/spaces/LAA/pages/1391460702/New+Hire+Check+List)
+- [Cloud Platform user guide](https://user-guide.cloud-platform.service.justice.gov.uk/#application-logging)
+- [Modernisation Platform Team Information](https://user-guide.modernisation-platform.service.justice.gov.uk/#modernisation-platform-team-information)
+
+## JSON Schema to POJO
+
+Gradle plugin that converts json schema files into POJOs (Plain Old Java Objects). See [Extended jsonschema2pojo Gradle plugin](https://github.com/jsonschema2dataclass/js2d-gradle).
+
+The generated POJO files can be found in crime-hardship/build/generated/sources/js2d, after each build, or by running the following command:
+
+```shell
+./gradlew clean generateJsonSchema2DataClass
+```
+
+### Configuration
+
+In the jsonSchema2Pojo section of crime-means-assessment/build.gradle file, there are a number of settings to that have
+been set and are documented inside that section.:
+
+- source.setFrom: The location of the json schema files.
+- targetPackage: what package the POJOs should belong to
+- includeJsr303Annotations: JSR-303/349 annotations (for schema rules like minimum, maximum, etc)
+- dateTimeType: What type to use instead of string
