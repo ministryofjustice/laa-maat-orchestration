@@ -43,8 +43,6 @@ dependencies {
 	implementation "io.sentry:sentry-logback"
 	implementation "io.sentry:sentry-spring-boot-starter"
 
-	implementation "org.postgresql:postgresql"
-	implementation "org.liquibase:liquibase-core"
 	implementation "org.apache.commons:commons-lang3"
 	implementation "io.micrometer:micrometer-registry-prometheus"
 	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$versions.springdocVersion"
