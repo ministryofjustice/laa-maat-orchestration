@@ -109,3 +109,21 @@ pitest {
 	timestampedReports = false
 	mutationThreshold = 60
 }
+
+
+tasks["sonar"].dependsOn test
+
+sonar {
+	properties {
+		property "sonar.exclusions", "**/entity/**.java , **/model/**.java , **/dto/**.java , **/config/**.java, **/jms/**.java,**/exception/**.java,**/handler/**.java"
+		property "sonar.coverage.exclusions", "**/MAATOrchestrationApplication.java"
+		property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+		property "sonar.projectKey", "ministryofjustice_laa-maat-orchestration"
+		property "sonar.organization", "ministryofjustice"
+		property "sonar.host.url", "https://sonarcloud.io"
+		property "sonar.projectName", "Crime Apps :: maat-orchestration"
+		property "sonar.pitest.mode", "reuseReport"
+		property "sonar.pitest.reportsDirectory", "build/reports/pitest"
+	}
+}
+
