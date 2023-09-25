@@ -1,2 +1,6 @@
+<<<<<<< HEAD
 docker-compose.override.yml filter=git-crypt diff=git-crypt
+=======
+docker-compose.override.yml filter=git-crypt diff=git-crypt
+>>>>>>> 063ce9816b70718ac1f8ae42e5bfdec1144b54d6
 helm_deploy/**/values-*.yaml filter=git-crypt diff=git-crypt
