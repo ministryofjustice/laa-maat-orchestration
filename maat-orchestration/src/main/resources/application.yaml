@@ -14,21 +14,3 @@ management:
     web:
       exposure:
         include: health,info,metrics,prometheus
-
-spring:
-  datasource:
-    url: jdbc:postgresql://${DATASOURCE_HOST_PORT}/${DATASOURCE_DBNAME}
-    username: ${DATASOURCE_USERNAME}
-    password: ${DATASOURCE_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      connection-timeout: 30000
-      idle-timeout: 60000
-      max-lifetime: 3600000
-
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: false
-    generate-ddl: false
-    properties:
-      hibernate.temp.use_jdbc_metadata_defaults: false
