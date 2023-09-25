@@ -1,10 +1,9 @@
-microservice-template/.gradle
+maat-orchestration/.gradle
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-.DS_Store
 
 ### STS ###
 .apt_generated
@@ -36,4 +35,5 @@ out/
 
 ### VS Code ###
 .vscode/
+**/pgdata
 *.java-version

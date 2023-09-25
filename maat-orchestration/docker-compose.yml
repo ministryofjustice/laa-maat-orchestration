@@ -7,6 +7,3 @@ services:
     ports:
       - "8290:8290"
       - "8300:8300"
-    depends_on:
-      postgres:
-        condition: service_healthy
