@@ -20,26 +20,6 @@ env:
     value: {{ .Values.hardshipApi.baseUrl }}
   - name: HARDSHIP_API_OAUTH_URL
     value: {{ .Values.hardshipApi.oauthUrl }}
-  - name: MAAT_API_OAUTH_CLIENT_ID
-    valueFrom:
-        secretKeyRef:
-            name: maat-api-oauth-client-id
-            key: MAAT_API_OAUTH_CLIENT_ID
-  - name: MAAT_API_OAUTH_CLIENT_SECRET
-    valueFrom:
-        secretKeyRef:
-            name: maat-api-oauth-client-secret
-            key: MAAT_API_OAUTH_CLIENT_SECRET
-  - name: HARDSHIP_API_OAUTH_CLIENT_ID
-    valueFrom:
-        secretKeyRef:
-            name: hardship-api-oauth-client-id
-            key: HARDSHIP_API_OAUTH_CLIENT_ID
-  - name: HARDSHIP_API_OAUTH_CLIENT_SECRET
-    valueFrom:
-        secretKeyRef:
-            name: hardship-api-oauth-client-secret
-            key: HARDSHIP_API_OAUTH_CLIENT_SECRET
   - name: JWT_ISSUER_URI
     value: {{ .Values.jwt.issuerUri }}
 {{- end -}}

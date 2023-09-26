@@ -9,7 +9,7 @@ logging:
 
 management:
   server:
-    port: 8299
+    port: 8300
   endpoints:
     web:
       exposure:
