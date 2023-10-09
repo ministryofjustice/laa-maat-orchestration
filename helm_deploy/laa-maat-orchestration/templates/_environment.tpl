@@ -20,6 +20,8 @@ env:
     value: {{ .Values.hardshipApi.baseUrl }}
   - name: HARDSHIP_API_OAUTH_URL
     value: {{ .Values.hardshipApi.oauthUrl }}
+  - name: CONTRIBUTION_API_BASE_URL
+    value: {{ .Values.hardshipApi.baseUrl }}
   - name: JWT_ISSUER_URI
     value: {{ .Values.jwt.issuerUri }}
 {{- end -}}

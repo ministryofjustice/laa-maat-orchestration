@@ -15,6 +15,9 @@ public class ServicesConfiguration {
     @NotNull
     private HardshipApi hardshipApi;
 
+    @NotNull
+    private ContributionApi contributionApi;
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -43,6 +46,29 @@ public class ServicesConfiguration {
 
             @NotNull
             private String rollbackUrl;
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ContributionApi {
+        @NotNull
+        private String baseUrl;
+
+        @NotNull
+        private ContributionEndpoints contributionEndpoints;
+
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class ContributionEndpoints {
+
+            @NotNull
+            private String calculateContributionUrl;
+
+            @NotNull
+            private String requestTransferUrl;
         }
     }
 }
