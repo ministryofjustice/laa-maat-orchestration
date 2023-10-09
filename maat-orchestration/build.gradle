@@ -20,6 +20,7 @@ def versions = [
 		pitest                  : "1.4.10",
 		sentryVersion			: "6.15.0",
 		springdocVersion        : "2.1.0",
+		crimeCommonsVersion     : "2.4.0",
 		okhttpVersion           : "4.9.3",
 		wiremockVersion    		: "2.35.0"
 ]
@@ -53,6 +54,7 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-security"
 	implementation "org.springframework.boot:spring-boot-starter-actuator"
 	implementation "org.springframework.boot:spring-boot-starter-validation"
+	implementation "uk.gov.justice.service.laa-crime:crime-commons-spring-boot-starter-rest-client:$versions.crimeCommonsVersion"
 
 
 	compileOnly "org.projectlombok:lombok"
