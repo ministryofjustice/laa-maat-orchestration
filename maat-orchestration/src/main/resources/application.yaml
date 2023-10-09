@@ -14,3 +14,18 @@ management:
     web:
       exposure:
         include: health,info,metrics,prometheus
+
+services:
+  hardship-api:
+    base-url: ${HARDSHIP_API_BASE_URL}
+    hardship-endpoints:
+      find-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/hardshipReviewId
+      calculate-hardship-for-detail-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/calculate-hardship-for-detail
+      create-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/
+      update-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/
+      rollbacl-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/rollback
+    contribution-endpoints:
+      calculate-hardship-for-detail-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/calculate-hardship-for-detail
+      create-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/
+      update-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/
+      rollbacl-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/rollback
