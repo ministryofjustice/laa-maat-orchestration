@@ -22,7 +22,7 @@ def versions = [
 		springdocVersion        : "2.1.0",
 		crimeCommonsVersion     : "2.4.0",
 		okhttpVersion           : "4.9.3",
-		wiremockVersion    		: "2.35.0"
+		wiremockVersion    		: "3.0.1"
 ]
 
 configurations {
