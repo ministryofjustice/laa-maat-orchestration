@@ -17,7 +17,7 @@ java {
 }
 
 def versions = [
-		pitest                  : "1.15.1",
+		pitest                  : "1.15.2",
 		sentryVersion			: "6.32.0",
 		springdocVersion        : "2.2.0",
 		crimeCommonsVersion     : "2.7.0",
