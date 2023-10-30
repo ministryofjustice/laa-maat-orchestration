@@ -16,6 +16,9 @@ public class ServicesConfiguration {
     private HardshipApi hardshipApi;
 
     @NotNull
+    private boolean oAuthEnabled;
+
+    @NotNull
     private ContributionApi contributionApi;
 
     @Data
@@ -34,9 +37,6 @@ public class ServicesConfiguration {
         public static class HardshipEndpoints {
             @NotNull
             private String findUrl;
-
-            @NotNull
-            private String calculateHardshipForDetailUrl;
 
             @NotNull
             private String createUrl;
