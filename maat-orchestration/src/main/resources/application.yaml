@@ -15,6 +15,12 @@ management:
       exposure:
         include: health,info,metrics,prometheus
 
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI}
+
 services:
   hardship-api:
     base-url: ${HARDSHIP_API_BASE_URL}
