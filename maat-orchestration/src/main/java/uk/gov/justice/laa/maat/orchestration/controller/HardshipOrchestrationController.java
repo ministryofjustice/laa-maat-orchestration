@@ -17,6 +17,8 @@ import uk.gov.justice.laa.maat.orchestration.dto.ApplicationDTO;
 import uk.gov.justice.laa.maat.orchestration.dto.GetHardshipDTO;
 import uk.gov.justice.laa.maat.orchestration.dto.HardshipReviewDTO;
 
+import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_ID;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -37,7 +39,9 @@ public class HardshipOrchestrationController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = GetHardshipDTO.class)
                     )
-            ) @Valid @RequestBody GetHardshipDTO getHardshipDTO) {
+            ) @Valid @RequestBody GetHardshipDTO getHardshipDTO,
+            @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
+        log.info("Received request to find hardship with transaction id - " + laaTransactionId);
         return ResponseEntity.ok(new HardshipReviewDTO());
     }
 
@@ -55,8 +59,9 @@ public class HardshipOrchestrationController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ApplicationDTO.class)
                     )
-            ) @Valid @RequestBody ApplicationDTO applicationDTO) {
-
+            ) @Valid @RequestBody ApplicationDTO applicationDTO,
+            @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
+        log.info("Received request to create hardship with transaction id - " + laaTransactionId);
         return ResponseEntity.ok(applicationDTO);
     }
 
@@ -74,7 +79,9 @@ public class HardshipOrchestrationController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ApplicationDTO.class)
                     )
-            ) @Valid @RequestBody ApplicationDTO applicationDTO) {
+            ) @Valid @RequestBody ApplicationDTO applicationDTO,
+            @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
+        log.info("Received request to update hardship with transaction id - " + laaTransactionId);
         return ResponseEntity.ok(applicationDTO);
     }
 
