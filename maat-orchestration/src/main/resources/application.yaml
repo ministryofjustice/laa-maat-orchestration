@@ -17,6 +17,12 @@ management:
 
   security:
     oauth2:
+      client:
+        provider:
+          hareship-api:
+            token-uri: ${HARDSHIP_API_OAUTH_URL}
+          ccc:
+            token-uri: ${CCC_API_OAUTH_URL}
       resource-server:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI}
