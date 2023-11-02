@@ -39,6 +39,7 @@ dependencies {
 
 	implementation platform("io.sentry:sentry-bom:$versions.sentryVersion")
 	implementation platform(SpringBootPlugin.BOM_COORDINATES)
+	testImplementation 'org.projectlombok:lombok:1.18.26'
 	annotationProcessor platform(SpringBootPlugin.BOM_COORDINATES)
 
 	implementation "io.sentry:sentry-logback"
@@ -54,8 +55,8 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-security"
 	implementation "org.springframework.boot:spring-boot-starter-actuator"
 	implementation "org.springframework.boot:spring-boot-starter-validation"
-	implementation "uk.gov.justice.service.laa-crime:crime-commons-spring-boot-starter-rest-client:$versions.crimeCommonsVersion"
 
+	implementation "uk.gov.justice.service.laa-crime:crime-commons-spring-boot-starter-rest-client:$versions.crimeCommonsVersion"
 
 	compileOnly "org.projectlombok:lombok"
 	annotationProcessor "org.projectlombok:lombok"
