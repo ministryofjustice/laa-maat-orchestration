@@ -15,15 +15,27 @@ management:
       exposure:
         include: health,info,metrics,prometheus
 
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          hareship-api:
+            token-uri: ${HARDSHIP_API_OAUTH_URL}
+          ccc:
+            token-uri: ${CCC_API_OAUTH_URL}
+      resource-server:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI}
+
 services:
   hardship-api:
     base-url: ${HARDSHIP_API_BASE_URL}
     hardship-endpoints:
-      find-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/hardshipReviewId
-      calculate-hardship-for-detail-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/calculate-hardship-for-detail
+      find-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/{hardshipReviewId}
       create-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/
       update-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/
-      rollbacl-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/rollback
+      rollback-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/rollback
   contribution-api:
     base-url: ${CONTRIBUTION_API_BASE_URL}
     contribution-endpoints:
@@ -34,3 +46,21 @@ retry-config:
   max-retries: 3
   min-back-off-period: 5
   jitter-value: 0.75
+
+springdoc:
+  packagesToScan: uk.gov.justice.laa.maat.orchestration
+  api-docs:
+    path: open-api/api-docs
+
+  swagger-ui:
+    path: open-api/swagger-ui.html
+    operationsSorter: method
+
+sentry:
+  dsn: ${SENTRY_DSN}
+  environment: ${SENTRY_ENV}
+  release: 0.0.1
+  servername: aws-eks-container
+  send-default-pii: true
+  attach-stacktrace: true
+  sample-rate: ${SENTRY_SAMPLE_RATE}
