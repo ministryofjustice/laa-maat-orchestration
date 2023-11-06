@@ -24,4 +24,14 @@ env:
     value: {{ .Values.contributionApi.baseUrl }}
   - name: JWT_ISSUER_URI
     value: {{ .Values.jwt.issuerUri }}
+  - name: HARDSHIP_API_OAUTH_CLIENT_ID
+    valueFrom:
+        secretKeyRef:
+            name: hardship-api-oauth-client-id
+            key: HARDSHIP_API_OAUTH_CLIENT_ID
+  - name: HARDSHIP_API_OAUTH_CLIENT_SECRET
+    valueFrom:
+        secretKeyRef:
+            name: hardship-api-oauth-client-secret
+            key: HARDSHIP_API_OAUTH_CLIENT_SECRET
 {{- end -}}

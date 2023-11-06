@@ -16,7 +16,8 @@ import uk.gov.justice.laa.maat.orchestration.annotation.DefaultHTTPErrorResponse
 import uk.gov.justice.laa.maat.orchestration.dto.ApplicationDTO;
 import uk.gov.justice.laa.maat.orchestration.dto.GetHardshipDTO;
 import uk.gov.justice.laa.maat.orchestration.dto.HardshipReviewDTO;
-import uk.gov.justice.laa.maat.orchestration.dto.UserDTO;
+import uk.gov.justice.laa.maat.orchestration.mapper.HardshipReviewMapper;
+import uk.gov.justice.laa.maat.orchestration.service.HardshipService;
 
 import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_ID;
 
@@ -26,6 +27,9 @@ import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_
 @RequestMapping("api/internal/v1/orchestration/hardship")
 @Tag(name = "Crime Hardship Orchestration", description = "Rest API for orchestration MAAT Hardship flows.")
 public class HardshipOrchestrationController {
+
+    private final HardshipService hardshipService;
+    private final HardshipReviewMapper hardshipReviewMapper;
 
     @PostMapping(value = "/get-summary", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Find Hardship review")
@@ -39,7 +43,10 @@ public class HardshipOrchestrationController {
             @Valid @RequestBody GetHardshipDTO getHardshipDTO,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
         log.info("Received request to find hardship with transaction id - " + laaTransactionId);
-        return ResponseEntity.ok(HardshipReviewDTO.builder().build());
+        Integer hardshipAssessmentId = getHardshipDTO.getHardshipAssessmentId();
+        HardshipReviewDTO hardshipReviewDTO = HardshipReviewDTO.builder().id(hardshipAssessmentId.longValue()).build();
+        hardshipReviewMapper.toDto(hardshipService.getHardship(hardshipAssessmentId), hardshipReviewDTO);
+        return ResponseEntity.ok(hardshipReviewDTO);
     }
 
 

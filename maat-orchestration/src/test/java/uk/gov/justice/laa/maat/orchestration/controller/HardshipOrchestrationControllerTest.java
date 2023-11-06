@@ -5,14 +5,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.justice.laa.maat.orchestration.config.OrchestrationTestConfiguration;
+import uk.gov.justice.laa.maat.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.maat.orchestration.dto.ApplicationDTO;
 import uk.gov.justice.laa.maat.orchestration.dto.AssessmentDTO;
-import uk.gov.justice.laa.maat.orchestration.dto.GetHardshipDTO;
+import uk.gov.justice.laa.maat.orchestration.mapper.HardshipReviewMapper;
+import uk.gov.justice.laa.maat.orchestration.service.HardshipService;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -31,9 +34,15 @@ class HardshipOrchestrationControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockBean
+    private HardshipService hardshipService;
+
+    @MockBean
+    private HardshipReviewMapper hardshipReviewMapper;
+
     @Test
     void givenValidRequest_whenFindIsInvoked_thenOkResponseIsReturned() throws Exception {
-        String requestBody = objectMapper.writeValueAsString(GetHardshipDTO.builder().build());
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.getHardshipDTO());
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL + "/get-summary"))
                 .andExpect(status().isOk())
@@ -49,7 +58,7 @@ class HardshipOrchestrationControllerTest {
     @Test
     void givenValidRequest_whenCreateIsInvoked_thenOkResponseIsReturned() throws Exception {
         String requestBody = objectMapper.writeValueAsString(ApplicationDTO.builder()
-                        .assessmentDTO(AssessmentDTO.builder().build())
+                .assessmentDTO(AssessmentDTO.builder().build())
 
                 .build());
 

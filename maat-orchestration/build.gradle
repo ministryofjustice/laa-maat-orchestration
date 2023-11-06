@@ -5,7 +5,7 @@ plugins {
 	id "jacoco"
 	id "org.sonarqube" version "4.4.1.3373"
 	id "info.solidsoft.pitest" version "1.15.0"
-	id "org.springframework.boot" version "3.1.5"
+	id "org.springframework.boot" version "3.1.2"
 	id "org.jsonschema2dataclass" version "6.0.0"
 }
 
@@ -39,7 +39,6 @@ dependencies {
 
 	implementation platform("io.sentry:sentry-bom:$versions.sentryVersion")
 	implementation platform(SpringBootPlugin.BOM_COORDINATES)
-	testImplementation 'org.projectlombok:lombok:1.18.26'
 	annotationProcessor platform(SpringBootPlugin.BOM_COORDINATES)
 
 	implementation "io.sentry:sentry-logback"
@@ -125,5 +124,19 @@ sonar {
 		property "sonar.projectName", "Crime Apps :: maat-orchestration"
 		property "sonar.pitest.mode", "reuseReport"
 		property "sonar.pitest.reportsDirectory", "build/reports/pitest"
+	}
+}
+
+jsonSchema2Pojo {
+	executions {
+		main {
+			methods.builders = true
+			methods.buildersDynamic = true
+			methods.annotateJsr303Jakarta = true
+			fields.floatUseBigDecimal = true
+			dateTime.dateTimeType = "java.time.LocalDateTime"
+			klass.targetPackage = "uk.gov.justice.laa.maat.orchestration.model"
+			io.source.setFrom files("${project.rootDir}/src/main/resources/schemas")
+		}
 	}
 }
