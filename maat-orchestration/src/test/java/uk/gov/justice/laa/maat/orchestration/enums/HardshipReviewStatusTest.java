@@ -28,6 +28,7 @@ class HardshipReviewStatusTest {
     void givenValidInput_ValidateEnumValues() {
         assertThat("COMPLETE").isEqualTo(HardshipReviewStatus.COMPLETE.getStatus());
         assertThat("Incomplete").isEqualTo(HardshipReviewStatus.IN_PROGRESS.getDescription());
+        assertThat("COMPLETE").isEqualTo(HardshipReviewStatus.COMPLETE.getValue());
     }
 
 }
