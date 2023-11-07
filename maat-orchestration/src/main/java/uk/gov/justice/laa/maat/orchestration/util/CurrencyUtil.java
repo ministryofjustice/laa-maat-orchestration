@@ -6,6 +6,9 @@ import uk.gov.justice.laa.maat.orchestration.dto.SysGenCurrency;
 import java.math.BigDecimal;
 
 public class CurrencyUtil {
+
+    private CurrencyUtil() {}
+
     public static Currency toCurrency(BigDecimal input) {
         return (input != null) ? new Currency(input.doubleValue()) : null;
     }

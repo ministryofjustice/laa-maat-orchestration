@@ -22,6 +22,7 @@ public class HardshipReviewMapper implements ResponseMapper<ApiFindHardshipRespo
 
     @Override
     public void toDto(ApiFindHardshipResponse model, HardshipReviewDTO reviewDTO) {
+        reviewDTO.setId(model.getId().longValue());
         reviewDTO.setReviewResult(model.getReviewResult().toString());
         reviewDTO.setCmuId(model.getCmuId().longValue());
         reviewDTO.setNotes(model.getNotes());

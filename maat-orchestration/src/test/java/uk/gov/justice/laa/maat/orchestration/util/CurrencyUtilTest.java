@@ -1,7 +1,10 @@
 package uk.gov.justice.laa.maat.orchestration.util;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -25,5 +28,12 @@ class CurrencyUtilTest {
     @Test
     void givenAValidInput_whenToSysGenCurrencyIsInvoked_ValidCurrencyIsReturned() {
         assertThat(CurrencyUtil.toSysGenCurrency(BigDecimal.ONE)).isNotNull();
+    }
+
+    @Test
+    void testCurrencyUtilConstructorIsPrivate() throws NoSuchMethodException {
+        Assertions.assertThat(CurrencyUtil.class.getDeclaredConstructors()).hasSize(1);
+        Constructor<CurrencyUtil> constructor = CurrencyUtil.class.getDeclaredConstructor();
+        Assertions.assertThat(Modifier.isPrivate(constructor.getModifiers())).isTrue();
     }
 }
