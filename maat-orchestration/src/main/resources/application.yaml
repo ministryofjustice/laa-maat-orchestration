@@ -20,10 +20,15 @@ spring:
     oauth2:
       client:
         provider:
-          hareship-api:
+          hardship:
             token-uri: ${HARDSHIP_API_OAUTH_URL}
           ccc:
             token-uri: ${CCC_API_OAUTH_URL}
+        registration:
+          hardship:
+            client-id: ${HARDSHIP_API_OAUTH_CLIENT_ID}
+            client-secret: ${HARDSHIP_API_OAUTH_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
       resource-server:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI}
