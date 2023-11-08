@@ -135,7 +135,7 @@ jsonSchema2Pojo {
 			methods.annotateJsr303Jakarta = true
 			fields.floatUseBigDecimal = true
 			dateTime.dateTimeType = "java.time.LocalDateTime"
-			klass.targetPackage = "uk.gov.justice.laa.maat.orchestration.model"
+			klass.targetPackage = "uk.gov.justice.laa.crime.orchestration.model"
 			io.source.setFrom files("${project.rootDir}/src/main/resources/schemas")
 		}
 	}

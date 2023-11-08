@@ -29,7 +29,7 @@
     "reviewResult": {
       "type": "object",
       "description": "The review result",
-      "existingJavaType": "uk.gov.justice.laa.maat.orchestration.enums.HardshipReviewResult"
+      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewResult"
     },
     "disposableIncome": {
       "type": "number",
@@ -42,7 +42,7 @@
     "newWorkReason": {
       "type": "object",
       "description": "The new work reason code",
-      "existingJavaType": "uk.gov.justice.laa.maat.orchestration.enums.NewWorkReason"
+      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.NewWorkReason"
     },
     "solicitorCosts": {
       "type": "object",
@@ -52,7 +52,7 @@
     "status": {
       "type": "object",
       "description": "The review status",
-      "existingJavaType": "uk.gov.justice.laa.maat.orchestration.enums.HardshipReviewStatus"
+      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewStatus"
     },
     "reviewDetails": {
       "type": "array",

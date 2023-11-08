@@ -27,12 +27,12 @@
     "progressAction": {
       "type": "object",
       "description": "The hardship review progress action codes",
-      "existingJavaType": "uk.gov.justice.laa.maat.orchestration.enums.HardshipReviewProgressAction"
+      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewProgressAction"
     },
     "progressResponse": {
       "type": "object",
       "description": "The hardship review progress response codes",
-      "existingJavaType": "uk.gov.justice.laa.maat.orchestration.enums.HardshipReviewProgressResponse"
+      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewProgressResponse"
     },
     "removedDate": {
       "type": "string",
