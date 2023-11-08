@@ -17,12 +17,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class HardshipServiceTest {
+class HardshipApiServiceTest {
 
     @Mock
     private RestAPIClient hardshipApiClient;
     @InjectMocks
-    private HardshipService hardshipService;
+    private HardshipApiService hardshipApiService;
 
     @Spy
     private ServicesConfiguration configuration = MockServicesConfiguration.getConfiguration(1000);
@@ -32,7 +32,7 @@ class HardshipServiceTest {
         ApiFindHardshipResponse expected = new ApiFindHardshipResponse();
         when(hardshipApiClient.get(any(), anyString(), anyInt())).thenReturn(expected);
 
-        hardshipService.getHardship(TestModelDataBuilder.HARDSHIP_ID);
+        hardshipApiService.getHardship(TestModelDataBuilder.HARDSHIP_ID);
         verify(hardshipApiClient).get(any(), anyString(), anyInt());
     }
 }

@@ -12,7 +12,7 @@ import uk.gov.justice.laa.maat.orchestration.model.ApiFindHardshipResponse;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class HardshipService {
+public class HardshipApiService {
 
     @Qualifier("hardshipApiClient")
     private final RestAPIClient hardshipApiClient;

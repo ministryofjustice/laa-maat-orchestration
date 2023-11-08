@@ -16,7 +16,7 @@ import uk.gov.justice.laa.maat.orchestration.annotation.DefaultHTTPErrorResponse
 import uk.gov.justice.laa.maat.orchestration.dto.ApplicationDTO;
 import uk.gov.justice.laa.maat.orchestration.dto.HardshipReviewDTO;
 import uk.gov.justice.laa.maat.orchestration.mapper.HardshipReviewMapper;
-import uk.gov.justice.laa.maat.orchestration.service.HardshipService;
+import uk.gov.justice.laa.maat.orchestration.service.HardshipApiService;
 
 import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_ID;
 
@@ -25,9 +25,9 @@ import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_
 @RequiredArgsConstructor
 @RequestMapping("api/internal/v1/orchestration/hardship")
 @Tag(name = "Crime Hardship Orchestration", description = "Rest API for orchestration MAAT Hardship flows.")
-public class HardshipOrchestrationController {
+public class HardshipController {
 
-    private final HardshipService hardshipService;
+    private final HardshipApiService hardshipApiService;
     private final HardshipReviewMapper hardshipReviewMapper;
 
     @GetMapping(value = "/{hardshipReviewId}", produces = MediaType.APPLICATION_JSON_VALUE)

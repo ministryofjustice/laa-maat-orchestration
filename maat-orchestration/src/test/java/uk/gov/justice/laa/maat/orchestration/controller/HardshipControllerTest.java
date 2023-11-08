@@ -15,17 +15,17 @@ import uk.gov.justice.laa.maat.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.maat.orchestration.dto.ApplicationDTO;
 import uk.gov.justice.laa.maat.orchestration.dto.AssessmentDTO;
 import uk.gov.justice.laa.maat.orchestration.mapper.HardshipReviewMapper;
-import uk.gov.justice.laa.maat.orchestration.service.HardshipService;
+import uk.gov.justice.laa.maat.orchestration.service.HardshipApiService;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.justice.laa.maat.orchestration.util.RequestBuilderUtils.buildRequest;
 import static uk.gov.justice.laa.maat.orchestration.util.RequestBuilderUtils.buildRequestGivenContent;
 
-@WebMvcTest(HardshipOrchestrationController.class)
+@WebMvcTest(HardshipController.class)
 @Import(OrchestrationTestConfiguration.class)
 @AutoConfigureMockMvc(addFilters = false)
-class HardshipOrchestrationControllerTest {
+class HardshipControllerTest {
 
     private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/hardship";
 
@@ -36,7 +36,7 @@ class HardshipOrchestrationControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private HardshipService hardshipService;
+    private HardshipApiService hardshipApiService;
 
     @MockBean
     private HardshipReviewMapper hardshipReviewMapper;
