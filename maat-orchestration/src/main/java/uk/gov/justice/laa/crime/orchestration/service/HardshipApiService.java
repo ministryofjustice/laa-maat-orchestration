@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.model.ApiFindHardshipResponse;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
+
+import java.util.Collections;
 
 @Slf4j
 @Service
@@ -25,6 +29,19 @@ public class HardshipApiService {
                 },
                 configuration.getHardshipApi().getHardshipEndpoints().getFindUrl(),
                 hardshipReviewId
+        );
+
+        log.info(String.format(RESPONSE_STRING, response));
+        return response;
+    }
+
+    public ApiPerformHardshipResponse create(ApiPerformHardshipRequest request) {
+        ApiPerformHardshipResponse response = hardshipApiClient.post(
+                request,
+                new ParameterizedTypeReference<>() {
+                },
+                configuration.getHardshipApi().getHardshipEndpoints().getCreateUrl(),
+                Collections.emptyMap()
         );
 
         log.info(String.format(RESPONSE_STRING, response));
