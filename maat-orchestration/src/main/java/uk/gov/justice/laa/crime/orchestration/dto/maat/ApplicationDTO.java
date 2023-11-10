@@ -30,6 +30,7 @@ public class ApplicationDTO extends GenericDTO {
     private Date dateStamp;
     private Date hearingDate;
     private AssessmentDTO assessmentDTO;
+    private CaseDetailDTO caseDetailsDTO;
     private CaseManagementUnitDTO caseManagementUnitDTO;
     private CrownCourtOverviewDTO crownCourtOverviewDTO;
     private MagsCourtDTO magsCourtDTO;
