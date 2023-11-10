@@ -24,10 +24,38 @@ spring:
             token-uri: ${HARDSHIP_API_OAUTH_URL}
           ccc:
             token-uri: ${CCC_API_OAUTH_URL}
+          ccp:
+            token-uri: ${CCP_API_OAUTH_URL}
+          cma:
+            token-uri: ${CMA_API_OAUTH_URL}
+          validation:
+            token-uri: ${VALIDATION_API_OAUTH_URL}
+          maat:
+            token-uri: ${MAAT_API_OAUTH_URL}
         registration:
           hardship:
             client-id: ${HARDSHIP_API_OAUTH_CLIENT_ID}
             client-secret: ${HARDSHIP_API_OAUTH_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+          ccc:
+            client-id: ${CCC_API_OAUTH_CLIENT_ID}
+            client-secret: ${CCC_API_OAUTH_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+          ccp:
+            client-id: ${CCP_API_OAUTH_CLIENT_ID}
+            client-secret: ${CCP_API_OAUTH_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+          cma:
+            client-id: ${CMA_API_OAUTH_CLIENT_ID}
+            client-secret: ${CMA_API_OAUTH_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+          validation:
+            client-id: ${VALIDATION_API_OAUTH_CLIENT_ID}
+            client-secret: ${VALIDATION_API_OAUTH_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+          maat:
+            client-id: ${MAAT_API_OAUTH_CLIENT_ID}
+            client-secret: ${MAAT_API_OAUTH_CLIENT_SECRET}
             authorization-grant-type: client_credentials
       resource-server:
         jwt:
@@ -41,11 +69,19 @@ services:
       create-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/
       update-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/
       rollback-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/rollback
-  contribution-api:
-    base-url: ${CONTRIBUTION_API_BASE_URL}
+  ccc-api:
+    base-url: ${CCC_API_BASE_URL}
     contribution-endpoints:
-      calculate-contribution-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/calculate-contribution
-      request-transfer-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/request-transfer
+      calculate-contribution-url: ${services.ccc-api.base-url}/api/internal/v1/contribution/calculate-contribution
+      request-transfer-url: ${services.ccc-api.base-url}/api/internal/v1/contribution/request-transfer
+  ccp-api:
+    base-url: ${CCP_API_BASE_URL}
+  cma-api:
+    base-url: ${CMA_API_BASE_URL}
+  validation-api:
+    base-url: ${VALIDATION_API_BASE_URL}
+  maat-api:
+    base-url: ${MAAT_API_BASE_URL}
 
 retry-config:
   max-retries: 3
