@@ -7,6 +7,7 @@ import uk.gov.justice.laa.crime.orchestration.model.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.model.ApiHardshipDetail;
 import uk.gov.justice.laa.crime.orchestration.model.ApiHardshipProgress;
 import uk.gov.justice.laa.crime.orchestration.model.SolicitorCosts;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,8 @@ import static uk.gov.justice.laa.crime.orchestration.util.CurrencyUtil.toSysGenC
 import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toDate;
 
 @Component
-public class HardshipMapper implements ResponseMapper<ApiFindHardshipResponse, HardshipReviewDTO> {
+public class HardshipMapper implements RequestMapper<ApiPerformHardshipRequest, HardshipReviewDTO>,
+        ResponseMapper<ApiFindHardshipResponse, HardshipReviewDTO> {
 
     @Override
     public void toDto(ApiFindHardshipResponse model, HardshipReviewDTO reviewDTO) {
@@ -42,23 +44,36 @@ public class HardshipMapper implements ResponseMapper<ApiFindHardshipResponse, H
         List<HRSectionDTO> hrSectionDTOList = new ArrayList<>();
         reviewDetails.stream()
                 .collect(groupingBy(ApiHardshipDetail::getDetailType))
-                .forEach((type, details) -> hrSectionDTOList.add(HRSectionDTO.builder()
-                        .detailType(getHRDetailType(type))
-                        .detail(details.stream()
-                                .map(apiHardshipDetail -> HRDetailDTO.builder()
-                                        .dateDue(toDate(apiHardshipDetail.getDateDue()))
-                                        .id(apiHardshipDetail.getId().longValue())
-                                        .accepted("Y".equals(apiHardshipDetail.getAccepted()))
-                                        .amountNumber(toCurrency(apiHardshipDetail.getAmount()))
+                .forEach((type, details) -> hrSectionDTOList.add(
+                        HRSectionDTO.builder()
+                                .detailType(getHRDetailType(type))
+                                .detail(details.stream()
+                                                .map(apiHardshipDetail -> HRDetailDTO.builder()
+                                                        .dateDue(
+                                                                toDate(apiHardshipDetail.getDateDue()))
+                                                        .id(apiHardshipDetail.getId()
+                                                                    .longValue())
+                                                        .accepted("Y".equals(
+                                                                apiHardshipDetail.getAccepted()))
+                                                        .amountNumber(
+                                                                toCurrency(
+                                                                        apiHardshipDetail.getAmount()))
 //                                .dateReceived(item.get)
-                                        .hrReasonNote(apiHardshipDetail.getReasonNote())
-                                        .otherDescription(apiHardshipDetail.getOtherDescription())
-                                        .detailDescription(getHRDetailDescriptionDTO(apiHardshipDetail.getDetailCode()))
-                                        .frequency(getFrequencyDTO(apiHardshipDetail.getFrequency()))
-                                        .reason(getHRReasonDTO(apiHardshipDetail.getDetailReason()))
-                                        .build())
-                                .collect(Collectors.toList()))
-                        .build()));
+                                                        .hrReasonNote(
+                                                                apiHardshipDetail.getReasonNote())
+                                                        .otherDescription(
+                                                                apiHardshipDetail.getOtherDescription())
+                                                        .detailDescription(
+                                                                getHRDetailDescriptionDTO(
+                                                                        apiHardshipDetail.getDetailCode()))
+                                                        .frequency(
+                                                                getFrequencyDTO(
+                                                                        apiHardshipDetail.getFrequency()))
+                                                        .reason(getHRReasonDTO(
+                                                                apiHardshipDetail.getDetailReason()))
+                                                        .build())
+                                                .collect(Collectors.toList()))
+                                .build()));
         return hrSectionDTOList;
     }
 
@@ -146,5 +161,10 @@ public class HardshipMapper implements ResponseMapper<ApiFindHardshipResponse, H
                 .solicitorEstimatedTotalCost(toCurrency(solicitorCosts.getEstimatedTotal()))
                 .solicitorVat(toCurrency(solicitorCosts.getVat()))
                 .build();
+    }
+
+    @Override
+    public ApiPerformHardshipRequest fromDto(HardshipReviewDTO dto) {
+        return null;
     }
 }
