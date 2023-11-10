@@ -20,8 +20,22 @@ env:
     value: {{ .Values.hardshipApi.baseUrl }}
   - name: HARDSHIP_API_OAUTH_URL
     value: {{ .Values.hardshipApi.oauthUrl }}
-  - name: CONTRIBUTION_API_BASE_URL
-    value: {{ .Values.contributionApi.baseUrl }}
+  - name: CCC_API_BASE_URL
+    value: {{ .Values.cccApi.baseUrl }}
+  - name: CCC_API_OAUTH_URL
+    value: {{ .Values.cccApi.oauthUrl }}
+  - name: CCP_API_BASE_URL
+    value: {{ .Values.ccpApi.baseUrl }}
+  - name: CCP_API_OAUTH_URL
+    value: {{ .Values.ccpApi.oauthUrl }}
+  - name: CMA_API_BASE_URL
+    value: {{ .Values.cmaApi.baseUrl }}
+  - name: CMA_API_OAUTH_URL
+    value: {{ .Values.cmaApi.oauthUrl }}
+  - name: VALIDATION_API_BASE_URL
+    value: {{ .Values.validationApi.baseUrl }}
+  - name: VALIDATION_API_OAUTH_URL
+    value: {{ .Values.validationApi.oauthUrl }}
   - name: JWT_ISSUER_URI
     value: {{ .Values.jwt.issuerUri }}
   - name: HARDSHIP_API_OAUTH_CLIENT_ID
@@ -34,4 +48,54 @@ env:
         secretKeyRef:
             name: hardship-api-oauth-client-secret
             key: HARDSHIP_API_OAUTH_CLIENT_SECRET
+  - name: CCC_API_OAUTH_CLIENT_ID
+    valueFrom:
+        secretKeyRef:
+            name: ccc-api-oauth-client-id
+            key: CCC_API_OAUTH_CLIENT_ID
+  - name: CCC_API_OAUTH_CLIENT_SECRET
+    valueFrom:
+        secretKeyRef:
+            name: ccc-api-oauth-client-secret
+            key: CCC_API_OAUTH_CLIENT_SECRET
+  - name: CCP_API_OAUTH_CLIENT_ID
+    valueFrom:
+        secretKeyRef:
+            name: ccp-api-oauth-client-id
+            key: CCP_API_OAUTH_CLIENT_ID
+  - name: CCP_API_OAUTH_CLIENT_SECRET
+    valueFrom:
+        secretKeyRef:
+            name: ccp-api-oauth-client-secret
+            key: CCP_API_OAUTH_CLIENT_SECRET
+  - name: CMA_API_OAUTH_CLIENT_ID
+    valueFrom:
+        secretKeyRef:
+            name: cma-api-oauth-client-id
+            key: CMA_API_OAUTH_CLIENT_ID
+  - name: CMA_API_OAUTH_CLIENT_SECRET
+    valueFrom:
+        secretKeyRef:
+            name: cma-api-oauth-client-secret
+            key: CMA_API_OAUTH_CLIENT_SECRET
+  - name: VALIDATION_API_OAUTH_CLIENT_ID
+    valueFrom:
+        secretKeyRef:
+            name: validation-api-oauth-client-id
+            key: VALIDATION_API_OAUTH_CLIENT_ID
+  - name: VALIDATION_API_OAUTH_CLIENT_SECRET
+    valueFrom:
+        secretKeyRef:
+            name: validation-api-oauth-client-secret
+            key: VALIDATION_API_OAUTH_CLIENT_SECRET
+  - name: MAAT_API_OAUTH_CLIENT_ID
+    valueFrom:
+        secretKeyRef:
+            name: maat-api-oauth-client-id
+            key: MAAT_API_OAUTH_CLIENT_ID
+  - name: MAAT_API_OAUTH_CLIENT_SECRET
+    valueFrom:
+        secretKeyRef:
+            name: maat-api-oauth-client-secret
+            key: MAAT_API_OAUTH_CLIENT_SECRET
 {{- end -}}
