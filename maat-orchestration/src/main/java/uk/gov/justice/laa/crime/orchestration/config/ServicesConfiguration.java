@@ -21,6 +21,9 @@ public class ServicesConfiguration {
     @NotNull
     private ContributionApi contributionApi;
 
+    @NotNull
+    private CrownCourtApi crownCourtApi;
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -69,6 +72,27 @@ public class ServicesConfiguration {
 
             @NotNull
             private String requestTransferUrl;
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CrownCourtApi {
+        @NotNull
+        private String baseUrl;
+
+        @NotNull
+        private CrownCourtEndpoints crownCourtEndpoints;
+
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class CrownCourtEndpoints {
+
+            @NotNull
+            private String updateUrl;
+
         }
     }
 }
