@@ -10,7 +10,7 @@
       "description": "The solicitors hourly rate"
     },
     "hours": {
-      "type": "integer",
+      "type": "number",
       "description": "The number of billable hours"
     },
     "vat": {
