@@ -7,10 +7,11 @@ import java.math.BigDecimal;
 
 public class CurrencyUtil {
 
-    private CurrencyUtil() {}
+    private CurrencyUtil() {
+    }
 
     public static Currency toCurrency(BigDecimal input) {
-        return (input != null) ? new Currency(input.doubleValue()) : null;
+        return (input != null) ? (Currency) input : null;
     }
 
     public static Double toDouble(Integer input) {
@@ -18,6 +19,6 @@ public class CurrencyUtil {
     }
 
     public static SysGenCurrency toSysGenCurrency(BigDecimal input) {
-        return (input != null) ? new SysGenCurrency(input.doubleValue()) : null;
+        return (input != null) ? (SysGenCurrency) input : null;
     }
 }
