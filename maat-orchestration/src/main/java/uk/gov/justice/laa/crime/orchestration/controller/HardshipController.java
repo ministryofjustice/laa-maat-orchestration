@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.crime.orchestration.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
-import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
+import uk.gov.justice.laa.crime.orchestration.mapper.FindHardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.service.HardshipApiService;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.GetHardshipDTO;
 
@@ -29,7 +29,7 @@ import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_
 public class HardshipController {
 
     private final HardshipApiService hardshipApiService;
-    private final HardshipMapper hardshipMapper;
+    private final FindHardshipMapper hardshipMapper;
 
     @GetMapping(value = "/{hardshipReviewId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Find Hardship review")

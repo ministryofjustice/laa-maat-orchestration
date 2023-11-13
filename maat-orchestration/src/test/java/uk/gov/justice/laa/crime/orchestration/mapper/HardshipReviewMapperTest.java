@@ -17,7 +17,7 @@ import static uk.gov.justice.laa.maat.orchestration.data.builder.TestModelDataBu
 @ExtendWith(SoftAssertionsExtension.class)
 class HardshipReviewMapperTest {
 
-    HardshipMapper mapper = new HardshipMapper();
+    FindHardshipMapper mapper = new FindHardshipMapper();
 
     @InjectSoftAssertions
     private SoftAssertions softly;

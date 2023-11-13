@@ -7,7 +7,6 @@ import uk.gov.justice.laa.crime.orchestration.model.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.model.ApiHardshipDetail;
 import uk.gov.justice.laa.crime.orchestration.model.ApiHardshipProgress;
 import uk.gov.justice.laa.crime.orchestration.model.SolicitorCosts;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +18,7 @@ import static uk.gov.justice.laa.crime.orchestration.util.CurrencyUtil.toSysGenC
 import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toDate;
 
 @Component
-public class HardshipMapper implements RequestMapper<ApiPerformHardshipRequest, HardshipReviewDTO>,
-        ResponseMapper<ApiFindHardshipResponse, HardshipReviewDTO> {
+public class FindHardshipMapper implements ResponseMapper<ApiFindHardshipResponse, HardshipReviewDTO> {
 
     @Override
     public void toDto(ApiFindHardshipResponse model, HardshipReviewDTO reviewDTO) {
@@ -37,7 +35,6 @@ public class HardshipMapper implements RequestMapper<ApiPerformHardshipRequest, 
         reviewDTO.setAsessmentStatus(getAssessmentStatusDTO(model.getStatus()));
         reviewDTO.setProgress(getProgressDTO(model.getReviewProgressItems()));
         reviewDTO.setSection(getSectionDTO(model.getReviewDetails()));
-//        reviewDTO.setSupplier(model.gets);
     }
 
     private List<HRSectionDTO> getSectionDTO(List<ApiHardshipDetail> reviewDetails) {
@@ -161,10 +158,5 @@ public class HardshipMapper implements RequestMapper<ApiPerformHardshipRequest, 
                 .solicitorEstimatedTotalCost(toCurrency(solicitorCosts.getEstimatedTotal()))
                 .solicitorVat(toCurrency(solicitorCosts.getVat()))
                 .build();
-    }
-
-    @Override
-    public ApiPerformHardshipRequest fromDto(HardshipReviewDTO dto) {
-        return null;
     }
 }

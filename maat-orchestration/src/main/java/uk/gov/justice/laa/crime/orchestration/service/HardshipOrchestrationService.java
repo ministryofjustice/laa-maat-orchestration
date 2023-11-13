@@ -27,7 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HardshipOrchestrationService implements AssessmentOrchestrator<HardshipReviewDTO> {
 
-    private final HardshipMapper hardshipMapper;
+    private final FindHardshipMapper hardshipMapper;
     private final CrownCourtMapper crownCourtMapper;
     private final ContributionMapper contributionMapper;
 
