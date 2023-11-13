@@ -22,4 +22,11 @@ public class DateUtil {
         }
     }
 
+    public static LocalDateTime toLocalDateTime(Date date) {
+        if (date != null) {
+            return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        }
+        return null;
+    }
+
 }
