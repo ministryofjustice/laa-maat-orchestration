@@ -4,14 +4,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
 
 import java.util.Collection;
 import java.util.Date;
 
 @Data
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ApplicationDTO extends GenericDTO {
     private Long repId;
     private Long areaId;
@@ -55,5 +56,7 @@ public class ApplicationDTO extends GenericDTO {
     private boolean messageDisplayed;
     private String alertMessage;
     private Long usn;
+    // New field required for Hardships, not expected to be passed in requests
+    private CourtType courtType;
 
 }
