@@ -10,8 +10,8 @@ import java.util.Date;
 
 @Data
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class UserDTO extends GenericDTO {
 
     private String userName;

@@ -3,16 +3,14 @@ package uk.gov.justice.laa.crime.orchestration.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipOverviewDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.CaseType;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.orchestration.mapper.ContributionMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.CrownCourtMapper;
-import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
+import uk.gov.justice.laa.crime.orchestration.mapper.FindHardshipMapper;
+import uk.gov.justice.laa.crime.orchestration.mapper.PerformHardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.model.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
@@ -27,9 +25,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HardshipOrchestrationService implements AssessmentOrchestrator<HardshipReviewDTO> {
 
-    private final FindHardshipMapper hardshipMapper;
     private final CrownCourtMapper crownCourtMapper;
     private final ContributionMapper contributionMapper;
+    private final FindHardshipMapper findHardshipMapper;
+    private final PerformHardshipMapper performHardshipMapper;
 
     private final HardshipApiService hardshipApiService;
     private final CrownCourtApiService crownCourtApiService;
@@ -47,28 +46,24 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         return null;
     }
 
-    public ApplicationDTO create(ApplicationDTO application) {
-        HardshipReviewDTO current;
+    public ApplicationDTO create(WorkflowRequestDTO workflowRequest) {
+        ApplicationDTO application = workflowRequest.getApplicationDTO();
         CourtType courtType = isCrownCourt(application) ? CourtType.CROWN_COURT : CourtType.MAGISTRATE;
+        // Set the courtType, as this will be needed in the mapping logic
+        application.setCourtType(courtType);
         HardshipOverviewDTO hardshipOverview =
                 application.getAssessmentDTO()
                         .getFinancialAssessmentDTO()
                         .getHardship();
-        if (courtType == CourtType.MAGISTRATE) {
-            current = hardshipOverview.getMagCourtHardship();
-        } else {
-            current = hardshipOverview.getCrownCourtHardship();
-        }
-        ApiPerformHardshipRequest createRequest = hardshipMapper.fromDto(current);
 
-        createRequest.getHardship().setCourtType(courtType);
+        ApiPerformHardshipRequest createRequest = performHardshipMapper.fromDto(workflowRequest);
         ApiPerformHardshipResponse response = hardshipApiService.create(createRequest);
 
         // Need to refresh from DB as HardshipDetail ids may have changed
-        // This is not captured in the response from the Hardship service, as it has its own schema
+        // This information is not currently captured in the response from the Hardship service
         ApiFindHardshipResponse hardship = hardshipApiService.getHardship(response.getHardshipReviewId());
         HardshipReviewDTO newHardship = new HardshipReviewDTO();
-        hardshipMapper.toDto(hardship, newHardship);
+        findHardshipMapper.toDto(hardship, newHardship);
 
         if (courtType == CourtType.MAGISTRATE) {
             hardshipOverview.setMagCourtHardship(newHardship);
@@ -92,7 +87,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             // TODO: Call crown_court.xx_process_activity_and_get_correspondence stored procedure
         }
 
-        // Update assessment summary - displayed on the application tab
+        // Update assessment summary view - displayed on the application tab
         AssessmentSummaryDTO hardshipSummary = AssessmentSummaryDTO.builder()
                 .id(newHardship.getId())
                 .status(newHardship.getAsessmentStatus().getStatus())
@@ -111,9 +106,9 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
 
     }
 
-    public ApplicationDTO update(ApplicationDTO application) {
+    public ApplicationDTO update(WorkflowRequestDTO workflowRequest) {
 
-        return application;
+        return workflowRequest.getApplicationDTO();
     }
 
     private void calculateContribution(ApplicationDTO application) {

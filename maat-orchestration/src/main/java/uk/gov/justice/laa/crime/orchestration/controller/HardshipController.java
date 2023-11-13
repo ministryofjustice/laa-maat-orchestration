@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.crime.orchestration.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.WorkflowRequestDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.FindHardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.service.HardshipApiService;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.GetHardshipDTO;
@@ -58,10 +59,10 @@ public class HardshipController {
     )
     @DefaultHTTPErrorResponse
     public ResponseEntity<ApplicationDTO> create(
-            @Valid @RequestBody ApplicationDTO applicationDTO,
+            @Valid @RequestBody WorkflowRequestDTO workflowRequest,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
         log.info("Received request to create hardship with transaction id - " + laaTransactionId);
-        return ResponseEntity.ok(applicationDTO);
+        return ResponseEntity.ok(workflowRequest.getApplicationDTO());
     }
 
 
@@ -74,10 +75,10 @@ public class HardshipController {
     )
     @DefaultHTTPErrorResponse
     public ResponseEntity<ApplicationDTO> update(
-            @Valid @RequestBody ApplicationDTO applicationDTO,
+            @Valid @RequestBody WorkflowRequestDTO workflowRequest,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
         log.info("Received request to update hardship with transaction id - " + laaTransactionId);
-        return ResponseEntity.ok(applicationDTO);
+        return ResponseEntity.ok(workflowRequest.getApplicationDTO());
     }
 
 }
