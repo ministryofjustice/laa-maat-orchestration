@@ -67,8 +67,6 @@ public class HardshipReviewMapper implements ResponseMapper<ApiFindHardshipRespo
         if (detailReason != null) {
             return HRReasonDTO.builder()
                     .reason(detailReason.getReason())
-//                .id(detailReason.get)
-//                .accepted(detailReason.)
                     .build();
         }
         return null;
