@@ -13,6 +13,10 @@ public class CurrencyUtil {
         return (input != null) ? new Currency(input.doubleValue()) : null;
     }
 
+    public static Double toDouble(Integer input) {
+        return (input != null) ? input.doubleValue() : null;
+    }
+
     public static SysGenCurrency toSysGenCurrency(BigDecimal input) {
         return (input != null) ? new SysGenCurrency(input.doubleValue()) : null;
     }

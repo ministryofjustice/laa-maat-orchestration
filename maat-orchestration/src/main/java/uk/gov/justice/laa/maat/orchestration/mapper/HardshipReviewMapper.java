@@ -7,6 +7,7 @@ import uk.gov.justice.laa.maat.orchestration.model.ApiFindHardshipResponse;
 import uk.gov.justice.laa.maat.orchestration.model.ApiHardshipDetail;
 import uk.gov.justice.laa.maat.orchestration.model.ApiHardshipProgress;
 import uk.gov.justice.laa.maat.orchestration.model.SolicitorCosts;
+import uk.gov.justice.laa.maat.orchestration.util.CurrencyUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,11 +64,12 @@ public class HardshipReviewMapper implements ResponseMapper<ApiFindHardshipRespo
     }
 
     private HRReasonDTO getHRReasonDTO(HardshipReviewDetailReason detailReason) {
-        return HRReasonDTO.builder()
-                .reason(detailReason.getReason())
-//                .id(detailReason.get)
-//                .accepted(detailReason.)
-                .build();
+        if (detailReason != null) {
+            return HRReasonDTO.builder()
+                    .reason(detailReason.getReason())
+                    .build();
+        }
+        return null;
     }
 
     private FrequenciesDTO getFrequencyDTO(Frequency frequency) {
@@ -135,7 +137,7 @@ public class HardshipReviewMapper implements ResponseMapper<ApiFindHardshipRespo
     private HRSolicitorsCostsDTO getSolicitorsCostsDTO(SolicitorCosts solicitorCosts) {
         return HRSolicitorsCostsDTO.builder()
                 .solicitorDisb(toCurrency(solicitorCosts.getDisbursements()))
-                .solicitorHours(solicitorCosts.getHours().doubleValue())
+                .solicitorHours(CurrencyUtil.toDouble(solicitorCosts.getHours()))
                 .solicitorRate(toCurrency(solicitorCosts.getRate()))
                 .solicitorEstimatedTotalCost(toCurrency(solicitorCosts.getEstimatedTotal()))
                 .solicitorVat(toCurrency(solicitorCosts.getVat()))

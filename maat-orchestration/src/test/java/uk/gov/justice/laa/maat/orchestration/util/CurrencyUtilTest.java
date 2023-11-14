@@ -31,6 +31,16 @@ class CurrencyUtilTest {
     }
 
     @Test
+    void givenNull_whenToDoubleIsInvoked_NullIsReturned() {
+        assertThat(CurrencyUtil.toDouble(null)).isNull();
+    }
+
+    @Test
+    void givenAValidInput_whenToDoubleIsInvoked_ValidCurrencyIsReturned() {
+        assertThat(CurrencyUtil.toDouble(1)).isNotNull();
+    }
+
+    @Test
     void testCurrencyUtilConstructorIsPrivate() throws NoSuchMethodException {
         Assertions.assertThat(CurrencyUtil.class.getDeclaredConstructors()).hasSize(1);
         Constructor<CurrencyUtil> constructor = CurrencyUtil.class.getDeclaredConstructor();
