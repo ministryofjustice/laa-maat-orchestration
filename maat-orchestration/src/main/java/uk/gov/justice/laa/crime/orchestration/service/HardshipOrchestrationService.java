@@ -7,10 +7,10 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.CaseType;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.enums.MagCourtOutcome;
-import uk.gov.justice.laa.crime.orchestration.mapper.ContributionMapper;
-import uk.gov.justice.laa.crime.orchestration.mapper.CrownCourtMapper;
+import uk.gov.justice.laa.crime.orchestration.mapper.CalculateContributionMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.FindHardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.PerformHardshipMapper;
+import uk.gov.justice.laa.crime.orchestration.mapper.UpdateCrownCourtApplicationMapper;
 import uk.gov.justice.laa.crime.orchestration.model.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
@@ -25,14 +25,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HardshipOrchestrationService implements AssessmentOrchestrator<HardshipReviewDTO> {
 
-    private final CrownCourtMapper crownCourtMapper;
-    private final ContributionMapper contributionMapper;
-    private final FindHardshipMapper findHardshipMapper;
-    private final PerformHardshipMapper performHardshipMapper;
-
     private final HardshipApiService hardshipApiService;
     private final CrownCourtApiService crownCourtApiService;
     private final ContributionApiService contributionApiService;
+
+    private final FindHardshipMapper findHardshipMapper;
+    private final PerformHardshipMapper performHardshipMapper;
+    private final CalculateContributionMapper calculateContributionMapper;
+    private final UpdateCrownCourtApplicationMapper updateCrownCourtApplicationMapper;
+
 
     public static final List<CaseType> CC_CASE_TYPES =
             List.of(CaseType.INDICTABLE, CaseType.CC_ALREADY, CaseType.APPEAL_CC, CaseType.COMMITAL);
@@ -71,15 +72,16 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             boolean isVariationRequired = false;
             // Based on calling contribution.contribution_rule_applies (in the process of being migrated to C3)
             if (isVariationRequired) {
-                calculateContribution(application);
+                calculateContribution(workflowRequest);
             }
         } else {
             hardshipOverview.setCrownCourtHardship(newHardship);
-            calculateContribution(application);
+            calculateContribution(workflowRequest);
 
             // TODO: Call application.pre_update checks stored procedure
 
-            ApiUpdateApplicationRequest apiUpdateApplicationRequest = crownCourtMapper.fromDto(application);
+            ApiUpdateApplicationRequest apiUpdateApplicationRequest =
+                    updateCrownCourtApplicationMapper.fromDto(workflowRequest);
             crownCourtApiService.update(apiUpdateApplicationRequest);
 
             // TODO: Call application.handle_eform_result stored procedure
@@ -111,11 +113,12 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         return workflowRequest.getApplicationDTO();
     }
 
-    private void calculateContribution(ApplicationDTO application) {
-        ApiMaatCalculateContributionRequest calculateContributionRequest = contributionMapper.fromDto(application);
+    private void calculateContribution(WorkflowRequestDTO workflowRequest) {
+        ApiMaatCalculateContributionRequest calculateContributionRequest =
+                calculateContributionMapper.fromDto(workflowRequest);
         ApiMaatCalculateContributionResponse calculateContributionResponse =
                 contributionApiService.calculate(calculateContributionRequest);
-        contributionMapper.toDto(calculateContributionResponse, application);
+        calculateContributionMapper.toDto(calculateContributionResponse, workflowRequest.getApplicationDTO());
     }
 
     private boolean isCrownCourt(ApplicationDTO application) {
