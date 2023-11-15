@@ -9,6 +9,7 @@ import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculat
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.LastOutcome;
 import uk.gov.justice.laa.crime.orchestration.util.DateUtil;
+import uk.gov.justice.laa.crime.orchestration.util.NumberUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -39,14 +40,14 @@ public class CalculateContributionMapper implements RequestMapper<ApiMaatCalcula
 
         return new ApiMaatCalculateContributionRequest()
                 .withUserCreated(user.getUserName())
-                .withRepId(application.getRepId().intValue())
-                .withApplId(application.getApplicantDTO().getId().intValue())
+                .withRepId(NumberUtils.toInteger(application.getRepId()))
+                .withApplId(NumberUtils.toInteger(application.getApplicantDTO().getId()))
                 .withMagCourtOutcome(MagCourtOutcome.getFrom(application.getMagsOutcomeDTO().getOutcome()))
                 .withCommittalDate(DateUtil.toLocalDateTime(application.getCommittalDate()))
                 .withCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()))
                 .withAssessments(getApiAssessments(application))
                 .withContributionCap(BigDecimal.valueOf(application.getOffenceDTO().getContributionCap()))
-                .withContributionId(contributionsDTO.getId().intValue())
+                .withContributionId(NumberUtils.toInteger(contributionsDTO.getId()))
                 .withMonthlyContributions(contributionsDTO.getMonthlyContribs())
                 .withEffectiveDate(effectiveDate)
                 .withUpfrontContributions(contributionsDTO.getUpfrontContribs())

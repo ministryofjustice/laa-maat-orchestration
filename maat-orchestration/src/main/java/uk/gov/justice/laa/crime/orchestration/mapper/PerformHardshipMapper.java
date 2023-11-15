@@ -7,6 +7,7 @@ import uk.gov.justice.laa.crime.orchestration.model.common.ApiUserSession;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
 import uk.gov.justice.laa.crime.orchestration.util.CurrencyUtil;
 import uk.gov.justice.laa.crime.orchestration.util.DateUtil;
+import uk.gov.justice.laa.crime.orchestration.util.NumberUtils;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -42,8 +43,8 @@ public class PerformHardshipMapper implements RequestMapper<ApiPerformHardshipRe
                 .withSolicitorCosts(mapSolicitorCosts(current.getSolictorsCosts()));
 
         HardshipMetadata metadata = new HardshipMetadata()
-                .withRepId(application.getRepId().intValue())
-                .withCmuId(current.getCmuId().intValue())
+                .withRepId(NumberUtils.toInteger(application.getRepId()))
+                .withCmuId(NumberUtils.toInteger(current.getCmuId()))
                 .withReviewStatus(HardshipReviewStatus.getFrom(current.getAsessmentStatus().getStatus()))
                 .withUserSession(
                         new ApiUserSession()
@@ -54,9 +55,9 @@ public class PerformHardshipMapper implements RequestMapper<ApiPerformHardshipRe
                 .withNotes(current.getNotes())
                 .withDecisionNotes(current.getDecisionNotes())
                 .withFinancialAssessmentId(
-                        application.getAssessmentDTO().getFinancialAssessmentDTO().getId().intValue()
+                        NumberUtils.toInteger(application.getAssessmentDTO().getFinancialAssessmentDTO().getId())
                 )
-                .withHardshipReviewId(current.getId().intValue())
+                .withHardshipReviewId(NumberUtils.toInteger(current.getId()))
                 .withProgressItems(mapProgressItems(current.getProgress()));
 
         return new ApiPerformHardshipRequest()
