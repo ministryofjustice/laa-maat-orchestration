@@ -72,6 +72,9 @@ public class ServicesConfiguration {
 
             @NotNull
             private String requestTransferUrl;
+
+            @NotNull
+            private String checkContributionRule;
         }
     }
 

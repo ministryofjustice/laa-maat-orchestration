@@ -74,6 +74,7 @@ services:
     contribution-endpoints:
       calculate-contribution-url: ${services.ccc-api.base-url}/api/internal/v1/contribution/calculate-contribution
       request-transfer-url: ${services.ccc-api.base-url}/api/internal/v1/contribution/request-transfer
+      check-contribution-rule: ${services.ccc-api.base-url}/api/internal/v1/contribution/check-contribution-rule}
   ccp-api:
     base-url: ${CCP_API_BASE_URL}
   cma-api:

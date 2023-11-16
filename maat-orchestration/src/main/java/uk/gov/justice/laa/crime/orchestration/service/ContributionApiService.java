@@ -9,6 +9,7 @@ import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCheckContributionRuleRequest;
 
 import java.util.Collections;
 
@@ -28,6 +29,19 @@ public class ContributionApiService {
                 new ParameterizedTypeReference<>() {
                 },
                 configuration.getContributionApi().getContributionEndpoints().getCalculateContributionUrl(),
+                Collections.emptyMap()
+        );
+
+        log.info(String.format(RESPONSE_STRING, response));
+        return response;
+    }
+
+    public Boolean isContributionRule(ApiMaatCheckContributionRuleRequest request) {
+        Boolean response = contributionApiClient.put(
+                request,
+                new ParameterizedTypeReference<>() {
+                },
+                configuration.getContributionApi().getContributionEndpoints().getCheckContributionRule(),
                 Collections.emptyMap()
         );
 
