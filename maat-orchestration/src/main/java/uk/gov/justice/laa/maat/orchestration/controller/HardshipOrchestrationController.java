@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.maat.orchestration.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.maat.orchestration.dto.ApplicationDTO;
-import uk.gov.justice.laa.maat.orchestration.dto.GetHardshipDTO;
 import uk.gov.justice.laa.maat.orchestration.dto.HardshipReviewDTO;
 import uk.gov.justice.laa.maat.orchestration.mapper.HardshipReviewMapper;
 import uk.gov.justice.laa.maat.orchestration.service.HardshipService;
@@ -31,7 +30,7 @@ public class HardshipOrchestrationController {
     private final HardshipService hardshipService;
     private final HardshipReviewMapper hardshipReviewMapper;
 
-    @PostMapping(value = "/get-summary", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{hardshipReviewId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Find Hardship review")
     @ApiResponse(responseCode = "200",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -40,12 +39,11 @@ public class HardshipOrchestrationController {
     )
     @DefaultHTTPErrorResponse
     public ResponseEntity<HardshipReviewDTO> find(
-            @Valid @RequestBody GetHardshipDTO getHardshipDTO,
+            @PathVariable int hardshipReviewId,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
         log.info("Received request to find hardship with transaction id - " + laaTransactionId);
-        Integer hardshipAssessmentId = getHardshipDTO.getHardshipAssessmentId();
-        HardshipReviewDTO hardshipReviewDTO = HardshipReviewDTO.builder().id(hardshipAssessmentId.longValue()).build();
-        hardshipReviewMapper.toDto(hardshipService.getHardship(hardshipAssessmentId), hardshipReviewDTO);
+        HardshipReviewDTO hardshipReviewDTO = HardshipReviewDTO.builder().build();
+        hardshipReviewMapper.toDto(hardshipService.getHardship(hardshipReviewId), hardshipReviewDTO);
         return ResponseEntity.ok(hardshipReviewDTO);
     }
 

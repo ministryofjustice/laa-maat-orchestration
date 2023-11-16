@@ -1,7 +1,6 @@
 package uk.gov.justice.laa.maat.orchestration.data.builder;
 
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.maat.orchestration.dto.GetHardshipDTO;
 import uk.gov.justice.laa.maat.orchestration.enums.*;
 import uk.gov.justice.laa.maat.orchestration.model.ApiFindHardshipResponse;
 import uk.gov.justice.laa.maat.orchestration.model.ApiHardshipDetail;
@@ -31,12 +30,6 @@ public class TestModelDataBuilder {
     public static final BigDecimal TEST_SOLICITOR_DISBURSEMENTS = BigDecimal.valueOf(375);
     public static final BigDecimal TEST_SOLICITOR_VAT = BigDecimal.valueOf(250);
     public static final BigDecimal TEST_SOLICITOR_ESTIMATED_COST = BigDecimal.valueOf(2500);
-
-    public static GetHardshipDTO getHardshipDTO() {
-        return GetHardshipDTO.builder()
-                .hardshipAssessmentId(HARDSHIP_ID)
-                .build();
-    }
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
         return new ApiFindHardshipResponse()
