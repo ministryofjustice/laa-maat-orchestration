@@ -12,5 +12,4 @@ import java.sql.Timestamp;
 public class GenericDTO {
     private Timestamp timestamp;
     private Boolean selected;
-    private Boolean mDirty;
 }
