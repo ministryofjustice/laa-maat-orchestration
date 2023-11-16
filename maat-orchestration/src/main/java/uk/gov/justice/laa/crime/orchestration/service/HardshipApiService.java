@@ -23,7 +23,7 @@ public class HardshipApiService {
     private final ServicesConfiguration configuration;
     private static final String RESPONSE_STRING = "Response from Hardship Service: %s";
 
-    public ApiFindHardshipResponse getHardship(Integer hardshipReviewId) {
+    public ApiFindHardshipResponse find(Integer hardshipReviewId) {
         ApiFindHardshipResponse response = hardshipApiClient.get(
                 new ParameterizedTypeReference<>() {
                 },

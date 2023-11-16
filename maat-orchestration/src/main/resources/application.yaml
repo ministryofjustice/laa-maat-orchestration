@@ -64,19 +64,23 @@ spring:
 services:
   hardship-api:
     base-url: ${HARDSHIP_API_BASE_URL}
-    hardship-endpoints:
+    endpoints:
       find-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/{hardshipReviewId}
-      create-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/
-      update-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/
+      create-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/api/internal/v1/hardship/
+      update-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/api/internal/v1/hardship/
       rollback-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/rollback
-  ccc-api:
+  contribution-api:
     base-url: ${CCC_API_BASE_URL}
-    contribution-endpoints:
-      calculate-contribution-url: ${services.ccc-api.base-url}/api/internal/v1/contribution/calculate-contribution
-      request-transfer-url: ${services.ccc-api.base-url}/api/internal/v1/contribution/request-transfer
-      check-contribution-rule: ${services.ccc-api.base-url}/api/internal/v1/contribution/check-contribution-rule
-  ccp-api:
+    endpoints:
+      request-transfer-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/request-transfer
+      calculate-contribution-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/calculate-contribution
+      check-contribution-rule-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/check-contribution-rule
+  crown-court-api:
     base-url: ${CCP_API_BASE_URL}
+    endpoints:
+      update-application-url
+      update-crown-court-url: ${services.crown-court-api.base-url}/api/internal/v1/contribution/update-crown-court
+
   cma-api:
     base-url: ${CMA_API_BASE_URL}
   validation-api:

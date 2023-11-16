@@ -27,7 +27,7 @@ public class CrownCourtApiService {
                 request,
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getCrownCourtApi().getCrownCourtEndpoints().getUpdateUrl(),
+                configuration.getCrownCourtApi().getCrownCourtEndpoints().getUpdateApplicationUrl(),
                 Collections.emptyMap()
         );
 

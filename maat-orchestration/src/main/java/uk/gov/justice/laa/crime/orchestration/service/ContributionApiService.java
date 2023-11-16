@@ -41,7 +41,7 @@ public class ContributionApiService {
                 request,
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getContributionApi().getContributionEndpoints().getCheckContributionRule(),
+                configuration.getContributionApi().getContributionEndpoints().getCheckContributionRuleUrl(),
                 Collections.emptyMap()
         );
 

@@ -7,33 +7,43 @@ public class MockServicesConfiguration {
         String host = String.format("http://localhost:%s", port);
         ServicesConfiguration servicesConfiguration = new ServicesConfiguration();
 
-        ServicesConfiguration.HardshipApi hardshipApiConfiguration = new ServicesConfiguration.HardshipApi();
-        ServicesConfiguration.ContributionApi cccApiConfiguration = new ServicesConfiguration.ContributionApi();
+        ServicesConfiguration.HardshipApi hardshipApi = new ServicesConfiguration.HardshipApi();
+        ServicesConfiguration.ContributionApi contributionApi = new ServicesConfiguration.ContributionApi();
+        ServicesConfiguration.CrownCourtApi crownCourtApi = new ServicesConfiguration.CrownCourtApi();
 
-        ServicesConfiguration.HardshipApi.HardshipEndpoints hardshipEndpoints =
-                new ServicesConfiguration.HardshipApi.HardshipEndpoints(
+        ServicesConfiguration.HardshipApi.Endpoints hardshipEndpoints =
+                new ServicesConfiguration.HardshipApi.Endpoints(
                         "/hardship/{hardshipReviewId}",
                         "/hardship",
                         "/hardship",
                         "/hardship/rollback"
                 );
 
-        ServicesConfiguration.ContributionApi.ContributionEndpoints cccEndpoints =
-                new ServicesConfiguration.ContributionApi.ContributionEndpoints(
+        ServicesConfiguration.ContributionApi.Endpoints contributionEndpoints =
+                new ServicesConfiguration.ContributionApi.Endpoints(
                         "contribution/calculate-contribution",
                         "/contribution/request-transfer",
-                        "check-contribution-rule"
+                        "/contribution/check-contribution-rule"
                 );
 
-        hardshipApiConfiguration.setBaseUrl(host);
-        hardshipApiConfiguration.setHardshipEndpoints(hardshipEndpoints);
+        ServicesConfiguration.CrownCourtApi.Endpoints crownCourtEndpoints =
+                new ServicesConfiguration.CrownCourtApi.Endpoints(
+                        "/proceedings",
+                        "/proceedings/update-crown-court"
+                );
 
-        cccApiConfiguration.setBaseUrl(host);
-        cccApiConfiguration.setContributionEndpoints(cccEndpoints);
+        hardshipApi.setBaseUrl(host);
+        hardshipApi.setHardshipEndpoints(hardshipEndpoints);
 
-        servicesConfiguration.setOAuthEnabled(false);
-        servicesConfiguration.setHardshipApi(hardshipApiConfiguration);
-        servicesConfiguration.setContributionApi(cccApiConfiguration);
+        contributionApi.setBaseUrl(host);
+        contributionApi.setContributionEndpoints(contributionEndpoints);
+
+        crownCourtApi.setBaseUrl(host);
+        crownCourtApi.setCrownCourtEndpoints(crownCourtEndpoints);
+
+        servicesConfiguration.setHardshipApi(hardshipApi);
+        servicesConfiguration.setContributionApi(contributionApi);
+        servicesConfiguration.setCrownCourtApi(crownCourtApi);
 
         return servicesConfiguration;
     }

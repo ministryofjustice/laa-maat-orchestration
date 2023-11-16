@@ -45,7 +45,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             );
 
     public HardshipReviewDTO find(int hardshipReviewId) {
-        ApiFindHardshipResponse hardship = hardshipApiService.getHardship(hardshipReviewId);
+        ApiFindHardshipResponse hardship = hardshipApiService.find(hardshipReviewId);
         return hardshipMapper.findHardshipResponseToHardshipDto(hardship);
     }
 
@@ -64,7 +64,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
 
         // Need to refresh from DB as HardshipDetail ids may have changed
         // This information is not currently captured in the response from the Hardship service
-        ApiFindHardshipResponse hardship = hardshipApiService.getHardship(response.getHardshipReviewId());
+        ApiFindHardshipResponse hardship = hardshipApiService.find(response.getHardshipReviewId());
         HardshipReviewDTO newHardship = hardshipMapper.findHardshipResponseToHardshipDto(hardship);
 
         if (courtType == CourtType.MAGISTRATE) {

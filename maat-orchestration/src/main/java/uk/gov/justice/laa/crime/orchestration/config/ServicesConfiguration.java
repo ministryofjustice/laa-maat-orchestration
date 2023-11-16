@@ -16,9 +16,6 @@ public class ServicesConfiguration {
     private HardshipApi hardshipApi;
 
     @NotNull
-    private boolean oAuthEnabled;
-
-    @NotNull
     private ContributionApi contributionApi;
 
     @NotNull
@@ -32,12 +29,12 @@ public class ServicesConfiguration {
         private String baseUrl;
 
         @NotNull
-        private HardshipEndpoints hardshipEndpoints;
+        private Endpoints hardshipEndpoints;
 
         @Data
         @NoArgsConstructor
         @AllArgsConstructor
-        public static class HardshipEndpoints {
+        public static class Endpoints {
             @NotNull
             private String findUrl;
 
@@ -60,12 +57,12 @@ public class ServicesConfiguration {
         private String baseUrl;
 
         @NotNull
-        private ContributionEndpoints contributionEndpoints;
+        private Endpoints contributionEndpoints;
 
         @Data
         @NoArgsConstructor
         @AllArgsConstructor
-        public static class ContributionEndpoints {
+        public static class Endpoints {
 
             @NotNull
             private String calculateContributionUrl;
@@ -74,7 +71,7 @@ public class ServicesConfiguration {
             private String requestTransferUrl;
 
             @NotNull
-            private String checkContributionRule;
+            private String checkContributionRuleUrl;
         }
     }
 
@@ -86,15 +83,18 @@ public class ServicesConfiguration {
         private String baseUrl;
 
         @NotNull
-        private CrownCourtEndpoints crownCourtEndpoints;
+        private Endpoints crownCourtEndpoints;
 
         @Data
         @NoArgsConstructor
         @AllArgsConstructor
-        public static class CrownCourtEndpoints {
+        public static class Endpoints {
 
             @NotNull
-            private String updateUrl;
+            private String updateApplicationUrl;
+
+            @NotNull
+            private String updateCrownCourtUrl;
 
         }
     }
