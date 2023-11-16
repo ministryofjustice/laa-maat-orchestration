@@ -20,7 +20,7 @@ def versions = [
 		pitest                  : "1.15.3",
 		sentryVersion			: "6.33.1",
 		springdocVersion        : "2.2.0",
-		crimeCommonsVersion     : "2.9.0",
+		crimeCommonsVersion     : "2.8.0",
 		okhttpVersion           : "4.12.0",
 		wiremockVersion    		: "3.0.1"
 ]
