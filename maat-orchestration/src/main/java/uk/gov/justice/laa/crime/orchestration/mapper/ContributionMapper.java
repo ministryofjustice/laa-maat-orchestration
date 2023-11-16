@@ -7,6 +7,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.*;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.LastOutcome;
 import uk.gov.justice.laa.crime.orchestration.util.DateUtil;
 import uk.gov.justice.laa.crime.orchestration.util.NumberUtils;
@@ -16,7 +17,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -58,9 +58,7 @@ public class ContributionMapper extends CrownCourtMapper {
                 .withAppealType(appealType != null ? AppealType.getFrom(appealType) : null)
                 .withLastOutcome(getLastCrownCourtOutcome(outcomeDTOs))
                 .withCrownCourtOutcome(
-                        outcomeDTOs.stream()
-                                .map(this::outcomeDtoToCrownCourtOutcome)
-                                .collect(Collectors.toList())
+                        crownCourtSummaryDtoToCrownCourtOutcomes(crownCourtOverviewDTO.getCrownCourtSummaryDTO())
                 )
                 .withDateUpliftApplied(DateUtil.toLocalDateTime(incomeEvidenceSummaryDTO.getUpliftAppliedDate()))
                 .withDateUpliftRemoved(DateUtil.toLocalDateTime(incomeEvidenceSummaryDTO.getUpliftRemovedDate()))
@@ -122,6 +120,16 @@ public class ContributionMapper extends CrownCourtMapper {
             );
         }
         return assessmentList;
+    }
+
+    public ApiMaatCheckContributionRuleRequest applicationDtoToCheckContributionRuleRequest(
+            ApplicationDTO application) {
+
+        CrownCourtSummaryDTO crownCourtSummary = application.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO();
+        return new ApiMaatCheckContributionRuleRequest()
+                .withCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()))
+                .withMagCourtOutcome(MagCourtOutcome.getFrom(application.getMagsOutcomeDTO().getOutcome()))
+                .withCrownCourtOutcome(crownCourtSummaryDtoToCrownCourtOutcomes(crownCourtSummary));
     }
 
     public ContributionsDTO maatCalculateContributionResponseToContributionsDto(

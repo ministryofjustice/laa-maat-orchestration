@@ -4,16 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.*;
-import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.*;
 import uk.gov.justice.laa.crime.orchestration.util.DateUtil;
 import uk.gov.justice.laa.crime.orchestration.util.NumberUtils;
 
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -61,7 +57,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         }
 
         if (null != crownCourtSummary.getOutcomeDTOs()) {
-            ccpCrownCourtSummary.setCrownCourtOutcome(crownCourtSummaryToCrownCourtOutcomes(crownCourtSummary));
+            ccpCrownCourtSummary.setCrownCourtOutcome(crownCourtSummaryDtoToCrownCourtOutcomes(crownCourtSummary));
         }
 
         UserDTO userDTO = workflowRequest.getUserDTO();
@@ -71,14 +67,6 @@ public class ProceedingsMapper extends CrownCourtMapper {
                 .withCrownRepId(NumberUtils.toInteger(crownCourtSummary.getCcRepId()))
                 .withIsImprisoned(crownCourtSummary.getInPrisoned())
                 .withUserSession(userMapper.userDtoToUserSession(userDTO));
-    }
-
-    private List<ApiCrownCourtOutcome> crownCourtSummaryToCrownCourtOutcomes(CrownCourtSummaryDTO crownCourtSummary) {
-        Collection<OutcomeDTO> outcomeDTOS = crownCourtSummary.getOutcomeDTOs();
-        return outcomeDTOS.stream()
-                .filter(outcomeDTO -> null == outcomeDTO.getDateSet())
-                .map(this::outcomeDtoToCrownCourtOutcome)
-                .collect(Collectors.toList());
     }
 
     private ApiPassportAssessment applicationDtoToPassportAssessment(ApplicationDTO application) {
@@ -133,7 +121,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
     }
 
     public ApplicationDTO updateApplicationResponseToApplicationDto(ApiUpdateApplicationResponse response,
-                                                                          ApplicationDTO application) {
+                                                                    ApplicationDTO application) {
 
         application.setTimestamp(Timestamp.valueOf(response.getModifiedDateTime()));
         CrownCourtSummaryDTO crownCourtSummary = application.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO();
