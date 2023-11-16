@@ -19,6 +19,7 @@ import uk.gov.justice.laa.maat.orchestration.service.HardshipService;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.justice.laa.maat.orchestration.util.RequestBuilderUtils.buildRequest;
 import static uk.gov.justice.laa.maat.orchestration.util.RequestBuilderUtils.buildRequestGivenContent;
 
 @WebMvcTest(HardshipOrchestrationController.class)
@@ -42,16 +43,15 @@ class HardshipOrchestrationControllerTest {
 
     @Test
     void givenValidRequest_whenFindIsInvoked_thenOkResponseIsReturned() throws Exception {
-        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.getHardshipDTO());
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL + "/get-summary"))
+        mvc.perform(buildRequest(HttpMethod.GET, ENDPOINT_URL + "/" + TestModelDataBuilder.HARDSHIP_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
     void givenInvalidRequest_whenFindIsInvoked_thenBadRequestResponseIsReturned() throws Exception {
-        mvc.perform(buildRequestGivenContent(HttpMethod.POST, "", ENDPOINT_URL + "/get-summary"))
+        mvc.perform(buildRequest(HttpMethod.GET, ENDPOINT_URL + "/invalidId"))
                 .andExpect(status().isBadRequest());
     }
 
