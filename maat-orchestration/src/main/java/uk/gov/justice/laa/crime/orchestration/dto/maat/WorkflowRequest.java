@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkflowRequestDTO {
+public class WorkflowRequest {
     private UserDTO userDTO;
     private ApplicationDTO applicationDTO;
 }

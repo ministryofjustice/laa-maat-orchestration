@@ -14,7 +14,6 @@ import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfigurat
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.orchestration.mapper.FindHardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.service.HardshipApiService;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;

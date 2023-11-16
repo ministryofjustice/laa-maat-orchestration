@@ -15,10 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.crime.orchestration.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.WorkflowRequestDTO;
-import uk.gov.justice.laa.crime.orchestration.mapper.FindHardshipMapper;
-import uk.gov.justice.laa.crime.orchestration.service.HardshipApiService;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.GetHardshipDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.service.HardshipOrchestrationService;
 
 import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_ID;
 
@@ -29,8 +27,7 @@ import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_
 @Tag(name = "Crime Hardship Orchestration", description = "Rest API for orchestration MAAT Hardship flows.")
 public class HardshipController {
 
-    private final HardshipApiService hardshipApiService;
-    private final FindHardshipMapper hardshipMapper;
+    private final HardshipOrchestrationService orchestrationService;
 
     @GetMapping(value = "/{hardshipReviewId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Find Hardship review")
@@ -44,9 +41,7 @@ public class HardshipController {
             @PathVariable int hardshipReviewId,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
         log.info("Received request to find hardship with transaction id - " + laaTransactionId);
-        HardshipReviewDTO hardshipReviewDTO = HardshipReviewDTO.builder().build();
-        hardshipReviewMapper.toDto(hardshipService.getHardship(hardshipReviewId), hardshipReviewDTO);
-        return ResponseEntity.ok(hardshipReviewDTO);
+        return ResponseEntity.ok(orchestrationService.find(hardshipReviewId));
     }
 
 
@@ -59,10 +54,10 @@ public class HardshipController {
     )
     @DefaultHTTPErrorResponse
     public ResponseEntity<ApplicationDTO> create(
-            @Valid @RequestBody WorkflowRequestDTO workflowRequest,
+            @Valid @RequestBody WorkflowRequest workflowRequest,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
         log.info("Received request to create hardship with transaction id - " + laaTransactionId);
-        return ResponseEntity.ok(workflowRequest.getApplicationDTO());
+        return ResponseEntity.ok(orchestrationService.create(workflowRequest));
     }
 
 
@@ -75,10 +70,10 @@ public class HardshipController {
     )
     @DefaultHTTPErrorResponse
     public ResponseEntity<ApplicationDTO> update(
-            @Valid @RequestBody WorkflowRequestDTO workflowRequest,
+            @Valid @RequestBody WorkflowRequest workflowRequest,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
         log.info("Received request to update hardship with transaction id - " + laaTransactionId);
-        return ResponseEntity.ok(workflowRequest.getApplicationDTO());
+        return ResponseEntity.ok(orchestrationService.update(workflowRequest));
     }
 
 }

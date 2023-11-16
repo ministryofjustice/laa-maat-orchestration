@@ -7,14 +7,14 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.CaseType;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.enums.MagCourtOutcome;
-import uk.gov.justice.laa.crime.orchestration.mapper.CalculateContributionMapper;
-import uk.gov.justice.laa.crime.orchestration.mapper.FindHardshipMapper;
-import uk.gov.justice.laa.crime.orchestration.mapper.PerformHardshipMapper;
-import uk.gov.justice.laa.crime.orchestration.mapper.UpdateCrownCourtApplicationMapper;
+import uk.gov.justice.laa.crime.orchestration.mapper.ContributionMapper;
+import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
+import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
 import uk.gov.justice.laa.crime.orchestration.model.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationRequest;
+import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 
@@ -29,10 +29,9 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     private final CrownCourtApiService crownCourtApiService;
     private final ContributionApiService contributionApiService;
 
-    private final FindHardshipMapper findHardshipMapper;
-    private final PerformHardshipMapper performHardshipMapper;
-    private final CalculateContributionMapper calculateContributionMapper;
-    private final UpdateCrownCourtApplicationMapper updateCrownCourtApplicationMapper;
+    private final HardshipMapper hardshipMapper;
+    private final ContributionMapper contributionMapper;
+    private final ProceedingsMapper proceedingsMapper;
 
 
     public static final List<CaseType> CC_CASE_TYPES =
@@ -43,12 +42,13 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                     MagCourtOutcome.COMMITTED, MagCourtOutcome.APPEAL_TO_CC
             );
 
-    public HardshipReviewDTO find(int assessmentId) {
-        return null;
+    public HardshipReviewDTO find(int hardshipReviewId) {
+        ApiFindHardshipResponse hardship = hardshipApiService.getHardship(hardshipReviewId);
+        return hardshipMapper.findHardshipResponseToHardshipDto(hardship);
     }
 
-    public ApplicationDTO create(WorkflowRequestDTO workflowRequest) {
-        ApplicationDTO application = workflowRequest.getApplicationDTO();
+    public ApplicationDTO create(WorkflowRequest request) {
+        ApplicationDTO application = request.getApplicationDTO();
         CourtType courtType = isCrownCourt(application) ? CourtType.CROWN_COURT : CourtType.MAGISTRATE;
         // Set the courtType, as this will be needed in the mapping logic
         application.setCourtType(courtType);
@@ -57,14 +57,13 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                         .getFinancialAssessmentDTO()
                         .getHardship();
 
-        ApiPerformHardshipRequest createRequest = performHardshipMapper.fromDto(workflowRequest);
+        ApiPerformHardshipRequest createRequest = hardshipMapper.workflowRequestToPerformHardshipRequest(request);
         ApiPerformHardshipResponse response = hardshipApiService.create(createRequest);
 
         // Need to refresh from DB as HardshipDetail ids may have changed
         // This information is not currently captured in the response from the Hardship service
         ApiFindHardshipResponse hardship = hardshipApiService.getHardship(response.getHardshipReviewId());
-        HardshipReviewDTO newHardship = new HardshipReviewDTO();
-        findHardshipMapper.toDto(hardship, newHardship);
+        HardshipReviewDTO newHardship = hardshipMapper.findHardshipResponseToHardshipDto(hardship);
 
         if (courtType == CourtType.MAGISTRATE) {
             hardshipOverview.setMagCourtHardship(newHardship);
@@ -72,17 +71,20 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             boolean isVariationRequired = false;
             // Based on calling contribution.contribution_rule_applies (in the process of being migrated to C3)
             if (isVariationRequired) {
-                calculateContribution(workflowRequest);
+                calculateContribution(request);
             }
         } else {
             hardshipOverview.setCrownCourtHardship(newHardship);
-            calculateContribution(workflowRequest);
+            calculateContribution(request);
 
             // TODO: Call application.pre_update checks stored procedure
 
             ApiUpdateApplicationRequest apiUpdateApplicationRequest =
-                    updateCrownCourtApplicationMapper.fromDto(workflowRequest);
-            crownCourtApiService.update(apiUpdateApplicationRequest);
+                    proceedingsMapper.workflowRequestToUpdateApplicationRequest(request);
+            ApiUpdateApplicationResponse updateApplicationResponse =
+                    crownCourtApiService.update(apiUpdateApplicationRequest);
+            application =
+                    proceedingsMapper.updateApplicationResponseToApplicationDto(updateApplicationResponse, application);
 
             // TODO: Call application.handle_eform_result stored procedure
 
@@ -100,25 +102,24 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                 .result(newHardship.getReviewResult())
                 .assessmentDate(newHardship.getReviewDate()).build();
 
-        // TODO: Looks like this DTO might be missing a field - modified_date
-
         updateAssessmentSummary(application, hardshipSummary);
 
         return application;
 
     }
 
-    public ApplicationDTO update(WorkflowRequestDTO workflowRequest) {
-
-        return workflowRequest.getApplicationDTO();
+    public ApplicationDTO update(WorkflowRequest request) {
+        return request.getApplicationDTO();
     }
 
-    private void calculateContribution(WorkflowRequestDTO workflowRequest) {
+    private void calculateContribution(WorkflowRequest request) {
         ApiMaatCalculateContributionRequest calculateContributionRequest =
-                calculateContributionMapper.fromDto(workflowRequest);
+                contributionMapper.workflowRequestToMaatCalculateContributionRequest(request);
         ApiMaatCalculateContributionResponse calculateContributionResponse =
                 contributionApiService.calculate(calculateContributionRequest);
-        calculateContributionMapper.toDto(calculateContributionResponse, workflowRequest.getApplicationDTO());
+        ContributionsDTO contributionsDTO =
+                contributionMapper.maatCalculateContributionResponseToContributionsDto(calculateContributionResponse);
+        request.getApplicationDTO().getCrownCourtOverviewDTO().setContribution(contributionsDTO);
     }
 
     private boolean isCrownCourt(ApplicationDTO application) {
