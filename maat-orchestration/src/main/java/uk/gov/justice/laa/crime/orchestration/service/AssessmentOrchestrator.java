@@ -2,7 +2,7 @@ package uk.gov.justice.laa.crime.orchestration.service;
 
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 
 import java.util.Collection;
 

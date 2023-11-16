@@ -17,7 +17,8 @@ import static uk.gov.justice.laa.maat.orchestration.data.builder.TestModelDataBu
 @ExtendWith(SoftAssertionsExtension.class)
 class HardshipReviewMapperTest {
 
-    FindHardshipMapper mapper = new FindHardshipMapper();
+    UserMapper userMapper = new UserMapper();
+    HardshipMapper hardshipMapper = new HardshipMapper(userMapper);
 
     @InjectSoftAssertions
     private SoftAssertions softly;
@@ -26,7 +27,7 @@ class HardshipReviewMapperTest {
     void givenApiFindHardshipResponseWithSection_whenToDtoIsInvoked_thenDtoIsMapped() {
         ApiFindHardshipResponse hardship = TestModelDataBuilder.getApiFindHardshipResponse();
         HardshipReviewDTO reviewDTO = new HardshipReviewDTO();
-        mapper.toDto(hardship, reviewDTO);
+        hardshipMapper.findHardshipResponseToHardshipDto(hardship);
 
         validateCommonFields(hardship, reviewDTO);
 

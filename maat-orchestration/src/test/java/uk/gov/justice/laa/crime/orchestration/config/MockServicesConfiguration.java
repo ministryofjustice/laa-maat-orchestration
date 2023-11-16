@@ -21,7 +21,8 @@ public class MockServicesConfiguration {
         ServicesConfiguration.ContributionApi.ContributionEndpoints cccEndpoints =
                 new ServicesConfiguration.ContributionApi.ContributionEndpoints(
                         "contribution/calculate-contribution",
-                        "/contribution/request-transfer"
+                        "/contribution/request-transfer",
+                        "check-contribution-rule"
                 );
 
         hardshipApiConfiguration.setBaseUrl(host);
