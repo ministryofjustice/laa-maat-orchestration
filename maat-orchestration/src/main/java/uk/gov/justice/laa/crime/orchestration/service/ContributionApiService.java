@@ -37,7 +37,7 @@ public class ContributionApiService {
     }
 
     public Boolean isContributionRule(ApiMaatCheckContributionRuleRequest request) {
-        Boolean response = contributionApiClient.put(
+        Boolean response = contributionApiClient.post(
                 request,
                 new ParameterizedTypeReference<>() {
                 },
