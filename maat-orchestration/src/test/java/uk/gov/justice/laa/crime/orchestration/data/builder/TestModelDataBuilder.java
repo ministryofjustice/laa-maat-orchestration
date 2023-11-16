@@ -6,8 +6,6 @@ import uk.gov.justice.laa.crime.orchestration.model.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.model.ApiHardshipDetail;
 import uk.gov.justice.laa.crime.orchestration.model.ApiHardshipProgress;
 import uk.gov.justice.laa.crime.orchestration.model.SolicitorCosts;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.GetHardshipDTO;
-import uk.gov.justice.laa.crime.orchestration.enums.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
