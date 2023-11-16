@@ -1,9 +1,10 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.*;
-import uk.gov.justice.laa.crime.orchestration.model.common.ApiUserSession;
+import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.*;
 import uk.gov.justice.laa.crime.orchestration.util.DateUtil;
 import uk.gov.justice.laa.crime.orchestration.util.NumberUtils;
@@ -15,11 +16,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
-public class UpdateCrownCourtApplicationMapper implements RequestMapper<ApiUpdateApplicationRequest, WorkflowRequestDTO>,
-        ResponseMapper<ApiUpdateApplicationResponse, ApplicationDTO> {
+@RequiredArgsConstructor
+public class ProceedingsMapper extends CrownCourtMapper {
 
-    @Override
-    public ApiUpdateApplicationRequest fromDto(WorkflowRequestDTO workflowRequest) {
+    private final UserMapper userMapper;
+
+    public ApiUpdateApplicationRequest workflowRequestToUpdateApplicationRequest(
+            WorkflowRequest workflowRequest) {
+
         ApplicationDTO application = workflowRequest.getApplicationDTO();
         ApiUpdateApplicationRequest updateApplicationRequest = new ApiUpdateApplicationRequest()
                 .withLaaTransactionId(UUID.randomUUID().toString())
@@ -30,7 +34,7 @@ public class UpdateCrownCourtApplicationMapper implements RequestMapper<ApiUpdat
                 .withDecisionDate(DateUtil.toLocalDateTime(application.getDecisionDate()))
                 .withCommittalDate(DateUtil.toLocalDateTime(application.getCommittalDate()))
                 .withDateReceived(DateUtil.toLocalDateTime(application.getDateReceived()))
-                .withCrownCourtSummary(buildCrownCourtSummary(application))
+                .withCrownCourtSummary(applicationDtoToCrownCourtSummary(application))
                 .withIojAppeal(
                         new ApiIOJAppeal()
                                 .withDecisionResult(
@@ -38,8 +42,8 @@ public class UpdateCrownCourtApplicationMapper implements RequestMapper<ApiUpdat
                                 )
                                 .withIojResult(application.getIojResult())
                 )
-                .withPassportAssessment(buildPassportAssessment(application))
-                .withFinancialAssessment(buildFinancialAssessment(application));
+                .withPassportAssessment(applicationDtoToPassportAssessment(application))
+                .withFinancialAssessment(applicationDtoToFinancialAssessment(application));
 
         CrownCourtOverviewDTO crownCourtOverview = application.getCrownCourtOverviewDTO();
         CrownCourtSummaryDTO crownCourtSummary = crownCourtOverview.getCrownCourtSummaryDTO();
@@ -57,7 +61,7 @@ public class UpdateCrownCourtApplicationMapper implements RequestMapper<ApiUpdat
         }
 
         if (null != crownCourtSummary.getOutcomeDTOs()) {
-            ccpCrownCourtSummary.setCrownCourtOutcome(mapToApiCrownCourtOutcomes(crownCourtSummary));
+            ccpCrownCourtSummary.setCrownCourtOutcome(crownCourtSummaryToCrownCourtOutcomes(crownCourtSummary));
         }
 
         UserDTO userDTO = workflowRequest.getUserDTO();
@@ -66,30 +70,18 @@ public class UpdateCrownCourtApplicationMapper implements RequestMapper<ApiUpdat
                 .withApplicantHistoryId(NumberUtils.toInteger(application.getApplicantDTO().getApplicantHistoryId()))
                 .withCrownRepId(NumberUtils.toInteger(crownCourtSummary.getCcRepId()))
                 .withIsImprisoned(crownCourtSummary.getInPrisoned())
-                .withUserSession(
-                        new ApiUserSession()
-                                .withUserName(userDTO.getUserName())
-                                .withSessionId(userDTO.getUserSession())
-                );
+                .withUserSession(userMapper.userDtoToUserSession(userDTO));
     }
 
-    private List<ApiCrownCourtOutcome> mapToApiCrownCourtOutcomes(CrownCourtSummaryDTO crownCourtSummary) {
+    private List<ApiCrownCourtOutcome> crownCourtSummaryToCrownCourtOutcomes(CrownCourtSummaryDTO crownCourtSummary) {
         Collection<OutcomeDTO> outcomeDTOS = crownCourtSummary.getOutcomeDTOs();
         return outcomeDTOS.stream()
                 .filter(outcomeDTO -> null == outcomeDTO.getDateSet())
-                .map(this::getApiCrownCourtOutcome)
+                .map(this::outcomeDtoToCrownCourtOutcome)
                 .collect(Collectors.toList());
     }
 
-    private ApiCrownCourtOutcome getApiCrownCourtOutcome(OutcomeDTO outcomeDTO) {
-        return new ApiCrownCourtOutcome()
-                .withOutcome(CrownCourtOutcome.getFrom(outcomeDTO.getOutcome()))
-                .withOutComeType(outcomeDTO.getOutComeType())
-                .withDateSet(DateUtil.toLocalDateTime(outcomeDTO.getDateSet()))
-                .withDescription(outcomeDTO.getDescription());
-    }
-
-    private static ApiPassportAssessment buildPassportAssessment(ApplicationDTO application) {
+    private ApiPassportAssessment applicationDtoToPassportAssessment(ApplicationDTO application) {
         PassportedDTO passported = application.getPassportedDTO();
 
         if (passported.getPassportedId() != null) {
@@ -100,7 +92,7 @@ public class UpdateCrownCourtApplicationMapper implements RequestMapper<ApiUpdat
         return null;
     }
 
-    private static ApiFinancialAssessment buildFinancialAssessment(ApplicationDTO application) {
+    private ApiFinancialAssessment applicationDtoToFinancialAssessment(ApplicationDTO application) {
 
         FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
         FullAssessmentDTO fullAssessment = financialAssessmentDTO.getFull();
@@ -112,7 +104,8 @@ public class UpdateCrownCourtApplicationMapper implements RequestMapper<ApiUpdat
                 .withInitStatus(CurrentStatus.getFrom(initialAssessment.getAssessmnentStatusDTO().getStatus()));
 
         if (financialAssessmentDTO.getFull().getAssessmentDate() != null) {
-            assessment.withFullResult(fullAssessment.getResult())
+            assessment
+                    .withFullResult(fullAssessment.getResult())
                     .withFullStatus(CurrentStatus.getFrom(fullAssessment.getAssessmnentStatusDTO().getStatus()));
         }
 
@@ -127,7 +120,7 @@ public class UpdateCrownCourtApplicationMapper implements RequestMapper<ApiUpdat
         return assessment;
     }
 
-    private static ApiCrownCourtSummary buildCrownCourtSummary(ApplicationDTO application) {
+    private ApiCrownCourtSummary applicationDtoToCrownCourtSummary(ApplicationDTO application) {
         CrownCourtSummaryDTO crownCourtSummary = application.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO();
         return new ApiCrownCourtSummary()
                 .withRepId(NumberUtils.toInteger(crownCourtSummary.getCcRepId()))
@@ -139,12 +132,16 @@ public class UpdateCrownCourtApplicationMapper implements RequestMapper<ApiUpdat
                 .withEvidenceFeeLevel(crownCourtSummary.getEvidenceProvisionFee().getFeeLevel());
     }
 
-    @Override
-    public void toDto(ApiUpdateApplicationResponse response, ApplicationDTO application) {
+    public ApplicationDTO updateApplicationResponseToApplicationDto(ApiUpdateApplicationResponse response,
+                                                                          ApplicationDTO application) {
+
         application.setTimestamp(Timestamp.valueOf(response.getModifiedDateTime()));
         CrownCourtSummaryDTO crownCourtSummary = application.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO();
         crownCourtSummary.setCcRepOrderDate(DateUtil.toDate(response.getCrownRepOrderDate()));
         crownCourtSummary.setRepOrderDecision(new SysGenString(response.getCrownRepOrderDecision()));
         crownCourtSummary.setCcRepType(new SysGenString(response.getCrownRepOrderType()));
+
+        return application;
     }
+
 }

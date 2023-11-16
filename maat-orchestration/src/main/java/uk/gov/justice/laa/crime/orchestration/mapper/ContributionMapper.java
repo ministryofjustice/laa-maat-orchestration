@@ -1,8 +1,8 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.*;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionRequest;
@@ -15,16 +15,16 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class CalculateContributionMapper implements RequestMapper<ApiMaatCalculateContributionRequest, WorkflowRequestDTO>,
-        ResponseMapper<ApiMaatCalculateContributionResponse, ApplicationDTO> {
+@RequiredArgsConstructor
+public class ContributionMapper extends CrownCourtMapper {
 
-    @Override
-    public ApiMaatCalculateContributionRequest fromDto(WorkflowRequestDTO workflowRequest) {
+    public ApiMaatCalculateContributionRequest workflowRequestToMaatCalculateContributionRequest(
+            WorkflowRequest workflowRequest) {
+
         UserDTO user = workflowRequest.getUserDTO();
         ApplicationDTO application = workflowRequest.getApplicationDTO();
 
@@ -45,7 +45,7 @@ public class CalculateContributionMapper implements RequestMapper<ApiMaatCalcula
                 .withMagCourtOutcome(MagCourtOutcome.getFrom(application.getMagsOutcomeDTO().getOutcome()))
                 .withCommittalDate(DateUtil.toLocalDateTime(application.getCommittalDate()))
                 .withCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()))
-                .withAssessments(getApiAssessments(application))
+                .withAssessments(applicationDtoToAssessments(application))
                 .withContributionCap(BigDecimal.valueOf(application.getOffenceDTO().getContributionCap()))
                 .withContributionId(NumberUtils.toInteger(contributionsDTO.getId()))
                 .withMonthlyContributions(contributionsDTO.getMonthlyContribs())
@@ -56,10 +56,10 @@ public class CalculateContributionMapper implements RequestMapper<ApiMaatCalcula
                                              MagCourtOutcome.getFrom(
                                                      application.getMagsOutcomeDTO().getOutcome()) : null)
                 .withAppealType(appealType != null ? AppealType.getFrom(appealType) : null)
-                .withLastOutcome(getLastCCOutcome(outcomeDTOs))
+                .withLastOutcome(getLastCrownCourtOutcome(outcomeDTOs))
                 .withCrownCourtOutcome(
                         outcomeDTOs.stream()
-                                .map(this::mapApiCrownCourtOutcome)
+                                .map(this::outcomeDtoToCrownCourtOutcome)
                                 .collect(Collectors.toList())
                 )
                 .withDateUpliftApplied(DateUtil.toLocalDateTime(incomeEvidenceSummaryDTO.getUpliftAppliedDate()))
@@ -75,15 +75,7 @@ public class CalculateContributionMapper implements RequestMapper<ApiMaatCalcula
                 );
     }
 
-    private ApiCrownCourtOutcome mapApiCrownCourtOutcome(OutcomeDTO outcomeDTO) {
-        return new ApiCrownCourtOutcome()
-                .withOutcome(CrownCourtOutcome.getFrom(outcomeDTO.getOutcome()))
-                .withOutComeType(outcomeDTO.getOutComeType())
-                .withDateSet(DateUtil.toLocalDateTime(outcomeDTO.getDateSet()))
-                .withDescription(outcomeDTO.getDescription());
-    }
-
-    private LastOutcome getLastCCOutcome(final Collection<OutcomeDTO> crownCourtOutcomeList) {
+    private LastOutcome getLastCrownCourtOutcome(final Collection<OutcomeDTO> crownCourtOutcomeList) {
         return crownCourtOutcomeList.stream().reduce((first, second) -> second)
                 .map(outcome ->
                              new LastOutcome()
@@ -92,65 +84,58 @@ public class CalculateContributionMapper implements RequestMapper<ApiMaatCalcula
                 ).orElse(null);
     }
 
-    private ApiAssessment mapAssessment(final AssessmentType assessmentType,
-                                        final Date assessmentDate,
-                                        final AssessmentStatusDTO assessmentStatusDTO,
-                                        final String result,
-                                        final NewWorkReasonDTO newWorkReason) {
-        return new ApiAssessment()
-                .withAssessmentType(assessmentType)
-                .withAssessmentDate(DateUtil.toLocalDateTime(assessmentDate))
-                .withNewWorkReason(
-                        newWorkReason.getCode() != null ? NewWorkReason.getFrom(newWorkReason.getCode()) : null)
-                .withResult(result != null ? AssessmentResult.valueOf(result) : null)
-                .withStatus(CurrentStatus.getFrom(assessmentStatusDTO.getStatus()));
-    }
-
-    private List<ApiAssessment> getApiAssessments(final ApplicationDTO application) {
+    private List<ApiAssessment> applicationDtoToAssessments(final ApplicationDTO application) {
         List<ApiAssessment> assessmentList = new ArrayList<>();
         FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
         InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
-        assessmentList.add(mapAssessment(AssessmentType.INIT,
-                                         initialAssessmentDTO.getAssessmentDate(),
-                                         initialAssessmentDTO.getAssessmnentStatusDTO(),
-                                         initialAssessmentDTO.getResult(),
-                                         initialAssessmentDTO.getNewWorkReason()
-        ));
+
+        assessmentList.add(
+                new ApiAssessment()
+                        .withAssessmentType(AssessmentType.INIT)
+                        .withResult(AssessmentResult.getFrom(initialAssessmentDTO.getResult()))
+                        .withAssessmentDate(DateUtil.toLocalDateTime(initialAssessmentDTO.getAssessmentDate()))
+                        .withNewWorkReason(NewWorkReason.getFrom(initialAssessmentDTO.getNewWorkReason().getCode()))
+                        .withStatus(CurrentStatus.getFrom(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus()))
+        );
 
         FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
         if (Boolean.TRUE.equals(financialAssessmentDTO.getFullAvailable())) {
-            assessmentList.add(mapAssessment(AssessmentType.FULL,
-                                             fullAssessmentDTO.getAssessmentDate(),
-                                             fullAssessmentDTO.getAssessmnentStatusDTO(),
-                                             fullAssessmentDTO.getResult(),
-                                             initialAssessmentDTO.getNewWorkReason()
-            ));
+            assessmentList.add(
+                    new ApiAssessment()
+                            .withAssessmentType(AssessmentType.FULL)
+                            .withResult(AssessmentResult.getFrom(fullAssessmentDTO.getResult()))
+                            .withAssessmentDate(DateUtil.toLocalDateTime(fullAssessmentDTO.getAssessmentDate()))
+                            .withNewWorkReason(NewWorkReason.getFrom(initialAssessmentDTO.getNewWorkReason().getCode()))
+                            .withStatus(CurrentStatus.getFrom(fullAssessmentDTO.getAssessmnentStatusDTO().getStatus()))
+            );
         }
 
         PassportedDTO passported = application.getPassportedDTO();
         if (passported.getPassportedId() != null) {
-            assessmentList.add(mapAssessment(AssessmentType.PASSPORT,
-                                             passported.getDate(),
-                                             passported.getAssessementStatusDTO(),
-                                             passported.getResult(),
-                                             passported.getNewWorkReason()
-            ));
+            assessmentList.add(
+                    new ApiAssessment()
+                            .withAssessmentType(AssessmentType.PASSPORT)
+                            .withResult(AssessmentResult.getFrom(passported.getResult()))
+                            .withAssessmentDate(DateUtil.toLocalDateTime(passported.getDate()))
+                            .withNewWorkReason(NewWorkReason.getFrom(passported.getNewWorkReason().getCode()))
+                            .withStatus(CurrentStatus.getFrom(passported.getAssessementStatusDTO().getStatus()))
+            );
         }
         return assessmentList;
     }
 
-    @Override
-    public void toDto(ApiMaatCalculateContributionResponse response, ApplicationDTO application) {
-        if (response != null && response.getContributionId() != null) {
-            ContributionsDTO contributionsDTO = application.getCrownCourtOverviewDTO().getContribution();
-            contributionsDTO.setBasedOn(new SysGenString(response.getBasedOn()));
-            contributionsDTO.setId(response.getContributionId().longValue());
-            contributionsDTO.setCalcDate(DateUtil.toDate(response.getCalcDate()));
-            contributionsDTO.setMonthlyContribs(response.getMonthlyContributions());
-            contributionsDTO.setUpfrontContribs(response.getUpfrontContributions());
-            contributionsDTO.setEffectiveDate(DateUtil.toDate(response.getEffectiveDate()));
-            contributionsDTO.setUpliftApplied(Boolean.parseBoolean(response.getUpliftApplied()));
-            contributionsDTO.setCapped(response.getContributionCap());
-        }
+    public ContributionsDTO maatCalculateContributionResponseToContributionsDto(
+            ApiMaatCalculateContributionResponse response) {
+
+        return ContributionsDTO.builder()
+                .id(response.getContributionId().longValue())
+                .capped(response.getContributionCap())
+                .calcDate(DateUtil.toDate(response.getCalcDate()))
+                .basedOn(new SysGenString(response.getBasedOn()))
+                .monthlyContribs(response.getMonthlyContributions())
+                .upfrontContribs(response.getUpfrontContributions())
+                .effectiveDate(DateUtil.toDate(response.getEffectiveDate()))
+                .upliftApplied(Boolean.parseBoolean(response.getUpliftApplied()))
+                .build();
     }
 }
