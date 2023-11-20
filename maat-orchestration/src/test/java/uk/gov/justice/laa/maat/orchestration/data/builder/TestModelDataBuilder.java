@@ -30,6 +30,7 @@ public class TestModelDataBuilder {
     public static final BigDecimal TEST_SOLICITOR_DISBURSEMENTS = BigDecimal.valueOf(375);
     public static final BigDecimal TEST_SOLICITOR_VAT = BigDecimal.valueOf(250);
     public static final BigDecimal TEST_SOLICITOR_ESTIMATED_COST = BigDecimal.valueOf(2500);
+    public static final BigDecimal AMOUNT = BigDecimal.valueOf(99.99);
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
         return new ApiFindHardshipResponse()
@@ -44,7 +45,7 @@ public class TestModelDataBuilder {
                 .withNewWorkReason(NewWorkReason.PRI)
                 .withSolicitorCosts(getSolicitorsCosts())
                 .withStatus(HardshipReviewStatus.COMPLETE)
-                .withReviewDetails(getApiHardshipReviewDetails(BigDecimal.valueOf(99.99), HardshipReviewDetailType.EXPENDITURE))
+                .withReviewDetails(getApiHardshipReviewDetails(AMOUNT, HardshipReviewDetailType.EXPENDITURE))
                 .withReviewProgressItems(getReviewProgressItems());
     }
 

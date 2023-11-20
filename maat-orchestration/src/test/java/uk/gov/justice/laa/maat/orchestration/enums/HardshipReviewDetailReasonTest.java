@@ -34,6 +34,7 @@ class HardshipReviewDetailReasonTest {
     @Test
     void givenValidInput_ValidateEnumValues() {
         assertThat("Evidence Supplied").isEqualTo(HardshipReviewDetailReason.EVIDENCE_SUPPLIED.getReason());
+        assertThat(7).isEqualTo(HardshipReviewDetailReason.EVIDENCE_SUPPLIED.getId());
     }
 
 }

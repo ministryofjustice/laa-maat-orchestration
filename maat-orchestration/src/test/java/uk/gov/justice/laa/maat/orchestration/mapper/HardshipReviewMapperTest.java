@@ -6,9 +6,19 @@ import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.justice.laa.maat.orchestration.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.maat.orchestration.dto.HRDetailDTO;
+import uk.gov.justice.laa.maat.orchestration.dto.HRSectionDTO;
 import uk.gov.justice.laa.maat.orchestration.dto.HardshipReviewDTO;
+import uk.gov.justice.laa.maat.orchestration.enums.Frequency;
+import uk.gov.justice.laa.maat.orchestration.enums.HardshipReviewDetailCode;
+import uk.gov.justice.laa.maat.orchestration.enums.HardshipReviewDetailReason;
+import uk.gov.justice.laa.maat.orchestration.enums.HardshipReviewDetailType;
 import uk.gov.justice.laa.maat.orchestration.model.ApiFindHardshipResponse;
 import uk.gov.justice.laa.maat.orchestration.util.DateUtil;
+
+import java.util.Optional;
+
+import static uk.gov.justice.laa.maat.orchestration.data.builder.TestModelDataBuilder.HARDSHIP_DETAIL_ID;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class HardshipReviewMapperTest {
@@ -62,5 +72,34 @@ class HardshipReviewMapperTest {
                 .isEqualTo(hardship.getSolicitorCosts().getRate().doubleValue());
         softly.assertThat(reviewDTO.getSolictorsCosts().getSolicitorVat().doubleValue())
                 .isEqualTo(hardship.getSolicitorCosts().getVat().doubleValue());
+        Optional<HRSectionDTO> optionalHRSectionDTO = reviewDTO.getSection().stream().findFirst();
+        softly.assertThat(optionalHRSectionDTO.isPresent()).isTrue();
+        if (optionalHRSectionDTO.isPresent()) {
+            HRSectionDTO hrSectionDTO = optionalHRSectionDTO.get();
+            softly.assertThat(hrSectionDTO.getDetailType().getType())
+                    .isEqualTo(HardshipReviewDetailType.EXPENDITURE.getType());
+            softly.assertThat(hrSectionDTO.getDetailType().getDescription())
+                    .isEqualTo("Extra Expenditure");
+            Optional<HRDetailDTO> optionalHRDetailDTO = hrSectionDTO.getDetail().stream().findFirst();
+            softly.assertThat(optionalHRDetailDTO.isPresent()).isTrue();
+            if (optionalHRDetailDTO.isPresent()) {
+                HRDetailDTO hrDetailDTO = optionalHRDetailDTO.get();
+                softly.assertThat(hrDetailDTO.getAmountNumber().doubleValue())
+                        .isEqualTo(TestModelDataBuilder.AMOUNT.doubleValue());
+                softly.assertThat(hrDetailDTO.getId().intValue())
+                        .isEqualTo(HARDSHIP_DETAIL_ID);
+                softly.assertThat(hrDetailDTO.getOtherDescription())
+                        .isEqualTo("Loan to family members");
+                softly.assertThat(hrDetailDTO.getFrequency().getCode())
+                        .isEqualTo(Frequency.TWO_WEEKLY.getCode());
+                softly.assertThat(hrDetailDTO.getReason().getReason())
+                        .isEqualTo(HardshipReviewDetailReason.COVERED_BY_LIVING_EXPENSE.getReason());
+                softly.assertThat(hrDetailDTO.getReason().getId())
+                        .isEqualTo(HardshipReviewDetailReason.COVERED_BY_LIVING_EXPENSE.getId());
+                softly.assertThat(hrDetailDTO.getDetailDescription().getDescription())
+                        .isEqualTo(HardshipReviewDetailCode.OTHER.getDescription());
+                softly.assertThat(hrDetailDTO.isAccepted()).isTrue();
+            }
+        }
     }
 }
