@@ -8,12 +8,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.justice.laa.maat.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.maat.orchestration.dto.HRDetailDTO;
 import uk.gov.justice.laa.maat.orchestration.dto.HRSectionDTO;
+import uk.gov.justice.laa.maat.orchestration.dto.HRSolicitorsCostsDTO;
 import uk.gov.justice.laa.maat.orchestration.dto.HardshipReviewDTO;
 import uk.gov.justice.laa.maat.orchestration.enums.Frequency;
 import uk.gov.justice.laa.maat.orchestration.enums.HardshipReviewDetailCode;
 import uk.gov.justice.laa.maat.orchestration.enums.HardshipReviewDetailReason;
 import uk.gov.justice.laa.maat.orchestration.enums.HardshipReviewDetailType;
 import uk.gov.justice.laa.maat.orchestration.model.ApiFindHardshipResponse;
+import uk.gov.justice.laa.maat.orchestration.model.ApiHardshipDetail;
+import uk.gov.justice.laa.maat.orchestration.model.SolicitorCosts;
 import uk.gov.justice.laa.maat.orchestration.util.DateUtil;
 
 import java.util.Optional;
@@ -29,11 +32,42 @@ class HardshipReviewMapperTest {
     private SoftAssertions softly;
 
     @Test
-    void givenApiFindHardshipResponse_whenToDtoIsInvoked_thenDtoIsMapped() {
+    void givenApiFindHardshipResponseWithSection_whenToDtoIsInvoked_thenDtoIsMapped() {
         ApiFindHardshipResponse hardship = TestModelDataBuilder.getApiFindHardshipResponse();
         HardshipReviewDTO reviewDTO = new HardshipReviewDTO();
         mapper.toDto(hardship, reviewDTO);
 
+        validateCommonFields(hardship, reviewDTO);
+
+        validateHRSection(reviewDTO);
+    }
+
+    @Test
+    void givenApiFindHardshipResponse_whenToDtoIsInvoked_thenDtoIsMapped() {
+        ApiFindHardshipResponse hardship = TestModelDataBuilder.getApiFindHardshipResponse();
+        Optional<ApiHardshipDetail> optionalApiHardshipDetail = hardship.getReviewDetails().stream().findFirst();
+        if (optionalApiHardshipDetail.isPresent()) {
+            optionalApiHardshipDetail.get().setDetailReason(null);
+            optionalApiHardshipDetail.get().setDetailCode(null);
+        }
+        HardshipReviewDTO reviewDTO = new HardshipReviewDTO();
+        mapper.toDto(hardship, reviewDTO);
+
+        validateCommonFields(hardship, reviewDTO);
+
+        Optional<HRSectionDTO> optionalHRSectionDTO = reviewDTO.getSection().stream().findFirst();
+        softly.assertThat(optionalHRSectionDTO.isPresent()).isTrue();
+        if (optionalHRSectionDTO.isPresent()) {
+            Optional<HRDetailDTO> optionalHRDetailDTO = optionalHRSectionDTO.get().getDetail().stream().findFirst();
+            softly.assertThat(optionalHRDetailDTO.isPresent()).isTrue();
+            if (optionalHRDetailDTO.isPresent()) {
+                softly.assertThat(optionalHRDetailDTO.get().getReason()).isNull();
+                softly.assertThat(optionalHRDetailDTO.get().getDetailDescription()).isNull();
+            }
+        }
+    }
+
+    private void validateCommonFields(ApiFindHardshipResponse hardship, HardshipReviewDTO reviewDTO) {
         softly.assertThat(reviewDTO.getReviewResult())
                 .isEqualTo(hardship.getReviewResult().toString());
         softly.assertThat(reviewDTO.getReviewDate())
@@ -62,16 +96,23 @@ class HardshipReviewMapperTest {
                 .isEqualTo(hardship.getNewWorkReason().getDescription());
         softly.assertThat(reviewDTO.getProgress().size())
                 .isEqualTo(hardship.getReviewProgressItems().size());
-        softly.assertThat(reviewDTO.getSolictorsCosts().getSolicitorDisb().doubleValue())
-                .isEqualTo(hardship.getSolicitorCosts().getDisbursements().doubleValue());
-        softly.assertThat(reviewDTO.getSolictorsCosts().getSolicitorHours().intValue())
-                .isEqualTo(hardship.getSolicitorCosts().getHours().intValue());
-        softly.assertThat(reviewDTO.getSolictorsCosts().getSolicitorEstimatedTotalCost().doubleValue())
-                .isEqualTo(hardship.getSolicitorCosts().getEstimatedTotal().doubleValue());
-        softly.assertThat(reviewDTO.getSolictorsCosts().getSolicitorRate().doubleValue())
-                .isEqualTo(hardship.getSolicitorCosts().getRate().doubleValue());
-        softly.assertThat(reviewDTO.getSolictorsCosts().getSolicitorVat().doubleValue())
-                .isEqualTo(hardship.getSolicitorCosts().getVat().doubleValue());
+        validateSolicitorCosts(reviewDTO.getSolictorsCosts(), hardship.getSolicitorCosts());
+    }
+
+    private void validateSolicitorCosts(HRSolicitorsCostsDTO hrSolicitorsCostsDTO, SolicitorCosts solicitorCosts) {
+        softly.assertThat(hrSolicitorsCostsDTO.getSolicitorDisb().doubleValue())
+                .isEqualTo(solicitorCosts.getDisbursements().doubleValue());
+        softly.assertThat(hrSolicitorsCostsDTO.getSolicitorHours().intValue())
+                .isEqualTo(solicitorCosts.getHours().intValue());
+        softly.assertThat(hrSolicitorsCostsDTO.getSolicitorEstimatedTotalCost().doubleValue())
+                .isEqualTo(solicitorCosts.getEstimatedTotal().doubleValue());
+        softly.assertThat(hrSolicitorsCostsDTO.getSolicitorRate().doubleValue())
+                .isEqualTo(solicitorCosts.getRate().doubleValue());
+        softly.assertThat(hrSolicitorsCostsDTO.getSolicitorVat().doubleValue())
+                .isEqualTo(solicitorCosts.getVat().doubleValue());
+    }
+
+    private void validateHRSection(HardshipReviewDTO reviewDTO) {
         Optional<HRSectionDTO> optionalHRSectionDTO = reviewDTO.getSection().stream().findFirst();
         softly.assertThat(optionalHRSectionDTO.isPresent()).isTrue();
         if (optionalHRSectionDTO.isPresent()) {
