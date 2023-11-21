@@ -67,6 +67,7 @@ public class HardshipReviewMapper implements ResponseMapper<ApiFindHardshipRespo
         if (detailReason != null) {
             return HRReasonDTO.builder()
                     .reason(detailReason.getReason())
+                    .id((long) detailReason.getId())
                     .build();
         }
         return null;
@@ -81,10 +82,13 @@ public class HardshipReviewMapper implements ResponseMapper<ApiFindHardshipRespo
     }
 
     private HRDetailDescriptionDTO getHRDetailDescriptionDTO(HardshipReviewDetailCode detailCode) {
-        return HRDetailDescriptionDTO.builder()
-                .description(detailCode.getDescription())
-                .code(detailCode.getCode())
-                .build();
+        if (detailCode != null) {
+            return HRDetailDescriptionDTO.builder()
+                    .description(detailCode.getDescription())
+                    .code(detailCode.getCode())
+                    .build();
+        }
+        return null;
     }
 
     private HRDetailTypeDTO getHRDetailType(HardshipReviewDetailType hrDetailType) {
@@ -131,6 +135,7 @@ public class HardshipReviewMapper implements ResponseMapper<ApiFindHardshipRespo
         return NewWorkReasonDTO.builder()
                 .description(newWorkReason.getDescription())
                 .code(newWorkReason.getCode())
+                .type(newWorkReason.getType())
                 .build();
     }
 
