@@ -6,7 +6,7 @@ import uk.gov.justice.laa.crime.orchestration.model.common.ApiUserSession;
 
 @Component
 public class UserMapper {
-    protected ApiUserSession userDtoToUserSession(UserDTO user) {
+    public ApiUserSession userDtoToUserSession(UserDTO user) {
         return new ApiUserSession()
                 .withUserName(user.getUserName())
                 .withSessionId(user.getUserSession());

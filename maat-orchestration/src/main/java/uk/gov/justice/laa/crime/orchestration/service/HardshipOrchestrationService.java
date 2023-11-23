@@ -11,12 +11,12 @@ import uk.gov.justice.laa.crime.orchestration.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.orchestration.mapper.ContributionMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
-import uk.gov.justice.laa.crime.orchestration.model.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationResponse;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 
@@ -74,7 +74,6 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                     contributionMapper.applicationDtoToCheckContributionRuleRequest(application);
             boolean isVariationRequired =
                     contributionApiService.isContributionRule(apiMaatCheckContributionRuleRequest);
-            // Based on calling contribution.contribution_rule_applies (in the process of being migrated to C3)
             if (isVariationRequired) {
                 calculateContribution(request);
             }
