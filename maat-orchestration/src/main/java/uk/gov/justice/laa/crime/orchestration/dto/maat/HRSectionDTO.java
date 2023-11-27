@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 
 @Data
@@ -15,8 +16,8 @@ public class HRSectionDTO extends GenericDTO {
 
     private HRDetailTypeDTO detailType;
     private Collection<HRDetailDTO> detail;
-    private Currency applicantAnnualTotal;
-    private Currency partnerAnnualTotal;
-    private Currency annualTotal;
+    private BigDecimal applicantAnnualTotal;
+    private BigDecimal partnerAnnualTotal;
+    private BigDecimal annualTotal;
 
 }

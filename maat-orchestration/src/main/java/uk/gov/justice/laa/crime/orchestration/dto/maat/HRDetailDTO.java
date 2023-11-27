@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -19,7 +20,7 @@ public class HRDetailDTO extends GenericDTO {
     private Date dateReceived;
     private HRDetailDescriptionDTO detailDescription;
     private String otherDescription;
-    private Currency amountNumber;
+    private BigDecimal amountNumber;
     private Date dateDue;
     private boolean accepted;
     private HRReasonDTO reason;
