@@ -15,7 +15,7 @@ import java.util.Collections;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CrownCourtApiService {
+public class ProceedingsApiService {
 
     @Qualifier("ccpApiClient")
     private final RestAPIClient crownCourtApiClient;

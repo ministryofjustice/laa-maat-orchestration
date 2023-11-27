@@ -8,16 +8,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.CaseType;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.enums.MagCourtOutcome;
-import uk.gov.justice.laa.crime.orchestration.mapper.ContributionMapper;
-import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
-import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
-import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
-import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCheckContributionRuleRequest;
-import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationRequest;
-import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationResponse;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiFindHardshipResponse;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 
 import java.util.List;
@@ -27,14 +17,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HardshipOrchestrationService implements AssessmentOrchestrator<HardshipReviewDTO> {
 
-    private final HardshipApiService hardshipApiService;
-    private final CrownCourtApiService crownCourtApiService;
-    private final ContributionApiService contributionApiService;
-
-    private final HardshipMapper hardshipMapper;
-    private final ContributionMapper contributionMapper;
-    private final ProceedingsMapper proceedingsMapper;
-
+    private final HardshipService hardshipService;
+    private final ContributionService contributionService;
+    private final ProceedingsService proceedingsService;
 
     public static final List<CaseType> CC_CASE_TYPES =
             List.of(CaseType.INDICTABLE, CaseType.CC_ALREADY, CaseType.APPEAL_CC, CaseType.COMMITAL);
@@ -45,8 +30,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             );
 
     public HardshipReviewDTO find(int hardshipReviewId) {
-        ApiFindHardshipResponse hardship = hardshipApiService.find(hardshipReviewId);
-        return hardshipMapper.findHardshipResponseToHardshipDto(hardship);
+        return hardshipService.find(hardshipReviewId);
     }
 
     public ApplicationDTO create(WorkflowRequest request) {
@@ -59,36 +43,26 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                         .getFinancialAssessmentDTO()
                         .getHardship();
 
-        ApiPerformHardshipRequest createRequest = hardshipMapper.workflowRequestToPerformHardshipRequest(request);
-        ApiPerformHardshipResponse response = hardshipApiService.create(createRequest);
-
+        ApiPerformHardshipResponse performHardshipResponse = hardshipService.createHardship(request);
         // Need to refresh from DB as HardshipDetail ids may have changed
-        // This information is not currently captured in the response from the Hardship service
-        ApiFindHardshipResponse hardship = hardshipApiService.find(response.getHardshipReviewId());
-        HardshipReviewDTO newHardship = hardshipMapper.findHardshipResponseToHardshipDto(hardship);
+        HardshipReviewDTO newHardship = hardshipService.find(performHardshipResponse.getHardshipReviewId());
 
         if (courtType == CourtType.MAGISTRATE) {
             hardshipOverview.setMagCourtHardship(newHardship);
             // TODO: Call assessments.determine_mags_rep_decision stored procedure
-            ApiMaatCheckContributionRuleRequest apiMaatCheckContributionRuleRequest =
-                    contributionMapper.applicationDtoToCheckContributionRuleRequest(application);
-            boolean isVariationRequired =
-                    contributionApiService.isContributionRule(apiMaatCheckContributionRuleRequest);
+            boolean isVariationRequired = contributionService.isVariationRequired(application);
             if (isVariationRequired) {
-                calculateContribution(request);
+                ContributionsDTO contributionsDTO = contributionService.calculateContribution(request);
+                application.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
             }
         } else {
             hardshipOverview.setCrownCourtHardship(newHardship);
-            calculateContribution(request);
+            ContributionsDTO contributionsDTO = contributionService.calculateContribution(request);
+            application.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
 
             // TODO: Call application.pre_update checks stored procedure
 
-            ApiUpdateApplicationRequest apiUpdateApplicationRequest =
-                    proceedingsMapper.workflowRequestToUpdateApplicationRequest(request);
-            ApiUpdateApplicationResponse updateApplicationResponse =
-                    crownCourtApiService.update(apiUpdateApplicationRequest);
-            application =
-                    proceedingsMapper.updateApplicationResponseToApplicationDto(updateApplicationResponse, application);
+            proceedingsService.updateApplication(request);
 
             // TODO: Call application.handle_eform_result stored procedure
 
@@ -114,16 +88,6 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
 
     public ApplicationDTO update(WorkflowRequest request) {
         return request.getApplicationDTO();
-    }
-
-    private void calculateContribution(WorkflowRequest request) {
-        ApiMaatCalculateContributionRequest calculateContributionRequest =
-                contributionMapper.workflowRequestToMaatCalculateContributionRequest(request);
-        ApiMaatCalculateContributionResponse calculateContributionResponse =
-                contributionApiService.calculate(calculateContributionRequest);
-        ContributionsDTO contributionsDTO =
-                contributionMapper.maatCalculateContributionResponseToContributionsDto(calculateContributionResponse);
-        request.getApplicationDTO().getCrownCourtOverviewDTO().setContribution(contributionsDTO);
     }
 
     private boolean isCrownCourt(ApplicationDTO application) {
