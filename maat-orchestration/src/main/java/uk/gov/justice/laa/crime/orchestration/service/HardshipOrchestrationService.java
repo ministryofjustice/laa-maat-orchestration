@@ -3,14 +3,12 @@ package uk.gov.justice.laa.crime.orchestration.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.orchestration.builder.AssessmentSummaryBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.enums.CaseType;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
-import uk.gov.justice.laa.crime.orchestration.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
-
-import java.util.List;
+import uk.gov.justice.laa.crime.orchestration.util.CrownCourtHelper;
 
 @Slf4j
 @Service
@@ -20,6 +18,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     private final HardshipService hardshipService;
     private final ContributionService contributionService;
     private final ProceedingsService proceedingsService;
+    private final AssessmentSummaryBuilder assessmentSummaryBuilder;
 
     public HardshipReviewDTO find(int hardshipReviewId) {
         return hardshipService.find(hardshipReviewId);
@@ -65,16 +64,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         }
 
         // Update assessment summary view - displayed on the application tab
-        AssessmentSummaryDTO hardshipSummary = AssessmentSummaryDTO.builder()
-                .id(newHardship.getId())
-                .status(newHardship.getAsessmentStatus().getStatus())
-                .type(courtType == CourtType.CROWN_COURT
-                              ? "Hardship Review - Crown Court"
-                              : "Hardship Review - Magistrate"
-                )
-                .result(newHardship.getReviewResult())
-                .assessmentDate(newHardship.getReviewDate()).build();
-
+        AssessmentSummaryDTO hardshipSummary = assessmentSummaryBuilder.build(newHardship, courtType);
         updateAssessmentSummary(application, hardshipSummary);
 
         return application;
