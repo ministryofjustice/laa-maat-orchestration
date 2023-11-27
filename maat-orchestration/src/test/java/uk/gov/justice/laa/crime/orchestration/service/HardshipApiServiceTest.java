@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.MockServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
-import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -29,7 +29,7 @@ class HardshipApiServiceTest {
 
     @Test
     void givenValidHardshipReviewId_whenFindIsInvoked_thenHardshipIsRetrieved() {
-        hardshipApiService.find(TestModelDataBuilder.HARDSHIP_ID);
+        hardshipApiService.find(Constants.TEST_HARDSHIP_ID);
 
         verify(hardshipApiClient)
                 .get(any(), anyString(), anyInt());
