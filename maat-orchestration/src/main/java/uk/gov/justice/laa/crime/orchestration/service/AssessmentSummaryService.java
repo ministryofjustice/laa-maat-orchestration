@@ -1,16 +1,19 @@
-package uk.gov.justice.laa.crime.orchestration.builder;
+package uk.gov.justice.laa.crime.orchestration.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
 
-@Slf4j
-@Component
-public class AssessmentSummaryBuilder {
+import java.util.Collection;
 
-    public AssessmentSummaryDTO build(HardshipReviewDTO hardshipReviewDTO, CourtType courtType) {
+@Slf4j
+@Service
+public class AssessmentSummaryService {
+
+    public AssessmentSummaryDTO getSummary(HardshipReviewDTO hardshipReviewDTO, CourtType courtType) {
         return AssessmentSummaryDTO.builder()
                 .id(hardshipReviewDTO.getId())
                 .status(hardshipReviewDTO.getAsessmentStatus().getStatus())
@@ -20,5 +23,11 @@ public class AssessmentSummaryBuilder {
                 )
                 .result(hardshipReviewDTO.getReviewResult())
                 .assessmentDate(hardshipReviewDTO.getReviewDate()).build();
+    }
+
+    public void updateApplication(ApplicationDTO application, AssessmentSummaryDTO summaryDTO) {
+        Collection<AssessmentSummaryDTO> assessmentSummary = application.getAssessmentSummary();
+        assessmentSummary.removeIf(s -> s.getId().equals(summaryDTO.getId()));
+        assessmentSummary.add(summaryDTO);
     }
 }

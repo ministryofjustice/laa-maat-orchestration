@@ -1,10 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-
-import java.util.Collection;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 
 public interface AssessmentOrchestrator<T> {
 
@@ -13,10 +10,4 @@ public interface AssessmentOrchestrator<T> {
     ApplicationDTO create(WorkflowRequest workflowRequest);
 
     ApplicationDTO update(WorkflowRequest workflowRequest);
-
-    default void updateAssessmentSummary(ApplicationDTO application, AssessmentSummaryDTO summaryDTO) {
-        Collection<AssessmentSummaryDTO> assessmentSummary = application.getAssessmentSummary();
-        assessmentSummary.removeIf(s -> s.getId().equals(summaryDTO.getId()));
-        assessmentSummary.add(summaryDTO);
-    }
 }

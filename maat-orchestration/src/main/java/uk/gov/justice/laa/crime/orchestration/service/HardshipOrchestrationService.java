@@ -3,7 +3,6 @@ package uk.gov.justice.laa.crime.orchestration.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.orchestration.builder.AssessmentSummaryBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
@@ -18,7 +17,8 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     private final HardshipService hardshipService;
     private final ContributionService contributionService;
     private final ProceedingsService proceedingsService;
-    private final AssessmentSummaryBuilder assessmentSummaryBuilder;
+    private final CrownCourtHelper crownCourtHelper;
+    private final AssessmentSummaryService assessmentSummaryService;
 
     public HardshipReviewDTO find(int hardshipReviewId) {
         return hardshipService.find(hardshipReviewId);
@@ -26,10 +26,8 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
 
     public ApplicationDTO create(WorkflowRequest request) {
         ApplicationDTO application = request.getApplicationDTO();
-        String caseType = application.getCaseDetailsDTO().getCaseType();
-        String magsOutcome = application.getMagsOutcomeDTO().getOutcome();
-        CourtType courtType = CrownCourtHelper.isCrownCourt(caseType, magsOutcome)
-                ? CourtType.CROWN_COURT : CourtType.MAGISTRATE;
+
+        CourtType courtType = crownCourtHelper.getCourtType(application);
         // Set the courtType, as this will be needed in the mapping logic
         application.setCourtType(courtType);
         HardshipOverviewDTO hardshipOverview =
@@ -64,8 +62,8 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         }
 
         // Update assessment summary view - displayed on the application tab
-        AssessmentSummaryDTO hardshipSummary = assessmentSummaryBuilder.build(newHardship, courtType);
-        updateAssessmentSummary(application, hardshipSummary);
+        AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(newHardship, courtType);
+        assessmentSummaryService.updateApplication(application, hardshipSummary);
 
         return application;
     }
