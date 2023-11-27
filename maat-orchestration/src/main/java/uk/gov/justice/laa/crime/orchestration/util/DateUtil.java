@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DateUtil {
 
     public static Date toDate(LocalDateTime source) {

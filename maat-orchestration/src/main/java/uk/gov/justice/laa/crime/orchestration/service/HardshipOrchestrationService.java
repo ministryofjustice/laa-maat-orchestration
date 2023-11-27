@@ -21,21 +21,16 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     private final ContributionService contributionService;
     private final ProceedingsService proceedingsService;
 
-    public static final List<CaseType> CC_CASE_TYPES =
-            List.of(CaseType.INDICTABLE, CaseType.CC_ALREADY, CaseType.APPEAL_CC, CaseType.COMMITAL);
-
-    public static final List<MagCourtOutcome> MAG_COURT_OUTCOMES =
-            List.of(MagCourtOutcome.COMMITTED_FOR_TRIAL, MagCourtOutcome.SENT_FOR_TRIAL,
-                    MagCourtOutcome.COMMITTED, MagCourtOutcome.APPEAL_TO_CC
-            );
-
     public HardshipReviewDTO find(int hardshipReviewId) {
         return hardshipService.find(hardshipReviewId);
     }
 
     public ApplicationDTO create(WorkflowRequest request) {
         ApplicationDTO application = request.getApplicationDTO();
-        CourtType courtType = isCrownCourt(application) ? CourtType.CROWN_COURT : CourtType.MAGISTRATE;
+        String caseType = application.getCaseDetailsDTO().getCaseType();
+        String magsOutcome = application.getMagsOutcomeDTO().getOutcome();
+        CourtType courtType = CrownCourtHelper.isCrownCourt(caseType, magsOutcome)
+                ? CourtType.CROWN_COURT : CourtType.MAGISTRATE;
         // Set the courtType, as this will be needed in the mapping logic
         application.setCourtType(courtType);
         HardshipOverviewDTO hardshipOverview =
@@ -83,21 +78,10 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         updateAssessmentSummary(application, hardshipSummary);
 
         return application;
-
     }
 
     public ApplicationDTO update(WorkflowRequest request) {
         return request.getApplicationDTO();
-    }
-
-    private boolean isCrownCourt(ApplicationDTO application) {
-        String caseType = application.getCaseDetailsDTO().getCaseType();
-        if (CC_CASE_TYPES.contains(CaseType.getFrom(caseType))) {
-            return true;
-        }
-        String magsOutcome = application.getMagsOutcomeDTO().getOutcome();
-        return CaseType.getFrom(caseType) == CaseType.EITHER_WAY
-                && MAG_COURT_OUTCOMES.contains(MagCourtOutcome.getFrom(magsOutcome));
     }
 
 }
