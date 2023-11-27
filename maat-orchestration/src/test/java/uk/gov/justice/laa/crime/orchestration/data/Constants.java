@@ -46,4 +46,5 @@ public class Constants {
     public static final String TEST_HARDSHIP_OTHER_DESCRIPTION = "Mock other description";
     public static final String TEST_HARDSHIP_REASON_NOTE = "Mock reason note";
     public static final String TEST_HARDSHIP_REVIEW_RESULT = "PASS";
+    public static final Integer TEST_HARDSHIP_REVIEW_PROGRESS_ID = 53;
 }

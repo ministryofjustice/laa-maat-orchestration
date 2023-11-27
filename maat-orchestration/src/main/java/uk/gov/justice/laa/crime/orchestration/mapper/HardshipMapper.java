@@ -201,9 +201,13 @@ public class HardshipMapper {
     }
 
     private HRReasonDTO hardshipReviewDetailReasonToHrReasonDto(HardshipReviewDetailReason detailReason) {
-        return HRReasonDTO.builder()
-                .reason(detailReason.getReason())
-                .build();
+        if (detailReason != null) {
+            return HRReasonDTO.builder()
+                    .reason(detailReason.getReason())
+                    .build();
+        }
+        // Mimic Maat, create empty object
+        return HRReasonDTO.builder().build();
     }
 
     private FrequenciesDTO frequencyToFrequenciesDto(Frequency frequency) {

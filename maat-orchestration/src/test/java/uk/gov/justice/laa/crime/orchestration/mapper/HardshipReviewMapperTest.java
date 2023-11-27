@@ -30,8 +30,7 @@ class HardshipReviewMapperTest {
     @Test
     void givenApiFindHardshipResponseWithSection_whenToDtoIsInvoked_thenDtoIsMapped() {
         ApiFindHardshipResponse hardship = TestModelDataBuilder.getApiFindHardshipResponse();
-        HardshipReviewDTO reviewDTO = new HardshipReviewDTO();
-        hardshipMapper.findHardshipResponseToHardshipDto(hardship);
+        HardshipReviewDTO reviewDTO = hardshipMapper.findHardshipResponseToHardshipDto(hardship);
 
         validateCommonFields(hardship, reviewDTO);
 
