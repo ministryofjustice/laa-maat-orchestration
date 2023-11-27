@@ -48,7 +48,7 @@ class HardshipControllerTest {
         when(orchestrationService.find(anyInt()))
                 .thenReturn(new HardshipReviewDTO());
 
-        mvc.perform(buildRequest(HttpMethod.GET, ENDPOINT_URL + "/" + Constants.TEST_HARDSHIP_ID))
+        mvc.perform(buildRequest(HttpMethod.GET, ENDPOINT_URL + "/" + Constants.TEST_HARDSHIP_REVIEW_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
@@ -64,7 +64,7 @@ class HardshipControllerTest {
         when(orchestrationService.find(anyInt()))
                 .thenThrow(new APIClientException());
 
-        mvc.perform(buildRequest(HttpMethod.GET, ENDPOINT_URL + "/" + Constants.TEST_HARDSHIP_ID))
+        mvc.perform(buildRequest(HttpMethod.GET, ENDPOINT_URL + "/" + Constants.TEST_HARDSHIP_REVIEW_ID))
                 .andExpect(status().isInternalServerError());
     }
 

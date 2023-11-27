@@ -1,5 +1,9 @@
 package uk.gov.justice.laa.crime.orchestration.data;
 
+import uk.gov.justice.laa.crime.orchestration.dto.maat.SysGenString;
+import uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewResult;
+import uk.gov.justice.laa.crime.orchestration.enums.NewWorkReason;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
@@ -9,11 +13,8 @@ import java.util.Date;
 
 public class Constants {
 
-    public static final BigDecimal TEST_SOLICITOR_ESTIMATED_COST = BigDecimal.valueOf(2500);
     public static final Integer TEST_CMU_ID = 50;
-    public static final Integer TEST_HARDSHIP_ID = 1234;
     public static final Integer TEST_HARDSHIP_DETAIL_ID = 12345;
-    public static final Integer TEST_SECOND_HARDSHIP_DETAIL_ID = 12346;
     public static final LocalDateTime REMOVED_DATETIME = LocalDateTime.of(2022, 12, 14, 0, 0, 0);
     public static final LocalDateTime TEST_DATE_COMPLETED_DATETIME = LocalDateTime.of(2022, 11, 14, 0, 0, 0);
     public static final Date TEST_DATE_COMPLETED =
@@ -55,5 +56,17 @@ public class Constants {
     public static final LocalDateTime TEST_ASSESSMENT_SUMMARY_DATETIME = LocalDateTime.of(2022, 9, 3, 0, 0, 0);
     public static final Date TEST_ASSESSMENT_SUMMARY_DATE =
             Date.from(Instant.ofEpochSecond(TEST_ASSESSMENT_SUMMARY_DATETIME.toEpochSecond(ZoneOffset.UTC)));
+
+
+    public static final Integer TEST_CONTRIBUTIONS_ID = 43;
+    public static final BigDecimal TEST_MONTHLY_CONTRIBUTION_AMOUNT = BigDecimal.valueOf(150.00);
+    public static final BigDecimal TEST_UPFRONT_CONTRIBUTION_AMOUNT = BigDecimal.valueOf(2000.00);
+    public static final LocalDateTime TEST_CONTRIBUTION_EFFECTIVE_DATETIME = LocalDateTime.of(2022, 10, 5, 0, 0, 0);
+    public static final Date TEST_CONTRIBUTION_EFFECTIVE_DATE =
+            Date.from(Instant.ofEpochSecond(TEST_CONTRIBUTION_EFFECTIVE_DATETIME.toEpochSecond(ZoneOffset.UTC)));
+    public static final LocalDateTime TEST_CONTRIBUTION_CALCULATION_DATETIME = LocalDateTime.of(2022, 10, 5, 0, 0, 0);
+    public static final Date TEST_CONTRIBUTION_CALCULATION_DATE =
+            Date.from(Instant.ofEpochSecond(TEST_CONTRIBUTION_CALCULATION_DATETIME.toEpochSecond(ZoneOffset.UTC)));
+    public static final SysGenString CONTRIBUTION_BASED_ON = new SysGenString("Means");
 
 }
