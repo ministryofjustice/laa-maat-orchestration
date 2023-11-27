@@ -27,7 +27,15 @@ public class AssessmentSummaryService {
 
     public void updateApplication(ApplicationDTO application, AssessmentSummaryDTO summaryDTO) {
         Collection<AssessmentSummaryDTO> assessmentSummary = application.getAssessmentSummary();
-        assessmentSummary.removeIf(s -> s.getId().equals(summaryDTO.getId()));
-        assessmentSummary.add(summaryDTO);
+        assessmentSummary.stream().filter(s -> s.getId().equals(summaryDTO.getId()))
+                .findFirst().ifPresentOrElse(
+                        assessmentSummaryDTO -> {
+                            assessmentSummaryDTO.setType(summaryDTO.getType());
+                            assessmentSummaryDTO.setStatus(summaryDTO.getStatus());
+                            assessmentSummaryDTO.setResult(summaryDTO.getResult());
+                            assessmentSummaryDTO.setReviewType(summaryDTO.getReviewType());
+                            assessmentSummaryDTO.setAssessmentDate(summaryDTO.getAssessmentDate());
+                        },() -> assessmentSummary.add(summaryDTO)
+                );
     }
 }

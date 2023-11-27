@@ -208,6 +208,25 @@ public class TestModelDataBuilder {
         return details;
     }
 
+    public static AssessmentSummaryDTO getAssessmentSummaryDTO() {
+        return AssessmentSummaryDTO.builder()
+                .id(Constants.TEST_ASSESSMENT_SUMMARY_ID.longValue())
+                .status(AssessmentStatusDTO.COMPLETE)
+                .result(ReviewResult.PASS.getResult())
+                .assessmentDate(Constants.TEST_ASSESSMENT_SUMMARY_DATE)
+                .build();
+    }
+
+    public static AssessmentSummaryDTO getAssessmentSummaryDTOFromHardship(CourtType courtType) {
+        AssessmentSummaryDTO assessmentSummaryDTO = getAssessmentSummaryDTO();
+        if (courtType == CourtType.CROWN_COURT) {
+            assessmentSummaryDTO.setType("Hardship Review - Crown Court");
+        } else {
+            assessmentSummaryDTO.setType("Hardship Review - Magistrate");
+        }
+        return assessmentSummaryDTO;
+    }
+
     public static List<HRSectionDTO> getHrSectionDtosWithMixedTypes() {
         return Stream.concat(
                 getHrSectionDtosWithExpenditureType().stream(),
@@ -222,11 +241,24 @@ public class TestModelDataBuilder {
                 .build();
     }
 
+    public static ContributionsDTO getContributionsDTO() {
+        return ContributionsDTO.builder()
+                .id(Constants.TEST_CONTRIBUTIONS_ID.longValue())
+                .upliftApplied(false)
+                .basedOn(Constants.CONTRIBUTION_BASED_ON)
+                .calcDate(Constants.TEST_CONTRIBUTION_CALCULATION_DATE)
+                .effectiveDate(Constants.TEST_CONTRIBUTION_EFFECTIVE_DATE)
+                .monthlyContribs(Constants.TEST_MONTHLY_CONTRIBUTION_AMOUNT)
+                .upfrontContribs(Constants.TEST_UPFRONT_CONTRIBUTION_AMOUNT)
+                .build();
+    }
+
     public static ApplicationDTO getApplicationDTOWithHardship(CourtType courtType) {
         return ApplicationDTO.builder()
+                .courtType(courtType)
                 .repId(Constants.TEST_REP_ID.longValue())
                 .caseManagementUnitDTO(getCaseManagementUnitDTO())
-                .courtType(courtType)
+                .crownCourtOverviewDTO(CrownCourtOverviewDTO.builder().build())
                 .assessmentDTO(
                         AssessmentDTO.builder()
                                 .financialAssessmentDTO(getFinancialAssessmentDTO(courtType))
@@ -294,7 +326,8 @@ public class TestModelDataBuilder {
                         .progressResponse(
                                 HRProgressResponseDTO.builder()
                                         .response(HardshipReviewProgressResponse.ADDITIONAL_PROVIDED.getResponse())
-                                        .description(HardshipReviewProgressResponse.ADDITIONAL_PROVIDED.getDescription())
+                                        .description(
+                                                HardshipReviewProgressResponse.ADDITIONAL_PROVIDED.getDescription())
                                         .build()
                         )
                         .dateRequired(Constants.TEST_DATE_REQUIRED)
@@ -313,7 +346,7 @@ public class TestModelDataBuilder {
 
     private static AssessmentStatusDTO getAssessmentStatusDTO() {
         return AssessmentStatusDTO.builder()
-                .status("COMPLETE")
+                .status(AssessmentStatusDTO.COMPLETE)
                 .description("Complete")
                 .build();
     }
@@ -383,12 +416,14 @@ public class TestModelDataBuilder {
                                                 .detailDescription(
                                                         HRDetailDescriptionDTO.builder()
                                                                 .code(HardshipReviewDetailCode.MEDICAL_GROUNDS.getCode())
-                                                                .description(HardshipReviewDetailCode.MEDICAL_GROUNDS.getDescription())
+                                                                .description(
+                                                                        HardshipReviewDetailCode.MEDICAL_GROUNDS.getDescription())
                                                                 .build())
                                                 .accepted(true)
                                                 .frequency(FrequenciesDTO.builder()
                                                                    .code(Frequency.MONTHLY.getCode())
-                                                                   .annualWeighting((long) Frequency.MONTHLY.getAnnualWeighting())
+                                                                   .annualWeighting(
+                                                                           (long) Frequency.MONTHLY.getAnnualWeighting())
                                                                    .description(Frequency.MONTHLY.getDescription())
                                                                    .build())
                                                 .amountNumber(BigDecimal.valueOf(1500.00))
