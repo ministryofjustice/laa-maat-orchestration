@@ -308,6 +308,7 @@ public class TestModelDataBuilder {
                 .newWorkReason(getNewWorkReasonDTO())
                 .notes(Constants.TEST_CASEWORKER_NOTES)
                 .decisionNotes(Constants.TEST_CASEWORKER_DECISION_NOTES)
+                .solictorsCosts(getHRSolicitorsCostsDTO())
                 .progress(getHrProgressDTOs())
                 .build();
     }
