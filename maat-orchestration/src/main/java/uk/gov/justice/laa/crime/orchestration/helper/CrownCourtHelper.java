@@ -1,4 +1,4 @@
-package uk.gov.justice.laa.crime.orchestration.util;
+package uk.gov.justice.laa.crime.orchestration.helper;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,10 @@ public class CrownCourtHelper {
         if (CC_CASE_TYPES.contains(CaseType.getFrom(caseType))) {
             return true;
         }
-        return CaseType.getFrom(caseType) == CaseType.EITHER_WAY
-                && MagCourtOutcome.RESOLVED_IN_MAGS != MagCourtOutcome.getFrom(magsOutcome);
+        if (magsOutcome != null) {
+            return CaseType.getFrom(caseType) == CaseType.EITHER_WAY
+                    && MagCourtOutcome.RESOLVED_IN_MAGS != MagCourtOutcome.getFrom(magsOutcome);
+        }
+        return false;
     }
 }

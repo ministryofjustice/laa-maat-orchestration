@@ -7,7 +7,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
-import uk.gov.justice.laa.crime.orchestration.util.CrownCourtHelper;
+import uk.gov.justice.laa.crime.orchestration.helper.CrownCourtHelper;
 
 @Slf4j
 @Service
