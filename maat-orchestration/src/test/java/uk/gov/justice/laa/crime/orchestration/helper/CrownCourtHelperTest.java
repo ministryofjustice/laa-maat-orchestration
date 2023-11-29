@@ -75,4 +75,12 @@ class CrownCourtHelperTest {
         CourtType courtType = crownCourtHelper.getCourtType(applicationDTO);
         assertThat(courtType).isEqualTo(CourtType.MAGISTRATE);
     }
+
+    @Test
+    void givenSummaryOnlyCaseTypeAndOutcomeIsResolvedInMags_whenGetCourtTypeIsInvoked_thenMagsCourtTypeIsReturned() {
+        ApplicationDTO applicationDTO =
+                getApplicationDTOWithCaseTypeAndMagsOutcome(CaseType.SUMMARY_ONLY, MagCourtOutcome.RESOLVED_IN_MAGS);
+        CourtType courtType = crownCourtHelper.getCourtType(applicationDTO);
+        assertThat(courtType).isEqualTo(CourtType.MAGISTRATE);
+    }
 }
