@@ -20,7 +20,7 @@ def versions = [
 		pitest                  : "1.15.3",
 		sentryVersion			: "6.34.0",
 		springdocVersion        : "2.2.0",
-		crimeCommonsVersion     : "2.8.0",
+		crimeCommonsVersion     : "2.9.3",
 		okhttpVersion           : "4.12.0",
 		wiremockVersion    		: "3.0.1"
 ]
@@ -111,11 +111,13 @@ pitest {
 }
 
 
-tasks["sonar"].dependsOn test
+tasks.named("sonar") {
+	it.dependsOn test
+}
 
 sonar {
 	properties {
-		property "sonar.exclusions", "**/entity/**.java , **/model/**.java , **/dto/**.java , **/config/**.java, **/jms/**.java,**/exception/**.java,**/handler/**.java"
+		property "sonar.exclusions", "**/dto/**.java , **/config/**.java, **/enums/**.java, **/exception/**.java"
 		property "sonar.coverage.exclusions", "**/MAATOrchestrationApplication.java"
 		property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
 		property "sonar.projectKey", "ministryofjustice_laa-maat-orchestration"
@@ -135,7 +137,7 @@ jsonSchema2Pojo {
 			methods.annotateJsr303Jakarta = true
 			fields.floatUseBigDecimal = true
 			dateTime.dateTimeType = "java.time.LocalDateTime"
-			klass.targetPackage = "uk.gov.justice.laa.maat.orchestration.model"
+			klass.targetPackage = "uk.gov.justice.laa.crime.orchestration.model"
 			io.source.setFrom files("${project.rootDir}/src/main/resources/schemas")
 		}
 	}

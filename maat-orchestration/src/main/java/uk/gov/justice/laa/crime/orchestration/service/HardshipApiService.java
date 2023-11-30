@@ -1,0 +1,51 @@
+package uk.gov.justice.laa.crime.orchestration.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
+import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiFindHardshipResponse;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
+
+import java.util.Collections;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class HardshipApiService {
+
+    @Qualifier("hardshipApiClient")
+    private final RestAPIClient hardshipApiClient;
+    private final ServicesConfiguration configuration;
+    private static final String RESPONSE_STRING = "Response from Hardship Service: %s";
+
+    public ApiFindHardshipResponse find(Integer hardshipReviewId) {
+        ApiFindHardshipResponse response = hardshipApiClient.get(
+                new ParameterizedTypeReference<>() {
+                },
+                configuration.getHardshipApi().getHardshipEndpoints().getFindUrl(),
+                hardshipReviewId
+        );
+
+        log.info(String.format(RESPONSE_STRING, response));
+        return response;
+    }
+
+    public ApiPerformHardshipResponse create(ApiPerformHardshipRequest request) {
+        ApiPerformHardshipResponse response = hardshipApiClient.post(
+                request,
+                new ParameterizedTypeReference<>() {
+                },
+                configuration.getHardshipApi().getHardshipEndpoints().getCreateUrl(),
+                Collections.emptyMap()
+        );
+
+        log.info(String.format(RESPONSE_STRING, response));
+        return response;
+    }
+
+}

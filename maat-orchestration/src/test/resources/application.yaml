@@ -4,16 +4,21 @@ server:
 services:
   hardship-api:
     base-url: http://localhost:9999
-    hardship-endpoints:
+    endpoints:
       find-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/{hardshipReviewId}
       create-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/
       update-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/
       rollback-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/rollback
-  ccc-api:
+  contribution-api:
     base-url: http://localhost:9999
-    contribution-endpoints:
-      calculate-contribution-url: ${services.ccc-api.base-url}/api/internal/v1/contribution/calculate-contribution
-      request-transfer-url: ${services.ccc-api.base-url}/api/internal/v1/contribution/request-transfer
+    endpoints:
+      calculate-contribution-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/calculate-contribution
+      request-transfer-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/request-transfer
+      check-contribution-rule-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/check-contribution-rule
+  crown-court-api:
+    base-url: http://localhost:9999
+    endpoints:
+      update-application-url: ${services.crown-court-api.base-url}/api/internal/v1/proceedings
 
 retry-config:
   max-retries: 2
