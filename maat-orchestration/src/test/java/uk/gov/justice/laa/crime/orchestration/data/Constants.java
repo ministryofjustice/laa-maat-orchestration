@@ -1,14 +1,15 @@
 package uk.gov.justice.laa.crime.orchestration.data;
 
 import uk.gov.justice.laa.crime.orchestration.dto.maat.SysGenString;
-import uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewResult;
-import uk.gov.justice.laa.crime.orchestration.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.orchestration.enums.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 public class Constants {
@@ -68,5 +69,28 @@ public class Constants {
     public static final Date TEST_CONTRIBUTION_CALCULATION_DATE =
             Date.from(Instant.ofEpochSecond(TEST_CONTRIBUTION_CALCULATION_DATETIME.toEpochSecond(ZoneOffset.UTC)));
     public static final SysGenString CONTRIBUTION_BASED_ON = new SysGenString("Means");
+
+    // TODO: Better organise these constants
+    public static final LocalDateTime TEST_DATETIME_RECEIVED = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
+    public static final LocalDateTime TEST_COMMITAL_DATETIME = TEST_DATETIME_RECEIVED.plus(1, ChronoUnit.DAYS);
+    public static final LocalDateTime TEST_DECISION_DATETIME = TEST_COMMITAL_DATETIME.plus(1, ChronoUnit.DAYS);
+    public static final Date TEST_ASSESSMENT_DATE =
+            Date.from(TEST_DATETIME_RECEIVED.plus(2, ChronoUnit.DAYS).toInstant(ZoneOffset.UTC));
+    public static final LocalDateTime TEST_CC_REP_ORDER_DATETIME = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
+    public static final LocalDateTime TEST_SENTENCE_ORDER_DATETIME = TEST_CC_REP_ORDER_DATETIME.plus(1, ChronoUnit.DAYS);
+    public static final SysGenString TEST_CC_REP_TYPE_THROUGH_ORDER = new SysGenString("Through Order");
+    public static final SysGenString TEST_REP_ORDER_DECISION_GRANTED = new SysGenString("Granted");
+    public static final String TEST_ASSESSMENT_STATUS_COMPLETE = "COMPLETE";
+    public static final String TEST_RESULT_PASS = "PASS";
+    public static final String TEST_RESULT_FAIL = "FAIL";
+    public static final Integer TEST_APPLICANT_HISTORY_ID = 666;
+    public static final Integer TEST_PASSPORTED_ID = 777;
+    public static final String TEST_EVIDENCE_FEE_LEVEL_1 = "LEVEL1";
+
+    public static final String TEST_CC_OUTCOME_TYPE_TRIAL = "TRIAL";
+    public static final String TEST_CC_OUTCOME_DESCRIPTION_CONVICTED = "Convicted";
+
+
+
 
 }
