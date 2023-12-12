@@ -15,12 +15,13 @@ import uk.gov.justice.laa.crime.orchestration.model.contribution.common.ApiContr
 
 import java.util.List;
 
+import static uk.gov.justice.laa.crime.orchestration.enums.CurrentStatus.COMPLETE;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ContributionService {
 
-    public static final String COMPLETE = "COMPLETE";
     public static final String DB_PACKAGE_CORRESPONDENCE_PKG = "CORRESPONDENCE_PKG";
     public static final String DB_PACKAGE_MATRIX_ACTIVITY = "MATRIX_ACTIVITY";
     public static final String DB_GET_APPLICATION_CORRESPONDENCE = "get_application_correspondence";
@@ -62,7 +63,7 @@ public class ContributionService {
     protected boolean isCalculateContributionReqd(final ApplicationDTO applicationDTO) {
         PassportedDTO passportedDTO = applicationDTO.getPassportedDTO();
         if (passportedDTO != null && passportedDTO.getAssessementStatusDTO() != null &&
-                COMPLETE.equals(passportedDTO.getAssessementStatusDTO().getStatus())) {
+                COMPLETE.getValue().equals(passportedDTO.getAssessementStatusDTO().getStatus())) {
             return true;
         }
 
@@ -72,12 +73,12 @@ public class ContributionService {
             if (financialAssessmentDTO != null) {
                 InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
                 if (initialAssessmentDTO != null && initialAssessmentDTO.getAssessmnentStatusDTO() != null &&
-                        COMPLETE.equals(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus())) {
+                        COMPLETE.getValue().equals(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus())) {
                     CaseDetailDTO caseDetailsDTO = applicationDTO.getCaseDetailsDTO();
                     String initResult = initialAssessmentDTO.getResult();
                     boolean isFullComplete = financialAssessmentDTO.getFull() != null &&
                             financialAssessmentDTO.getFull().getAssessmnentStatusDTO() != null &&
-                            COMPLETE.equals(financialAssessmentDTO.getFull().getAssessmnentStatusDTO().getStatus());
+                            COMPLETE.getValue().equals(financialAssessmentDTO.getFull().getAssessmnentStatusDTO().getStatus());
                     return isFullComplete || InitAssessmentResult.PASS.getResult().equals(initResult) ||
                             (caseDetailsDTO != null && CaseType.APPEAL_CC.getCaseType().equals(caseDetailsDTO.getCaseType()) &&
                                     InitAssessmentResult.FAIL.getResult().equals(initResult));

@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.data;
 
 import uk.gov.justice.laa.crime.orchestration.dto.maat.SysGenString;
+import uk.gov.justice.laa.crime.orchestration.enums.Frequency;
 import uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewResult;
 import uk.gov.justice.laa.crime.orchestration.enums.NewWorkReason;
 
@@ -68,5 +69,28 @@ public class Constants {
     public static final Date TEST_CONTRIBUTION_CALCULATION_DATE =
             Date.from(Instant.ofEpochSecond(TEST_CONTRIBUTION_CALCULATION_DATETIME.toEpochSecond(ZoneOffset.UTC)));
     public static final SysGenString CONTRIBUTION_BASED_ON = new SysGenString("Means");
+
+    public static final Integer TEST_CRITERIA_ID = 34;
+    public static final String TEST_ASSESSMENT_NOTES = "Mock assessment notes";;
+    public static final String TEST_OTHER_HOUSING_NOTE = "Mock other housing note";
+    public static final Integer TEST_USN = 123456789;
+    public static final LocalDateTime ASSESSMENT_DATE = LocalDateTime.parse("2022-10-09T15:02:25");
+    public static final BigDecimal TEST_AGGREGATED_EXPENSE = BigDecimal.valueOf(22000.00);
+    public static final BigDecimal TEST_ANNUAL_DISPOSABLE_INCOME = BigDecimal.valueOf(1000.00);
+    public static final BigDecimal THRESHOLD = BigDecimal.valueOf(5000.00);
+    public static final String TRANSACTION_ID = "7c49ebfe-fe3a-4f2f-8dad-f7b8f03b8327";
+    public static final LocalDateTime TEST_INCOME_EVIDENCE_DUE_DATE =
+            LocalDateTime.of(2020, 10, 5, 0, 0, 0);
+    public static final LocalDateTime TEST_INCOME_UPLIFT_APPLY_DATE =
+            LocalDateTime.of(2021, 12, 12, 0, 0, 0);
+    public static final LocalDateTime TEST_INCOME_UPLIFT_REMOVE_DATE =
+            TEST_INCOME_UPLIFT_APPLY_DATE.plusDays(10);
+    public static final String TEST_INCOME_EVIDENCE_NOTES = "Mock Income evidence notes";
+    public static final String TEST_EMPLOYMENT_STATUS = "EMPLOY";
+    public static final BigDecimal TEST_APPLICANT_ANNUAL_TOTAL = BigDecimal.valueOf(12000);
+    public static final Integer TEST_CRITERIA_DETAIL_ID = 135;
+    public static final BigDecimal TEST_APPLICANT_VALUE = BigDecimal.valueOf(1000);
+    public static final Frequency TEST_FREQUENCY = Frequency.MONTHLY;
+    public static final String TEST_FULL_ASSESSMENT_NOTES = "Mock full assessment notes";;
 
 }

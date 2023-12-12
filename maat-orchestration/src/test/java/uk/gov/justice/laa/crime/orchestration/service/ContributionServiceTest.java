@@ -25,6 +25,8 @@ class ContributionServiceTest {
 
     @Mock
     private ContributionApiService contributionApiService;
+    @Mock
+    private MaatCourtDataService maatCourtDataService;
 
     @InjectMocks
     private ContributionService contributionService;
