@@ -27,7 +27,7 @@ import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_
 @Tag(name = "Crime Means Assessment Orchestration", description = "Rest API for orchestrating Crime Means assessment flows.")
 public class MeansAssessmentController {
 
-    private final MeansAssessmentOrchestrationService orchestrationService;
+    private final MeansAssessmentOrchestrationService assessmentOrchestrationService;
 
     @GetMapping(value = "/{financialAssessmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Find Crime Means Assessment")
@@ -40,8 +40,8 @@ public class MeansAssessmentController {
     public ResponseEntity<FinancialAssessmentDTO> find(
             @PathVariable int financialAssessmentId,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
-        log.info("Received request to find crime means assessment with transaction id - " + laaTransactionId);
-        return ResponseEntity.ok(orchestrationService.find(financialAssessmentId));
+        log.info("Received request to find crime means assessment with transaction id - {}", laaTransactionId);
+        return ResponseEntity.ok(assessmentOrchestrationService.find(financialAssessmentId));
     }
 
 
@@ -56,8 +56,8 @@ public class MeansAssessmentController {
     public ResponseEntity<ApplicationDTO> create(
             @Valid @RequestBody WorkflowRequest workflowRequest,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
-        log.info("Received request to create hardship with transaction id - " + laaTransactionId);
-        return ResponseEntity.ok(orchestrationService.create(workflowRequest));
+        log.info("Received request to create hardship with transaction id - {}", laaTransactionId);
+        return ResponseEntity.ok(assessmentOrchestrationService.create(workflowRequest));
     }
 
 
@@ -72,8 +72,8 @@ public class MeansAssessmentController {
     public ResponseEntity<ApplicationDTO> update(
             @Valid @RequestBody WorkflowRequest workflowRequest,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
-        log.info("Received request to update hardship with transaction id - " + laaTransactionId);
-        return ResponseEntity.ok(orchestrationService.update(workflowRequest));
+        log.info("Received request to update hardship with transaction id - {}", laaTransactionId);
+        return ResponseEntity.ok(assessmentOrchestrationService.update(workflowRequest));
     }
 
 }

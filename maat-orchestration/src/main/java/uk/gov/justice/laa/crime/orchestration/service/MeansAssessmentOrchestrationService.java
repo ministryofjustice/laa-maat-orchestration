@@ -3,7 +3,6 @@ package uk.gov.justice.laa.crime.orchestration.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
@@ -16,7 +15,7 @@ public class MeansAssessmentOrchestrationService implements AssessmentOrchestrat
     private final MeansAssessmentService meansAssessmentService;
     private final ContributionService contributionService;
     private final ProceedingsService proceedingsService;
-    private final MaatCourtDataApiService maatCourtDataApiService;
+    private final MaatCourtDataService maatCourtDataService;
     private static final String DB_ASSESSMENT_POST_PROCESSING_PART_1 = "post_assessment_processing_part_1";
     private static final String DB_ASSESSMENT_POST_PROCESSING_PART_2 = "post_assessment_processing_part_2";
     private static final String DB_ASSESSMENT_POST_PROCESSING_PART_1_C3 = "post_assessment_processing_part_1_c3";
@@ -51,45 +50,37 @@ public class MeansAssessmentOrchestrationService implements AssessmentOrchestrat
     private ApplicationDTO processCrownCourtProceedings(WorkflowRequest request) {
         if (request.isC3Enabled()) {
             // call post_processing_part_1_c3 and map the application
-            request.setApplicationDTO(maatCourtDataApiService.executeStoredProcedure(
-                    StoredProcedureRequest.builder()
-                            .dbPackageName(DB_PACKAGE_ASSESSMENTS)
-                            .procedureName(DB_ASSESSMENT_POST_PROCESSING_PART_1_C3)
-                            .application(request.getApplicationDTO())
-                            .user(request.getUserDTO())
-                            .build())
+            request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                    request.getApplicationDTO(),
+                    request.getUserDTO(),
+                    DB_PACKAGE_ASSESSMENTS,
+                    DB_ASSESSMENT_POST_PROCESSING_PART_1_C3)
             );
 
             // call pre_update_cc_application with the calculated contribution and map the application
-            request.setApplicationDTO(maatCourtDataApiService.executeStoredProcedure(
-                    StoredProcedureRequest.builder()
-                            .dbPackageName(DB_PACKAGE_APPLICATION)
-                            .procedureName(DB_PRE_UPDATE_CC_APPLICATION)
-                            .application(contributionService.calculateContribution(request))
-                            .user(request.getUserDTO())
-                            .build())
+            request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                    contributionService.calculateContribution(request),
+                    request.getUserDTO(),
+                    DB_PACKAGE_APPLICATION,
+                    DB_PRE_UPDATE_CC_APPLICATION)
             );
         } else {
             // call post_processing_part1 and map the application
-            request.setApplicationDTO(maatCourtDataApiService.executeStoredProcedure(
-                    StoredProcedureRequest.builder()
-                            .dbPackageName(DB_PACKAGE_ASSESSMENTS)
-                            .procedureName(DB_ASSESSMENT_POST_PROCESSING_PART_1)
-                            .application(request.getApplicationDTO())
-                            .user(request.getUserDTO())
-                            .build())
+            request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                    request.getApplicationDTO(),
+                    request.getUserDTO(),
+                    DB_PACKAGE_ASSESSMENTS,
+                    DB_ASSESSMENT_POST_PROCESSING_PART_1)
             );
         }
         proceedingsService.updateApplication(request);
 
         // call post_processing_part_2
-        ApplicationDTO application = maatCourtDataApiService.executeStoredProcedure(
-                StoredProcedureRequest.builder()
-                        .dbPackageName(DB_PACKAGE_ASSESSMENTS)
-                        .procedureName(DB_ASSESSMENT_POST_PROCESSING_PART_2)
-                        .application(request.getApplicationDTO())
-                        .user(request.getUserDTO())
-                        .build());
+        ApplicationDTO application = maatCourtDataService.invokeStoredProcedure(
+                request.getApplicationDTO(),
+                request.getUserDTO(),
+                DB_PACKAGE_ASSESSMENTS,
+                DB_ASSESSMENT_POST_PROCESSING_PART_2);
         application.setTransactionId(null);
         return application;
     }

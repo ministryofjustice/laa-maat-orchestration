@@ -21,9 +21,13 @@ import java.util.List;
 public class ContributionService {
 
     public static final String COMPLETE = "COMPLETE";
+    public static final String DB_PACKAGE_CORRESPONDENCE_PKG = "CORRESPONDENCE_PKG";
+    public static final String DB_PACKAGE_MATRIX_ACTIVITY = "MATRIX_ACTIVITY";
+    public static final String DB_GET_APPLICATION_CORRESPONDENCE = "get_application_correspondence";
+    public static final String DB_PROCESS_ACTIVITY = "process_activity";
     private final ContributionMapper contributionMapper;
     private final ContributionApiService contributionApiService;
-    private final MaatCourtDataApiService maatCourtDataApiService;
+    private final MaatCourtDataService maatCourtDataService;
 
     public ApplicationDTO calculateContribution(WorkflowRequest request) {
         ApplicationDTO application = request.getApplicationDTO();
@@ -40,12 +44,16 @@ public class ContributionService {
                 }
                 if (Boolean.TRUE.equals(calculateContributionResponse.getProcessActivity())) {
                     // invoke MATRIX stored procedure
+                    application = maatCourtDataService.invokeStoredProcedure(application, request.getUserDTO(),
+                            DB_PACKAGE_MATRIX_ACTIVITY, DB_PROCESS_ACTIVITY);
                 }
                 List<ApiContributionSummary> contributionSummaries = contributionApiService.getContributionSummary(application.getRepId());
                 application.getCrownCourtOverviewDTO().setContributionSummary(
                         contributionMapper.contributionSummaryToDto(contributionSummaries)
                 );
                 // correspondence_pkg.get_application_correspondence
+                application = maatCourtDataService.invokeStoredProcedure(application, request.getUserDTO(),
+                        DB_PACKAGE_CORRESPONDENCE_PKG, DB_GET_APPLICATION_CORRESPONDENCE);
             }
         }
         return application;
