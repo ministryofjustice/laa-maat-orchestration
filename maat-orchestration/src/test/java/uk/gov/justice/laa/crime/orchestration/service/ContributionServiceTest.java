@@ -5,12 +5,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.mapper.ContributionMapper;
+import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.justice.laa.crime.orchestration.data.Constants.TEST_CONTRIBUTIONS_ID;
 
 @ExtendWith({MockitoExtension.class})
 class ContributionServiceTest {
@@ -26,7 +31,9 @@ class ContributionServiceTest {
 
     @Test
     void givenWorkflowRequest_whenCalculateContributionIsInvoked_thenContributionServiceIsCalledAndResponseIsMapped() {
-        WorkflowRequest request = WorkflowRequest.builder().build();
+        WorkflowRequest request = TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.CROWN_COURT);
+        when(contributionApiService.calculate(any()))
+                .thenReturn(new ApiMaatCalculateContributionResponse().withContributionId(TEST_CONTRIBUTIONS_ID));
         contributionService.calculateContribution(request);
         verify(contributionApiService).calculate(any());
         verify(contributionMapper).workflowRequestToMaatCalculateContributionRequest(any());

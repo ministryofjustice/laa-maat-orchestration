@@ -270,6 +270,14 @@ public class TestModelDataBuilder {
         return FinancialAssessmentDTO.builder()
                 .id(Constants.TEST_FINANCIAL_ASSESSMENT_ID.longValue())
                 .hardship(getHardshipOverviewDTO(courtType))
+                .initial(getInitialAssessment())
+                .build();
+    }
+
+    private static InitialAssessmentDTO getInitialAssessment() {
+        return InitialAssessmentDTO.builder()
+                .assessmnentStatusDTO(AssessmentStatusDTO.builder().status("COMPLETE").build())
+                .result(AssessmentResult.PASS.toString())
                 .build();
     }
 
@@ -352,7 +360,7 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    private static HRSolicitorsCostsDTO getHRSolicitorsCostsDTO() {
+    public static HRSolicitorsCostsDTO getHRSolicitorsCostsDTO() {
         return HRSolicitorsCostsDTO.builder()
                 .solicitorRate(Constants.TEST_SOLICITOR_RATE)
                 .solicitorHours(Constants.TEST_SOLICITOR_HOURS.doubleValue())

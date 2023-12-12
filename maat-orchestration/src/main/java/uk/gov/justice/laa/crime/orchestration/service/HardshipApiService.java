@@ -27,7 +27,7 @@ public class HardshipApiService {
         ApiFindHardshipResponse response = hardshipApiClient.get(
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getHardshipApi().getHardshipEndpoints().getFindUrl(),
+                configuration.getHardshipApi().getEndpoints().getFindUrl(),
                 hardshipReviewId
         );
 
@@ -40,7 +40,7 @@ public class HardshipApiService {
                 request,
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getHardshipApi().getHardshipEndpoints().getCreateUrl(),
+                configuration.getHardshipApi().getEndpoints().getCreateUrl(),
                 Collections.emptyMap()
         );
 
