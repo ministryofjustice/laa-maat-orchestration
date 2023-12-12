@@ -1,7 +1,5 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
-import io.netty.util.Constant;
-import org.apache.tomcat.util.bcel.Const;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
@@ -16,11 +14,8 @@ import uk.gov.justice.laa.crime.orchestration.model.crown_court.*;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -44,10 +39,10 @@ public class TestModelDataBuilder {
                 .withReviewDetails(
                         Stream.concat(
                                 getApiHardshipReviewDetails(BigDecimal.valueOf(2000.00),
-                                                            HardshipReviewDetailType.EXPENDITURE
+                                        HardshipReviewDetailType.EXPENDITURE
                                 ).stream(),
                                 getApiHardshipReviewDetails(BigDecimal.valueOf(1500.00),
-                                                            HardshipReviewDetailType.INCOME
+                                        HardshipReviewDetailType.INCOME
                                 ).stream()
                         ).toList())
                 .withReviewProgressItems(getReviewProgressItems());
@@ -222,12 +217,12 @@ public class TestModelDataBuilder {
 
     private static List<ApiHardshipProgress> getReviewProgressItems() {
         return List.of(new ApiHardshipProgress()
-                               .withId(Constants.TEST_HARDSHIP_REVIEW_PROGRESS_ID)
-                               .withProgressResponse(HardshipReviewProgressResponse.ADDITIONAL_PROVIDED)
-                               .withDateCompleted(Constants.TEST_DATE_COMPLETED_DATETIME)
-                               .withDateRequested(Constants.TEST_DATE_REQUESTED_DATETIME)
-                               .withDateRequired(Constants.TEST_DATE_REQUIRED_DATETIME)
-                               .withProgressAction(HardshipReviewProgressAction.SOLICITOR_INFORMED)
+                .withId(Constants.TEST_HARDSHIP_REVIEW_PROGRESS_ID)
+                .withProgressResponse(HardshipReviewProgressResponse.ADDITIONAL_PROVIDED)
+                .withDateCompleted(Constants.TEST_DATE_COMPLETED_DATETIME)
+                .withDateRequested(Constants.TEST_DATE_REQUESTED_DATETIME)
+                .withDateRequired(Constants.TEST_DATE_REQUIRED_DATETIME)
+                .withProgressAction(HardshipReviewProgressAction.SOLICITOR_INFORMED)
         );
     }
 
@@ -359,6 +354,8 @@ public class TestModelDataBuilder {
 
     public static CrownCourtOverviewDTO getCrownCourtOverviewDTO() {
         return CrownCourtOverviewDTO.builder()
+                .appealDTO(getAppealDTO())
+                .contribution(getContributionsDTO())
                 .crownCourtSummaryDTO(getCrownCourtSummaryDTO())
                 .build();
     }
@@ -455,6 +452,7 @@ public class TestModelDataBuilder {
                 .full(getFullAssessmentDTO())
                 .initial(getInitialAssessmentDTO())
                 .hardship(getHardshipOverviewDTO(courtType))
+                .incomeEvidence(getIncomeEvidenceSummaryDTO())
                 .build();
     }
 
@@ -569,13 +567,59 @@ public class TestModelDataBuilder {
                 .build();
     }
 
+    public static IncomeEvidenceSummaryDTO getIncomeEvidenceSummaryDTO() {
+        return IncomeEvidenceSummaryDTO.builder()
+                .upliftAppliedDate(Constants.UPLIFT_APPLIED_DATE)
+                .upliftRemovedDate(Constants.UPLIFT_REMOVED_DATE)
+                .incomeEvidenceNotes("Income Evidence Notes")
+                .applicantIncomeEvidenceList(List.of(getEvidenceDTO()))
+                .partnerIncomeEvidenceList(List.of(getEvidenceDTO()))
+                .evidenceReceivedDate(Constants.EVIDENCE_RECEIVED_DATE)
+                .evidenceDueDate(Constants.EVIDENCE_REQUESTED_DATE)
+                .upliftsAvailable(true)
+                .build();
+    }
+
+    private static EvidenceDTO getEvidenceDTO() {
+        return EvidenceDTO.builder()
+                .id(Constants.EVIDENCE_ID.longValue())
+                .evidenceTypeDTO(getEvidenceTypeDTO())
+                .dateReceived(Constants.EVIDENCE_RECEIVED_DATE)
+                .otherDescription("OTHER DESCRIPTION")
+                .selected(true)
+                .build();
+    }
+
+    private static EvidenceTypeDTO getEvidenceTypeDTO() {
+        return EvidenceTypeDTO.builder()
+                .evidence(Constants.INCOME_EVIDENCE)
+                .description(Constants.INCOME_EVIDENCE_DESCRIPTION)
+                .build();
+    }
+
+    private static AppealDTO getAppealDTO() {
+        return AppealDTO.builder()
+                .available(true)
+                .appealReceivedDate(Constants.APPEAL_RECEIVED_DATE)
+                .appealSentenceOrderDate(Constants.APPEAL_SENTENCE_ORDER_DATE)
+                .appealTypeDTO(getAppealTypeDTO())
+                .build();
+    }
+
+    private static AppealTypeDTO getAppealTypeDTO() {
+        return AppealTypeDTO.builder()
+                .code(AppealType.ACS.getCode())
+                .description(AppealType.ACS.getDescription())
+                .build();
+    }
+
     public static List<HRSectionDTO> getHrSectionDtosWithExpenditureType() {
         return List.of(
                 HRSectionDTO.builder()
                         .detailType(HRDetailTypeDTO.builder()
-                                            .type(HardshipReviewDetailType.EXPENDITURE.getType())
-                                            .description(HardshipReviewDetailType.EXPENDITURE.getDescription())
-                                            .build())
+                                .type(HardshipReviewDetailType.EXPENDITURE.getType())
+                                .description(HardshipReviewDetailType.EXPENDITURE.getDescription())
+                                .build())
                         .detail(List.of(
                                         HRDetailDTO.builder()
                                                 .id(Constants.TEST_HARDSHIP_DETAIL_ID.longValue())
@@ -586,11 +630,11 @@ public class TestModelDataBuilder {
                                                                 .build())
                                                 .accepted(false)
                                                 .frequency(FrequenciesDTO.builder()
-                                                                   .code(Frequency.ANNUALLY.getCode())
-                                                                   .annualWeighting(
-                                                                           (long) Frequency.ANNUALLY.getAnnualWeighting())
-                                                                   .description(Frequency.ANNUALLY.getDescription())
-                                                                   .build())
+                                                        .code(Frequency.ANNUALLY.getCode())
+                                                        .annualWeighting(
+                                                                (long) Frequency.ANNUALLY.getAnnualWeighting())
+                                                        .description(Frequency.ANNUALLY.getDescription())
+                                                        .build())
                                                 .amountNumber(BigDecimal.valueOf(2000.00))
                                                 .otherDescription(Constants.TEST_HARDSHIP_OTHER_DESCRIPTION)
                                                 .reason(
@@ -608,9 +652,9 @@ public class TestModelDataBuilder {
         return List.of(
                 HRSectionDTO.builder()
                         .detailType(HRDetailTypeDTO.builder()
-                                            .type(HardshipReviewDetailType.INCOME.getType())
-                                            .description(HardshipReviewDetailType.INCOME.getDescription())
-                                            .build())
+                                .type(HardshipReviewDetailType.INCOME.getType())
+                                .description(HardshipReviewDetailType.INCOME.getDescription())
+                                .build())
                         .detail(List.of(
                                         HRDetailDTO.builder()
                                                 .id(Constants.TEST_HARDSHIP_DETAIL_ID.longValue())
@@ -622,11 +666,11 @@ public class TestModelDataBuilder {
                                                                 .build())
                                                 .accepted(true)
                                                 .frequency(FrequenciesDTO.builder()
-                                                                   .code(Frequency.MONTHLY.getCode())
-                                                                   .annualWeighting(
-                                                                           (long) Frequency.MONTHLY.getAnnualWeighting())
-                                                                   .description(Frequency.MONTHLY.getDescription())
-                                                                   .build())
+                                                        .code(Frequency.MONTHLY.getCode())
+                                                        .annualWeighting(
+                                                                (long) Frequency.MONTHLY.getAnnualWeighting())
+                                                        .description(Frequency.MONTHLY.getDescription())
+                                                        .build())
                                                 .amountNumber(BigDecimal.valueOf(1500.00))
                                                 .hrReasonNote(Constants.TEST_HARDSHIP_REASON_NOTE)
                                                 .otherDescription(Constants.TEST_HARDSHIP_OTHER_DESCRIPTION)
