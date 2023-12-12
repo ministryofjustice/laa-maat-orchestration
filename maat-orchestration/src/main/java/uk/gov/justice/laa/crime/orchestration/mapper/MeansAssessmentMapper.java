@@ -196,6 +196,8 @@ public class MeansAssessmentMapper {
     }
 
     public FinancialAssessmentDTO getMeansAssessmentResponseToFinancialAssessmentDto(ApiGetMeansAssessmentResponse apiResponse) {
+        // map the response into DTO
+        apiResponse.getFullAssessment();
         return new FinancialAssessmentDTO();
     }
 

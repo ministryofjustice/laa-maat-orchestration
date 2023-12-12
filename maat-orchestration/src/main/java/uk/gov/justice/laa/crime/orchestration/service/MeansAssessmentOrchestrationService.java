@@ -1,6 +1,5 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
-import io.sentry.protocol.App;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -8,7 +7,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
-import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiMeansAssessmentResponse;
 
 @Slf4j
 @Service
@@ -51,8 +49,7 @@ public class MeansAssessmentOrchestrationService implements AssessmentOrchestrat
     }
 
     private ApplicationDTO processCrownCourtProceedings(WorkflowRequest request) {
-        // if (featureToggleService.isFeatureEnabled(user, Constants.FEATURE_CALCULATE_CONTRIBUTION, Constants.ACTION_CREATE)) {
-        if (true) {
+        if (request.isC3Enabled()) {
             // call post_processing_part_1_c3 and map the application
             request.setApplicationDTO(maatCourtDataApiService.executeStoredProcedure(
                     StoredProcedureRequest.builder()

@@ -20,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ContributionService {
 
+    public static final String COMPLETE = "COMPLETE";
     private final ContributionMapper contributionMapper;
     private final ContributionApiService contributionApiService;
     private final MaatCourtDataApiService maatCourtDataApiService;
@@ -53,7 +54,7 @@ public class ContributionService {
     protected boolean isCalculateContributionReqd(final ApplicationDTO applicationDTO) {
         PassportedDTO passportedDTO = applicationDTO.getPassportedDTO();
         if (passportedDTO != null && passportedDTO.getAssessementStatusDTO() != null &&
-                "COMPLETE".equals(passportedDTO.getAssessementStatusDTO().getStatus())) {
+                COMPLETE.equals(passportedDTO.getAssessementStatusDTO().getStatus())) {
             return true;
         }
 
@@ -63,12 +64,12 @@ public class ContributionService {
             if (financialAssessmentDTO != null) {
                 InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
                 if (initialAssessmentDTO != null && initialAssessmentDTO.getAssessmnentStatusDTO() != null &&
-                        "COMPLETE".equals(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus())) {
+                        COMPLETE.equals(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus())) {
                     CaseDetailDTO caseDetailsDTO = applicationDTO.getCaseDetailsDTO();
                     String initResult = initialAssessmentDTO.getResult();
                     boolean isFullComplete = financialAssessmentDTO.getFull() != null &&
                             financialAssessmentDTO.getFull().getAssessmnentStatusDTO() != null &&
-                            "COMPLETE".equals(financialAssessmentDTO.getFull().getAssessmnentStatusDTO().getStatus());
+                            COMPLETE.equals(financialAssessmentDTO.getFull().getAssessmnentStatusDTO().getStatus());
                     return isFullComplete || InitAssessmentResult.PASS.getResult().equals(initResult) ||
                             (caseDetailsDTO != null && CaseType.APPEAL_CC.getCaseType().equals(caseDetailsDTO.getCaseType()) &&
                                     InitAssessmentResult.FAIL.getResult().equals(initResult));

@@ -14,4 +14,5 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 public class WorkflowRequest {
     private UserDTO userDTO;
     private ApplicationDTO applicationDTO;
+    private boolean isC3Enabled;
 }
