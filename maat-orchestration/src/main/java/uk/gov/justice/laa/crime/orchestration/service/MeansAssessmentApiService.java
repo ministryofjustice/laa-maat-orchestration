@@ -28,7 +28,7 @@ public class MeansAssessmentApiService {
         ApiGetMeansAssessmentResponse response = cmaApiClient.get(
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getHardshipApi().getEndpoints().getFindUrl(),
+                configuration.getCmaApi().getEndpoints().getFindUrl(),
                 assessmentId
         );
 
@@ -54,7 +54,7 @@ public class MeansAssessmentApiService {
                 request,
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getCmaApi().getEndpoints().getCreateUrl(),
+                configuration.getCmaApi().getEndpoints().getUpdateUrl(),
                 Collections.emptyMap()
         );
 
