@@ -220,10 +220,13 @@ public class HardshipMapper {
 
     private HRDetailDescriptionDTO hardshipReviewDetailCodeToHrDetailDescriptionDto(
             HardshipReviewDetailCode detailCode) {
-        return HRDetailDescriptionDTO.builder()
-                .description(detailCode.getDescription())
-                .code(detailCode.getCode())
-                .build();
+        if (detailCode != null) {
+            return HRDetailDescriptionDTO.builder()
+                    .description(detailCode.getDescription())
+                    .code(detailCode.getCode())
+                    .build();
+        }
+        return HRDetailDescriptionDTO.builder().build();
     }
 
     private HRDetailTypeDTO hardshipReviewDetailTypeToHrDetailTypeDto(HardshipReviewDetailType hrDetailType) {

@@ -21,6 +21,12 @@ public class ServicesConfiguration {
     @NotNull
     private CrownCourtApi crownCourtApi;
 
+    @NotNull
+    private CmaApi cmaApi;
+
+    @NotNull
+    private MaatApi maatApi;
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -29,7 +35,7 @@ public class ServicesConfiguration {
         private String baseUrl;
 
         @NotNull
-        private Endpoints hardshipEndpoints;
+        private Endpoints endpoints;
 
         @Data
         @NoArgsConstructor
@@ -57,7 +63,7 @@ public class ServicesConfiguration {
         private String baseUrl;
 
         @NotNull
-        private Endpoints contributionEndpoints;
+        private Endpoints endpoints;
 
         @Data
         @NoArgsConstructor
@@ -72,6 +78,9 @@ public class ServicesConfiguration {
 
             @NotNull
             private String checkContributionRuleUrl;
+
+            @NotNull
+            private String contributionSummariesUrl;
         }
     }
 
@@ -83,7 +92,7 @@ public class ServicesConfiguration {
         private String baseUrl;
 
         @NotNull
-        private Endpoints crownCourtEndpoints;
+        private Endpoints endpoints;
 
         @Data
         @NoArgsConstructor
@@ -95,6 +104,51 @@ public class ServicesConfiguration {
 
             @NotNull
             private String updateCrownCourtUrl;
+
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CmaApi {
+        @NotNull
+        private String baseUrl;
+
+        @NotNull
+        private Endpoints endpoints;
+
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Endpoints {
+            @NotNull
+            private String findUrl;
+
+            @NotNull
+            private String createUrl;
+
+            @NotNull
+            private String updateUrl;
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class MaatApi {
+        @NotNull
+        private String baseUrl;
+
+        @NotNull
+        private Endpoints endpoints;
+
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Endpoints {
+            @NotNull
+            private String callStoredProcUrl;
 
         }
     }

@@ -44,13 +44,11 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             // TODO: Call assessments.determine_mags_rep_decision stored procedure
             boolean isVariationRequired = contributionService.isVariationRequired(application);
             if (isVariationRequired) {
-                ContributionsDTO contributionsDTO = contributionService.calculateContribution(request);
-                application.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
+                application = contributionService.calculateContribution(request);
             }
         } else {
             hardshipOverview.setCrownCourtHardship(newHardship);
-            ContributionsDTO contributionsDTO = contributionService.calculateContribution(request);
-            application.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
+            application = contributionService.calculateContribution(request);
 
             // TODO: Call application.pre_update checks stored procedure
 
