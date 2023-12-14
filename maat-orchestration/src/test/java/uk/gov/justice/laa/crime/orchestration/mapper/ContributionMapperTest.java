@@ -25,7 +25,7 @@ import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toDate;
 import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toLocalDateTime;
 
 @ExtendWith(SoftAssertionsExtension.class)
-public class ContributionMapperTest {
+class ContributionMapperTest {
 
     ContributionMapper contributionMapper = new ContributionMapper();
     @InjectSoftAssertions
