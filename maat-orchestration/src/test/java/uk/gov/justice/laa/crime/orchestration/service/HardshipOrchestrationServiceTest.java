@@ -13,13 +13,15 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.helper.CrownCourtHelper;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.*;
 
 @ExtendWith({MockitoExtension.class})
 class HardshipOrchestrationServiceTest {
@@ -49,20 +51,20 @@ class HardshipOrchestrationServiceTest {
     }
 
     private WorkflowRequest setupCreateStubs(CourtType courtType) {
-        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestWithHardship(courtType);
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(courtType);
 
         when(crownCourtHelper.getCourtType(any(ApplicationDTO.class)))
                 .thenReturn(courtType);
 
-        ApiPerformHardshipResponse performHardshipResponse = TestModelDataBuilder.getApiPerformHardshipResponse();
+        ApiPerformHardshipResponse performHardshipResponse = getApiPerformHardshipResponse();
         when(hardshipService.createHardship(workflowRequest))
                 .thenReturn(performHardshipResponse);
 
         when(hardshipService.find(performHardshipResponse.getHardshipReviewId()))
-                .thenReturn(TestModelDataBuilder.getHardshipReviewDTO());
+                .thenReturn(getHardshipReviewDTO());
 
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), eq(courtType)))
-                .thenReturn(TestModelDataBuilder.getAssessmentSummaryDTO());
+                .thenReturn(getAssessmentSummaryDTO());
 
         return workflowRequest;
     }
@@ -78,7 +80,7 @@ class HardshipOrchestrationServiceTest {
         ApplicationDTO applicationDTO = orchestrationService.create(workflowRequest);
 
         assertThat(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getMagCourtHardship())
-                .isEqualTo(TestModelDataBuilder.getHardshipReviewDTO());
+                .isEqualTo(getHardshipReviewDTO());
 
         verify(assessmentSummaryService)
                 .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
@@ -91,16 +93,19 @@ class HardshipOrchestrationServiceTest {
         when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
                 .thenReturn(true);
 
-        ContributionsDTO contributionsDTO = TestModelDataBuilder.getContributionsDTO();
+
+        ContributionsDTO contributionsDTO = getContributionsDTO();
+        ApplicationDTO applicationDTO = getApplicationDTOWithHardship(CourtType.MAGISTRATE);
+        applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
         when(contributionService.calculateContribution(workflowRequest))
-                .thenReturn(contributionsDTO);
+                .thenReturn(applicationDTO);
 
-        ApplicationDTO applicationDTO = orchestrationService.create(workflowRequest);
+        ApplicationDTO expected = orchestrationService.create(workflowRequest);
 
-        assertThat(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getMagCourtHardship())
-                .isEqualTo(TestModelDataBuilder.getHardshipReviewDTO());
+        assertThat(expected.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getMagCourtHardship())
+                .isEqualTo(getHardshipReviewDTO());
 
-        assertThat(applicationDTO.getCrownCourtOverviewDTO().getContribution())
+        assertThat(expected.getCrownCourtOverviewDTO().getContribution())
                 .isEqualTo(contributionsDTO);
 
         verify(assessmentSummaryService)
@@ -111,16 +116,20 @@ class HardshipOrchestrationServiceTest {
     void givenIsCrownCourt_whenCreateIsInvoked_thenApplicationDTOIsUpdatedWithNewHardship() {
         WorkflowRequest workflowRequest = setupCreateStubs(CourtType.CROWN_COURT);
 
-        ContributionsDTO contributionsDTO = TestModelDataBuilder.getContributionsDTO();
+        ContributionsDTO contributionsDTO = getContributionsDTO();
+        ApplicationDTO applicationDTO = getApplicationDTOWithHardship(CourtType.CROWN_COURT);
+        applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
+        applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship()
+                .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
         when(contributionService.calculateContribution(workflowRequest))
-                .thenReturn(contributionsDTO);
+                .thenReturn(applicationDTO);
 
-        ApplicationDTO applicationDTO = orchestrationService.create(workflowRequest);
+        ApplicationDTO expected = orchestrationService.create(workflowRequest);
 
-        assertThat(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship())
-                .isEqualTo(TestModelDataBuilder.getHardshipReviewDTO());
+        assertThat(expected.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship())
+                .isEqualTo(getHardshipReviewDTO());
 
-        assertThat(applicationDTO.getCrownCourtOverviewDTO().getContribution())
+        assertThat(expected.getCrownCourtOverviewDTO().getContribution())
                 .isEqualTo(contributionsDTO);
 
         verify(proceedingsService).updateApplication(workflowRequest);

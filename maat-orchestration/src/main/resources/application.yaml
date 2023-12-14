@@ -30,7 +30,7 @@ spring:
             token-uri: ${CMA_API_OAUTH_URL}
           validation:
             token-uri: ${VALIDATION_API_OAUTH_URL}
-          maat:
+          maat-api:
             token-uri: ${MAAT_API_OAUTH_URL}
         registration:
           hardship:
@@ -53,7 +53,7 @@ spring:
             client-id: ${VALIDATION_API_OAUTH_CLIENT_ID}
             client-secret: ${VALIDATION_API_OAUTH_CLIENT_SECRET}
             authorization-grant-type: client_credentials
-          maat:
+          maat-api:
             client-id: ${MAAT_API_OAUTH_CLIENT_ID}
             client-secret: ${MAAT_API_OAUTH_CLIENT_SECRET}
             authorization-grant-type: client_credentials
@@ -66,8 +66,8 @@ services:
     base-url: ${HARDSHIP_API_BASE_URL}
     endpoints:
       find-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/{hardshipReviewId}
-      create-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/api/internal/v1/hardship
-      update-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/api/internal/v1/hardship
+      create-url: ${services.hardship-api.base-url}/api/internal/v1/hardship
+      update-url: ${services.hardship-api.base-url}/api/internal/v1/hardship
       rollback-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/rollback
   contribution-api:
     base-url: ${CCC_API_BASE_URL}
@@ -75,6 +75,7 @@ services:
       request-transfer-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/request-transfer
       calculate-contribution-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/calculate-contribution
       check-contribution-rule-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/check-contribution-rule
+      contribution-summaries-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/summaries
   crown-court-api:
     base-url: ${CCP_API_BASE_URL}
     endpoints:
@@ -83,10 +84,16 @@ services:
 
   cma-api:
     base-url: ${CMA_API_BASE_URL}
+    endpoints:
+      find-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means/{financialAssessmentId}
+      create-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means
+      update-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means
   validation-api:
     base-url: ${VALIDATION_API_BASE_URL}
   maat-api:
     base-url: ${MAAT_API_BASE_URL}
+    endpoints:
+      call-stored-proc-url: ${services.maat-api.base-url}/api/internal/v1/assessment/execute-stored-procedure
 
 retry-config:
   max-retries: 3

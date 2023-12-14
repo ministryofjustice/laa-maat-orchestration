@@ -1,7 +1,9 @@
 package uk.gov.justice.laa.crime.orchestration.data;
 
 import uk.gov.justice.laa.crime.orchestration.dto.maat.SysGenString;
-import uk.gov.justice.laa.crime.orchestration.enums.*;
+import uk.gov.justice.laa.crime.orchestration.enums.Frequency;
+import uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewResult;
+import uk.gov.justice.laa.crime.orchestration.enums.NewWorkReason;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -36,6 +38,7 @@ public class Constants {
     public static final BigDecimal TEST_SOLICITOR_DISBURSEMENTS = BigDecimal.valueOf(375);
     public static final BigDecimal TEST_SOLICITOR_VAT = BigDecimal.valueOf(250);
     public static final BigDecimal TEST_SOLICITOR_ESTIMATED_COST = BigDecimal.valueOf(2500);
+
     public static final BigDecimal TEST_DISPOSABLE_INCOME = BigDecimal.valueOf(12000);
     public static final BigDecimal TEST_POST_HARDSHIP_DISPOSABLE_INCOME = BigDecimal.valueOf(5000);
     public static final Integer TEST_REP_ID = 200;
@@ -50,10 +53,13 @@ public class Constants {
     public static final String TEST_HARDSHIP_REASON_NOTE = "Mock reason note";
     public static final String TEST_HARDSHIP_REVIEW_RESULT = HardshipReviewResult.PASS.name();
     public static final Integer TEST_HARDSHIP_REVIEW_PROGRESS_ID = 53;
+
     public static final Integer TEST_ASSESSMENT_SUMMARY_ID = 75;
     public static final LocalDateTime TEST_ASSESSMENT_SUMMARY_DATETIME = LocalDateTime.of(2022, 9, 3, 0, 0, 0);
     public static final Date TEST_ASSESSMENT_SUMMARY_DATE =
             Date.from(Instant.ofEpochSecond(TEST_ASSESSMENT_SUMMARY_DATETIME.toEpochSecond(ZoneOffset.UTC)));
+
+
     public static final Integer TEST_CONTRIBUTIONS_ID = 43;
     public static final BigDecimal TEST_MONTHLY_CONTRIBUTION_AMOUNT = BigDecimal.valueOf(150.00);
     public static final BigDecimal TEST_UPFRONT_CONTRIBUTION_AMOUNT = BigDecimal.valueOf(2000.00);
@@ -65,6 +71,30 @@ public class Constants {
             Date.from(Instant.ofEpochSecond(TEST_CONTRIBUTION_CALCULATION_DATETIME.toEpochSecond(ZoneOffset.UTC)));
     public static final SysGenString CONTRIBUTION_BASED_ON = new SysGenString("Means");
 
+    public static final Integer TEST_CRITERIA_ID = 34;
+    public static final String TEST_ASSESSMENT_NOTES = "Mock assessment notes";;
+    public static final String TEST_OTHER_HOUSING_NOTE = "Mock other housing note";
+    public static final Integer TEST_USN = 123456789;
+    public static final LocalDateTime ASSESSMENT_DATE = LocalDateTime.parse("2022-10-09T15:02:25");
+    public static final BigDecimal TEST_AGGREGATED_EXPENSE = BigDecimal.valueOf(22000.00);
+    public static final BigDecimal TEST_ANNUAL_DISPOSABLE_INCOME = BigDecimal.valueOf(1000.00);
+    public static final BigDecimal THRESHOLD = BigDecimal.valueOf(5000.00);
+    public static final String TRANSACTION_ID = "7c49ebfe-fe3a-4f2f-8dad-f7b8f03b8327";
+    public static final LocalDateTime TEST_INCOME_EVIDENCE_DUE_DATE =
+            LocalDateTime.of(2020, 10, 5, 0, 0, 0);
+    public static final LocalDateTime TEST_INCOME_UPLIFT_APPLY_DATE =
+            LocalDateTime.of(2021, 12, 12, 0, 0, 0);
+    public static final LocalDateTime TEST_INCOME_UPLIFT_REMOVE_DATE =
+            TEST_INCOME_UPLIFT_APPLY_DATE.plusDays(10);
+    public static final String TEST_INCOME_EVIDENCE_NOTES = "Mock Income evidence notes";
+    public static final String TEST_EMPLOYMENT_STATUS = "EMPLOY";
+    public static final BigDecimal TEST_APPLICANT_ANNUAL_TOTAL = BigDecimal.valueOf(12000);
+    public static final Integer TEST_CRITERIA_DETAIL_ID = 135;
+    public static final BigDecimal TEST_APPLICANT_VALUE = BigDecimal.valueOf(1000);
+    public static final Frequency TEST_FREQUENCY = Frequency.MONTHLY;
+    public static final String TEST_FULL_ASSESSMENT_NOTES = "Mock full assessment notes";;
+
+
     // TODO: Better organise these constants
     public static final LocalDateTime TEST_DATETIME_RECEIVED = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
     public static final LocalDateTime TEST_COMMITAL_DATETIME = TEST_DATETIME_RECEIVED.plus(1, ChronoUnit.DAYS);
@@ -75,32 +105,13 @@ public class Constants {
     public static final LocalDateTime TEST_SENTENCE_ORDER_DATETIME = TEST_CC_REP_ORDER_DATETIME.plus(1, ChronoUnit.DAYS);
     public static final SysGenString TEST_CC_REP_TYPE_THROUGH_ORDER = new SysGenString("Through Order");
     public static final SysGenString TEST_REP_ORDER_DECISION_GRANTED = new SysGenString("Granted");
-    public static final String TEST_ASSESSMENT_STATUS_COMPLETE = "COMPLETE";
     public static final String TEST_RESULT_PASS = "PASS";
     public static final String TEST_RESULT_FAIL = "FAIL";
     public static final Integer TEST_APPLICANT_HISTORY_ID = 666;
     public static final Integer TEST_PASSPORTED_ID = 777;
     public static final String TEST_EVIDENCE_FEE_LEVEL_1 = "LEVEL1";
-    public static final String TEST_CC_OUTCOME_TYPE_TRIAL = "TRIAL";
-    public static final String TEST_CC_OUTCOME_DESCRIPTION_CONVICTED = "Convicted";
     public static final String INCOME_EVIDENCE = "TAX RETURN";
     public static final String INCOME_EVIDENCE_DESCRIPTION = "Tax Return";
     public static final Integer EVIDENCE_ID = 9552473;
-    public static final LocalDateTime DATE_RECEIVED_DATETIME = LocalDateTime.of(2023, 04, 12, 0, 0, 0);
-    public static final Date EVIDENCE_RECEIVED_DATE =
-            Date.from(Instant.ofEpochSecond(DATE_RECEIVED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
-    public static final Date EVIDENCE_REQUESTED_DATE =
-            Date.from(Instant.ofEpochSecond(TEST_DATE_REQUESTED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
-    public static final LocalDateTime UPLIFT_APPLIED_DATETIME = LocalDateTime.of(2022, 11, 12, 0, 0, 0);
-    public static final Date UPLIFT_APPLIED_DATE =
-            Date.from(Instant.ofEpochSecond(UPLIFT_APPLIED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
-    public static final LocalDateTime UPLIFT_REMOVED_DATETIME = LocalDateTime.of(2023, 11, 12, 0, 0, 0);
-    public static final Date UPLIFT_REMOVED_DATE =
-            Date.from(Instant.ofEpochSecond(UPLIFT_REMOVED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
-    public static final Date APPEAL_RECEIVED_DATE =
-            Date.from(Instant.ofEpochSecond(DATE_RECEIVED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
-    public static final LocalDateTime APPEAL_SENTENCE_ORDER_DATETIME = LocalDateTime.of(2023, 11, 12, 0, 0, 0);
-    public static final Date APPEAL_SENTENCE_ORDER_DATE =
-            Date.from(Instant.ofEpochSecond(APPEAL_SENTENCE_ORDER_DATETIME.toEpochSecond(ZoneOffset.UTC)));
 
 }
