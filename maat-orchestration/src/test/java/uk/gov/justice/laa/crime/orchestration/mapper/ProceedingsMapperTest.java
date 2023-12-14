@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ProceedingsMapperTest {
+class ProceedingsMapperTest {
 
     @Mock
     UserMapper userMapper;
@@ -44,7 +44,7 @@ public class ProceedingsMapperTest {
     }
 
     @Test
-    @Disabled
+    @Disabled("In progress")
     void whenUpdateApplicationResponseToApplicationDtoIsInvoked() {
         // TODO: Generate ApiUpdateApplicationResponse test data
         ApiUpdateApplicationResponse updateApplicationResponse = TestModelDataBuilder.getApiUpdateApplicationResponse();
