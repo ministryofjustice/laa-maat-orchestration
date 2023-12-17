@@ -6,19 +6,27 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
+import uk.gov.justice.laa.crime.orchestration.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.helper.CrownCourtHelper;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class HardshipOrchestrationService implements AssessmentOrchestrator<HardshipReviewDTO> {
 
+    private static final String DB_PACKAGE_ASSESSMENTS = "assessments";
+    private static final String DB_PACKAGE_APPLICATION = "application";
+    private static final String DB_PACKAGE_CROWN_COURT = "crown_court";
+    private static final String DB_DETERMINE_MAGS_REP_DECISION = "determine_mags_rep_decision";
+    private static final String DB_PRE_UPDATE_CC_APPLICATION = "pre_update_cc_application";
+    private static final String DB_PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE = "xx_process_activity_and_get_correspondence";
     private final HardshipService hardshipService;
     private final ContributionService contributionService;
     private final ProceedingsService proceedingsService;
     private final CrownCourtHelper crownCourtHelper;
     private final AssessmentSummaryService assessmentSummaryService;
+    private final MaatCourtDataService maatCourtDataService;
 
     public HardshipReviewDTO find(int hardshipReviewId) {
         return hardshipService.find(hardshipReviewId);
@@ -48,15 +56,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             }
         } else {
             hardshipOverview.setCrownCourtHardship(newHardship);
-            application = contributionService.calculateContribution(request);
-
-            // TODO: Call application.pre_update checks stored procedure
-
-            proceedingsService.updateApplication(request);
-
-            // TODO: Call application.handle_eform_result stored procedure
-
-            // TODO: Call crown_court.xx_process_activity_and_get_correspondence stored procedure
+            application = checkActionsAndUpdateApplication(request);
         }
 
         // Update assessment summary view - displayed on the application tab
@@ -67,6 +67,63 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     }
 
     public ApplicationDTO update(WorkflowRequest request) {
+        // invoke the validation service to check that data has not been modified by another user
+        // invoke the validation service to Check user has rep order reserved
+
+        // derive the court type - we might have to pass the Court type as part of the request
+        CourtType courtType = crownCourtHelper.getCourtType(request.getApplicationDTO());
+        request.getApplicationDTO().setCourtType(courtType);
+
+        hardshipService.updateHardship(request);
+
+        if (courtType == CourtType.MAGISTRATE) {
+            AssessmentStatusDTO assessmentStatusDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO()
+                    .getHardship().getMagCourtHardship().getAsessmentStatus();
+            if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
+                // call assessments.determine_mags_rep_decision stored procedure
+                request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(request.getApplicationDTO(),
+                        request.getUserDTO(),
+                        DB_PACKAGE_ASSESSMENTS,
+                        DB_DETERMINE_MAGS_REP_DECISION));
+                if (contributionService.isVariationRequired(request.getApplicationDTO())) {
+                    request.setApplicationDTO(contributionService.calculateContribution(request));
+                }
+            }
+        } else {
+            AssessmentStatusDTO assessmentStatusDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO()
+                    .getHardship().getCrownCourtHardship().getAsessmentStatus();
+            if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
+                request.setApplicationDTO(checkActionsAndUpdateApplication(request));
+            }
+        }
+
+        return request.getApplicationDTO();
+    }
+
+    /**
+     * This method performs the logic from the following stored procedures:
+     * crown_court.check_crown_court_actions(p_application_object => p_application_object);
+     * application.update_cc_application(p_application_object => p_application_object);
+     */
+    protected ApplicationDTO checkActionsAndUpdateApplication(WorkflowRequest request) {
+        request.setApplicationDTO(contributionService.calculateContribution(request));
+
+        // call application.pre_update_cc_application stored procedure
+        request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(request.getApplicationDTO(),
+                request.getUserDTO(),
+                DB_PACKAGE_APPLICATION,
+                DB_PRE_UPDATE_CC_APPLICATION));
+
+        proceedingsService.updateApplication(request);
+
+        // Call application.handle_eform_result stored procedure OR Equivalent ATS service endpoint
+
+        // Call crown_court.xx_process_activity_and_get_correspondence stored procedure
+        request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(request.getApplicationDTO(),
+                request.getUserDTO(),
+                DB_PACKAGE_CROWN_COURT,
+                DB_PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE));
+
         return request.getApplicationDTO();
     }
 

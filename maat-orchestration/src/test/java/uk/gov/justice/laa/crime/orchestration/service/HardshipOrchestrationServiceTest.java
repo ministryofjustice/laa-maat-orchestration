@@ -8,10 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.helper.CrownCourtHelper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
@@ -39,6 +36,9 @@ class HardshipOrchestrationServiceTest {
 
     @Mock
     private AssessmentSummaryService assessmentSummaryService;
+
+    @Mock
+    private MaatCourtDataService maatCourtDataService;
 
     @InjectMocks
     private HardshipOrchestrationService orchestrationService;
@@ -121,6 +121,9 @@ class HardshipOrchestrationServiceTest {
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship()
                 .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
         when(contributionService.calculateContribution(workflowRequest))
+                .thenReturn(applicationDTO);
+
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
                 .thenReturn(applicationDTO);
 
         ApplicationDTO expected = orchestrationService.create(workflowRequest);
