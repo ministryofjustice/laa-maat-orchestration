@@ -74,6 +74,8 @@ class HardshipOrchestrationServiceTest {
 
         WorkflowRequest workflowRequest = setupCreateStubs(CourtType.MAGISTRATE);
 
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+                .thenReturn(workflowRequest.getApplicationDTO());
         when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
                 .thenReturn(false);
 
@@ -90,15 +92,15 @@ class HardshipOrchestrationServiceTest {
     void givenIsMagsCourtWithVariation_whenCreateIsInvoked_thenApplicationDTOIsUpdatedWithNewHardship() {
         WorkflowRequest workflowRequest = setupCreateStubs(CourtType.MAGISTRATE);
 
-        when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
-                .thenReturn(true);
-
-
         ContributionsDTO contributionsDTO = getContributionsDTO();
         ApplicationDTO applicationDTO = getApplicationDTOWithHardship(CourtType.MAGISTRATE);
         applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
         when(contributionService.calculateContribution(workflowRequest))
                 .thenReturn(applicationDTO);
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+                .thenReturn(applicationDTO);
+        when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
+                .thenReturn(true);
 
         ApplicationDTO expected = orchestrationService.create(workflowRequest);
 
@@ -141,5 +143,78 @@ class HardshipOrchestrationServiceTest {
                 .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
     }
 
+    private WorkflowRequest setupUpdateStubs(CourtType courtType) {
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(courtType);
 
+        when(crownCourtHelper.getCourtType(any(ApplicationDTO.class)))
+                .thenReturn(courtType);
+
+        return workflowRequest;
+    }
+
+    @Test
+    void givenMagsCourtAndNoVariation_whenUpdateIsInvoked_thenApplicationDTOIsUpdatedWithNewHardship() {
+
+        WorkflowRequest workflowRequest = setupUpdateStubs(CourtType.MAGISTRATE);
+
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+                .thenReturn(workflowRequest.getApplicationDTO());
+        when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
+                .thenReturn(false);
+
+        ApplicationDTO applicationDTO = orchestrationService.update(workflowRequest);
+
+        assertThat(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getMagCourtHardship())
+                .isEqualTo(getHardshipReviewDTO());
+    }
+
+    @Test
+    void givenMagsCourtWithVariation_whenUpdateIsInvoked_thenApplicationDTOIsUpdatedWithNewHardship() {
+        WorkflowRequest workflowRequest = setupUpdateStubs(CourtType.MAGISTRATE);
+
+        ContributionsDTO contributionsDTO = getContributionsDTO();
+        ApplicationDTO applicationDTO = getApplicationDTOWithHardship(CourtType.MAGISTRATE);
+        applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
+        when(contributionService.calculateContribution(workflowRequest))
+                .thenReturn(applicationDTO);
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+                .thenReturn(applicationDTO);
+        when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
+                .thenReturn(true);
+
+        ApplicationDTO expected = orchestrationService.update(workflowRequest);
+
+        assertThat(expected.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getMagCourtHardship())
+                .isEqualTo(getHardshipReviewDTO());
+
+        assertThat(expected.getCrownCourtOverviewDTO().getContribution())
+                .isEqualTo(contributionsDTO);
+    }
+
+    @Test
+    void givenCrownCourt_whenUpdateIsInvoked_thenApplicationDTOIsUpdatedWithNewHardship() {
+        WorkflowRequest workflowRequest = setupUpdateStubs(CourtType.CROWN_COURT);
+
+        ContributionsDTO contributionsDTO = getContributionsDTO();
+        ApplicationDTO applicationDTO = getApplicationDTOWithHardship(CourtType.CROWN_COURT);
+        applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
+        applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship()
+                .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
+        when(contributionService.calculateContribution(workflowRequest))
+                .thenReturn(applicationDTO);
+
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+                .thenReturn(applicationDTO);
+
+        ApplicationDTO expected = orchestrationService.update(workflowRequest);
+
+        assertThat(expected.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship())
+                .isEqualTo(getHardshipReviewDTO());
+
+        assertThat(expected.getCrownCourtOverviewDTO().getContribution())
+                .isEqualTo(contributionsDTO);
+
+        verify(proceedingsService).updateApplication(workflowRequest);
+
+    }
 }

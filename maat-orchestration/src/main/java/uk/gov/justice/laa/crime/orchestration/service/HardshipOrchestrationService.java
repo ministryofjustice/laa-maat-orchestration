@@ -49,11 +49,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
 
         if (courtType == CourtType.MAGISTRATE) {
             hardshipOverview.setMagCourtHardship(newHardship);
-            // TODO: Call assessments.determine_mags_rep_decision stored procedure
-            boolean isVariationRequired = contributionService.isVariationRequired(application);
-            if (isVariationRequired) {
-                application = contributionService.calculateContribution(request);
-            }
+            application = processMagCourtHardshipRules(request);
         } else {
             hardshipOverview.setCrownCourtHardship(newHardship);
             application = checkActionsAndUpdateApplication(request);
@@ -80,14 +76,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             AssessmentStatusDTO assessmentStatusDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO()
                     .getHardship().getMagCourtHardship().getAsessmentStatus();
             if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
-                // call assessments.determine_mags_rep_decision stored procedure
-                request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(request.getApplicationDTO(),
-                        request.getUserDTO(),
-                        DB_PACKAGE_ASSESSMENTS,
-                        DB_DETERMINE_MAGS_REP_DECISION));
-                if (contributionService.isVariationRequired(request.getApplicationDTO())) {
-                    request.setApplicationDTO(contributionService.calculateContribution(request));
-                }
+                request.setApplicationDTO(processMagCourtHardshipRules(request));
             }
         } else {
             AssessmentStatusDTO assessmentStatusDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO()
@@ -97,6 +86,18 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             }
         }
 
+        return request.getApplicationDTO();
+    }
+
+    private ApplicationDTO processMagCourtHardshipRules(WorkflowRequest request) {
+        // call assessments.determine_mags_rep_decision stored procedure
+        request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(request.getApplicationDTO(),
+                request.getUserDTO(),
+                DB_PACKAGE_ASSESSMENTS,
+                DB_DETERMINE_MAGS_REP_DECISION));
+        if (contributionService.isVariationRequired(request.getApplicationDTO())) {
+            return contributionService.calculateContribution(request);
+        }
         return request.getApplicationDTO();
     }
 
