@@ -97,7 +97,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
      * crown_court.check_crown_court_actions(p_application_object => p_application_object);
      * application.update_cc_application(p_application_object => p_application_object);
      */
-    protected ApplicationDTO checkActionsAndUpdateApplication(WorkflowRequest request) {
+    private ApplicationDTO checkActionsAndUpdateApplication(WorkflowRequest request) {
         request.setApplicationDTO(contributionService.calculateContribution(request));
 
         // call application.pre_update_cc_application stored procedure

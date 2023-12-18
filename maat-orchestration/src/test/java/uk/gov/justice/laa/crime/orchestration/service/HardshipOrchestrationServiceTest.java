@@ -10,7 +10,6 @@ import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
-import uk.gov.justice.laa.crime.orchestration.helper.CrownCourtHelper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -158,7 +157,7 @@ class HardshipOrchestrationServiceTest {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
 
         ContributionsDTO contributionsDTO = getContributionsDTO();
-        ApplicationDTO applicationDTO = getApplicationDTOWithHardship(CourtType.MAGISTRATE);
+        ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
         applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
         when(contributionService.calculateContribution(workflowRequest))
                 .thenReturn(applicationDTO);
@@ -181,7 +180,7 @@ class HardshipOrchestrationServiceTest {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.CROWN_COURT);
 
         ContributionsDTO contributionsDTO = getContributionsDTO();
-        ApplicationDTO applicationDTO = getApplicationDTOWithHardship(CourtType.CROWN_COURT);
+        ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
         applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship()
                 .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
@@ -200,6 +199,44 @@ class HardshipOrchestrationServiceTest {
                 .isEqualTo(contributionsDTO);
 
         verify(proceedingsService).updateApplication(workflowRequest);
+
+    }
+
+    @Test
+    void givenCrownCourtInProgressHardship_whenUpdateIsInvoked_thenCheckActionsIsNotInvoked() {
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.CROWN_COURT);
+        workflowRequest.getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .getHardship()
+                .getCrownCourtHardship()
+                .getAsessmentStatus().setStatus(AssessmentStatusDTO.INCOMPLETE);
+
+        ApplicationDTO actual = orchestrationService.update(workflowRequest);
+
+        HardshipReviewDTO expected = getHardshipOverviewDTO(CourtType.CROWN_COURT).getCrownCourtHardship();
+        expected.getAsessmentStatus().setStatus(AssessmentStatusDTO.INCOMPLETE);
+        assertThat(actual.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship())
+                .isEqualTo(expected);
+
+    }
+
+    @Test
+    void givenCrownCourtWithMissingAssessment_whenUpdateIsInvoked_thenCheckActionsIsNotInvoked() {
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.CROWN_COURT);
+        workflowRequest.getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .getHardship()
+                .getCrownCourtHardship()
+                .getAsessmentStatus().setStatus(null);
+
+        ApplicationDTO actual = orchestrationService.update(workflowRequest);
+
+        HardshipReviewDTO expected = getHardshipOverviewDTO(CourtType.CROWN_COURT).getCrownCourtHardship();
+        expected.getAsessmentStatus().setStatus(null);
+        assertThat(actual.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship())
+                .isEqualTo(expected);
 
     }
 }
