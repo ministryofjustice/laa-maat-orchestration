@@ -45,7 +45,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         if (application.getCourtType() == CourtType.MAGISTRATE) {
             hardshipOverview.setMagCourtHardship(newHardship);
             application = processMagCourtHardshipRules(request);
-        } else {
+        } else if (application.getCourtType() == CourtType.CROWN_COURT) {
             hardshipOverview.setCrownCourtHardship(newHardship);
             application = checkActionsAndUpdateApplication(request);
         }
@@ -63,13 +63,14 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
 
         hardshipService.updateHardship(request);
 
-        if (request.getApplicationDTO().getCourtType() == CourtType.MAGISTRATE) {
+        CourtType courtType = request.getApplicationDTO().getCourtType();
+        if (courtType == CourtType.MAGISTRATE) {
             AssessmentStatusDTO assessmentStatusDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO()
                     .getHardship().getMagCourtHardship().getAsessmentStatus();
             if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
                 request.setApplicationDTO(processMagCourtHardshipRules(request));
             }
-        } else {
+        } else if (courtType == CourtType.CROWN_COURT) {
             AssessmentStatusDTO assessmentStatusDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO()
                     .getHardship().getCrownCourtHardship().getAsessmentStatus();
             if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
