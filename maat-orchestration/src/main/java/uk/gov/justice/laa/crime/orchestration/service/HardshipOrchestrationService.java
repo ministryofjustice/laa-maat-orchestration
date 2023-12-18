@@ -7,7 +7,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.enums.CurrentStatus;
-import uk.gov.justice.laa.crime.orchestration.helper.CrownCourtHelper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 
 @Slf4j
@@ -24,7 +23,6 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     private final HardshipService hardshipService;
     private final ContributionService contributionService;
     private final ProceedingsService proceedingsService;
-    private final CrownCourtHelper crownCourtHelper;
     private final AssessmentSummaryService assessmentSummaryService;
     private final MaatCourtDataService maatCourtDataService;
 
@@ -35,9 +33,6 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     public ApplicationDTO create(WorkflowRequest request) {
         ApplicationDTO application = request.getApplicationDTO();
 
-        CourtType courtType = crownCourtHelper.getCourtType(application);
-        // Set the courtType, as this will be needed in the mapping logic
-        application.setCourtType(courtType);
         HardshipOverviewDTO hardshipOverview =
                 application.getAssessmentDTO()
                         .getFinancialAssessmentDTO()
@@ -47,7 +42,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         // Need to refresh from DB as HardshipDetail ids may have changed
         HardshipReviewDTO newHardship = hardshipService.find(performHardshipResponse.getHardshipReviewId());
 
-        if (courtType == CourtType.MAGISTRATE) {
+        if (application.getCourtType() == CourtType.MAGISTRATE) {
             hardshipOverview.setMagCourtHardship(newHardship);
             application = processMagCourtHardshipRules(request);
         } else {
@@ -56,7 +51,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         }
 
         // Update assessment summary view - displayed on the application tab
-        AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(newHardship, courtType);
+        AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(newHardship, application.getCourtType());
         assessmentSummaryService.updateApplication(application, hardshipSummary);
 
         return application;
@@ -66,13 +61,9 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         // invoke the validation service to check that data has not been modified by another user
         // invoke the validation service to Check user has rep order reserved
 
-        // derive the court type - we might have to pass the Court type as part of the request
-        CourtType courtType = crownCourtHelper.getCourtType(request.getApplicationDTO());
-        request.getApplicationDTO().setCourtType(courtType);
-
         hardshipService.updateHardship(request);
 
-        if (courtType == CourtType.MAGISTRATE) {
+        if (request.getApplicationDTO().getCourtType() == CourtType.MAGISTRATE) {
             AssessmentStatusDTO assessmentStatusDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO()
                     .getHardship().getMagCourtHardship().getAsessmentStatus();
             if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {

@@ -78,7 +78,6 @@ public class ApplicationDTO extends GenericDTO {
     private boolean partnerDetailsApplicable;
     private String solicitorOfficeId;
     private FdcContributionDTO latestActiveFDC;
-    // New field required for Hardships, not expected to be passed in requests
     private CourtType courtType;
 
 }

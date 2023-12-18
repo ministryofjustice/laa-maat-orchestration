@@ -27,9 +27,6 @@ class HardshipOrchestrationServiceTest {
     private HardshipService hardshipService;
 
     @Mock
-    private CrownCourtHelper crownCourtHelper;
-
-    @Mock
     private ProceedingsService proceedingsService;
 
     @Mock
@@ -52,9 +49,6 @@ class HardshipOrchestrationServiceTest {
 
     private WorkflowRequest setupCreateStubs(CourtType courtType) {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(courtType);
-
-        when(crownCourtHelper.getCourtType(any(ApplicationDTO.class)))
-                .thenReturn(courtType);
 
         ApiPerformHardshipResponse performHardshipResponse = getApiPerformHardshipResponse();
         when(hardshipService.createHardship(workflowRequest))
@@ -143,19 +137,10 @@ class HardshipOrchestrationServiceTest {
                 .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
     }
 
-    private WorkflowRequest setupUpdateStubs(CourtType courtType) {
-        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(courtType);
-
-        when(crownCourtHelper.getCourtType(any(ApplicationDTO.class)))
-                .thenReturn(courtType);
-
-        return workflowRequest;
-    }
-
     @Test
     void givenMagsCourtAndNoVariation_whenUpdateIsInvoked_thenApplicationDTOIsUpdatedWithNewHardship() {
 
-        WorkflowRequest workflowRequest = setupUpdateStubs(CourtType.MAGISTRATE);
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
 
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
                 .thenReturn(workflowRequest.getApplicationDTO());
@@ -170,7 +155,7 @@ class HardshipOrchestrationServiceTest {
 
     @Test
     void givenMagsCourtWithVariation_whenUpdateIsInvoked_thenApplicationDTOIsUpdatedWithNewHardship() {
-        WorkflowRequest workflowRequest = setupUpdateStubs(CourtType.MAGISTRATE);
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
 
         ContributionsDTO contributionsDTO = getContributionsDTO();
         ApplicationDTO applicationDTO = getApplicationDTOWithHardship(CourtType.MAGISTRATE);
@@ -193,7 +178,7 @@ class HardshipOrchestrationServiceTest {
 
     @Test
     void givenCrownCourt_whenUpdateIsInvoked_thenApplicationDTOIsUpdatedWithNewHardship() {
-        WorkflowRequest workflowRequest = setupUpdateStubs(CourtType.CROWN_COURT);
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.CROWN_COURT);
 
         ContributionsDTO contributionsDTO = getContributionsDTO();
         ApplicationDTO applicationDTO = getApplicationDTOWithHardship(CourtType.CROWN_COURT);
