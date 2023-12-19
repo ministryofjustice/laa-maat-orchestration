@@ -57,11 +57,22 @@ class MeansAssessmentOrchestrationServiceTest {
         assertThat(actual.getCrownCourtOverviewDTO().getContribution())
                 .isEqualTo(contributionsDTO);
 
+        verify(meansAssessmentService).create(workflowRequest);
+        verify(maatCourtDataService).invokeStoredProcedure(applicationDTO,
+                workflowRequest.getUserDTO(),
+                Constants.DB_PACKAGE_APPLICATION,
+                Constants.DB_PRE_UPDATE_CC_APPLICATION);
+
         verify(proceedingsService).updateApplication(workflowRequest);
+
+        verify(maatCourtDataService).invokeStoredProcedure(applicationDTO,
+                workflowRequest.getUserDTO(),
+                Constants.DB_PACKAGE_ASSESSMENTS,
+                Constants.DB_ASSESSMENT_POST_PROCESSING_PART_2);
     }
 
     @Test
-    void givenARequestWithC3NotEnabled_whenCreateIsInvoked_thenApplicationDTOIsNotUpdatedWithContribution() {
+    void givenARequestWithC3NotEnabled_whenCreateIsInvoked_thenCalculationContributionIsNotCalled() {
 
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         workflowRequest.setC3Enabled(false);
@@ -69,9 +80,18 @@ class MeansAssessmentOrchestrationServiceTest {
                 .thenReturn(workflowRequest.getApplicationDTO());
 
         orchestrationService.create(workflowRequest);
+        verify(meansAssessmentService).create(workflowRequest);
         verify(contributionService, times(0)).calculateContribution(workflowRequest);
+        verify(maatCourtDataService).invokeStoredProcedure(workflowRequest.getApplicationDTO(),
+                workflowRequest.getUserDTO(),
+                Constants.DB_PACKAGE_ASSESSMENTS,
+                Constants.DB_ASSESSMENT_POST_PROCESSING_PART_1);
 
         verify(proceedingsService, times(1)).updateApplication(workflowRequest);
+        verify(maatCourtDataService).invokeStoredProcedure(workflowRequest.getApplicationDTO(),
+                workflowRequest.getUserDTO(),
+                Constants.DB_PACKAGE_ASSESSMENTS,
+                Constants.DB_ASSESSMENT_POST_PROCESSING_PART_2);
     }
 
     @Test
@@ -91,11 +111,21 @@ class MeansAssessmentOrchestrationServiceTest {
         assertThat(actual.getCrownCourtOverviewDTO().getContribution())
                 .isEqualTo(contributionsDTO);
 
+        verify(meansAssessmentService).update(workflowRequest);
+        verify(maatCourtDataService).invokeStoredProcedure(workflowRequest.getApplicationDTO(),
+                workflowRequest.getUserDTO(),
+                Constants.DB_PACKAGE_APPLICATION,
+                Constants.DB_PRE_UPDATE_CC_APPLICATION);
+
         verify(proceedingsService).updateApplication(workflowRequest);
+        verify(maatCourtDataService).invokeStoredProcedure(workflowRequest.getApplicationDTO(),
+                workflowRequest.getUserDTO(),
+                Constants.DB_PACKAGE_ASSESSMENTS,
+                Constants.DB_ASSESSMENT_POST_PROCESSING_PART_2);
     }
 
     @Test
-    void givenARequestWithC3NotEnabled_whenUpdateIsInvoked_thenApplicationDTOIsNotUpdatedWithContribution() {
+    void givenARequestWithC3NotEnabled_whenUpdateIsInvoked_thenCalculationContributionIsNotCalled() {
 
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         workflowRequest.setC3Enabled(false);
@@ -103,9 +133,18 @@ class MeansAssessmentOrchestrationServiceTest {
                 .thenReturn(workflowRequest.getApplicationDTO());
 
         orchestrationService.update(workflowRequest);
+        verify(meansAssessmentService).update(workflowRequest);
         verify(contributionService, times(0)).calculateContribution(workflowRequest);
+        verify(maatCourtDataService).invokeStoredProcedure(workflowRequest.getApplicationDTO(),
+                workflowRequest.getUserDTO(),
+                Constants.DB_PACKAGE_ASSESSMENTS,
+                Constants.DB_ASSESSMENT_POST_PROCESSING_PART_1);
 
         verify(proceedingsService, times(1)).updateApplication(workflowRequest);
+        verify(maatCourtDataService).invokeStoredProcedure(workflowRequest.getApplicationDTO(),
+                workflowRequest.getUserDTO(),
+                Constants.DB_PACKAGE_ASSESSMENTS,
+                Constants.DB_ASSESSMENT_POST_PROCESSING_PART_2);
     }
 
 }
