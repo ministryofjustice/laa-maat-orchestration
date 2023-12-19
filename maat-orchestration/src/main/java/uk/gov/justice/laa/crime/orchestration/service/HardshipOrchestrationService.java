@@ -42,16 +42,17 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         // Need to refresh from DB as HardshipDetail ids may have changed
         HardshipReviewDTO newHardship = hardshipService.find(performHardshipResponse.getHardshipReviewId());
 
-        if (application.getCourtType() == CourtType.MAGISTRATE) {
+        CourtType courtType = application.getCourtType();
+        if (courtType == CourtType.MAGISTRATE) {
             hardshipOverview.setMagCourtHardship(newHardship);
             application = processMagCourtHardshipRules(request);
-        } else if (application.getCourtType() == CourtType.CROWN_COURT) {
+        } else if (courtType == CourtType.CROWN_COURT) {
             hardshipOverview.setCrownCourtHardship(newHardship);
             application = checkActionsAndUpdateApplication(request);
         }
 
         // Update assessment summary view - displayed on the application tab
-        AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(newHardship, application.getCourtType());
+        AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(newHardship, courtType);
         assessmentSummaryService.updateApplication(application, hardshipSummary);
 
         return application;
