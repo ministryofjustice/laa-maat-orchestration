@@ -119,5 +119,5 @@ public class Constants {
     public static final String DB_ASSESSMENT_POST_PROCESSING_PART_1_C3 = "post_assessment_processing_part_1_c3";
     public static final String DB_PRE_UPDATE_CC_APPLICATION = "pre_update_cc_application";
     public static final String DB_PACKAGE_ASSESSMENTS = "assessments";
-    public static final String DB_PACKAGE_APPLICATION = " application";
+    public static final String DB_PACKAGE_APPLICATION = "application";
 }
