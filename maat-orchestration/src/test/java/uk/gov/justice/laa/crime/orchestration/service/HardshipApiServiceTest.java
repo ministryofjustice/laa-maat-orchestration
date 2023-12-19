@@ -42,4 +42,12 @@ class HardshipApiServiceTest {
         verify(hardshipApiClient)
                 .post(any(ApiPerformHardshipRequest.class), any(), anyString(), anyMap());
     }
+
+    @Test
+    void givenValidHardshipDto_whenUpdateIsInvoked_thenHardshipIsPersisted() {
+        hardshipApiService.update(new ApiPerformHardshipRequest());
+
+        verify(hardshipApiClient)
+                .put(any(ApiPerformHardshipRequest.class), any(), anyString(), anyMap());
+    }
 }

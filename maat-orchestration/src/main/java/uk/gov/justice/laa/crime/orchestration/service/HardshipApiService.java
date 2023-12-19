@@ -48,4 +48,16 @@ public class HardshipApiService {
         return response;
     }
 
+    public ApiPerformHardshipResponse update(ApiPerformHardshipRequest request) {
+        ApiPerformHardshipResponse response = hardshipApiClient.put(
+                request,
+                new ParameterizedTypeReference<>() {
+                },
+                configuration.getHardshipApi().getEndpoints().getUpdateUrl(),
+                Collections.emptyMap()
+        );
+
+        log.info(String.format(RESPONSE_STRING, response));
+        return response;
+    }
 }
