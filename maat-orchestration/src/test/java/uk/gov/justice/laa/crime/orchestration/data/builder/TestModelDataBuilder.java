@@ -334,6 +334,7 @@ public class TestModelDataBuilder {
         return WorkflowRequest.builder()
                 .userDTO(getUserDTO())
                 .applicationDTO(getApplicationDTO())
+                .isC3Enabled(true)
                 .build();
     }
 
