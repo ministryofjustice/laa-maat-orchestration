@@ -31,6 +31,8 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     }
 
     public ApplicationDTO create(WorkflowRequest request) {
+        // invoke the validation service to Check user has rep order reserved
+
         ApplicationDTO application = request.getApplicationDTO();
 
         HardshipOverviewDTO hardshipOverview =
@@ -45,10 +47,16 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         CourtType courtType = application.getCourtType();
         if (courtType == CourtType.MAGISTRATE) {
             hardshipOverview.setMagCourtHardship(newHardship);
-            application = processMagCourtHardshipRules(request);
+            AssessmentStatusDTO assessmentStatusDTO = newHardship.getAsessmentStatus();
+            if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
+                application = processMagCourtHardshipRules(request);
+            }
         } else if (courtType == CourtType.CROWN_COURT) {
             hardshipOverview.setCrownCourtHardship(newHardship);
-            application = checkActionsAndUpdateApplication(request);
+            AssessmentStatusDTO assessmentStatusDTO = newHardship.getAsessmentStatus();
+            if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
+                application = checkActionsAndUpdateApplication(request);
+            }
         }
 
         // Update assessment summary view - displayed on the application tab

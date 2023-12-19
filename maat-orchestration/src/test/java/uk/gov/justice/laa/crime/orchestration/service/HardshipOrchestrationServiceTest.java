@@ -10,6 +10,7 @@ import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
+import uk.gov.justice.laa.crime.orchestration.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -46,15 +47,26 @@ class HardshipOrchestrationServiceTest {
         verify(hardshipService).find(Constants.TEST_HARDSHIP_REVIEW_ID);
     }
 
-    private WorkflowRequest setupCreateStubs(CourtType courtType) {
+    private WorkflowRequest setupCreateStubs(CourtType courtType, CurrentStatus status) {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(courtType);
 
         ApiPerformHardshipResponse performHardshipResponse = getApiPerformHardshipResponse();
         when(hardshipService.createHardship(workflowRequest))
                 .thenReturn(performHardshipResponse);
 
+        HardshipReviewDTO hardshipReviewDTO = HardshipReviewDTO.builder().build();
+        if (CourtType.CROWN_COURT == courtType) {
+            hardshipReviewDTO = getHardshipOverviewDTO(courtType).getCrownCourtHardship();
+        } else if (CourtType.MAGISTRATE == courtType) {
+            hardshipReviewDTO = getHardshipOverviewDTO(courtType).getMagCourtHardship();
+        }
+        if (status != null) {
+            hardshipReviewDTO.setAsessmentStatus(getAssessmentStatusDTO(status));
+        } else {
+            hardshipReviewDTO.setAsessmentStatus(null);
+        }
         when(hardshipService.find(performHardshipResponse.getHardshipReviewId()))
-                .thenReturn(getHardshipReviewDTO());
+                .thenReturn(hardshipReviewDTO);
 
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), eq(courtType)))
                 .thenReturn(getAssessmentSummaryDTO());
@@ -65,7 +77,7 @@ class HardshipOrchestrationServiceTest {
     @Test
     void givenIsMagsCourtAndNoVariation_whenCreateIsInvoked_thenApplicationDTOIsUpdatedWithNewHardship() {
 
-        WorkflowRequest workflowRequest = setupCreateStubs(CourtType.MAGISTRATE);
+        WorkflowRequest workflowRequest = setupCreateStubs(CourtType.MAGISTRATE, CurrentStatus.COMPLETE);
 
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
                 .thenReturn(workflowRequest.getApplicationDTO());
@@ -83,7 +95,7 @@ class HardshipOrchestrationServiceTest {
 
     @Test
     void givenIsMagsCourtWithVariation_whenCreateIsInvoked_thenApplicationDTOIsUpdatedWithNewHardship() {
-        WorkflowRequest workflowRequest = setupCreateStubs(CourtType.MAGISTRATE);
+        WorkflowRequest workflowRequest = setupCreateStubs(CourtType.MAGISTRATE, CurrentStatus.COMPLETE);
 
         ContributionsDTO contributionsDTO = getContributionsDTO();
         ApplicationDTO applicationDTO = getApplicationDTOWithHardship(CourtType.MAGISTRATE);
@@ -109,7 +121,7 @@ class HardshipOrchestrationServiceTest {
 
     @Test
     void givenIsCrownCourt_whenCreateIsInvoked_thenApplicationDTOIsUpdatedWithNewHardship() {
-        WorkflowRequest workflowRequest = setupCreateStubs(CourtType.CROWN_COURT);
+        WorkflowRequest workflowRequest = setupCreateStubs(CourtType.CROWN_COURT, CurrentStatus.COMPLETE);
 
         ContributionsDTO contributionsDTO = getContributionsDTO();
         ApplicationDTO applicationDTO = getApplicationDTOWithHardship(CourtType.CROWN_COURT);
@@ -134,6 +146,54 @@ class HardshipOrchestrationServiceTest {
 
         verify(assessmentSummaryService)
                 .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
+    }
+
+    @Test
+    void givenCrownCourtInProgressHardship_whenCreateIsInvoked_thenCheckActionsIsNotInvoked() {
+        WorkflowRequest workflowRequest = setupCreateStubs(CourtType.CROWN_COURT, CurrentStatus.IN_PROGRESS);
+
+        ApplicationDTO actual = orchestrationService.create(workflowRequest);
+
+        HardshipReviewDTO expected = getHardshipOverviewDTO(CourtType.CROWN_COURT).getCrownCourtHardship();
+        expected.setAsessmentStatus(getAssessmentStatusDTO(CurrentStatus.IN_PROGRESS));
+        assertThat(actual.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship())
+                .isEqualTo(expected);
+    }
+
+    @Test
+    void givenCrownCourtWithMissingAssessment_whenCreateIsInvoked_thenCheckActionsIsNotInvoked() {
+        WorkflowRequest workflowRequest = setupCreateStubs(CourtType.CROWN_COURT, null);
+
+        ApplicationDTO actual = orchestrationService.create(workflowRequest);
+
+        HardshipReviewDTO expected = getHardshipOverviewDTO(CourtType.CROWN_COURT).getCrownCourtHardship();
+        expected.setAsessmentStatus(null);
+        assertThat(actual.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship())
+                .isEqualTo(expected);
+    }
+
+    @Test
+    void givenMagCourtInProgressHardship_whenCreateIsInvoked_thenCheckActionsIsNotInvoked() {
+        WorkflowRequest workflowRequest = setupCreateStubs(CourtType.MAGISTRATE, CurrentStatus.IN_PROGRESS);
+
+        ApplicationDTO actual = orchestrationService.create(workflowRequest);
+
+        HardshipReviewDTO expected = getHardshipOverviewDTO(CourtType.MAGISTRATE).getMagCourtHardship();
+        expected.setAsessmentStatus(getAssessmentStatusDTO(CurrentStatus.IN_PROGRESS));
+        assertThat(actual.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getMagCourtHardship())
+                .isEqualTo(expected);
+    }
+
+    @Test
+    void givenMagCourtWithMissingAssessment_whenCreateIsInvoked_thenCheckActionsIsNotInvoked() {
+        WorkflowRequest workflowRequest = setupCreateStubs(CourtType.MAGISTRATE, null);
+
+        ApplicationDTO actual = orchestrationService.create(workflowRequest);
+
+        HardshipReviewDTO expected = getHardshipOverviewDTO(CourtType.MAGISTRATE).getMagCourtHardship();
+        expected.setAsessmentStatus(null);
+        assertThat(actual.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getMagCourtHardship())
+                .isEqualTo(expected);
     }
 
     @Test

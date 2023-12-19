@@ -937,4 +937,11 @@ public class TestModelDataBuilder {
                 )
                 .withSectionSummaries(List.of(getApiAssessmentSectionSummary()));
     }
+
+    public static AssessmentStatusDTO getAssessmentStatusDTO(CurrentStatus status) {
+        return AssessmentStatusDTO.builder()
+                .status(status.getValue())
+                .description(status.getDescription())
+                .build();
+    }
 }
