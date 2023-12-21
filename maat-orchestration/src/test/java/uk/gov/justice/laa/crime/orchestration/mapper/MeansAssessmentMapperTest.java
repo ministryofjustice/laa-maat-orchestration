@@ -6,7 +6,7 @@ import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
-import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 
 @ExtendWith(SoftAssertionsExtension.class)
@@ -20,8 +20,8 @@ public class MeansAssessmentMapperTest {
     void givenApiFindHardshipResponseWithSection_whenFindHardshipResponseToHardshipDTOIsInvoked_thenMappingIsCorrect() {
         FinancialAssessmentDTO actual =
                 meansAssessmentMapper.getMeansAssessmentResponseToFinancialAssessmentDto(
-                        TestModelDataBuilder.getApiGetMeansAssessmentResponse(), Constants.APPLICANT_ID);
-        FinancialAssessmentDTO expected = TestModelDataBuilder.getFinancialAssessmentDto();
+                        MeansAssessmentDataBuilder.getApiGetMeansAssessmentResponse(), Constants.APPLICANT_ID);
+        FinancialAssessmentDTO expected = MeansAssessmentDataBuilder.getFinancialAssessmentDto();
 
         softly.assertThat(actual)
                 .usingRecursiveComparison()

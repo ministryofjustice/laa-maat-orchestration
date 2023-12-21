@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
-import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiCreateMeansAssessmentRequest;
@@ -33,26 +33,26 @@ class MeansAssessmentServiceTest {
     @Test
     void givenFinancialAssessmentId_whenFindIsInvoked_thenApiServiceIsCalledAndResponseMapped() {
         when(meansAssessmentApiService.find(Constants.FINANCIAL_ASSESSMENT_ID))
-                .thenReturn(TestModelDataBuilder.getApiGetMeansAssessmentResponse());
+                .thenReturn(MeansAssessmentDataBuilder.getApiGetMeansAssessmentResponse());
         meansAssessmentService.find(Constants.FINANCIAL_ASSESSMENT_ID, Constants.APPLICANT_ID);
         verify(meansAssessmentMapper).getMeansAssessmentResponseToFinancialAssessmentDto(any(ApiGetMeansAssessmentResponse.class), anyInt());
     }
 
     @Test
     void givenWorkflowRequest_whenCreateIsInvoked_thenRequestIsMappedAndApiServiceIsCalled() {
-        ApiCreateMeansAssessmentRequest apiCreateMeansAssessmentRequest = TestModelDataBuilder.getApiCreateMeansAssessmentRequest();
+        ApiCreateMeansAssessmentRequest apiCreateMeansAssessmentRequest = MeansAssessmentDataBuilder.getApiCreateMeansAssessmentRequest();
         when(meansAssessmentMapper.workflowRequestToCreateAssessmentRequest(any(WorkflowRequest.class)))
                 .thenReturn(apiCreateMeansAssessmentRequest);
-        meansAssessmentService.create(TestModelDataBuilder.buildWorkFlowRequest());
+        meansAssessmentService.create(MeansAssessmentDataBuilder.buildWorkFlowRequest());
         verify(meansAssessmentApiService).create(apiCreateMeansAssessmentRequest);
     }
 
     @Test
     void givenWorkflowRequest_whenUpdateIsInvoked_thenRequestIsMappedAndApiServiceIsCalled() {
-        ApiUpdateMeansAssessmentRequest apiUpdateMeansAssessmentRequest = TestModelDataBuilder.getApiUpdateMeansAssessmentRequest();
+        ApiUpdateMeansAssessmentRequest apiUpdateMeansAssessmentRequest = MeansAssessmentDataBuilder.getApiUpdateMeansAssessmentRequest();
         when(meansAssessmentMapper.workflowRequestToUpdateAssessmentRequest(any(WorkflowRequest.class)))
                 .thenReturn(apiUpdateMeansAssessmentRequest);
-        meansAssessmentService.update(TestModelDataBuilder.buildWorkFlowRequest());
+        meansAssessmentService.update(MeansAssessmentDataBuilder.buildWorkFlowRequest());
         verify(meansAssessmentApiService).update(apiUpdateMeansAssessmentRequest);
     }
 }

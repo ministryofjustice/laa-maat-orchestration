@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
-import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
@@ -43,9 +43,9 @@ class MeansAssessmentOrchestrationServiceTest {
     @Test
     void givenARequestWithC3Enabled_whenCreateIsInvoked_thenApplicationDTOIsUpdatedWithContribution() {
 
-        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
-        ContributionsDTO contributionsDTO = TestModelDataBuilder.getContributionsDTO();
-        ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO();
+        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
+        ContributionsDTO contributionsDTO = MeansAssessmentDataBuilder.getContributionsDTO();
+        ApplicationDTO applicationDTO = MeansAssessmentDataBuilder.getApplicationDTO();
         applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
         when(contributionService.calculateContribution(workflowRequest))
                 .thenReturn(applicationDTO);
@@ -74,7 +74,7 @@ class MeansAssessmentOrchestrationServiceTest {
     @Test
     void givenARequestWithC3NotEnabled_whenCreateIsInvoked_thenCalculationContributionIsNotCalled() {
 
-        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         workflowRequest.setC3Enabled(false);
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
                 .thenReturn(workflowRequest.getApplicationDTO());
@@ -97,9 +97,9 @@ class MeansAssessmentOrchestrationServiceTest {
     @Test
     void givenARequestWithC3Enabled_whenUpdateIsInvoked_thenApplicationDTOIsUpdatedWithContribution() {
 
-        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
-        ContributionsDTO contributionsDTO = TestModelDataBuilder.getContributionsDTO();
-        ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO();
+        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
+        ContributionsDTO contributionsDTO = MeansAssessmentDataBuilder.getContributionsDTO();
+        ApplicationDTO applicationDTO = MeansAssessmentDataBuilder.getApplicationDTO();
         applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
         when(contributionService.calculateContribution(workflowRequest))
                 .thenReturn(applicationDTO);
@@ -127,7 +127,7 @@ class MeansAssessmentOrchestrationServiceTest {
     @Test
     void givenARequestWithC3NotEnabled_whenUpdateIsInvoked_thenCalculationContributionIsNotCalled() {
 
-        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         workflowRequest.setC3Enabled(false);
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
                 .thenReturn(workflowRequest.getApplicationDTO());
