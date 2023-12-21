@@ -19,7 +19,9 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.*;
+import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toLocalDateTime;
+import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toTimeStamp;
 
 @Component
 @RequiredArgsConstructor

@@ -33,8 +33,7 @@ public class DateUtil {
     public static Timestamp toTimeStamp(LocalDateTime source) {
         if (source != null) {
             return Timestamp.valueOf(source);
-        } else {
-            return null;
         }
+        return null;
     }
 }
