@@ -22,8 +22,8 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.justice.laa.crime.orchestration.data.Constants.TEST_APPLICANT_ID;
-import static uk.gov.justice.laa.crime.orchestration.data.Constants.TEST_FINANCIAL_ASSESSMENT_ID;
+import static uk.gov.justice.laa.crime.orchestration.data.Constants.APPLICANT_ID;
+import static uk.gov.justice.laa.crime.orchestration.data.Constants.FINANCIAL_ASSESSMENT_ID;
 import static uk.gov.justice.laa.crime.orchestration.util.RequestBuilderUtils.buildRequest;
 import static uk.gov.justice.laa.crime.orchestration.util.RequestBuilderUtils.buildRequestGivenContent;
 
@@ -49,7 +49,7 @@ class MeansAssessmentControllerTest {
         when(orchestrationService.find(anyInt(), anyInt()))
                 .thenReturn(new FinancialAssessmentDTO());
 
-        String endpoint = ENDPOINT_URL + "/" + TEST_FINANCIAL_ASSESSMENT_ID + "/applicantId/" + TEST_APPLICANT_ID;
+        String endpoint = ENDPOINT_URL + "/" + FINANCIAL_ASSESSMENT_ID + "/applicantId/" + APPLICANT_ID;
         mvc.perform(buildRequest(HttpMethod.GET, endpoint))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
@@ -57,7 +57,7 @@ class MeansAssessmentControllerTest {
 
     @Test
     void givenInvalidRequest_whenFindIsInvoked_thenBadRequestResponseIsReturned() throws Exception {
-        mvc.perform(buildRequest(HttpMethod.GET, ENDPOINT_URL + "/invalidId" + "/applicantId/" + TEST_APPLICANT_ID))
+        mvc.perform(buildRequest(HttpMethod.GET, ENDPOINT_URL + "/invalidId" + "/applicantId/" + APPLICANT_ID))
                 .andExpect(status().isBadRequest());
     }
 
@@ -66,7 +66,7 @@ class MeansAssessmentControllerTest {
         when(orchestrationService.find(anyInt(), anyInt()))
                 .thenThrow(new APIClientException());
 
-        String endpoint = ENDPOINT_URL + "/" + TEST_FINANCIAL_ASSESSMENT_ID + "/applicantId/" + TEST_APPLICANT_ID;
+        String endpoint = ENDPOINT_URL + "/" + FINANCIAL_ASSESSMENT_ID + "/applicantId/" + APPLICANT_ID;
         mvc.perform(buildRequest(HttpMethod.GET, endpoint))
                 .andExpect(status().isInternalServerError());
     }

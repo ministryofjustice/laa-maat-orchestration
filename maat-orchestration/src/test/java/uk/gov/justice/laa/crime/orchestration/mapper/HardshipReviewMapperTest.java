@@ -117,11 +117,11 @@ class HardshipReviewMapperTest {
         softly.assertThat(magCourtHardship.getId())
                 .isEqualTo(response.getHardshipReviewId().longValue());
         softly.assertThat(magCourtHardship.getReviewResult())
-                .isEqualTo(Constants.TEST_HARDSHIP_REVIEW_RESULT);
+                .isEqualTo(Constants.HARDSHIP_REVIEW_RESULT);
         softly.assertThat(magCourtHardship.getDisposableIncomeAfterHardship())
-                .isEqualTo(Constants.TEST_POST_HARDSHIP_DISPOSABLE_INCOME);
+                .isEqualTo(Constants.POST_HARDSHIP_DISPOSABLE_INCOME);
         softly.assertThat(magCourtHardship.getDisposableIncome())
-                .isEqualTo(Constants.TEST_DISPOSABLE_INCOME);
+                .isEqualTo(Constants.DISPOSABLE_INCOME);
     }
 
 

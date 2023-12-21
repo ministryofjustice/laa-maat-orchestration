@@ -33,9 +33,9 @@ class HardshipServiceTest {
 
     @Test
     void givenHardshipReviewId_whenFindIsInvoked_thenApiServiceIsCalledAndResponseMapped() {
-        when(hardshipApiService.find(Constants.TEST_HARDSHIP_REVIEW_ID))
+        when(hardshipApiService.find(Constants.HARDSHIP_REVIEW_ID))
                 .thenReturn(TestModelDataBuilder.getApiFindHardshipResponse());
-        hardshipService.find(Constants.TEST_HARDSHIP_REVIEW_ID);
+        hardshipService.find(Constants.HARDSHIP_REVIEW_ID);
         verify(hardshipMapper).findHardshipResponseToHardshipDto(any(ApiFindHardshipResponse.class));
     }
 

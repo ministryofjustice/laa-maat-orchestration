@@ -15,7 +15,7 @@ import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculat
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.justice.laa.crime.orchestration.data.Constants.TEST_CONTRIBUTIONS_ID;
+import static uk.gov.justice.laa.crime.orchestration.data.Constants.CONTRIBUTIONS_ID;
 
 @ExtendWith({MockitoExtension.class})
 class ContributionServiceTest {
@@ -35,7 +35,7 @@ class ContributionServiceTest {
     void givenWorkflowRequest_whenCalculateContributionIsInvoked_thenContributionServiceIsCalledAndResponseIsMapped() {
         WorkflowRequest request = TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.CROWN_COURT);
         when(contributionApiService.calculate(any()))
-                .thenReturn(new ApiMaatCalculateContributionResponse().withContributionId(TEST_CONTRIBUTIONS_ID));
+                .thenReturn(new ApiMaatCalculateContributionResponse().withContributionId(CONTRIBUTIONS_ID));
         contributionService.calculateContribution(request);
         verify(contributionApiService).calculate(any());
         verify(contributionMapper).workflowRequestToMaatCalculateContributionRequest(any());

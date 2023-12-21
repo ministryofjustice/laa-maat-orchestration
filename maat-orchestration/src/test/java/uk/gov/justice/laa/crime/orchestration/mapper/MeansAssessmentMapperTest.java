@@ -20,7 +20,7 @@ public class MeansAssessmentMapperTest {
     void givenApiFindHardshipResponseWithSection_whenFindHardshipResponseToHardshipDTOIsInvoked_thenMappingIsCorrect() {
         FinancialAssessmentDTO actual =
                 meansAssessmentMapper.getMeansAssessmentResponseToFinancialAssessmentDto(
-                        TestModelDataBuilder.getApiGetMeansAssessmentResponse(), Constants.TEST_APPLICANT_ID);
+                        TestModelDataBuilder.getApiGetMeansAssessmentResponse(), Constants.APPLICANT_ID);
         FinancialAssessmentDTO expected = TestModelDataBuilder.getFinancialAssessmentDto();
 
         softly.assertThat(actual)
