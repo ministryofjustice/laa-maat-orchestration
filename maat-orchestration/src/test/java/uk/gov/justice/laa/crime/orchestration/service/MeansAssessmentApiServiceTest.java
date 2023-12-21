@@ -30,7 +30,7 @@ class MeansAssessmentApiServiceTest {
 
     @Test
     void givenValidFinancialAssessmentId_whenFindIsInvoked_thenAssessmentIsRetrieved() {
-        meansAssessmentApiService.find(Constants.TEST_FINANCIAL_ASSESSMENT_ID);
+        meansAssessmentApiService.find(Constants.FINANCIAL_ASSESSMENT_ID);
 
         verify(cmaApiClient)
                 .get(any(), anyString(), anyInt());

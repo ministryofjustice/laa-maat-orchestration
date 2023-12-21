@@ -1,6 +1,5 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,11 +8,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiUserSession;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationResponse;
+import uk.gov.justice.laa.crime.orchestration.util.DateUtil;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,17 +45,22 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    @Disabled("In progress")
     void whenUpdateApplicationResponseToApplicationDtoIsInvoked() {
-        // TODO: Generate ApiUpdateApplicationResponse test data
         ApiUpdateApplicationResponse updateApplicationResponse = TestModelDataBuilder.getApiUpdateApplicationResponse();
-        // TODO: Generate ApplicationDTO test data - getCrownCourtSummaryDTO is already populated need to look at this
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT);
 
-        // TODO: Call updateApplicationResponseToApplicationDto passing in test data
         ApplicationDTO updatedApplicationDTO = proceedingsMapper.updateApplicationResponseToApplicationDto(
                 updateApplicationResponse, applicationDTO);
 
-        // TODO: Assert ApplicationDTO updated with data from ApiUpdateApplicationResponse
+        CrownCourtSummaryDTO updatedCrownCourtSummaryDTO =
+                updatedApplicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO();
+        assertThat(updatedApplicationDTO.getTimestamp().toLocalDateTime())
+                .isEqualTo(updateApplicationResponse.getModifiedDateTime());
+        assertThat(updatedCrownCourtSummaryDTO.getCcRepOrderDate())
+                .isEqualTo(DateUtil.toDate(updateApplicationResponse.getCrownRepOrderDate()));
+        assertThat(updatedCrownCourtSummaryDTO.getRepOrderDecision().getValue())
+                .isEqualTo(updateApplicationResponse.getCrownRepOrderDecision());
+        assertThat(updatedCrownCourtSummaryDTO.getCcRepType().getValue())
+                .isEqualTo(updateApplicationResponse.getCrownRepOrderType());
     }
 }

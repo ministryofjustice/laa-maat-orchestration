@@ -43,8 +43,8 @@ class HardshipOrchestrationServiceTest {
 
     @Test
     void givenHardshipReviewId_whenFindIsInvoked_thenHardshipServiceIsCalled() {
-        orchestrationService.find(Constants.TEST_HARDSHIP_REVIEW_ID);
-        verify(hardshipService).find(Constants.TEST_HARDSHIP_REVIEW_ID);
+        orchestrationService.find(Constants.HARDSHIP_REVIEW_ID);
+        verify(hardshipService).find(Constants.HARDSHIP_REVIEW_ID);
     }
 
     private WorkflowRequest setupCreateStubs(CourtType courtType, CurrentStatus status) {

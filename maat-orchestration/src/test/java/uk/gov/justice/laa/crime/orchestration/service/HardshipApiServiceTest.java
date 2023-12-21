@@ -29,7 +29,7 @@ class HardshipApiServiceTest {
 
     @Test
     void givenValidHardshipReviewId_whenFindIsInvoked_thenHardshipIsRetrieved() {
-        hardshipApiService.find(Constants.TEST_HARDSHIP_REVIEW_ID);
+        hardshipApiService.find(Constants.HARDSHIP_REVIEW_ID);
 
         verify(hardshipApiClient)
                 .get(any(), anyString(), anyInt());

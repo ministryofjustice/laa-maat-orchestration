@@ -9,10 +9,7 @@ import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
-import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiFindHardshipResponse;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiCreateMeansAssessmentRequest;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiGetMeansAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiUpdateMeansAssessmentRequest;
@@ -35,9 +32,9 @@ class MeansAssessmentServiceTest {
 
     @Test
     void givenFinancialAssessmentId_whenFindIsInvoked_thenApiServiceIsCalledAndResponseMapped() {
-        when(meansAssessmentApiService.find(Constants.TEST_FINANCIAL_ASSESSMENT_ID))
+        when(meansAssessmentApiService.find(Constants.FINANCIAL_ASSESSMENT_ID))
                 .thenReturn(TestModelDataBuilder.getApiGetMeansAssessmentResponse());
-        meansAssessmentService.find(Constants.TEST_FINANCIAL_ASSESSMENT_ID);
+        meansAssessmentService.find(Constants.FINANCIAL_ASSESSMENT_ID);
         verify(meansAssessmentMapper).getMeansAssessmentResponseToFinancialAssessmentDto(any(ApiGetMeansAssessmentResponse.class));
     }
 
