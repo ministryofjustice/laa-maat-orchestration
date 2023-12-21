@@ -10,7 +10,7 @@ import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBu
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 
 @ExtendWith(SoftAssertionsExtension.class)
-public class MeansAssessmentMapperTest {
+class MeansAssessmentMapperTest {
     UserMapper userMapper = new UserMapper();
     MeansAssessmentMapper meansAssessmentMapper = new MeansAssessmentMapper(userMapper);
     @InjectSoftAssertions
