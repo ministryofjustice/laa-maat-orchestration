@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
-import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
@@ -23,6 +22,8 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.justice.laa.crime.orchestration.data.Constants.APPLICANT_ID;
+import static uk.gov.justice.laa.crime.orchestration.data.Constants.FINANCIAL_ASSESSMENT_ID;
 import static uk.gov.justice.laa.crime.orchestration.util.RequestBuilderUtils.buildRequest;
 import static uk.gov.justice.laa.crime.orchestration.util.RequestBuilderUtils.buildRequestGivenContent;
 
@@ -45,26 +46,28 @@ class MeansAssessmentControllerTest {
     @Test
     void givenValidRequest_whenFindIsInvoked_thenOkResponseIsReturned() throws Exception {
 
-        when(orchestrationService.find(anyInt()))
+        when(orchestrationService.find(anyInt(), anyInt()))
                 .thenReturn(new FinancialAssessmentDTO());
 
-        mvc.perform(buildRequest(HttpMethod.GET, ENDPOINT_URL + "/" + Constants.FINANCIAL_ASSESSMENT_ID))
+        String endpoint = ENDPOINT_URL + "/" + FINANCIAL_ASSESSMENT_ID + "/applicantId/" + APPLICANT_ID;
+        mvc.perform(buildRequest(HttpMethod.GET, endpoint))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
     void givenInvalidRequest_whenFindIsInvoked_thenBadRequestResponseIsReturned() throws Exception {
-        mvc.perform(buildRequest(HttpMethod.GET, ENDPOINT_URL + "/invalidId"))
+        mvc.perform(buildRequest(HttpMethod.GET, ENDPOINT_URL + "/invalidId" + "/applicantId/" + APPLICANT_ID))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void givenWebClientFailure_whenFindIsInvoked_thenInternalServerErrorResponseIsReturned() throws Exception {
-        when(orchestrationService.find(anyInt()))
+        when(orchestrationService.find(anyInt(), anyInt()))
                 .thenThrow(new APIClientException());
 
-        mvc.perform(buildRequest(HttpMethod.GET, ENDPOINT_URL + "/" + Constants.FINANCIAL_ASSESSMENT_ID))
+        String endpoint = ENDPOINT_URL + "/" + FINANCIAL_ASSESSMENT_ID + "/applicantId/" + APPLICANT_ID;
+        mvc.perform(buildRequest(HttpMethod.GET, endpoint))
                 .andExpect(status().isInternalServerError());
     }
 

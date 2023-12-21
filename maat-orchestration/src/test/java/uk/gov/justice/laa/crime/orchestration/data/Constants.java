@@ -9,6 +9,7 @@ import java.time.ZoneOffset;
 import java.util.Date;
 
 public class Constants {
+
     public static final BigDecimal DISPOSABLE_INCOME = BigDecimal.valueOf(12000);
     public static final BigDecimal POST_HARDSHIP_DISPOSABLE_INCOME = BigDecimal.valueOf(5000);
     public static final Integer FINANCIAL_ASSESSMENT_ID = 321;
@@ -25,4 +26,6 @@ public class Constants {
     public static final String DB_PRE_UPDATE_CC_APPLICATION = "pre_update_cc_application";
     public static final String DB_PACKAGE_ASSESSMENTS = "assessments";
     public static final String DB_PACKAGE_APPLICATION = "application";
+    public static final Integer APPLICANT_ID = 999;
+
 }

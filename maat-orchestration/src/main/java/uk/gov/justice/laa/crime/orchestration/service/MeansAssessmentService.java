@@ -19,9 +19,9 @@ public class MeansAssessmentService {
     private final MeansAssessmentApiService cmaApiService;
     private final MeansAssessmentMapper meansAssessmentMapper;
 
-    public FinancialAssessmentDTO find(int assessmentId) {
+    public FinancialAssessmentDTO find(int assessmentId, int applicantId) {
         ApiGetMeansAssessmentResponse apiResponse = cmaApiService.find(assessmentId);
-        return meansAssessmentMapper.getMeansAssessmentResponseToFinancialAssessmentDto(apiResponse);
+        return meansAssessmentMapper.getMeansAssessmentResponseToFinancialAssessmentDto(apiResponse, applicantId);
     }
 
     public void create(WorkflowRequest request) {

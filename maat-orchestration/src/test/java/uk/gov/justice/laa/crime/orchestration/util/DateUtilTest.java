@@ -35,4 +35,16 @@ class DateUtilTest {
         assertThat(DateUtil.toLocalDateTime(null))
                 .isNull();
     }
+
+    @Test
+    void givenAValidDateTime_whenToTimeStampIsInvoked_thenCorrectDateTimeIsReturned() {
+        LocalDateTime dateModified = LocalDateTime.now();
+        assertThat(DateUtil.toTimeStamp(dateModified)).isNotNull();
+    }
+
+    @Test
+    void givenANullDate_whenToTimeStampIsInvoked_thenNullIsReturned() {
+        assertThat(DateUtil.toTimeStamp(null))
+                .isNull();
+    }
 }

@@ -19,7 +19,9 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toDate;
 import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toLocalDateTime;
+import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toTimeStamp;
 
 @Component
 @RequiredArgsConstructor
@@ -195,10 +197,208 @@ public class MeansAssessmentMapper {
         return apiAssessmentDetails;
     }
 
-    public FinancialAssessmentDTO getMeansAssessmentResponseToFinancialAssessmentDto(ApiGetMeansAssessmentResponse apiResponse) {
-        // map the response into DTO
-        apiResponse.getFullAssessment();
-        return new FinancialAssessmentDTO();
+    public FinancialAssessmentDTO getMeansAssessmentResponseToFinancialAssessmentDto(ApiGetMeansAssessmentResponse apiResponse, int applicantId) {
+        return FinancialAssessmentDTO.builder()
+                .id(ofNullable(apiResponse.getId()).map(Integer::longValue).orElse(0L))
+                .criteriaId(ofNullable(apiResponse.getCriteriaId()).map(Integer::longValue).orElse(0L))
+                .usn(ofNullable(apiResponse.getUsn()).map(Integer::longValue).orElse(0L))
+                .fullAvailable(apiResponse.getFullAvailable())
+                .full(fullAssessmentToDto(apiResponse.getFullAssessment()))
+                .initial(initialAssessmentToDTO(apiResponse.getInitialAssessment()))
+                .incomeEvidence(incomeEvidenceSummaryToDto(apiResponse.getIncomeEvidenceSummary(), applicantId))
+                .build();
+
+    }
+
+    private IncomeEvidenceSummaryDTO incomeEvidenceSummaryToDto(ApiIncomeEvidenceSummary incomeEvidenceSummary, int applicantId) {
+        IncomeEvidenceSummaryDTO incomeEvidenceSummaryDTO = IncomeEvidenceSummaryDTO.builder()
+                .evidenceDueDate(toDate(incomeEvidenceSummary.getEvidenceDueDate()))
+                .evidenceReceivedDate(toDate(incomeEvidenceSummary.getEvidenceReceivedDate()))
+                .incomeEvidenceNotes(incomeEvidenceSummary.getIncomeEvidenceNotes())
+                .firstReminderDate(toDate(incomeEvidenceSummary.getFirstReminderDate()))
+                .secondReminderDate(toDate(incomeEvidenceSummary.getSecondReminderDate()))
+                .upliftAppliedDate(toDate(incomeEvidenceSummary.getUpliftAppliedDate()))
+                .upliftRemovedDate(toDate(incomeEvidenceSummary.getUpliftRemovedDate()))
+                .build();
+
+        List<ExtraEvidenceDTO> extraEvidenceList = new ArrayList<>();
+        List<EvidenceDTO> applicantEvidence = new ArrayList<>();
+        List<EvidenceDTO> partnerEvidence = new ArrayList<>();
+        for (ApiIncomeEvidence apiIncomeEvidence : incomeEvidenceSummary.getIncomeEvidence()) {
+            if (StringUtils.isNotEmpty(apiIncomeEvidence.getAdhoc())) {
+                ExtraEvidenceDTO extraEvidenceDTO = getExtraEvidenceDTO(apiIncomeEvidence);
+                extraEvidenceList.add(extraEvidenceDTO);
+            } else {
+                EvidenceDTO evidenceDTO = getEvidenceDTO(apiIncomeEvidence);
+                if (applicantId == apiIncomeEvidence.getApplicantId()) {
+                    applicantEvidence.add(evidenceDTO);
+                } else {
+                    partnerEvidence.add(evidenceDTO);
+                }
+            }
+        }
+        incomeEvidenceSummaryDTO.setExtraEvidenceList(extraEvidenceList);
+        incomeEvidenceSummaryDTO.setApplicantIncomeEvidenceList(applicantEvidence);
+        incomeEvidenceSummaryDTO.setPartnerIncomeEvidenceList(partnerEvidence);
+
+        return incomeEvidenceSummaryDTO;
+    }
+
+    private EvidenceDTO getEvidenceDTO(ApiIncomeEvidence apiIncomeEvidence) {
+        EvidenceDTO evidenceDTO = new EvidenceDTO();
+        evidenceDTO.setEvidenceTypeDTO(getEvidenceTypeDTO(apiIncomeEvidence.getApiEvidenceType()));
+        evidenceDTO.setId(ofNullable(apiIncomeEvidence.getId()).map(Integer::longValue).orElse(0L));
+        evidenceDTO.setOtherDescription(apiIncomeEvidence.getOtherText());
+        evidenceDTO.setDateReceived(toDate(apiIncomeEvidence.getDateReceived()));
+        evidenceDTO.setTimestamp(toTimeStamp(apiIncomeEvidence.getDateModified()));
+        return evidenceDTO;
+    }
+
+    private ExtraEvidenceDTO getExtraEvidenceDTO(ApiIncomeEvidence apiIncomeEvidence) {
+        ExtraEvidenceDTO extraEvidenceDTO = new ExtraEvidenceDTO();
+        extraEvidenceDTO.setAdhoc(apiIncomeEvidence.getAdhoc());
+        extraEvidenceDTO.setId(ofNullable(apiIncomeEvidence.getId()).map(Integer::longValue).orElse(0L));
+        extraEvidenceDTO.setDateReceived(toDate(apiIncomeEvidence.getDateReceived()));
+        extraEvidenceDTO.setEvidenceTypeDTO(getEvidenceTypeDTO(apiIncomeEvidence.getApiEvidenceType()));
+        extraEvidenceDTO.setMandatory(Boolean.valueOf(apiIncomeEvidence.getMandatory()));
+        extraEvidenceDTO.setOtherText(apiIncomeEvidence.getOtherText());
+        extraEvidenceDTO.setTimestamp(toTimeStamp(apiIncomeEvidence.getDateModified()));
+        return extraEvidenceDTO;
+    }
+
+    private EvidenceTypeDTO getEvidenceTypeDTO(ApiEvidenceType apiEvidenceType) {
+        EvidenceTypeDTO evidenceTypeDTO = new EvidenceTypeDTO();
+        if (apiEvidenceType != null) {
+            evidenceTypeDTO.setEvidence(apiEvidenceType.getCode());
+            evidenceTypeDTO.setDescription(apiEvidenceType.getDescription());
+        }
+        return evidenceTypeDTO;
+    }
+
+    private InitialAssessmentDTO initialAssessmentToDTO(ApiInitialMeansAssessment apiInitialMeansAssessment) {
+        return InitialAssessmentDTO.builder()
+                .id(ofNullable(apiInitialMeansAssessment.getId()).map(Integer::longValue).orElse(0L))
+                .adjustedIncomeValue(ofNullable(apiInitialMeansAssessment.getAdjustedIncomeValue()).map(BigDecimal::doubleValue).orElse(0.0))
+                .assessmentDate(toDate(apiInitialMeansAssessment.getAssessmentDate()))
+                .assessmnentStatusDTO(mapAssessmentStatus(apiInitialMeansAssessment.getAssessmentStatus()))
+                .childWeightings(mapChildWeightings(apiInitialMeansAssessment.getChildWeighting()))
+                .lowerThreshold(ofNullable(apiInitialMeansAssessment.getLowerThreshold()).map(BigDecimal::doubleValue).orElse(0.0))
+                .newWorkReason(mapNewWorkReason(apiInitialMeansAssessment.getNewWorkReason()))
+                .notes(apiInitialMeansAssessment.getNotes())
+                .otherBenefitNote(apiInitialMeansAssessment.getOtherBenefitNote())
+                .otherIncomeNote(apiInitialMeansAssessment.getOtherIncomeNote())
+                .reviewType(mapReviewType(apiInitialMeansAssessment.getReviewType()))
+                .result(apiInitialMeansAssessment.getResult())
+                .resultReason(apiInitialMeansAssessment.getResultReason())
+                .sectionSummaries(getSectionSummaries(apiInitialMeansAssessment.getAssessmentSectionSummary()))
+                .totalAggregatedIncome(ofNullable(apiInitialMeansAssessment.getTotalAggregatedIncome()).map(BigDecimal::doubleValue).orElse(0.0))
+                .upperThreshold(ofNullable(apiInitialMeansAssessment.getUpperThreshold()).map(BigDecimal::doubleValue).orElse(0.0))
+                .build();
+    }
+
+    private NewWorkReasonDTO mapNewWorkReason(ApiNewWorkReason apiNewWorkReason) {
+        if (apiNewWorkReason != null) {
+            return NewWorkReasonDTO.builder()
+                    .code(apiNewWorkReason.getCode())
+                    .description(apiNewWorkReason.getDescription())
+                    .type(apiNewWorkReason.getType())
+                    .build();
+        }
+        return NewWorkReasonDTO.builder().build();
+    }
+
+    private ReviewTypeDTO mapReviewType(ApiReviewType reviewType) {
+        if (reviewType != null) {
+            return ReviewTypeDTO.builder()
+                    .code(reviewType.getCode())
+                    .description(reviewType.getDescription())
+                    .build();
+        }
+        return ReviewTypeDTO.builder().build();
+    }
+
+    private static List<ChildWeightingDTO> mapChildWeightings(List<ApiAssessmentChildWeighting> childWeightings) {
+        List<ChildWeightingDTO> childWeightingDTOList = new ArrayList<>();
+        for (ApiAssessmentChildWeighting apiAssessmentChildWeighting : childWeightings) {
+            ChildWeightingDTO childWeightingDTO = new ChildWeightingDTO();
+            childWeightingDTO.setId(ofNullable(apiAssessmentChildWeighting.getId()).map(Integer::longValue).orElse(0L));
+            childWeightingDTO.setWeightingId(ofNullable(apiAssessmentChildWeighting.getChildWeightingId()).map(Integer::longValue).orElse(0L));
+            childWeightingDTO.setWeightingFactor(ofNullable(apiAssessmentChildWeighting.getWeightingFactor()).map(BigDecimal::doubleValue).orElse(0.0));
+            childWeightingDTO.setNoOfChildren(apiAssessmentChildWeighting.getNoOfChildren());
+            childWeightingDTO.setLowerAgeRange(apiAssessmentChildWeighting.getLowerAgeRange());
+            childWeightingDTO.setUpperAgeRange(apiAssessmentChildWeighting.getUpperAgeRange());
+            childWeightingDTOList.add(childWeightingDTO);
+        }
+        return childWeightingDTOList;
+    }
+
+    private FullAssessmentDTO fullAssessmentToDto(ApiFullMeansAssessment apiFullMeansAssessment) {
+        return FullAssessmentDTO.builder()
+                .adjustedLivingAllowance(ofNullable(apiFullMeansAssessment.getAdjustedLivingAllowance()).map(BigDecimal::doubleValue).orElse(0.0))
+                .assessmentDate(toDate(apiFullMeansAssessment.getAssessmentDate()))
+                .assessmentNotes(apiFullMeansAssessment.getAssessmentNotes())
+                .assessmnentStatusDTO(mapAssessmentStatus(apiFullMeansAssessment.getAssessmentStatus()))
+                .criteriaId(ofNullable(apiFullMeansAssessment.getCriteriaId()).map(Integer::longValue).orElse(0L))
+                .otherHousingNote(apiFullMeansAssessment.getOtherHousingNote())
+                .result(ofNullable(apiFullMeansAssessment.getResult()).map(String::toString).orElse(""))
+                .resultReason(ofNullable(apiFullMeansAssessment.getResultReason()).map(String::toString).orElse(""))
+                .sectionSummaries(getSectionSummaries(apiFullMeansAssessment.getAssessmentSectionSummary()))
+                .threshold(ofNullable(apiFullMeansAssessment.getThreshold()).map(BigDecimal::doubleValue).orElse(0.0))
+                .totalAggregatedExpense(ofNullable(apiFullMeansAssessment.getTotalAggregatedExpense()).map(BigDecimal::doubleValue).orElse(0.0))
+                .totalAnnualDisposableIncome(ofNullable(apiFullMeansAssessment.getTotalAnnualDisposableIncome()).map(BigDecimal::doubleValue).orElse(0.0))
+                .build();
+    }
+
+    private AssessmentStatusDTO mapAssessmentStatus(ApiAssessmentStatus apiAssessmentStatus) {
+        if (apiAssessmentStatus != null) {
+            return AssessmentStatusDTO.builder()
+                    .status(apiAssessmentStatus.getStatus())
+                    .description(apiAssessmentStatus.getDescription())
+                    .build();
+        }
+        return AssessmentStatusDTO.builder().build();
+    }
+
+    private static List<AssessmentSectionSummaryDTO> getSectionSummaries(List<ApiAssessmentSectionSummary> assessmentSectionSummary) {
+        List<AssessmentSectionSummaryDTO> sectionSummaryDTOS = new ArrayList<>();
+        for (ApiAssessmentSectionSummary apiAssessmentSectionSummary : assessmentSectionSummary) {
+            AssessmentSectionSummaryDTO assessmentSectionSummaryDTO = new AssessmentSectionSummaryDTO();
+            assessmentSectionSummaryDTO.setAssessmentDetail(getSectionDetail(apiAssessmentSectionSummary.getAssessmentDetails()));
+            assessmentSectionSummaryDTO.setSection(apiAssessmentSectionSummary.getSection());
+            assessmentSectionSummaryDTO.setAnnualTotal(ofNullable(apiAssessmentSectionSummary.getAnnualTotal()).map(BigDecimal::doubleValue).orElse(0.0));
+            assessmentSectionSummaryDTO.setApplicantAnnualTotal(ofNullable(apiAssessmentSectionSummary.getApplicantAnnualTotal()).map(BigDecimal::doubleValue).orElse(0.0));
+            assessmentSectionSummaryDTO.setPartnerAnnualTotal(ofNullable(apiAssessmentSectionSummary.getPartnerAnnualTotal()).map(BigDecimal::doubleValue).orElse(0.0));
+            sectionSummaryDTOS.add(assessmentSectionSummaryDTO);
+        }
+        return sectionSummaryDTOS;
+    }
+
+    private static List<AssessmentDetailDTO> getSectionDetail(List<ApiAssessmentDetail> assessmentDetailList) {
+        List<AssessmentDetailDTO> assessmentDetailDTOS = new ArrayList<>();
+        for (ApiAssessmentDetail apiAssessmentDetail : assessmentDetailList) {
+            AssessmentDetailDTO assessmentDetailDTO = new AssessmentDetailDTO();
+            assessmentDetailDTO.setDetailCode(apiAssessmentDetail.getAssessmentDetailCode());
+            assessmentDetailDTO.setDescription(apiAssessmentDetail.getAssessmentDescription());
+            assessmentDetailDTO.setPartnerAmount(ofNullable(apiAssessmentDetail.getPartnerAmount()).map(BigDecimal::doubleValue).orElse(0.0));
+            assessmentDetailDTO.setApplicantAmount(ofNullable(apiAssessmentDetail.getApplicantAmount()).map(BigDecimal::doubleValue).orElse(0.0));
+            assessmentDetailDTO.setCriteriaDetailsId(ofNullable(apiAssessmentDetail.getCriteriaDetailId()).map(Integer::longValue).orElse(0L));
+            assessmentDetailDTO.setId(ofNullable(apiAssessmentDetail.getId()).map(Integer::longValue).orElse(0L));
+            assessmentDetailDTO.setTimestamp(toTimeStamp(apiAssessmentDetail.getDateModified()));
+            assessmentDetailDTO.setApplicantFrequency(getFrequency(apiAssessmentDetail.getApplicantFrequency()));
+            assessmentDetailDTO.setPartnerFrequency(getFrequency(apiAssessmentDetail.getPartnerFrequency()));
+            assessmentDetailDTOS.add(assessmentDetailDTO);
+        }
+        return assessmentDetailDTOS;
+    }
+
+    private static FrequenciesDTO getFrequency(Frequency frequency) {
+        FrequenciesDTO frequenciesDTO = new FrequenciesDTO();
+        if (frequency != null) {
+            frequenciesDTO.setDescription(frequency.getDescription());
+            frequenciesDTO.setAnnualWeighting((long) frequency.getAnnualWeighting());
+            frequenciesDTO.setCode(frequency.getCode());
+        }
+        return frequenciesDTO;
     }
 
     public void meansAssessmentResponseToApplicationDto(final ApiMeansAssessmentResponse apiResponse, ApplicationDTO applicationDTO) {
