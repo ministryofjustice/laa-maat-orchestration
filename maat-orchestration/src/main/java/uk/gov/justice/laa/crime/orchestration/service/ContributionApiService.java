@@ -31,7 +31,6 @@ public class ContributionApiService {
                 new ParameterizedTypeReference<>() {
                 },
                 configuration.getContributionApi().getEndpoints().getCalculateContributionUrl(),
-                // TODO: Pass transaction ID here
                 Collections.emptyMap()
         );
 
@@ -45,7 +44,6 @@ public class ContributionApiService {
                 new ParameterizedTypeReference<>() {
                 },
                 configuration.getContributionApi().getEndpoints().getCheckContributionRuleUrl(),
-                // TODO: Pass transaction ID here
                 Collections.emptyMap()
         );
 

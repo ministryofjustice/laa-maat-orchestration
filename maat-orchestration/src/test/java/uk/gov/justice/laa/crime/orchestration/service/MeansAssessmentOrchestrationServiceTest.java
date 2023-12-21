@@ -36,8 +36,8 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Test
     void givenFinancialAssessmentId_whenFindIsInvoked_thenMeansAssessmentServiceIsCalled() {
-        orchestrationService.find(Constants.TEST_FINANCIAL_ASSESSMENT_ID);
-        verify(meansAssessmentService).find(Constants.TEST_FINANCIAL_ASSESSMENT_ID);
+        orchestrationService.find(Constants.TEST_FINANCIAL_ASSESSMENT_ID, Constants.TEST_APPLICANT_ID);
+        verify(meansAssessmentService).find(Constants.TEST_FINANCIAL_ASSESSMENT_ID, Constants.TEST_APPLICANT_ID);
     }
 
     @Test

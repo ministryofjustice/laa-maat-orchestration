@@ -108,6 +108,7 @@ public class Constants {
     public static final String TEST_RESULT_PASS = "PASS";
     public static final String TEST_RESULT_FAIL = "FAIL";
     public static final Integer TEST_APPLICANT_HISTORY_ID = 666;
+    public static final Integer TEST_APPLICANT_ID = 999;
     public static final Integer TEST_PASSPORTED_ID = 777;
     public static final String TEST_EVIDENCE_FEE_LEVEL_1 = "LEVEL1";
     public static final String INCOME_EVIDENCE = "TAX RETURN";

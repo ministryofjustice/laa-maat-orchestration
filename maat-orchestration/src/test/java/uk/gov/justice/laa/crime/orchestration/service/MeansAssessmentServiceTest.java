@@ -9,15 +9,13 @@ import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
-import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiFindHardshipResponse;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiCreateMeansAssessmentRequest;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiGetMeansAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiUpdateMeansAssessmentRequest;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,23 +35,25 @@ class MeansAssessmentServiceTest {
     void givenFinancialAssessmentId_whenFindIsInvoked_thenApiServiceIsCalledAndResponseMapped() {
         when(meansAssessmentApiService.find(Constants.TEST_FINANCIAL_ASSESSMENT_ID))
                 .thenReturn(TestModelDataBuilder.getApiGetMeansAssessmentResponse());
-        meansAssessmentService.find(Constants.TEST_FINANCIAL_ASSESSMENT_ID);
-        verify(meansAssessmentMapper).getMeansAssessmentResponseToFinancialAssessmentDto(any(ApiGetMeansAssessmentResponse.class));
+        meansAssessmentService.find(Constants.TEST_FINANCIAL_ASSESSMENT_ID, Constants.TEST_APPLICANT_ID);
+        verify(meansAssessmentMapper).getMeansAssessmentResponseToFinancialAssessmentDto(any(ApiGetMeansAssessmentResponse.class), anyInt());
     }
 
     @Test
     void givenWorkflowRequest_whenCreateIsInvoked_thenRequestIsMappedAndApiServiceIsCalled() {
+        ApiCreateMeansAssessmentRequest apiCreateMeansAssessmentRequest = TestModelDataBuilder.getApiCreateMeansAssessmentRequest();
         when(meansAssessmentMapper.workflowRequestToCreateAssessmentRequest(any(WorkflowRequest.class)))
-                .thenReturn(TestModelDataBuilder.getApiCreateMeansAssessmentRequest());
-        meansAssessmentService.create(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
-        verify(meansAssessmentApiService).create(any(ApiCreateMeansAssessmentRequest.class));
+                .thenReturn(apiCreateMeansAssessmentRequest);
+        meansAssessmentService.create(TestModelDataBuilder.buildWorkFlowRequest());
+        verify(meansAssessmentApiService).create(apiCreateMeansAssessmentRequest);
     }
 
     @Test
     void givenWorkflowRequest_whenUpdateIsInvoked_thenRequestIsMappedAndApiServiceIsCalled() {
+        ApiUpdateMeansAssessmentRequest apiUpdateMeansAssessmentRequest = TestModelDataBuilder.getApiUpdateMeansAssessmentRequest();
         when(meansAssessmentMapper.workflowRequestToUpdateAssessmentRequest(any(WorkflowRequest.class)))
-                .thenReturn(TestModelDataBuilder.getApiUpdateMeansAssessmentRequest());
-        meansAssessmentService.update(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
-        verify(meansAssessmentApiService).update(any(ApiUpdateMeansAssessmentRequest.class));
+                .thenReturn(apiUpdateMeansAssessmentRequest);
+        meansAssessmentService.update(TestModelDataBuilder.buildWorkFlowRequest());
+        verify(meansAssessmentApiService).update(apiUpdateMeansAssessmentRequest);
     }
 }

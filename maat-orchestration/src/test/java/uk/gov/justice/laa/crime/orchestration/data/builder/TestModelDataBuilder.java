@@ -945,4 +945,9 @@ public class TestModelDataBuilder {
                 .description(status.getDescription())
                 .build();
     }
+
+    public static FinancialAssessmentDTO getFinancialAssessmentDto() {
+        return FinancialAssessmentDTO.builder()
+                .build();
+    }
 }

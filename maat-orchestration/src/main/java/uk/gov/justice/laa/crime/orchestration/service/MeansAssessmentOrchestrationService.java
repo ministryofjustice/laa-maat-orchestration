@@ -10,7 +10,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MeansAssessmentOrchestrationService implements AssessmentOrchestrator<FinancialAssessmentDTO> {
+public class MeansAssessmentOrchestrationService {
 
     private final MeansAssessmentService meansAssessmentService;
     private final ContributionService contributionService;
@@ -23,8 +23,8 @@ public class MeansAssessmentOrchestrationService implements AssessmentOrchestrat
     private static final String DB_PACKAGE_ASSESSMENTS = "assessments";
     private static final String DB_PACKAGE_APPLICATION = "application";
 
-    public FinancialAssessmentDTO find(int assessmentId) {
-        return meansAssessmentService.find(assessmentId);
+    public FinancialAssessmentDTO find(int assessmentId, int applicantId) {
+        return meansAssessmentService.find(assessmentId, applicantId);
     }
 
     public ApplicationDTO create(WorkflowRequest request) {

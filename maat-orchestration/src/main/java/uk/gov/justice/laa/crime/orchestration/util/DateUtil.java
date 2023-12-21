@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -29,4 +30,11 @@ public class DateUtil {
         return null;
     }
 
+    public static Timestamp toTimeStamp(LocalDateTime source) {
+        if (source != null) {
+            return Timestamp.valueOf(source);
+        } else {
+            return null;
+        }
+    }
 }

@@ -23,7 +23,7 @@ services:
   cma-api:
     base-url: http://localhost:9999
     endpoints:
-      find-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means/{financialAssessmentId}
+      find-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means/{financialAssessmentId}/applicantId/{applicantId}
       create-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means
       update-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means
   maat-api:

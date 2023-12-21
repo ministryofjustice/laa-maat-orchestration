@@ -29,7 +29,7 @@ public class MeansAssessmentController {
 
     private final MeansAssessmentOrchestrationService assessmentOrchestrationService;
 
-    @GetMapping(value = "/{financialAssessmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{financialAssessmentId}/applicantId/{applicantId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Find Crime Means Assessment")
     @ApiResponse(responseCode = "200",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -39,9 +39,10 @@ public class MeansAssessmentController {
     @DefaultHTTPErrorResponse
     public ResponseEntity<FinancialAssessmentDTO> find(
             @PathVariable int financialAssessmentId,
+            @PathVariable int applicantId,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
         log.info("Received request to find crime means assessment with transaction id - {}", laaTransactionId);
-        return ResponseEntity.ok(assessmentOrchestrationService.find(financialAssessmentId));
+        return ResponseEntity.ok(assessmentOrchestrationService.find(financialAssessmentId, applicantId));
     }
 
 
