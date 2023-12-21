@@ -107,6 +107,7 @@ public class TestModelDataBuilder {
     private static final LocalDateTime DATE_REVIEWED_DATETIME = LocalDateTime.of(2022, 11, 12, 0, 0, 0);
     private static final Date DATE_REVIEWED =
             Date.from(Instant.ofEpochSecond(DATE_REVIEWED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
+    private static final LocalDateTime DATE_MODIFIED_DATETIME = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
     private static final LocalDateTime DATE_COMPLETED_DATETIME = LocalDateTime.of(2022, 11, 14, 0, 0, 0);
     private static final Date DATE_COMPLETED =
             Date.from(Instant.ofEpochSecond(DATE_COMPLETED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
@@ -284,7 +285,11 @@ public class TestModelDataBuilder {
     }
 
     public static ApiUpdateApplicationResponse getApiUpdateApplicationResponse() {
-        return new ApiUpdateApplicationResponse();
+        return new ApiUpdateApplicationResponse()
+                .withCrownRepOrderDate(CC_REP_ORDER_DATETIME)
+                .withModifiedDateTime(DATE_MODIFIED_DATETIME)
+                .withCrownRepOrderDecision(REP_ORDER_DECISION_GRANTED.toString())
+                .withCrownRepOrderType(CC_REP_TYPE_THROUGH_ORDER.toString());
     }
 
     public static ApplicationDTO getApplicationDTOWithBlankHardship(CourtType courtType) {
