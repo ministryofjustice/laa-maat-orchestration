@@ -202,8 +202,21 @@ class HardshipOrchestrationServiceTest {
     @Test
     void givenMagCourt_whenCreateIsInvokedAndExceptionThrownInCreateHardship_thenRollbackHardshipIsInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
+        ApiPerformHardshipResponse performHardshipResponse = getApiPerformHardshipResponse();
         when(hardshipService.createHardship(workflowRequest))
-                .thenThrow(new APIClientException());
+                .thenReturn(performHardshipResponse);
+
+        HardshipReviewDTO hardshipReviewDTO = getHardshipOverviewDTO(CourtType.MAGISTRATE).getMagCourtHardship();
+        hardshipReviewDTO.setAsessmentStatus(null);
+
+        when(hardshipService.find(performHardshipResponse.getHardshipReviewId()))
+                .thenReturn(hardshipReviewDTO);
+
+        when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), eq(CourtType.MAGISTRATE)))
+                .thenReturn(getAssessmentSummaryDTO());
+
+        doThrow(new APIClientException()).when(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
+
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(APIClientException.class);
         Mockito.verify(hardshipService, times(1)).rollbackHardship(any());
