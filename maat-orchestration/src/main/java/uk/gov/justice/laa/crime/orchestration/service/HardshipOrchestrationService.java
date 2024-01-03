@@ -3,6 +3,7 @@ package uk.gov.justice.laa.crime.orchestration.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
@@ -32,8 +33,9 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
 
     public ApplicationDTO create(WorkflowRequest request) {
         // invoke the validation service to Check user has rep order reserved
+        ApplicationDTO application;
 
-        ApplicationDTO application = request.getApplicationDTO();
+        application = request.getApplicationDTO();
 
         HardshipOverviewDTO hardshipOverview =
                 application.getAssessmentDTO()
@@ -41,52 +43,59 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                         .getHardship();
 
         ApiPerformHardshipResponse performHardshipResponse = hardshipService.createHardship(request);
-        // Need to refresh from DB as HardshipDetail ids may have changed
-        HardshipReviewDTO newHardship = hardshipService.find(performHardshipResponse.getHardshipReviewId());
+        try {
+            // Need to refresh from DB as HardshipDetail ids may have changed
+            HardshipReviewDTO newHardship = hardshipService.find(performHardshipResponse.getHardshipReviewId());
 
-        CourtType courtType = application.getCourtType();
-        if (courtType == CourtType.MAGISTRATE) {
-            hardshipOverview.setMagCourtHardship(newHardship);
-            AssessmentStatusDTO assessmentStatusDTO = newHardship.getAsessmentStatus();
-            if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
-                application = processMagCourtHardshipRules(request);
+            CourtType courtType = application.getCourtType();
+            if (courtType == CourtType.MAGISTRATE) {
+                hardshipOverview.setMagCourtHardship(newHardship);
+                AssessmentStatusDTO assessmentStatusDTO = newHardship.getAsessmentStatus();
+                if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
+                    application = processMagCourtHardshipRules(request);
+                }
+            } else if (courtType == CourtType.CROWN_COURT) {
+                hardshipOverview.setCrownCourtHardship(newHardship);
+                AssessmentStatusDTO assessmentStatusDTO = newHardship.getAsessmentStatus();
+                if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
+                    application = checkActionsAndUpdateApplication(request);
+                }
             }
-        } else if (courtType == CourtType.CROWN_COURT) {
-            hardshipOverview.setCrownCourtHardship(newHardship);
-            AssessmentStatusDTO assessmentStatusDTO = newHardship.getAsessmentStatus();
-            if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
-                application = checkActionsAndUpdateApplication(request);
-            }
+
+            // Update assessment summary view - displayed on the application tab
+            AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(newHardship, courtType);
+            assessmentSummaryService.updateApplication(application, hardshipSummary);
+        }  catch (Exception ex){
+            hardshipService.rollbackHardship(request);
+            throw new APIClientException(ex.getMessage());
         }
-
-        // Update assessment summary view - displayed on the application tab
-        AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(newHardship, courtType);
-        assessmentSummaryService.updateApplication(application, hardshipSummary);
-
         return application;
     }
 
     public ApplicationDTO update(WorkflowRequest request) {
         // invoke the validation service to check that data has not been modified by another user
         // invoke the validation service to Check user has rep order reserved
+        try {
+            hardshipService.updateHardship(request);
 
-        hardshipService.updateHardship(request);
-
-        CourtType courtType = request.getApplicationDTO().getCourtType();
-        if (courtType == CourtType.MAGISTRATE) {
-            AssessmentStatusDTO assessmentStatusDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO()
-                    .getHardship().getMagCourtHardship().getAsessmentStatus();
-            if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
-                request.setApplicationDTO(processMagCourtHardshipRules(request));
+            CourtType courtType = request.getApplicationDTO().getCourtType();
+            if (courtType == CourtType.MAGISTRATE) {
+                AssessmentStatusDTO assessmentStatusDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO()
+                        .getHardship().getMagCourtHardship().getAsessmentStatus();
+                if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
+                    request.setApplicationDTO(processMagCourtHardshipRules(request));
+                }
+            } else if (courtType == CourtType.CROWN_COURT) {
+                AssessmentStatusDTO assessmentStatusDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO()
+                        .getHardship().getCrownCourtHardship().getAsessmentStatus();
+                if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
+                    request.setApplicationDTO(checkActionsAndUpdateApplication(request));
+                }
             }
-        } else if (courtType == CourtType.CROWN_COURT) {
-            AssessmentStatusDTO assessmentStatusDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO()
-                    .getHardship().getCrownCourtHardship().getAsessmentStatus();
-            if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
-                request.setApplicationDTO(checkActionsAndUpdateApplication(request));
-            }
+        }  catch (Exception ex){
+            hardshipService.rollbackHardship(request);
+            throw new APIClientException(ex.getMessage());
         }
-
         return request.getApplicationDTO();
     }
 
