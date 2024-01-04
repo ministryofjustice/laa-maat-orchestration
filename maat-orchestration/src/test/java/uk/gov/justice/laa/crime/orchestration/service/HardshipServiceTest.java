@@ -57,4 +57,14 @@ class HardshipServiceTest {
         verify(hardshipApiService).update(any(ApiPerformHardshipRequest.class));
         verify(hardshipMapper).performHardshipResponseToApplicationDTO(any(ApiPerformHardshipResponse.class), any(ApplicationDTO.class));
     }
+
+    @Test
+    void givenWorkflowRequest_whenRollbackHardshipIsInvoked_thenRequestIsMappedAndApiServiceIsCalled() {
+        when(hardshipMapper.workflowRequestToPerformHardshipRequest(any(WorkflowRequest.class)))
+                .thenReturn(TestModelDataBuilder.getApiPerformHardshipRequest());
+        when(hardshipApiService.rollback(any(ApiPerformHardshipRequest.class)))
+                .thenReturn(new ApiPerformHardshipResponse());
+        hardshipService.rollbackHardship(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
+        verify(hardshipApiService).rollback(any(ApiPerformHardshipRequest.class));
+    }
 }

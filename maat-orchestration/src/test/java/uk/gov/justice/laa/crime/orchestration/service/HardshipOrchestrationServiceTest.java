@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -14,11 +16,12 @@ import uk.gov.justice.laa.crime.orchestration.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.*;
+
 
 @ExtendWith({MockitoExtension.class})
 class HardshipOrchestrationServiceTest {
@@ -197,6 +200,68 @@ class HardshipOrchestrationServiceTest {
     }
 
     @Test
+    void givenMagCourt_whenCreateIsInvokedAndExceptionThrownInCreateHardship_thenRollbackHardshipIsInvoked() {
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
+        ApiPerformHardshipResponse performHardshipResponse = getApiPerformHardshipResponse();
+        when(hardshipService.createHardship(workflowRequest))
+                .thenReturn(performHardshipResponse);
+
+        HardshipReviewDTO hardshipReviewDTO = getHardshipOverviewDTO(CourtType.MAGISTRATE).getMagCourtHardship();
+        hardshipReviewDTO.setAsessmentStatus(null);
+
+        when(hardshipService.find(performHardshipResponse.getHardshipReviewId()))
+                .thenReturn(hardshipReviewDTO);
+
+        when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), eq(CourtType.MAGISTRATE)))
+                .thenReturn(getAssessmentSummaryDTO());
+
+        doThrow(new APIClientException()).when(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
+
+        assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
+                .isInstanceOf(APIClientException.class);
+        Mockito.verify(hardshipService, times(1)).rollbackHardship(any());
+    }
+
+    @Test
+    void givenMagCourt_whenCreateIsInvokedAndExceptionThrownInFind_thenRollbackHardshipIsInvoked() {
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
+        ApiPerformHardshipResponse performHardshipResponse = getApiPerformHardshipResponse();
+        when(hardshipService.createHardship(workflowRequest))
+                .thenReturn(performHardshipResponse);
+
+        HardshipReviewDTO hardshipReviewDTO = getHardshipOverviewDTO(CourtType.MAGISTRATE).getMagCourtHardship();
+        hardshipReviewDTO.setAsessmentStatus(null);
+
+        when(hardshipService.find(performHardshipResponse.getHardshipReviewId()))
+                .thenThrow(new APIClientException());
+
+        assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
+                .isInstanceOf(APIClientException.class);
+        Mockito.verify(hardshipService, times(1)).rollbackHardship(any());
+    }
+
+    @Test
+    void givenMagCourt_whenCreateIsInvokedAndExceptionThrownInGetSummary_thenRollbackHardshipIsInvoked() {
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
+        ApiPerformHardshipResponse performHardshipResponse = getApiPerformHardshipResponse();
+        when(hardshipService.createHardship(workflowRequest))
+                .thenReturn(performHardshipResponse);
+
+        HardshipReviewDTO hardshipReviewDTO = getHardshipOverviewDTO(CourtType.MAGISTRATE).getMagCourtHardship();
+        hardshipReviewDTO.setAsessmentStatus(null);
+
+        when(hardshipService.find(performHardshipResponse.getHardshipReviewId()))
+                .thenReturn(hardshipReviewDTO);
+
+        when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), eq(CourtType.MAGISTRATE)))
+                .thenThrow(new APIClientException());
+
+        assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
+                .isInstanceOf(APIClientException.class);
+        Mockito.verify(hardshipService, times(1)).rollbackHardship(any());
+    }
+
+    @Test
     void givenMagsCourtAndNoVariation_whenUpdateIsInvoked_thenApplicationDTOIsUpdatedWithNewHardship() {
 
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
@@ -337,4 +402,41 @@ class HardshipOrchestrationServiceTest {
                 .isEqualTo(expected);
 
     }
+
+    @Test
+    void givenCrownCourt_whenUpdateIsInvokedAndExceptionThrownInSP_thenRollbackHardshipIsInvoked() {
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.CROWN_COURT);
+
+        ContributionsDTO contributionsDTO = getContributionsDTO();
+        ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
+        applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
+
+        applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship()
+                .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
+        when(contributionService.calculateContribution(workflowRequest))
+                .thenReturn(applicationDTO);
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+                .thenThrow(new APIClientException());
+        assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
+                .isInstanceOf(APIClientException.class);
+        Mockito.verify(hardshipService, times(1)).rollbackHardship(any());
+    }
+
+    @Test
+    void givenCrownCourt_whenUpdateIsInvokedAndExceptionThrownInCalculateContribution_thenRollbackHardshipIsInvoked() {
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.CROWN_COURT);
+
+        ContributionsDTO contributionsDTO = getContributionsDTO();
+        ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
+        applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
+
+        applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship()
+                .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
+        when(contributionService.calculateContribution(workflowRequest))
+                .thenThrow(new APIClientException());
+        assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
+                .isInstanceOf(APIClientException.class);
+        Mockito.verify(hardshipService, times(1)).rollbackHardship(any());
+    }
+
 }
