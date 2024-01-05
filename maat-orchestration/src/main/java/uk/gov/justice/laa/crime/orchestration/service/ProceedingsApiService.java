@@ -27,7 +27,7 @@ public class ProceedingsApiService {
                 request,
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getCrownCourtApi().getCrownCourtEndpoints().getUpdateApplicationUrl(),
+                configuration.getCrownCourtApi().getEndpoints().getUpdateApplicationUrl(),
                 Collections.emptyMap()
         );
 

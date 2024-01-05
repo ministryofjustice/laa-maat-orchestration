@@ -2,15 +2,15 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.contribution.model.common.ApiAssessment;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.*;
+import uk.gov.justice.laa.crime.orchestration.model.common.ApiAssessment;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.LastOutcome;
-import uk.gov.justice.laa.crime.orchestration.util.DateUtil;
+import uk.gov.justice.laa.crime.orchestration.model.contribution.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.orchestration.util.NumberUtils;
 
 import java.math.BigDecimal;
@@ -18,6 +18,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toLocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -37,14 +40,14 @@ public class ContributionMapper extends CrownCourtMapper {
 
         Collection<OutcomeDTO> outcomeDTOs = crownCourtOverviewDTO.getCrownCourtSummaryDTO().getOutcomeDTOs();
         String appealType = crownCourtOverviewDTO.getAppealDTO().getAppealTypeDTO().getCode();
-        LocalDateTime effectiveDate = DateUtil.toLocalDateTime(contributionsDTO.getEffectiveDate());
+        LocalDateTime effectiveDate = toLocalDateTime(contributionsDTO.getEffectiveDate());
 
         return new ApiMaatCalculateContributionRequest()
                 .withUserCreated(user.getUserName())
                 .withRepId(NumberUtils.toInteger(application.getRepId()))
                 .withApplId(NumberUtils.toInteger(application.getApplicantDTO().getId()))
                 .withMagCourtOutcome(MagCourtOutcome.getFrom(application.getMagsOutcomeDTO().getOutcome()))
-                .withCommittalDate(DateUtil.toLocalDateTime(application.getCommittalDate()))
+                .withCommittalDate(toLocalDateTime(application.getCommittalDate()))
                 .withCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()))
                 .withAssessments(applicationDtoToAssessments(application))
                 .withContributionCap(BigDecimal.valueOf(application.getOffenceDTO().getContributionCap()))
@@ -54,15 +57,15 @@ public class ContributionMapper extends CrownCourtMapper {
                 .withUpfrontContributions(contributionsDTO.getUpfrontContribs())
                 .withRemoveContributions(application.getStatusDTO().getRemoveContribs().toString())
                 .withMagCourtOutcome(application.getMagsOutcomeDTO() != null ?
-                                             MagCourtOutcome.getFrom(
-                                                     application.getMagsOutcomeDTO().getOutcome()) : null)
+                        MagCourtOutcome.getFrom(
+                                application.getMagsOutcomeDTO().getOutcome()) : null)
                 .withAppealType(appealType != null ? AppealType.getFrom(appealType) : null)
                 .withLastOutcome(getLastCrownCourtOutcome(outcomeDTOs))
                 .withCrownCourtOutcome(
                         crownCourtSummaryDtoToCrownCourtOutcomes(crownCourtOverviewDTO.getCrownCourtSummaryDTO())
                 )
-                .withDateUpliftApplied(DateUtil.toLocalDateTime(incomeEvidenceSummaryDTO.getUpliftAppliedDate()))
-                .withDateUpliftRemoved(DateUtil.toLocalDateTime(incomeEvidenceSummaryDTO.getUpliftRemovedDate()))
+                .withDateUpliftApplied(toLocalDateTime(incomeEvidenceSummaryDTO.getUpliftAppliedDate()))
+                .withDateUpliftRemoved(toLocalDateTime(incomeEvidenceSummaryDTO.getUpliftRemovedDate()))
                 .withDisposableIncomeAfterCrownHardship(
                         hardshipOverviewDTO.getCrownCourtHardship().getDisposableIncomeAfterHardship())
                 .withDisposableIncomeAfterMagHardship(
@@ -77,9 +80,9 @@ public class ContributionMapper extends CrownCourtMapper {
     private LastOutcome getLastCrownCourtOutcome(final Collection<OutcomeDTO> crownCourtOutcomeList) {
         return crownCourtOutcomeList.stream().reduce((first, second) -> second)
                 .map(outcome ->
-                             new LastOutcome()
-                                     .withDateSet(DateUtil.toLocalDateTime(outcome.getDateSet()))
-                                     .withOutcome(CrownCourtAppealOutcome.getFrom(outcome.getOutcome()))
+                        new LastOutcome()
+                                .withDateSet(toLocalDateTime(outcome.getDateSet()))
+                                .withOutcome(CrownCourtAppealOutcome.getFrom(outcome.getOutcome()))
                 ).orElse(null);
     }
 
@@ -92,7 +95,7 @@ public class ContributionMapper extends CrownCourtMapper {
                 new ApiAssessment()
                         .withAssessmentType(AssessmentType.INIT)
                         .withResult(AssessmentResult.getFrom(initialAssessmentDTO.getResult()))
-                        .withAssessmentDate(DateUtil.toLocalDateTime(initialAssessmentDTO.getAssessmentDate()))
+                        .withAssessmentDate(toLocalDateTime(initialAssessmentDTO.getAssessmentDate()))
                         .withNewWorkReason(NewWorkReason.getFrom(initialAssessmentDTO.getNewWorkReason().getCode()))
                         .withStatus(CurrentStatus.getFrom(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus()))
         );
@@ -103,7 +106,7 @@ public class ContributionMapper extends CrownCourtMapper {
                     new ApiAssessment()
                             .withAssessmentType(AssessmentType.FULL)
                             .withResult(AssessmentResult.getFrom(fullAssessmentDTO.getResult()))
-                            .withAssessmentDate(DateUtil.toLocalDateTime(fullAssessmentDTO.getAssessmentDate()))
+                            .withAssessmentDate(toLocalDateTime(fullAssessmentDTO.getAssessmentDate()))
                             .withNewWorkReason(NewWorkReason.getFrom(initialAssessmentDTO.getNewWorkReason().getCode()))
                             .withStatus(CurrentStatus.getFrom(fullAssessmentDTO.getAssessmnentStatusDTO().getStatus()))
             );
@@ -115,7 +118,7 @@ public class ContributionMapper extends CrownCourtMapper {
                     new ApiAssessment()
                             .withAssessmentType(AssessmentType.PASSPORT)
                             .withResult(AssessmentResult.getFrom(passported.getResult()))
-                            .withAssessmentDate(DateUtil.toLocalDateTime(passported.getDate()))
+                            .withAssessmentDate(toLocalDateTime(passported.getDate()))
                             .withNewWorkReason(NewWorkReason.getFrom(passported.getNewWorkReason().getCode()))
                             .withStatus(CurrentStatus.getFrom(passported.getAssessementStatusDTO().getStatus()))
             );
@@ -139,12 +142,31 @@ public class ContributionMapper extends CrownCourtMapper {
         return ContributionsDTO.builder()
                 .id(response.getContributionId().longValue())
                 .capped(response.getContributionCap())
-                .calcDate(DateUtil.toDate(response.getCalcDate()))
+                .calcDate(toDate(response.getCalcDate()))
                 .basedOn(new SysGenString(response.getBasedOn()))
                 .monthlyContribs(response.getMonthlyContributions())
                 .upfrontContribs(response.getUpfrontContributions())
-                .effectiveDate(DateUtil.toDate(response.getEffectiveDate()))
-                .upliftApplied(Boolean.parseBoolean(response.getUpliftApplied()))
+                .effectiveDate(toDate(response.getEffectiveDate()))
+                .upliftApplied("Y".equalsIgnoreCase(response.getUpliftApplied()))
                 .build();
+    }
+
+    public Collection<ContributionSummaryDTO> contributionSummaryToDto(List<ApiContributionSummary> contributionSummaries) {
+        Collection<ContributionSummaryDTO> contributionSummaryCollection = new ArrayList<>();
+        for (ApiContributionSummary apiContributionSummary : contributionSummaries) {
+            ContributionSummaryDTO contributionSummaryDTO = new ContributionSummaryDTO();
+            contributionSummaryDTO.setId(Long.valueOf(apiContributionSummary.getId()));
+            contributionSummaryDTO.setMonthlyContribs(apiContributionSummary.getMonthlyContributions().doubleValue());
+            contributionSummaryDTO.setUpfrontContribs(apiContributionSummary.getUpfrontContributions().doubleValue());
+            contributionSummaryDTO.setBasedOn(apiContributionSummary.getBasedOn());
+            contributionSummaryDTO.setUpliftApplied("Y".equalsIgnoreCase((apiContributionSummary.getUpliftApplied())));
+            contributionSummaryDTO.setEffectiveDate(toDate(apiContributionSummary.getEffectiveDate()));
+            contributionSummaryDTO.setCalcDate(toDate(apiContributionSummary.getCalcDate()));
+            contributionSummaryDTO.setFileName(apiContributionSummary.getFileName());
+            contributionSummaryDTO.setDateFileSent(toDate(apiContributionSummary.getDateSent()));
+            contributionSummaryDTO.setDateFileReceived(toDate(apiContributionSummary.getDateReceived()));
+            contributionSummaryCollection.add(contributionSummaryDTO);
+        }
+        return contributionSummaryCollection;
     }
 }

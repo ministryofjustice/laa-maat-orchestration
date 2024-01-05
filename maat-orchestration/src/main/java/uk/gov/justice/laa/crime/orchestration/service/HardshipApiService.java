@@ -27,7 +27,7 @@ public class HardshipApiService {
         ApiFindHardshipResponse response = hardshipApiClient.get(
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getHardshipApi().getHardshipEndpoints().getFindUrl(),
+                configuration.getHardshipApi().getEndpoints().getFindUrl(),
                 hardshipReviewId
         );
 
@@ -40,7 +40,33 @@ public class HardshipApiService {
                 request,
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getHardshipApi().getHardshipEndpoints().getCreateUrl(),
+                configuration.getHardshipApi().getEndpoints().getCreateUrl(),
+                Collections.emptyMap()
+        );
+
+        log.info(String.format(RESPONSE_STRING, response));
+        return response;
+    }
+
+    public ApiPerformHardshipResponse update(ApiPerformHardshipRequest request) {
+        ApiPerformHardshipResponse response = hardshipApiClient.put(
+                request,
+                new ParameterizedTypeReference<>() {
+                },
+                configuration.getHardshipApi().getEndpoints().getUpdateUrl(),
+                Collections.emptyMap()
+        );
+
+        log.info(String.format(RESPONSE_STRING, response));
+        return response;
+    }
+
+    public ApiPerformHardshipResponse rollback(ApiPerformHardshipRequest request) {
+        ApiPerformHardshipResponse response = hardshipApiClient.put(
+                request,
+                new ParameterizedTypeReference<>() {
+                },
+                configuration.getHardshipApi().getEndpoints().getRollbackUrl(),
                 Collections.emptyMap()
         );
 

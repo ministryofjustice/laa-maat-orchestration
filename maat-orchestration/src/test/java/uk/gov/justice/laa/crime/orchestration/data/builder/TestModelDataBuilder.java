@@ -1,7 +1,5 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
-import io.netty.util.Constant;
-import org.apache.tomcat.util.bcel.Const;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
@@ -9,45 +7,109 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.*;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOutcome;
+import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiUserSession;
+import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.orchestration.model.contribution.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipDetail;
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipProgress;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.*;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.temporal.TemporalAccessor;
-import java.util.*;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
 public class TestModelDataBuilder {
+    private static final Integer EVIDENCE_ID = 9552473;
+    private static final String INCOME_EVIDENCE_DESCRIPTION = "Tax Return";
+    private static final String INCOME_EVIDENCE = "TAX RETURN";
+    private static final String EVIDENCE_FEE_LEVEL_1 = "LEVEL1";
+    private static final Integer PASSPORTED_ID = 777;
+    private static final Integer APPLICANT_HISTORY_ID = 666;
+    private static final String RESULT_FAIL = "FAIL";
+    private static final String RESULT_PASS = "PASS";
+    private static final SysGenString REP_ORDER_DECISION_GRANTED = new SysGenString("Granted");
+    private static final SysGenString CC_REP_TYPE_THROUGH_ORDER = new SysGenString("Through Order");
+    private static final LocalDateTime CC_REP_ORDER_DATETIME = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
+    private static final LocalDateTime SENTENCE_ORDER_DATETIME = CC_REP_ORDER_DATETIME.plus(1, ChronoUnit.DAYS);
+    private static final LocalDateTime DATETIME_RECEIVED = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
+    private static final Date ASSESSMENT_DATE =
+            Date.from(DATETIME_RECEIVED.plus(2, ChronoUnit.DAYS).toInstant(ZoneOffset.UTC));
+    private static final LocalDateTime COMMITAL_DATETIME = DATETIME_RECEIVED.plus(1, ChronoUnit.DAYS);
+    private static final LocalDateTime DECISION_DATETIME = COMMITAL_DATETIME.plus(1, ChronoUnit.DAYS);
+    private static final SysGenString CONTRIBUTION_BASED_ON = new SysGenString("Means");
+    private static final LocalDateTime CONTRIBUTION_CALCULATION_DATETIME = LocalDateTime.of(2022, 10, 5, 0, 0, 0);
+    private static final Date CONTRIBUTION_CALCULATION_DATE =
+            Date.from(Instant.ofEpochSecond(CONTRIBUTION_CALCULATION_DATETIME.toEpochSecond(ZoneOffset.UTC)));
+    private static final LocalDateTime CONTRIBUTION_EFFECTIVE_DATETIME = LocalDateTime.of(2022, 10, 5, 0, 0, 0);
+    private static final Date CONTRIBUTION_EFFECTIVE_DATE =
+            Date.from(Instant.ofEpochSecond(CONTRIBUTION_EFFECTIVE_DATETIME.toEpochSecond(ZoneOffset.UTC)));
+    private static final BigDecimal UPFRONT_CONTRIBUTION_AMOUNT = BigDecimal.valueOf(2000.00);
+    private static final BigDecimal MONTHLY_CONTRIBUTION_AMOUNT = BigDecimal.valueOf(150.00);
+    private static final Integer HARDSHIP_REVIEW_PROGRESS_ID = 53;
+    private static final String HARDSHIP_REASON_NOTE = "Mock reason note";
+    private static final String HARDSHIP_OTHER_DESCRIPTION = "Mock other description";
+    private static final String CASEWORKER_DECISION_NOTES = "Mock caseworker decision notes";
+    private static final String CASEWORKER_NOTES = "Mock caseworker notes";
+    private static final String NEW_WORK_REASON_STRING = NewWorkReason.NEW.getCode();
+    private static final String USER_SESSION = "8ab0bab5-c27e-471a-babf-c3992c7a4471";
+    private static final String USERNAME = "mock-u";
+    private static final Integer REP_ID = 200;
+    private static final BigDecimal SOLICITOR_ESTIMATED_COST = BigDecimal.valueOf(2500);
+    private static final BigDecimal SOLICITOR_VAT = BigDecimal.valueOf(250);
+    private static final BigDecimal SOLICITOR_DISBURSEMENTS = BigDecimal.valueOf(375);
+    private static final BigDecimal SOLICITOR_RATE = BigDecimal.valueOf(200);
+    // Solicitors Costs
+    private static final BigDecimal SOLICITOR_HOURS = BigDecimal.valueOf(50)
+            .setScale(1, RoundingMode.DOWN);
+    private static final LocalDateTime DATE_REQUIRED_DATETIME = LocalDateTime.of(2022, 12, 15, 0, 0, 0);
+    private static final Date DATE_REQUIRED =
+            Date.from(Instant.ofEpochSecond(DATE_REQUIRED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
+    private static final LocalDateTime DATE_REQUESTED_DATETIME = LocalDateTime.of(2022, 11, 11, 0, 0, 0);
+    private static final Date DATE_REQUESTED =
+            Date.from(Instant.ofEpochSecond(DATE_REQUESTED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
+    private static final LocalDateTime DATE_REVIEWED_DATETIME = LocalDateTime.of(2022, 11, 12, 0, 0, 0);
+    private static final Date DATE_REVIEWED =
+            Date.from(Instant.ofEpochSecond(DATE_REVIEWED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
+    private static final LocalDateTime DATE_MODIFIED_DATETIME = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
+    private static final LocalDateTime DATE_COMPLETED_DATETIME = LocalDateTime.of(2022, 11, 14, 0, 0, 0);
+    private static final Date DATE_COMPLETED =
+            Date.from(Instant.ofEpochSecond(DATE_COMPLETED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
+    private static final Integer HARDSHIP_DETAIL_ID = 12345;
+    private static final Integer CMU_ID = 50;
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
         return new ApiFindHardshipResponse()
-                .withId(Constants.TEST_HARDSHIP_REVIEW_ID)
-                .withCmuId(Constants.TEST_CMU_ID)
-                .withNotes(Constants.TEST_CASEWORKER_NOTES)
-                .withDecisionNotes(Constants.TEST_CASEWORKER_DECISION_NOTES)
-                .withReviewDate(Constants.TEST_DATE_REVIEWED_DATETIME)
+                .withId(Constants.HARDSHIP_REVIEW_ID)
+                .withCmuId(CMU_ID)
+                .withNotes(CASEWORKER_NOTES)
+                .withDecisionNotes(CASEWORKER_DECISION_NOTES)
+                .withReviewDate(DATE_REVIEWED_DATETIME)
                 .withReviewResult(HardshipReviewResult.PASS)
-                .withDisposableIncome(Constants.TEST_DISPOSABLE_INCOME)
-                .withDisposableIncomeAfterHardship(Constants.TEST_POST_HARDSHIP_DISPOSABLE_INCOME)
+                .withDisposableIncome(Constants.DISPOSABLE_INCOME)
+                .withDisposableIncomeAfterHardship(Constants.POST_HARDSHIP_DISPOSABLE_INCOME)
                 .withNewWorkReason(NewWorkReason.NEW)
                 .withSolicitorCosts(getSolicitorsCosts())
                 .withStatus(HardshipReviewStatus.COMPLETE)
                 .withReviewDetails(
                         Stream.concat(
                                 getApiHardshipReviewDetails(BigDecimal.valueOf(2000.00),
-                                                            HardshipReviewDetailType.EXPENDITURE
+                                        HardshipReviewDetailType.EXPENDITURE
                                 ).stream(),
                                 getApiHardshipReviewDetails(BigDecimal.valueOf(1500.00),
-                                                            HardshipReviewDetailType.INCOME
+                                        HardshipReviewDetailType.INCOME
                                 ).stream()
                         ).toList())
                 .withReviewProgressItems(getReviewProgressItems());
@@ -56,9 +118,9 @@ public class TestModelDataBuilder {
     public static ApiPerformHardshipResponse getApiPerformHardshipResponse() {
         return new ApiPerformHardshipResponse()
                 .withReviewResult(HardshipReviewResult.PASS)
-                .withDisposableIncome(Constants.TEST_DISPOSABLE_INCOME)
-                .withHardshipReviewId(Constants.TEST_HARDSHIP_REVIEW_ID)
-                .withPostHardshipDisposableIncome(Constants.TEST_POST_HARDSHIP_DISPOSABLE_INCOME);
+                .withDisposableIncome(Constants.DISPOSABLE_INCOME)
+                .withHardshipReviewId(Constants.HARDSHIP_REVIEW_ID)
+                .withPostHardshipDisposableIncome(Constants.POST_HARDSHIP_DISPOSABLE_INCOME);
     }
 
     public static ApiPerformHardshipRequest getApiPerformHardshipRequest() {
@@ -73,9 +135,9 @@ public class TestModelDataBuilder {
                                                         .withFrequency(Frequency.MONTHLY)
                                                         .withAccepted(true)
                                                         .withDescription(
-                                                                Constants.TEST_HARDSHIP_OTHER_DESCRIPTION)
+                                                                HARDSHIP_OTHER_DESCRIPTION)
                                                         .withItemCode(DeniedIncomeDetailCode.MEDICAL_GROUNDS)
-                                                        .withReasonNote(Constants.TEST_HARDSHIP_REASON_NOTE)
+                                                        .withReasonNote(HARDSHIP_REASON_NOTE)
                                         )
                                 )
                                 .withExtraExpenditure(
@@ -86,31 +148,31 @@ public class TestModelDataBuilder {
                                                         .withAccepted(false)
                                                         .withReasonCode(HardshipReviewDetailReason.EVIDENCE_SUPPLIED)
                                                         .withDescription(
-                                                                Constants.TEST_HARDSHIP_OTHER_DESCRIPTION)
+                                                                HARDSHIP_OTHER_DESCRIPTION)
                                                         .withItemCode(ExtraExpenditureDetailCode.CAR_LOAN)
                                         )
                                 )
-                                .withReviewDate(Constants.TEST_DATE_REVIEWED_DATETIME)
+                                .withReviewDate(DATE_REVIEWED_DATETIME)
                                 .withSolicitorCosts(
                                         new SolicitorCosts()
-                                                .withVat(Constants.TEST_SOLICITOR_VAT)
-                                                .withRate(Constants.TEST_SOLICITOR_RATE)
-                                                .withHours(Constants.TEST_SOLICITOR_HOURS)
-                                                .withDisbursements(Constants.TEST_SOLICITOR_DISBURSEMENTS)
-                                                .withEstimatedTotal(Constants.TEST_SOLICITOR_ESTIMATED_COST)
+                                                .withVat(SOLICITOR_VAT)
+                                                .withRate(SOLICITOR_RATE)
+                                                .withHours(SOLICITOR_HOURS)
+                                                .withDisbursements(SOLICITOR_DISBURSEMENTS)
+                                                .withEstimatedTotal(SOLICITOR_ESTIMATED_COST)
                                 )
-                                .withTotalAnnualDisposableIncome(Constants.TEST_DISPOSABLE_INCOME)
+                                .withTotalAnnualDisposableIncome(Constants.DISPOSABLE_INCOME)
                 )
                 .withHardshipMetadata(
                         new HardshipMetadata()
-                                .withRepId(Constants.TEST_REP_ID)
-                                .withCmuId(Constants.TEST_CMU_ID)
-                                .withHardshipReviewId(Constants.TEST_HARDSHIP_REVIEW_ID)
-                                .withFinancialAssessmentId(Constants.TEST_FINANCIAL_ASSESSMENT_ID)
-                                .withReviewReason(NewWorkReason.getFrom(Constants.TEST_NEW_WORK_REASON_STRING))
+                                .withRepId(REP_ID)
+                                .withCmuId(CMU_ID)
+                                .withHardshipReviewId(Constants.HARDSHIP_REVIEW_ID)
+                                .withFinancialAssessmentId(Constants.FINANCIAL_ASSESSMENT_ID)
+                                .withReviewReason(NewWorkReason.getFrom(NEW_WORK_REASON_STRING))
                                 .withReviewStatus(HardshipReviewStatus.COMPLETE)
-                                .withNotes(Constants.TEST_CASEWORKER_NOTES)
-                                .withDecisionNotes(Constants.TEST_CASEWORKER_DECISION_NOTES)
+                                .withNotes(CASEWORKER_NOTES)
+                                .withDecisionNotes(CASEWORKER_DECISION_NOTES)
                                 .withUserSession(getApiUserSession())
                                 .withProgressItems(
                                         List.of(
@@ -118,9 +180,9 @@ public class TestModelDataBuilder {
                                                         .withAction(HardshipReviewProgressAction.SOLICITOR_INFORMED)
                                                         .withResponse(
                                                                 HardshipReviewProgressResponse.ADDITIONAL_PROVIDED)
-                                                        .withDateTaken(Constants.TEST_DATE_REQUESTED_DATETIME)
-                                                        .withDateRequired(Constants.TEST_DATE_REQUIRED_DATETIME)
-                                                        .withDateCompleted(Constants.TEST_DATE_COMPLETED_DATETIME)
+                                                        .withDateTaken(DATE_REQUESTED_DATETIME)
+                                                        .withDateRequired(DATE_REQUIRED_DATETIME)
+                                                        .withDateCompleted(DATE_COMPLETED_DATETIME)
                                         )
                                 )
                 );
@@ -128,17 +190,17 @@ public class TestModelDataBuilder {
 
     public static ApiUpdateApplicationRequest getUpdateApplicationRequest() {
         return new ApiUpdateApplicationRequest()
-                .withApplicantHistoryId(Constants.TEST_APPLICANT_HISTORY_ID)
-                .withCrownRepId(Constants.TEST_REP_ID)
+                .withApplicantHistoryId(APPLICANT_HISTORY_ID)
+                .withCrownRepId(REP_ID)
                 .withIsImprisoned(Boolean.TRUE)
                 .withUserSession(getApiUserSession())
-                .withRepId(Constants.TEST_REP_ID)
+                .withRepId(REP_ID)
                 .withCaseType(CaseType.EITHER_WAY)
                 .withMagCourtOutcome(MagCourtOutcome.SENT_FOR_TRIAL)
                 .withDecisionReason(DecisionReason.GRANTED)
-                .withDecisionDate(Constants.TEST_DECISION_DATETIME)
-                .withCommittalDate(Constants.TEST_COMMITAL_DATETIME)
-                .withDateReceived(Constants.TEST_DATETIME_RECEIVED)
+                .withDecisionDate(DECISION_DATETIME)
+                .withCommittalDate(COMMITAL_DATETIME)
+                .withDateReceived(DATETIME_RECEIVED)
                 .withCrownCourtSummary(getApiCrownCourtSummary())
                 .withIojAppeal(getApiIOJAppeal())
                 .withFinancialAssessment(getApiFinancialAssessment())
@@ -147,34 +209,34 @@ public class TestModelDataBuilder {
 
     public static ApiCrownCourtSummary getApiCrownCourtSummary() {
         return new ApiCrownCourtSummary()
-                .withEvidenceFeeLevel(Constants.TEST_EVIDENCE_FEE_LEVEL_1)
-                .withCrownCourtOutcome(List.of(getApiCrownCourtOutcome()))
-                .withRepOrderDate(Constants.TEST_CC_REP_ORDER_DATETIME)
-                .withRepType(Constants.TEST_CC_REP_TYPE_THROUGH_ORDER.getValue())
-                .withRepOrderDecision(Constants.TEST_REP_ORDER_DECISION_GRANTED.getValue())
-                .withRepId(Constants.TEST_REP_ID)
-                .withSentenceOrderDate(Constants.TEST_SENTENCE_ORDER_DATETIME);
+                .withEvidenceFeeLevel(EVIDENCE_FEE_LEVEL_1)
+                .withCrownCourtOutcome(List.of(getApiCrownCourtOutcome(CrownCourtOutcome.CONVICTED)))
+                .withRepOrderDate(CC_REP_ORDER_DATETIME)
+                .withRepType(CC_REP_TYPE_THROUGH_ORDER.getValue())
+                .withRepOrderDecision(REP_ORDER_DECISION_GRANTED.getValue())
+                .withRepId(REP_ID)
+                .withSentenceOrderDate(SENTENCE_ORDER_DATETIME);
     }
 
-    public static ApiCrownCourtOutcome getApiCrownCourtOutcome() {
+    public static ApiCrownCourtOutcome getApiCrownCourtOutcome(CrownCourtOutcome crownCourtOutcome) {
         return new ApiCrownCourtOutcome()
-                .withDateSet(Constants.TEST_SENTENCE_ORDER_DATETIME)
-                .withDescription(Constants.TEST_CC_OUTCOME_DESCRIPTION_CONVICTED)
-                .withOutComeType(Constants.TEST_CC_OUTCOME_TYPE_TRIAL)
-                .withOutcome(CrownCourtOutcome.CONVICTED);
+                .withDateSet(SENTENCE_ORDER_DATETIME)
+                .withDescription(crownCourtOutcome.getDescription())
+                .withOutComeType(crownCourtOutcome.getType())
+                .withOutcome(crownCourtOutcome);
     }
 
     public static ApiIOJAppeal getApiIOJAppeal() {
         return new ApiIOJAppeal()
-                .withIojResult(Constants.TEST_RESULT_PASS)
-                .withDecisionResult(Constants.TEST_RESULT_PASS);
+                .withIojResult(RESULT_PASS)
+                .withDecisionResult(RESULT_PASS);
     }
 
     public static ApiFinancialAssessment getApiFinancialAssessment() {
         return new ApiFinancialAssessment()
-                .withInitResult(Constants.TEST_RESULT_FAIL)
+                .withInitResult(RESULT_FAIL)
                 .withInitStatus(CurrentStatus.COMPLETE)
-                .withFullResult(Constants.TEST_RESULT_PASS)
+                .withFullResult(RESULT_PASS)
                 .withFullStatus(CurrentStatus.COMPLETE)
                 .withHardshipOverview(getApiHardshipOverview());
     }
@@ -187,19 +249,23 @@ public class TestModelDataBuilder {
 
     public static ApiPassportAssessment getApiPassportAssessment() {
         return new ApiPassportAssessment()
-                .withResult(Constants.TEST_RESULT_FAIL)
+                .withResult(RESULT_FAIL)
                 .withStatus(CurrentStatus.COMPLETE);
     }
 
 
     public static ApiUserSession getApiUserSession() {
         return new ApiUserSession()
-                .withUserName(Constants.TEST_USERNAME)
-                .withSessionId(Constants.TEST_USER_SESSION);
+                .withUserName(USERNAME)
+                .withSessionId(USER_SESSION);
     }
 
     public static ApiUpdateApplicationResponse getApiUpdateApplicationResponse() {
-        return new ApiUpdateApplicationResponse();
+        return new ApiUpdateApplicationResponse()
+                .withCrownRepOrderDate(CC_REP_ORDER_DATETIME)
+                .withModifiedDateTime(DATE_MODIFIED_DATETIME)
+                .withCrownRepOrderDecision(REP_ORDER_DECISION_GRANTED.toString())
+                .withCrownRepOrderType(CC_REP_TYPE_THROUGH_ORDER.toString());
     }
 
     public static ApplicationDTO getApplicationDTOWithBlankHardship(CourtType courtType) {
@@ -222,22 +288,22 @@ public class TestModelDataBuilder {
 
     private static List<ApiHardshipProgress> getReviewProgressItems() {
         return List.of(new ApiHardshipProgress()
-                               .withId(Constants.TEST_HARDSHIP_REVIEW_PROGRESS_ID)
-                               .withProgressResponse(HardshipReviewProgressResponse.ADDITIONAL_PROVIDED)
-                               .withDateCompleted(Constants.TEST_DATE_COMPLETED_DATETIME)
-                               .withDateRequested(Constants.TEST_DATE_REQUESTED_DATETIME)
-                               .withDateRequired(Constants.TEST_DATE_REQUIRED_DATETIME)
-                               .withProgressAction(HardshipReviewProgressAction.SOLICITOR_INFORMED)
+                .withId(HARDSHIP_REVIEW_PROGRESS_ID)
+                .withProgressResponse(HardshipReviewProgressResponse.ADDITIONAL_PROVIDED)
+                .withDateCompleted(DATE_COMPLETED_DATETIME)
+                .withDateRequested(DATE_REQUESTED_DATETIME)
+                .withDateRequired(DATE_REQUIRED_DATETIME)
+                .withProgressAction(HardshipReviewProgressAction.SOLICITOR_INFORMED)
         );
     }
 
     public static SolicitorCosts getSolicitorsCosts() {
         return new SolicitorCosts()
-                .withVat(Constants.TEST_SOLICITOR_VAT)
-                .withDisbursements(Constants.TEST_SOLICITOR_DISBURSEMENTS)
-                .withRate(Constants.TEST_SOLICITOR_RATE)
-                .withHours(Constants.TEST_SOLICITOR_HOURS)
-                .withEstimatedTotal(Constants.TEST_SOLICITOR_ESTIMATED_COST);
+                .withVat(SOLICITOR_VAT)
+                .withDisbursements(SOLICITOR_DISBURSEMENTS)
+                .withRate(SOLICITOR_RATE)
+                .withHours(SOLICITOR_HOURS)
+                .withEstimatedTotal(SOLICITOR_ESTIMATED_COST);
     }
 
     public static List<ApiHardshipDetail> getApiHardshipReviewDetails(BigDecimal amount,
@@ -254,24 +320,24 @@ public class TestModelDataBuilder {
                 );
                 case INCOME -> details.add(
                         new ApiHardshipDetail()
-                                .withId(Constants.TEST_HARDSHIP_DETAIL_ID)
+                                .withId(HARDSHIP_DETAIL_ID)
                                 .withDetailType(HardshipReviewDetailType.INCOME)
                                 .withAmount(amount)
                                 .withFrequency(Frequency.MONTHLY)
                                 .withAccepted("Y")
-                                .withOtherDescription(Constants.TEST_HARDSHIP_OTHER_DESCRIPTION)
-                                .withReasonNote(Constants.TEST_HARDSHIP_REASON_NOTE)
+                                .withOtherDescription(HARDSHIP_OTHER_DESCRIPTION)
+                                .withReasonNote(HARDSHIP_REASON_NOTE)
                                 .withDetailCode(HardshipReviewDetailCode.MEDICAL_GROUNDS)
                 );
                 case EXPENDITURE -> details.add(
                         new ApiHardshipDetail()
-                                .withId(Constants.TEST_HARDSHIP_DETAIL_ID)
+                                .withId(HARDSHIP_DETAIL_ID)
                                 .withDetailType(HardshipReviewDetailType.EXPENDITURE)
                                 .withAmount(amount)
                                 .withFrequency(Frequency.ANNUALLY)
                                 .withAccepted("F")
                                 .withDetailReason(HardshipReviewDetailReason.EVIDENCE_SUPPLIED)
-                                .withOtherDescription(Constants.TEST_HARDSHIP_OTHER_DESCRIPTION)
+                                .withOtherDescription(HARDSHIP_OTHER_DESCRIPTION)
                                 .withDetailCode(HardshipReviewDetailCode.CAR_LOAN)
                 );
                 case SOL_COSTS -> details.add(
@@ -288,10 +354,10 @@ public class TestModelDataBuilder {
 
     public static AssessmentSummaryDTO getAssessmentSummaryDTO() {
         return AssessmentSummaryDTO.builder()
-                .id(Constants.TEST_ASSESSMENT_SUMMARY_ID.longValue())
+                .id(Constants.ASSESSMENT_SUMMARY_ID.longValue())
                 .status(AssessmentStatusDTO.COMPLETE)
                 .result(ReviewResult.PASS.getResult())
-                .assessmentDate(Constants.TEST_ASSESSMENT_SUMMARY_DATE)
+                .assessmentDate(Constants.ASSESSMENT_SUMMARY_DATE)
                 .build();
     }
 
@@ -327,26 +393,56 @@ public class TestModelDataBuilder {
                 .build();
     }
 
+    public static WorkflowRequest buildWorkFlowRequest() {
+        return WorkflowRequest.builder()
+                .userDTO(getUserDTO())
+                .applicationDTO(getApplicationDTO())
+                .isC3Enabled(true)
+                .build();
+    }
+
+
     public static ApplicationDTO getApplicationDTO(CourtType courtType) {
         return ApplicationDTO.builder()
-                .repId(Constants.TEST_REP_ID.longValue())
-                .dateReceived(Date.from(Constants.TEST_DATETIME_RECEIVED.atZone(ZoneId.systemDefault()).toInstant()))
-                .committalDate(Date.from(Constants.TEST_COMMITAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
-                .decisionDate(Date.from(Constants.TEST_DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .repId(REP_ID.longValue())
+                .dateReceived(Date.from(DATETIME_RECEIVED.atZone(ZoneId.systemDefault()).toInstant()))
+                .committalDate(Date.from(COMMITAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .decisionDate(Date.from(DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .applicantDTO(getApplicantDTO())
                 .assessmentDTO(getAssessmentDTO(courtType))
                 .crownCourtOverviewDTO(getCrownCourtOverviewDTO())
                 .caseDetailsDTO(getCaseDetailDTO())
+                .offenceDTO(getOffenceDTO())
+                .statusDTO(getRepStatusDTO())
                 .magsOutcomeDTO(getOutcomeDTO(CourtType.MAGISTRATE))
                 .passportedDTO(getPassportedDTO())
                 .repOrderDecision(getRepOrderDecisionDTO())
-                .iojResult(Constants.TEST_RESULT_PASS)
+                .iojResult(RESULT_PASS)
+                .build();
+    }
+
+    public static ApplicationDTO getApplicationDTO() {
+        return ApplicationDTO.builder()
+                .repId(REP_ID.longValue())
+                .dateReceived(Date.from(DATETIME_RECEIVED.atZone(ZoneId.systemDefault()).toInstant()))
+                .committalDate(Date.from(COMMITAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .decisionDate(Date.from(DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .applicantDTO(getApplicantDTO())
+                .assessmentDTO(getAssessmentDTO())
+                .crownCourtOverviewDTO(getCrownCourtOverviewDTOForContribution())
+                .caseDetailsDTO(getCaseDetailDTO())
+                .offenceDTO(getOffenceDTO())
+                .statusDTO(getRepStatusDTO())
+                .magsOutcomeDTO(getOutcomeDTO(CourtType.MAGISTRATE))
+                .passportedDTO(getPassportedDTO())
+                .repOrderDecision(getRepOrderDecisionDTO())
+                .iojResult(RESULT_PASS)
                 .build();
     }
 
     public static ApplicantDTO getApplicantDTO() {
         return ApplicantDTO.builder()
-                .applicantHistoryId(Constants.TEST_APPLICANT_HISTORY_ID.longValue())
+                .applicantHistoryId(APPLICANT_HISTORY_ID.longValue())
                 .build();
     }
 
@@ -357,34 +453,64 @@ public class TestModelDataBuilder {
                 .build();
     }
 
+    public static AssessmentDTO getAssessmentDTO() {
+        return AssessmentDTO.builder()
+                .iojAppeal(getIOJAppealDTO())
+                .financialAssessmentDTO(getFinancialAssessmentDTO())
+                .build();
+    }
+
     public static CrownCourtOverviewDTO getCrownCourtOverviewDTO() {
         return CrownCourtOverviewDTO.builder()
+                .appealDTO(getAppealDTO())
+                .contribution(getContributionsDTO())
                 .crownCourtSummaryDTO(getCrownCourtSummaryDTO())
+                .build();
+    }
+
+    public static CrownCourtOverviewDTO getCrownCourtOverviewDTOForContribution() {
+        return CrownCourtOverviewDTO.builder()
+                .appealDTO(getAppealDTO())
+                .contribution(getContributionsDTO())
+                .crownCourtSummaryDTO(getCrownCourtSummaryDTOForContribution())
                 .build();
     }
 
     public static CrownCourtSummaryDTO getCrownCourtSummaryDTO() {
         return CrownCourtSummaryDTO.builder()
-                .ccRepId(Constants.TEST_REP_ID.longValue())
-                .ccRepType(Constants.TEST_CC_REP_TYPE_THROUGH_ORDER)
-                .ccRepOrderDate(Date.from(Constants.TEST_CC_REP_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
-                .sentenceOrderDate(Date.from(Constants.TEST_SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
-                .repOrderDecision(Constants.TEST_REP_ORDER_DECISION_GRANTED)
+                .ccRepId(REP_ID.longValue())
+                .ccRepType(CC_REP_TYPE_THROUGH_ORDER)
+                .ccRepOrderDate(Date.from(CC_REP_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .sentenceOrderDate(Date.from(SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .repOrderDecision(REP_ORDER_DECISION_GRANTED)
                 .inPrisoned(Boolean.TRUE)
                 .evidenceProvisionFee(getEvidenceFeeDTO())
                 .outcomeDTOs(List.of(getOutcomeDTO(CourtType.CROWN_COURT)))
                 .build();
     }
 
+    public static CrownCourtSummaryDTO getCrownCourtSummaryDTOForContribution() {
+        return CrownCourtSummaryDTO.builder()
+                .ccRepId(REP_ID.longValue())
+                .ccRepType(CC_REP_TYPE_THROUGH_ORDER)
+                .ccRepOrderDate(Date.from(CC_REP_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .sentenceOrderDate(Date.from(SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .repOrderDecision(REP_ORDER_DECISION_GRANTED)
+                .inPrisoned(Boolean.TRUE)
+                .evidenceProvisionFee(getEvidenceFeeDTO())
+                .outcomeDTOs(List.of(getOutcomeDTO()))
+                .build();
+    }
+
     public static EvidenceFeeDTO getEvidenceFeeDTO() {
         return EvidenceFeeDTO.builder()
-                .feeLevel(Constants.TEST_EVIDENCE_FEE_LEVEL_1)
+                .feeLevel(EVIDENCE_FEE_LEVEL_1)
                 .build();
     }
 
     public static IOJAppealDTO getIOJAppealDTO() {
         return IOJAppealDTO.builder()
-                .appealDecisionResult(Constants.TEST_RESULT_PASS)
+                .appealDecisionResult(RESULT_PASS)
                 .build();
     }
 
@@ -397,10 +523,10 @@ public class TestModelDataBuilder {
     public static OutcomeDTO getOutcomeDTO(CourtType courtType) {
         if (courtType.equals(CourtType.CROWN_COURT)) {
             return OutcomeDTO.builder()
-                    .dateSet(Date.from(Constants.TEST_SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
-                    .description(Constants.TEST_CC_OUTCOME_DESCRIPTION_CONVICTED)
-                    .outComeType(Constants.TEST_CC_OUTCOME_TYPE_TRIAL)
-                    .outcome(CrownCourtOutcome.CONVICTED.getCode())
+                    .dateSet(Date.from(SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                    .description(CrownCourtOutcome.CONVICTED.getDescription())
+                    .outComeType(CrownCourtOutcome.CONVICTED.getType())
+                    .outcome(CrownCourtOutcome.CONVICTED.toString())
                     .build();
         } else {
             return OutcomeDTO.builder()
@@ -410,11 +536,21 @@ public class TestModelDataBuilder {
 
     }
 
+    public static OutcomeDTO getOutcomeDTO() {
+        return OutcomeDTO.builder()
+                .dateSet(Date.from(SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .description(CrownCourtOutcome.SUCCESSFUL.getDescription())
+                .outComeType(CrownCourtOutcome.SUCCESSFUL.getType())
+                .outcome(CrownCourtOutcome.SUCCESSFUL.toString())
+                .build();
+    }
+
     public static PassportedDTO getPassportedDTO() {
         return PassportedDTO.builder()
-                .passportedId(Constants.TEST_PASSPORTED_ID.longValue())
+                .passportedId(PASSPORTED_ID.longValue())
+                .newWorkReason(getNewWorkReasonDTO())
                 .assessementStatusDTO(getAssessmentStatusDTO())
-                .result(Constants.TEST_RESULT_FAIL)
+                .result(RESULT_FAIL)
                 .build();
     }
 
@@ -426,20 +562,20 @@ public class TestModelDataBuilder {
 
     public static ContributionsDTO getContributionsDTO() {
         return ContributionsDTO.builder()
-                .id(Constants.TEST_CONTRIBUTIONS_ID.longValue())
+                .id(Constants.CONTRIBUTIONS_ID.longValue())
                 .upliftApplied(false)
-                .basedOn(Constants.CONTRIBUTION_BASED_ON)
-                .calcDate(Constants.TEST_CONTRIBUTION_CALCULATION_DATE)
-                .effectiveDate(Constants.TEST_CONTRIBUTION_EFFECTIVE_DATE)
-                .monthlyContribs(Constants.TEST_MONTHLY_CONTRIBUTION_AMOUNT)
-                .upfrontContribs(Constants.TEST_UPFRONT_CONTRIBUTION_AMOUNT)
+                .basedOn(CONTRIBUTION_BASED_ON)
+                .calcDate(CONTRIBUTION_CALCULATION_DATE)
+                .effectiveDate(CONTRIBUTION_EFFECTIVE_DATE)
+                .monthlyContribs(MONTHLY_CONTRIBUTION_AMOUNT)
+                .upfrontContribs(UPFRONT_CONTRIBUTION_AMOUNT)
                 .build();
     }
 
     public static ApplicationDTO getApplicationDTOWithHardship(CourtType courtType) {
         return ApplicationDTO.builder()
                 .courtType(courtType)
-                .repId(Constants.TEST_REP_ID.longValue())
+                .repId(REP_ID.longValue())
                 .caseManagementUnitDTO(getCaseManagementUnitDTO())
                 .crownCourtOverviewDTO(CrownCourtOverviewDTO.builder().build())
                 .assessmentDTO(
@@ -451,31 +587,43 @@ public class TestModelDataBuilder {
 
     private static FinancialAssessmentDTO getFinancialAssessmentDTO(CourtType courtType) {
         return FinancialAssessmentDTO.builder()
-                .id(Constants.TEST_FINANCIAL_ASSESSMENT_ID.longValue())
+                .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
                 .full(getFullAssessmentDTO())
                 .initial(getInitialAssessmentDTO())
                 .hardship(getHardshipOverviewDTO(courtType))
+                .incomeEvidence(getIncomeEvidenceSummaryDTO())
+                .build();
+    }
+
+    private static FinancialAssessmentDTO getFinancialAssessmentDTO() {
+        return FinancialAssessmentDTO.builder()
+                .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
+                .full(getFullAssessmentDTO())
+                .initial(getInitialAssessmentDTO())
+                .hardship(getHardshipOverviewDTO())
+                .incomeEvidence(getIncomeEvidenceSummaryDTO())
                 .build();
     }
 
     public static FullAssessmentDTO getFullAssessmentDTO() {
         return FullAssessmentDTO.builder()
-                .assessmentDate(Constants.TEST_ASSESSMENT_DATE)
-                .result(Constants.TEST_RESULT_PASS)
+                .assessmentDate(ASSESSMENT_DATE)
+                .result(RESULT_PASS)
                 .assessmnentStatusDTO(getAssessmentStatusDTO())
                 .build();
     }
 
     public static InitialAssessmentDTO getInitialAssessmentDTO() {
         return InitialAssessmentDTO.builder()
-                .result(Constants.TEST_RESULT_FAIL)
+                .result(RESULT_FAIL)
+                .newWorkReason(getNewWorkReasonDTO())
                 .assessmnentStatusDTO(getAssessmentStatusDTO())
                 .build();
     }
 
     private static CaseManagementUnitDTO getCaseManagementUnitDTO() {
         return CaseManagementUnitDTO.builder()
-                .cmuId(Constants.TEST_CMU_ID.longValue())
+                .cmuId(CMU_ID.longValue())
                 .build();
     }
 
@@ -492,22 +640,30 @@ public class TestModelDataBuilder {
             dtoBuilder.magCourtHardship(reviewDTO);
             reviewDTO.setSolictorsCosts(getHRSolicitorsCostsDTO());
         }
+//
         return dtoBuilder.build();
+    }
+
+    public static HardshipOverviewDTO getHardshipOverviewDTO() {
+        return HardshipOverviewDTO.builder()
+                .crownCourtHardship(getHardshipReviewDTO())
+                .magCourtHardship(getHardshipReviewDTO())
+                .build();
     }
 
     public static HardshipReviewDTO getHardshipReviewDTO() {
         return HardshipReviewDTO.builder()
-                .id(Constants.TEST_HARDSHIP_REVIEW_ID.longValue())
-                .cmuId(Constants.TEST_CMU_ID.longValue())
-                .disposableIncome(Constants.TEST_DISPOSABLE_INCOME)
-                .reviewResult(Constants.TEST_HARDSHIP_REVIEW_RESULT)
-                .disposableIncomeAfterHardship(Constants.TEST_POST_HARDSHIP_DISPOSABLE_INCOME)
-                .reviewDate(Constants.TEST_DATE_REVIEWED)
+                .id(Constants.HARDSHIP_REVIEW_ID.longValue())
+                .cmuId(CMU_ID.longValue())
+                .disposableIncome(Constants.DISPOSABLE_INCOME)
+                .reviewResult(Constants.HARDSHIP_REVIEW_RESULT)
+                .disposableIncomeAfterHardship(Constants.POST_HARDSHIP_DISPOSABLE_INCOME)
+                .reviewDate(DATE_REVIEWED)
                 .section(TestModelDataBuilder.getHrSectionDtosWithMixedTypes())
                 .asessmentStatus(getAssessmentStatusDTO())
                 .newWorkReason(getNewWorkReasonDTO())
-                .notes(Constants.TEST_CASEWORKER_NOTES)
-                .decisionNotes(Constants.TEST_CASEWORKER_DECISION_NOTES)
+                .notes(CASEWORKER_NOTES)
+                .decisionNotes(CASEWORKER_DECISION_NOTES)
                 .solictorsCosts(getHRSolicitorsCostsDTO())
                 .progress(getHrProgressDTOs())
                 .build();
@@ -517,7 +673,7 @@ public class TestModelDataBuilder {
     private static List<HRProgressDTO> getHrProgressDTOs() {
         return List.of(
                 HRProgressDTO.builder()
-                        .id(Constants.TEST_HARDSHIP_REVIEW_PROGRESS_ID.longValue())
+                        .id(HARDSHIP_REVIEW_PROGRESS_ID.longValue())
                         .progressAction(
                                 HRProgressActionDTO.builder()
                                         .action(HardshipReviewProgressAction.SOLICITOR_INFORMED.getAction())
@@ -531,16 +687,16 @@ public class TestModelDataBuilder {
                                                 HardshipReviewProgressResponse.ADDITIONAL_PROVIDED.getDescription())
                                         .build()
                         )
-                        .dateRequired(Constants.TEST_DATE_REQUIRED)
-                        .dateRequested(Constants.TEST_DATE_REQUESTED)
-                        .dateCompleted(Constants.TEST_DATE_COMPLETED)
+                        .dateRequired(DATE_REQUIRED)
+                        .dateRequested(DATE_REQUESTED)
+                        .dateCompleted(DATE_COMPLETED)
                         .build()
         );
     }
 
     private static NewWorkReasonDTO getNewWorkReasonDTO() {
         return NewWorkReasonDTO.builder()
-                .code(Constants.TEST_NEW_WORK_REASON_STRING)
+                .code(NEW_WORK_REASON_STRING)
                 .description("New")
                 .build();
     }
@@ -552,20 +708,111 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    private static HRSolicitorsCostsDTO getHRSolicitorsCostsDTO() {
+    public static HRSolicitorsCostsDTO getHRSolicitorsCostsDTO() {
         return HRSolicitorsCostsDTO.builder()
-                .solicitorRate(Constants.TEST_SOLICITOR_RATE)
-                .solicitorHours(Constants.TEST_SOLICITOR_HOURS.doubleValue())
-                .solicitorDisb(Constants.TEST_SOLICITOR_DISBURSEMENTS)
-                .solicitorVat(Constants.TEST_SOLICITOR_VAT)
-                .solicitorEstimatedTotalCost(Constants.TEST_SOLICITOR_ESTIMATED_COST)
+                .solicitorRate(SOLICITOR_RATE)
+                .solicitorHours(SOLICITOR_HOURS.doubleValue())
+                .solicitorDisb(SOLICITOR_DISBURSEMENTS)
+                .solicitorVat(SOLICITOR_VAT)
+                .solicitorEstimatedTotalCost(SOLICITOR_ESTIMATED_COST)
                 .build();
     }
 
     private static UserDTO getUserDTO() {
         return UserDTO.builder()
-                .userName(Constants.TEST_USERNAME)
-                .userSession(Constants.TEST_USER_SESSION)
+                .userName(USERNAME)
+                .userSession(USER_SESSION)
+                .build();
+    }
+
+    public static IncomeEvidenceSummaryDTO getIncomeEvidenceSummaryDTO() {
+        return IncomeEvidenceSummaryDTO.builder()
+                .upliftAppliedDate(new Date(2023, 11, 18))
+                .upliftRemovedDate(new Date(2023, 11, 18))
+                .incomeEvidenceNotes("Income Evidence Notes")
+                .applicantIncomeEvidenceList(List.of(getEvidenceDTO()))
+                .partnerIncomeEvidenceList(List.of(getEvidenceDTO()))
+                .evidenceReceivedDate(new Date(2023, 02, 18))
+                .evidenceDueDate(new Date(2023, 03, 18))
+                .upliftsAvailable(true)
+                .build();
+    }
+
+    private static EvidenceDTO getEvidenceDTO() {
+        return EvidenceDTO.builder()
+                .id(EVIDENCE_ID.longValue())
+                .evidenceTypeDTO(getEvidenceTypeDTO())
+                .dateReceived(new Date(2023, 11, 18))
+                .otherDescription("OTHER DESCRIPTION")
+                .selected(true)
+                .build();
+    }
+
+    private static EvidenceTypeDTO getEvidenceTypeDTO() {
+        return EvidenceTypeDTO.builder()
+                .evidence(INCOME_EVIDENCE)
+                .description(INCOME_EVIDENCE_DESCRIPTION)
+                .build();
+    }
+
+    private static AppealDTO getAppealDTO() {
+        return AppealDTO.builder()
+                .available(true)
+                .appealReceivedDate(new Date(2023, 03, 18))
+                .appealSentenceOrderDate(new Date(2023, 8, 3))
+                .appealTypeDTO(getAppealTypeDTO())
+                .build();
+    }
+
+    private static AppealTypeDTO getAppealTypeDTO() {
+        return AppealTypeDTO.builder()
+                .code(AppealType.ACS.getCode())
+                .description(AppealType.ACS.getDescription())
+                .build();
+    }
+
+    public static ApiContributionSummary getApiContributionSummary() {
+        return new ApiContributionSummary()
+                .withId(1)
+                .withMonthlyContributions(BigDecimal.valueOf(100))
+                .withUpfrontContributions(BigDecimal.valueOf(100))
+                .withBasedOn("Means")
+                .withUpliftApplied("Y")
+                .withEffectiveDate(LocalDateTime.parse("2023-06-27T10:15:30"))
+                .withCalcDate(LocalDateTime.parse("2023-03-01T09:00:00"))
+                .withFileName("Test")
+                .withDateSent(LocalDateTime.parse("2022-12-01T09:00:00"))
+                .withDateReceived(LocalDateTime.parse("2023-01-01T09:00:00"));
+    }
+
+    public static ApiMaatCalculateContributionResponse getApiMaatCalculateContributionResponse() {
+        return new ApiMaatCalculateContributionResponse()
+                .withContributionCap(BigDecimal.valueOf(100))
+                .withContributionId(1)
+                .withCreateContributionOrder("Contribution_Order")
+                .withCalcDate(LocalDateTime.parse("2022-12-01T09:00:00"))
+                .withCcOutcomeCount(1)
+                .withEffectiveDate(LocalDateTime.parse("2023-01-01T09:00:00"))
+                .withMonthlyContributions(BigDecimal.valueOf(50))
+                .withProcessActivity(true)
+                .withRepId(1)
+                .withReplacedDate(LocalDateTime.parse("2022-01-01T09:00:00"))
+                .withTotalMonths(12)
+                .withUpliftApplied("Y")
+                .withUpfrontContributions(BigDecimal.valueOf(50));
+    }
+
+    private static OffenceDTO getOffenceDTO() {
+        return OffenceDTO.builder()
+                .offenceType("Offence Type")
+                .contributionCap(Double.valueOf(100))
+                .build();
+    }
+
+    private static RepStatusDTO getRepStatusDTO() {
+        return RepStatusDTO.builder()
+                .status("RepStatus")
+                .removeContribs(true)
                 .build();
     }
 
@@ -573,12 +820,12 @@ public class TestModelDataBuilder {
         return List.of(
                 HRSectionDTO.builder()
                         .detailType(HRDetailTypeDTO.builder()
-                                            .type(HardshipReviewDetailType.EXPENDITURE.getType())
-                                            .description(HardshipReviewDetailType.EXPENDITURE.getDescription())
-                                            .build())
+                                .type(HardshipReviewDetailType.EXPENDITURE.getType())
+                                .description(HardshipReviewDetailType.EXPENDITURE.getDescription())
+                                .build())
                         .detail(List.of(
                                         HRDetailDTO.builder()
-                                                .id(Constants.TEST_HARDSHIP_DETAIL_ID.longValue())
+                                                .id(HARDSHIP_DETAIL_ID.longValue())
                                                 .detailDescription(
                                                         HRDetailDescriptionDTO.builder()
                                                                 .code(HardshipReviewDetailCode.CAR_LOAN.getCode())
@@ -586,13 +833,13 @@ public class TestModelDataBuilder {
                                                                 .build())
                                                 .accepted(false)
                                                 .frequency(FrequenciesDTO.builder()
-                                                                   .code(Frequency.ANNUALLY.getCode())
-                                                                   .annualWeighting(
-                                                                           (long) Frequency.ANNUALLY.getAnnualWeighting())
-                                                                   .description(Frequency.ANNUALLY.getDescription())
-                                                                   .build())
+                                                        .code(Frequency.ANNUALLY.getCode())
+                                                        .annualWeighting(
+                                                                (long) Frequency.ANNUALLY.getAnnualWeighting())
+                                                        .description(Frequency.ANNUALLY.getDescription())
+                                                        .build())
                                                 .amountNumber(BigDecimal.valueOf(2000.00))
-                                                .otherDescription(Constants.TEST_HARDSHIP_OTHER_DESCRIPTION)
+                                                .otherDescription(HARDSHIP_OTHER_DESCRIPTION)
                                                 .reason(
                                                         HRReasonDTO.builder()
                                                                 .reason(HardshipReviewDetailReason.EVIDENCE_SUPPLIED.getReason())
@@ -608,12 +855,12 @@ public class TestModelDataBuilder {
         return List.of(
                 HRSectionDTO.builder()
                         .detailType(HRDetailTypeDTO.builder()
-                                            .type(HardshipReviewDetailType.INCOME.getType())
-                                            .description(HardshipReviewDetailType.INCOME.getDescription())
-                                            .build())
+                                .type(HardshipReviewDetailType.INCOME.getType())
+                                .description(HardshipReviewDetailType.INCOME.getDescription())
+                                .build())
                         .detail(List.of(
                                         HRDetailDTO.builder()
-                                                .id(Constants.TEST_HARDSHIP_DETAIL_ID.longValue())
+                                                .id(HARDSHIP_DETAIL_ID.longValue())
                                                 .detailDescription(
                                                         HRDetailDescriptionDTO.builder()
                                                                 .code(HardshipReviewDetailCode.MEDICAL_GROUNDS.getCode())
@@ -622,14 +869,14 @@ public class TestModelDataBuilder {
                                                                 .build())
                                                 .accepted(true)
                                                 .frequency(FrequenciesDTO.builder()
-                                                                   .code(Frequency.MONTHLY.getCode())
-                                                                   .annualWeighting(
-                                                                           (long) Frequency.MONTHLY.getAnnualWeighting())
-                                                                   .description(Frequency.MONTHLY.getDescription())
-                                                                   .build())
+                                                        .code(Frequency.MONTHLY.getCode())
+                                                        .annualWeighting(
+                                                                (long) Frequency.MONTHLY.getAnnualWeighting())
+                                                        .description(Frequency.MONTHLY.getDescription())
+                                                        .build())
                                                 .amountNumber(BigDecimal.valueOf(1500.00))
-                                                .hrReasonNote(Constants.TEST_HARDSHIP_REASON_NOTE)
-                                                .otherDescription(Constants.TEST_HARDSHIP_OTHER_DESCRIPTION)
+                                                .hrReasonNote(HARDSHIP_REASON_NOTE)
+                                                .otherDescription(HARDSHIP_OTHER_DESCRIPTION)
                                                 .reason(HRReasonDTO.builder().build())
                                                 .build()
                                 )
@@ -637,4 +884,12 @@ public class TestModelDataBuilder {
                         .build()
         );
     }
+
+    public static AssessmentStatusDTO getAssessmentStatusDTO(CurrentStatus status) {
+        return AssessmentStatusDTO.builder()
+                .status(status.getValue())
+                .description(status.getDescription())
+                .build();
+    }
+
 }

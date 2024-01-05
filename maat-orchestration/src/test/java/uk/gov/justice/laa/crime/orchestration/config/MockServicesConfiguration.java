@@ -10,6 +10,8 @@ public class MockServicesConfiguration {
         ServicesConfiguration.HardshipApi hardshipApi = new ServicesConfiguration.HardshipApi();
         ServicesConfiguration.ContributionApi contributionApi = new ServicesConfiguration.ContributionApi();
         ServicesConfiguration.CrownCourtApi crownCourtApi = new ServicesConfiguration.CrownCourtApi();
+        ServicesConfiguration.CmaApi cmaApi = new ServicesConfiguration.CmaApi();
+        ServicesConfiguration.MaatApi maatApi = new ServicesConfiguration.MaatApi();
 
         ServicesConfiguration.HardshipApi.Endpoints hardshipEndpoints =
                 new ServicesConfiguration.HardshipApi.Endpoints(
@@ -23,7 +25,8 @@ public class MockServicesConfiguration {
                 new ServicesConfiguration.ContributionApi.Endpoints(
                         "contribution/calculate-contribution",
                         "/contribution/request-transfer",
-                        "/contribution/check-contribution-rule"
+                        "/contribution/check-contribution-rule",
+                        "/contribution/summaries"
                 );
 
         ServicesConfiguration.CrownCourtApi.Endpoints crownCourtEndpoints =
@@ -32,18 +35,38 @@ public class MockServicesConfiguration {
                         "/proceedings/update-crown-court"
                 );
 
+        ServicesConfiguration.CmaApi.Endpoints cmaEndpoints =
+                new ServicesConfiguration.CmaApi.Endpoints(
+                        "/assessment/means/{financialAssessmentId}/applicantId/{applicantId}",
+                        "/assessment/means",
+                        "/assessment/means"
+                );
+
+        ServicesConfiguration.MaatApi.Endpoints maatEndpoints =
+                new ServicesConfiguration.MaatApi.Endpoints(
+                        "/assessment/means/execute-stored-procedure"
+                );
+
         hardshipApi.setBaseUrl(host);
-        hardshipApi.setHardshipEndpoints(hardshipEndpoints);
+        hardshipApi.setEndpoints(hardshipEndpoints);
 
         contributionApi.setBaseUrl(host);
-        contributionApi.setContributionEndpoints(contributionEndpoints);
+        contributionApi.setEndpoints(contributionEndpoints);
 
         crownCourtApi.setBaseUrl(host);
-        crownCourtApi.setCrownCourtEndpoints(crownCourtEndpoints);
+        crownCourtApi.setEndpoints(crownCourtEndpoints);
+
+        cmaApi.setBaseUrl(host);
+        cmaApi.setEndpoints(cmaEndpoints);
+
+        maatApi.setBaseUrl(host);
+        maatApi.setEndpoints(maatEndpoints);
 
         servicesConfiguration.setHardshipApi(hardshipApi);
         servicesConfiguration.setContributionApi(contributionApi);
         servicesConfiguration.setCrownCourtApi(crownCourtApi);
+        servicesConfiguration.setCmaApi(cmaApi);
+        servicesConfiguration.setMaatApi(maatApi);
 
         return servicesConfiguration;
     }

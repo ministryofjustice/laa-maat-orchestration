@@ -88,7 +88,7 @@
       "description": "List of assessments performed",
       "minItems": 1,
       "items": {
-        "$ref": "common/apiAssessment.json"
+        "$ref": "../common/apiAssessment.json"
       }
     },
     "removeContributions": {
