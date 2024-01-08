@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.*;
+
 @Component
 public class TestModelDataBuilder {
     private static final Integer EVIDENCE_ID = 9552473;
@@ -429,6 +431,7 @@ public class TestModelDataBuilder {
                 .decisionDate(Date.from(DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .applicantDTO(getApplicantDTO())
                 .assessmentDTO(getAssessmentDTO())
+                .caseManagementUnitDTO(getCaseManagementUnitDTO())
                 .crownCourtOverviewDTO(getCrownCourtOverviewDTOForContribution())
                 .caseDetailsDTO(getCaseDetailDTO())
                 .offenceDTO(getOffenceDTO())
@@ -436,13 +439,29 @@ public class TestModelDataBuilder {
                 .magsOutcomeDTO(getOutcomeDTO(CourtType.MAGISTRATE))
                 .passportedDTO(getPassportedDTO())
                 .repOrderDecision(getRepOrderDecisionDTO())
+                .partnerContraryInterestDTO(getContraryInterestDTO())
                 .iojResult(RESULT_PASS)
+                .build();
+    }
+
+    public static ChildWeightingDTO getChildWeightingDTO() {
+        return ChildWeightingDTO.builder()
+                .weightingId(Long.valueOf(37))
+                .noOfChildren(1)
+                .build();
+    }
+
+    public static ContraryInterestDTO getContraryInterestDTO() {
+        return ContraryInterestDTO.builder()
+                .code("ContraryInterest")
+                .description("Contrary Interest")
                 .build();
     }
 
     public static ApplicantDTO getApplicantDTO() {
         return ApplicantDTO.builder()
                 .applicantHistoryId(APPLICANT_HISTORY_ID.longValue())
+                .employmentStatusDTO(getEmploymentStatusDTO())
                 .build();
     }
 
@@ -617,9 +636,15 @@ public class TestModelDataBuilder {
         return InitialAssessmentDTO.builder()
                 .result(RESULT_FAIL)
                 .newWorkReason(getNewWorkReasonDTO())
+                .reviewType(getReviewTypeDTO())
                 .assessmnentStatusDTO(getAssessmentStatusDTO())
+                .totalAggregatedIncome(TOTAL_AGGREGATED_INCOME.doubleValue())
+                .sectionSummaries(List.of(getSectionSummaryDTO()))
+                .childWeightings(List.of(getChildWeightingDTO()))
                 .build();
     }
+
+
 
     private static CaseManagementUnitDTO getCaseManagementUnitDTO() {
         return CaseManagementUnitDTO.builder()
@@ -889,6 +914,13 @@ public class TestModelDataBuilder {
         return AssessmentStatusDTO.builder()
                 .status(status.getValue())
                 .description(status.getDescription())
+                .build();
+    }
+
+    public static EmploymentStatusDTO getEmploymentStatusDTO() {
+        return EmploymentStatusDTO.builder()
+                .code("EMPLOY")
+                .description("Employed")
                 .build();
     }
 
