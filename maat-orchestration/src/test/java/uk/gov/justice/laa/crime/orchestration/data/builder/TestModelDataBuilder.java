@@ -91,6 +91,8 @@ public class TestModelDataBuilder {
             Date.from(Instant.ofEpochSecond(DATE_COMPLETED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
     private static final Integer HARDSHIP_DETAIL_ID = 12345;
     private static final Integer CMU_ID = 50;
+    private static final String OTHER_HOUSING_NOTES = "Other Housing Notes";
+    private static final String ASSESSMENT_NOTES = "ASSESSMENT NOTES";
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
         return new ApiFindHardshipResponse()
@@ -626,9 +628,11 @@ public class TestModelDataBuilder {
 
     public static FullAssessmentDTO getFullAssessmentDTO() {
         return FullAssessmentDTO.builder()
+                .assessmentNotes(ASSESSMENT_NOTES)
                 .assessmentDate(ASSESSMENT_DATE)
                 .result(RESULT_PASS)
                 .assessmnentStatusDTO(getAssessmentStatusDTO())
+                .otherHousingNote(OTHER_HOUSING_NOTES)
                 .build();
     }
 

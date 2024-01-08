@@ -18,6 +18,7 @@ import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiMeansAss
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiUpdateMeansAssessmentRequest;
 import uk.gov.justice.laa.crime.orchestration.util.NumberUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.CRITERIA_DETAIL_ID;
@@ -50,7 +51,7 @@ class MeansAssessmentMapperTest {
                 .buildWorkFlowRequest();
         ApiCreateMeansAssessmentRequest apiCreateMeansAssessmentRequest = meansAssessmentMapper
                 .workflowRequestToCreateAssessmentRequest(workflowRequest);
-        assertApiMeansAssessmentRequest(workflowRequest, apiCreateMeansAssessmentRequest);
+        assertApiMeansAssessmentRequestAttributes(workflowRequest, apiCreateMeansAssessmentRequest);
         assertApiCreateMeansAssessmentRequestAttributes(workflowRequest, apiCreateMeansAssessmentRequest);
     }
 
@@ -60,11 +61,12 @@ class MeansAssessmentMapperTest {
                 .buildWorkFlowRequest();
         ApiUpdateMeansAssessmentRequest apiUpdateMeansAssessmentRequest = meansAssessmentMapper
                 .workflowRequestToUpdateAssessmentRequest(workflowRequest);
-        assertApiMeansAssessmentRequest(workflowRequest, apiUpdateMeansAssessmentRequest);
+        assertApiMeansAssessmentRequestAttributes(workflowRequest, apiUpdateMeansAssessmentRequest);
+        assertApiUpdateMeansAssessmentRequestAttributes(workflowRequest, apiUpdateMeansAssessmentRequest);
+
     }
 
-
-    private void assertApiMeansAssessmentRequest(WorkflowRequest workflowRequest, ApiMeansAssessmentRequest apiMeansAssessmentRequest) {
+    private void assertApiMeansAssessmentRequestAttributes(WorkflowRequest workflowRequest, ApiMeansAssessmentRequest apiMeansAssessmentRequest) {
         ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
         AssessmentDTO assessmentDTO = applicationDTO.getAssessmentDTO();
         FinancialAssessmentDTO financialAssessmentDTO = assessmentDTO.getFinancialAssessmentDTO();
@@ -126,6 +128,24 @@ class MeansAssessmentMapperTest {
                 isEqualTo(initialAssessmentDTO.getOtherIncomeNote());
     }
 
+    private void assertApiUpdateMeansAssessmentRequestAttributes(WorkflowRequest workflowRequest, ApiUpdateMeansAssessmentRequest apiUpdateMeansAssessmentRequest) {
+        ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
+        AssessmentDTO assessmentDTO = applicationDTO.getAssessmentDTO();
+        FinancialAssessmentDTO financialAssessmentDTO = assessmentDTO.getFinancialAssessmentDTO();
+        InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
+        FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
+        softly.assertThat(apiUpdateMeansAssessmentRequest.getFinancialAssessmentId())
+                .isEqualTo(BigDecimal.valueOf(financialAssessmentDTO.getId()));
+        softly.assertThat(apiUpdateMeansAssessmentRequest.getFullAssessmentDate())
+                .isEqualTo(toLocalDateTime(fullAssessmentDTO.getAssessmentDate()));
+        softly.assertThat(apiUpdateMeansAssessmentRequest.getOtherHousingNote())
+                .isEqualTo(fullAssessmentDTO.getOtherHousingNote());
+        softly.assertThat(apiUpdateMeansAssessmentRequest.getInitTotalAggregatedIncome())
+                .isEqualTo(BigDecimal.valueOf(initialAssessmentDTO.getTotalAggregatedIncome()));
+        softly.assertThat(apiUpdateMeansAssessmentRequest.getFullAssessmentNotes())
+                .isEqualTo(fullAssessmentDTO.getAssessmentNotes());
+    }
+
     private void assertApiCreateMeansAssessmentRequestAttributes(WorkflowRequest workflowRequest, ApiCreateMeansAssessmentRequest apiCreateMeansAssessmentRequest) {
         ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
         AssessmentDTO assessmentDTO = applicationDTO.getAssessmentDTO();
@@ -164,6 +184,5 @@ class MeansAssessmentMapperTest {
         applicationDTO.setAssessmentDTO(assessmentDTO);
         return applicationDTO;
     }
-
 
 }
