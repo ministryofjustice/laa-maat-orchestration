@@ -14,6 +14,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.mapper.ContributionMapper;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.orchestration.service.api.ContributionApiService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,7 +41,7 @@ class ContributionServiceTest {
         WorkflowRequest request = TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.CROWN_COURT);
         when(contributionApiService.calculate(any()))
                 .thenReturn(new ApiMaatCalculateContributionResponse().withContributionId(CONTRIBUTIONS_ID));
-        contributionService.calculateContribution(request);
+        contributionService.calculate(request);
         verify(contributionApiService).calculate(any());
         verify(contributionMapper).workflowRequestToMaatCalculateContributionRequest(any());
         verify(contributionMapper).maatCalculateContributionResponseToContributionsDto(any());

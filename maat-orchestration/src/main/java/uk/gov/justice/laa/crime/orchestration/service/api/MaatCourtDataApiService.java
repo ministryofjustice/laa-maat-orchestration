@@ -1,4 +1,4 @@
-package uk.gov.justice.laa.crime.orchestration.service;
+package uk.gov.justice.laa.crime.orchestration.service.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,31 +7,32 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
-import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationRequest;
-import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationResponse;
+import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 
 import java.util.Collections;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ProceedingsApiService {
+public class MaatCourtDataApiService {
 
-    @Qualifier("ccpApiClient")
-    private final RestAPIClient crownCourtApiClient;
+    @Qualifier("maatApiClient")
+    private final RestAPIClient maatApiClient;
     private final ServicesConfiguration configuration;
-    private static final String RESPONSE_STRING = "Response from Crown Court API Service: %s";
+    private static final String RESPONSE_STRING = "Response from MAAT Court Data Service: %s";
 
-    public ApiUpdateApplicationResponse update(ApiUpdateApplicationRequest request) {
-        ApiUpdateApplicationResponse response = crownCourtApiClient.put(
+    public ApplicationDTO executeStoredProcedure(StoredProcedureRequest request) {
+        ApplicationDTO response = maatApiClient.post(
                 request,
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getCrownCourtApi().getEndpoints().getUpdateApplicationUrl(),
+                configuration.getMaatApi().getEndpoints().getCallStoredProcUrl(),
                 Collections.emptyMap()
         );
 
         log.info(String.format(RESPONSE_STRING, response));
         return response;
     }
+
 }

@@ -11,6 +11,7 @@ import uk.gov.justice.laa.crime.orchestration.config.MockServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCheckContributionRuleRequest;
+import uk.gov.justice.laa.crime.orchestration.service.api.ContributionApiService;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;

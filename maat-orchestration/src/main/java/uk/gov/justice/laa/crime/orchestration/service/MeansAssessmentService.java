@@ -10,6 +10,7 @@ import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiCreateMe
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiGetMeansAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiMeansAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiUpdateMeansAssessmentRequest;
+import uk.gov.justice.laa.crime.orchestration.service.api.MeansAssessmentApiService;
 
 @Slf4j
 @Service

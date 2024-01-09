@@ -11,6 +11,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
+import uk.gov.justice.laa.crime.orchestration.service.orchestration.MeansAssessmentOrchestrationService;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,7 +48,7 @@ class MeansAssessmentOrchestrationServiceTest {
         ContributionsDTO contributionsDTO = MeansAssessmentDataBuilder.getContributionsDTO();
         ApplicationDTO applicationDTO = MeansAssessmentDataBuilder.getApplicationDTO();
         applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
-        when(contributionService.calculateContribution(workflowRequest))
+        when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
                 .thenReturn(applicationDTO);
@@ -81,7 +82,7 @@ class MeansAssessmentOrchestrationServiceTest {
 
         orchestrationService.create(workflowRequest);
         verify(meansAssessmentService).create(workflowRequest);
-        verify(contributionService, times(0)).calculateContribution(workflowRequest);
+        verify(contributionService, times(0)).calculate(workflowRequest);
         verify(maatCourtDataService).invokeStoredProcedure(workflowRequest.getApplicationDTO(),
                 workflowRequest.getUserDTO(),
                 Constants.DB_PACKAGE_ASSESSMENTS,
@@ -101,7 +102,7 @@ class MeansAssessmentOrchestrationServiceTest {
         ContributionsDTO contributionsDTO = MeansAssessmentDataBuilder.getContributionsDTO();
         ApplicationDTO applicationDTO = MeansAssessmentDataBuilder.getApplicationDTO();
         applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
-        when(contributionService.calculateContribution(workflowRequest))
+        when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
                 .thenReturn(applicationDTO);
@@ -134,7 +135,7 @@ class MeansAssessmentOrchestrationServiceTest {
 
         orchestrationService.update(workflowRequest);
         verify(meansAssessmentService).update(workflowRequest);
-        verify(contributionService, times(0)).calculateContribution(workflowRequest);
+        verify(contributionService, times(0)).calculate(workflowRequest);
         verify(maatCourtDataService).invokeStoredProcedure(workflowRequest.getApplicationDTO(),
                 workflowRequest.getUserDTO(),
                 Constants.DB_PACKAGE_ASSESSMENTS,

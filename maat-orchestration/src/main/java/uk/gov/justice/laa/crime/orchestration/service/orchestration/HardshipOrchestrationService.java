@@ -1,4 +1,4 @@
-package uk.gov.justice.laa.crime.orchestration.service;
+package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +9,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
+import uk.gov.justice.laa.crime.orchestration.service.*;
 
 @Slf4j
 @Service
@@ -42,7 +43,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                         .getFinancialAssessmentDTO()
                         .getHardship();
 
-        ApiPerformHardshipResponse performHardshipResponse = hardshipService.createHardship(request);
+        ApiPerformHardshipResponse performHardshipResponse = hardshipService.create(request);
         try {
             // Need to refresh from DB as HardshipDetail ids may have changed
             HardshipReviewDTO newHardship = hardshipService.find(performHardshipResponse.getHardshipReviewId());
@@ -66,7 +67,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(newHardship, courtType);
             assessmentSummaryService.updateApplication(application, hardshipSummary);
         }  catch (Exception ex){
-            hardshipService.rollbackHardship(request);
+            hardshipService.rollback(request);
             throw new APIClientException(ex.getMessage());
         }
         return application;
@@ -76,7 +77,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         // invoke the validation service to check that data has not been modified by another user
         // invoke the validation service to Check user has rep order reserved
         try {
-            hardshipService.updateHardship(request);
+            hardshipService.update(request);
 
             CourtType courtType = request.getApplicationDTO().getCourtType();
             if (courtType == CourtType.MAGISTRATE) {
@@ -93,7 +94,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                 }
             }
         }  catch (Exception ex){
-            hardshipService.rollbackHardship(request);
+            hardshipService.rollback(request);
             throw new APIClientException(ex.getMessage());
         }
         return request.getApplicationDTO();
@@ -106,7 +107,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                 DB_PACKAGE_ASSESSMENTS,
                 DB_DETERMINE_MAGS_REP_DECISION));
         if (contributionService.isVariationRequired(request.getApplicationDTO())) {
-            return contributionService.calculateContribution(request);
+            return contributionService.calculate(request);
         }
         return request.getApplicationDTO();
     }
@@ -117,7 +118,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
      * application.update_cc_application(p_application_object => p_application_object);
      */
     private ApplicationDTO checkActionsAndUpdateApplication(WorkflowRequest request) {
-        request.setApplicationDTO(contributionService.calculateContribution(request));
+        request.setApplicationDTO(contributionService.calculate(request));
 
         // call application.pre_update_cc_application stored procedure
         request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(request.getApplicationDTO(),

@@ -1,4 +1,4 @@
-package uk.gov.justice.laa.crime.orchestration.service;
+package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,6 +6,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
+import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
+import uk.gov.justice.laa.crime.orchestration.service.MeansAssessmentService;
+import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 
 @Slf4j
 @Service
@@ -59,7 +63,7 @@ public class MeansAssessmentOrchestrationService {
 
             // call pre_update_cc_application with the calculated contribution and map the application
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                    contributionService.calculateContribution(request),
+                    contributionService.calculate(request),
                     request.getUserDTO(),
                     DB_PACKAGE_APPLICATION,
                     DB_PRE_UPDATE_CC_APPLICATION)
