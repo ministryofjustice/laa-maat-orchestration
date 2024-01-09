@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 
-import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.*;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getApplicationDTOForMeansAssessmentMapper;
 import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toLocalDateTime;
 
 @ExtendWith(SoftAssertionsExtension.class)
@@ -156,7 +156,7 @@ class MeansAssessmentMapperTest {
 
     @Test
     void givenValidMeansAssessmentResponse_whenMeansAssessmentMapperIsInvokedForFullAssessment_thenMappingIsCorrect() {
-        ApplicationDTO applicationDTO = getApplicationDTO(true);
+        ApplicationDTO applicationDTO = getApplicationDTOForMeansAssessmentMapper(true);
         FinancialAssessmentDTO financialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO();
         FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
         ApiMeansAssessmentResponse apiMeansAssessmentResponse = MeansAssessmentDataBuilder.getApiMeansAssessmentResponse();
@@ -192,7 +192,7 @@ class MeansAssessmentMapperTest {
     @Test
     void givenValidMeansAssessmentResponse_whenMeansAssessmentMapperIsInvokedForInitialAssessment_thenMappingIsCorrect() {
         ApiMeansAssessmentResponse apiMeansAssessmentResponse = MeansAssessmentDataBuilder.getApiMeansAssessmentResponse();
-        ApplicationDTO applicationDTO = getApplicationDTO(false);
+        ApplicationDTO applicationDTO = getApplicationDTOForMeansAssessmentMapper(false);
         FinancialAssessmentDTO financialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO();
         InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
         Collection<AssessmentSectionSummaryDTO> sectionSummaries = initialAssessmentDTO.getSectionSummaries();
@@ -249,28 +249,4 @@ class MeansAssessmentMapperTest {
         softly.assertThat(childWeightingDTO.getId())
                 .isEqualTo(apiAssessmentChildWeighting.getId().intValue());
     }
-
-    private static ApplicationDTO getApplicationDTO(Boolean isFullAssessmentAvailable) {
-        ApplicationDTO applicationDTO = new ApplicationDTO();
-        AssessmentDTO assessmentDTO = new AssessmentDTO();
-        FinancialAssessmentDTO financialAssessmentDTO = new FinancialAssessmentDTO();
-        InitialAssessmentDTO initialAssessmentDTO = new InitialAssessmentDTO();
-        initialAssessmentDTO.setReviewType(new ReviewTypeDTO());
-        financialAssessmentDTO.setInitial(initialAssessmentDTO);
-        financialAssessmentDTO.setFull(getFullAssessmentDTO());
-        financialAssessmentDTO.setFullAvailable(isFullAssessmentAvailable);
-        AssessmentSectionSummaryDTO assessmentSectionSummaryDTO = new AssessmentSectionSummaryDTO();
-        assessmentSectionSummaryDTO.setSection(SECTION);
-        AssessmentDetailDTO assessmentDetailDTO = new AssessmentDetailDTO();
-        assessmentDetailDTO.setCriteriaDetailsId(CRITERIA_DETAIL_ID.longValue());
-        assessmentSectionSummaryDTO.setAssessmentDetail(List.of(assessmentDetailDTO));
-        initialAssessmentDTO.setSectionSummaries(List.of(assessmentSectionSummaryDTO));
-        ChildWeightingDTO childWeightingDTO = new ChildWeightingDTO();
-        childWeightingDTO.setWeightingId(37L);
-        initialAssessmentDTO.setChildWeightings(List.of(childWeightingDTO));
-        assessmentDTO.setFinancialAssessmentDTO(financialAssessmentDTO);
-        applicationDTO.setAssessmentDTO(assessmentDTO);
-        return applicationDTO;
-    }
-
 }

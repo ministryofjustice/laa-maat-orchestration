@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.*;
+import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toDate;
 
 @Component
 public class TestModelDataBuilder {
@@ -448,7 +449,7 @@ public class TestModelDataBuilder {
 
     public static ChildWeightingDTO getChildWeightingDTO() {
         return ChildWeightingDTO.builder()
-                .weightingId(Long.valueOf(37))
+                .weightingId(37L)
                 .noOfChildren(1)
                 .build();
     }
@@ -756,13 +757,13 @@ public class TestModelDataBuilder {
 
     public static IncomeEvidenceSummaryDTO getIncomeEvidenceSummaryDTO() {
         return IncomeEvidenceSummaryDTO.builder()
-                .upliftAppliedDate(new Date(2023, 11, 18))
-                .upliftRemovedDate(new Date(2023, 11, 18))
+                .upliftAppliedDate(toDate(LocalDateTime.of(2023, 11, 18, 0, 0, 0)))
+                .upliftRemovedDate(toDate(LocalDateTime.of(2023, 11, 18, 0, 0, 0)))
                 .incomeEvidenceNotes("Income Evidence Notes")
                 .applicantIncomeEvidenceList(List.of(getEvidenceDTO()))
                 .partnerIncomeEvidenceList(List.of(getEvidenceDTO()))
-                .evidenceReceivedDate(new Date(2023, 02, 18))
-                .evidenceDueDate(new Date(2023, 03, 18))
+                .evidenceReceivedDate(toDate(LocalDateTime.of(2023, 2, 18, 0, 0, 0)))
+                .evidenceDueDate(toDate(LocalDateTime.of(2023, 3, 18, 0, 0, 0)))
                 .upliftsAvailable(true)
                 .build();
     }
@@ -771,7 +772,7 @@ public class TestModelDataBuilder {
         return EvidenceDTO.builder()
                 .id(EVIDENCE_ID.longValue())
                 .evidenceTypeDTO(getEvidenceTypeDTO())
-                .dateReceived(new Date(2023, 11, 18))
+                .dateReceived(toDate(LocalDateTime.of(2023, 11, 18, 0, 0, 0)))
                 .otherDescription("OTHER DESCRIPTION")
                 .selected(true)
                 .build();
@@ -787,8 +788,8 @@ public class TestModelDataBuilder {
     private static AppealDTO getAppealDTO() {
         return AppealDTO.builder()
                 .available(true)
-                .appealReceivedDate(new Date(2023, 03, 18))
-                .appealSentenceOrderDate(new Date(2023, 8, 3))
+                .appealReceivedDate(toDate(LocalDateTime.of(2023, 3, 18, 0, 0, 0)))
+                .appealSentenceOrderDate(toDate(LocalDateTime.of(2023, 8, 3, 0, 0, 0)))
                 .appealTypeDTO(getAppealTypeDTO())
                 .build();
     }
@@ -834,7 +835,7 @@ public class TestModelDataBuilder {
     private static OffenceDTO getOffenceDTO() {
         return OffenceDTO.builder()
                 .offenceType("Offence Type")
-                .contributionCap(Double.valueOf(100))
+                .contributionCap(100.0)
                 .build();
     }
 
@@ -928,4 +929,47 @@ public class TestModelDataBuilder {
                 .build();
     }
 
+    public static ApplicationDTO getApplicationDTOForMeansAssessmentMapper(Boolean isFullAssessmentAvailable) {
+        ApplicationDTO applicationDTO = new ApplicationDTO();
+        AssessmentDTO assessmentDTO = new AssessmentDTO();
+        FinancialAssessmentDTO financialAssessmentDTO = getFinancialAssessmentDTOForMeansAssessmentMapper(isFullAssessmentAvailable);
+        assessmentDTO.setFinancialAssessmentDTO(financialAssessmentDTO);
+        applicationDTO.setAssessmentDTO(assessmentDTO);
+        return applicationDTO;
+    }
+
+    private static FinancialAssessmentDTO getFinancialAssessmentDTOForMeansAssessmentMapper(Boolean isFullAssessmentAvailable) {
+        FinancialAssessmentDTO financialAssessmentDTO = new FinancialAssessmentDTO();
+        InitialAssessmentDTO initialAssessmentDTO = getInitialAssessmentDTOForMeansAssessmentMapper();
+        FullAssessmentDTO fullAssessmentDTO = getFullAssessmentDTOForMeansAssessmentMapper();
+        financialAssessmentDTO.setInitial(initialAssessmentDTO);
+        financialAssessmentDTO.setFull(fullAssessmentDTO);
+        financialAssessmentDTO.setFullAvailable(isFullAssessmentAvailable);
+        return financialAssessmentDTO;
+    }
+
+    private static FullAssessmentDTO getFullAssessmentDTOForMeansAssessmentMapper() {
+        FullAssessmentDTO fullAssessmentDTO = getFullAssessmentDTO();
+        fullAssessmentDTO.setSectionSummaries(List.of(getAssessmentSectionSummaryDTOForMeansAssessmentMapper()));
+        return fullAssessmentDTO;
+    }
+
+    private static InitialAssessmentDTO getInitialAssessmentDTOForMeansAssessmentMapper() {
+        InitialAssessmentDTO initialAssessmentDTO = new InitialAssessmentDTO();
+        initialAssessmentDTO.setReviewType(new ReviewTypeDTO());
+        initialAssessmentDTO.setSectionSummaries(List.of(getAssessmentSectionSummaryDTOForMeansAssessmentMapper()));
+        ChildWeightingDTO childWeightingDTO = new ChildWeightingDTO();
+        childWeightingDTO.setWeightingId(37L);
+        initialAssessmentDTO.setChildWeightings(List.of(childWeightingDTO));
+        return initialAssessmentDTO;
+    }
+
+    private static AssessmentSectionSummaryDTO getAssessmentSectionSummaryDTOForMeansAssessmentMapper() {
+        AssessmentSectionSummaryDTO assessmentSectionSummaryDTO = new AssessmentSectionSummaryDTO();
+        assessmentSectionSummaryDTO.setSection(SECTION);
+        AssessmentDetailDTO assessmentDetailDTO = new AssessmentDetailDTO();
+        assessmentDetailDTO.setCriteriaDetailsId(CRITERIA_DETAIL_ID.longValue());
+        assessmentSectionSummaryDTO.setAssessmentDetail(List.of(assessmentDetailDTO));
+        return assessmentSectionSummaryDTO;
+    }
 }
