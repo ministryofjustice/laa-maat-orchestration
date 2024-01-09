@@ -7,8 +7,8 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.*;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.*;
-import uk.gov.justice.laa.crime.orchestration.util.DateUtil;
-import uk.gov.justice.laa.crime.orchestration.util.NumberUtils;
+import uk.gov.justice.laa.crime.util.DateUtil;
+import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.sql.Timestamp;
 import java.util.UUID;

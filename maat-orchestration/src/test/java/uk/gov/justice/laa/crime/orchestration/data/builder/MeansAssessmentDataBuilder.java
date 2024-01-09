@@ -20,8 +20,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static uk.gov.justice.laa.crime.orchestration.data.Constants.FINANCIAL_ASSESSMENT_ID;
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toDate;
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toTimeStamp;
+import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.util.DateUtil.toTimeStamp;
 
 @Component
 public class MeansAssessmentDataBuilder {

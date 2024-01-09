@@ -15,14 +15,14 @@ import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculat
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.orchestration.util.NumberUtils;
+import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toDate;
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toLocalDateTime;
+import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class ContributionMapperTest {

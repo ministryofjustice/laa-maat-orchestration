@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.*;
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
 
 @Component
 public class TestModelDataBuilder {
