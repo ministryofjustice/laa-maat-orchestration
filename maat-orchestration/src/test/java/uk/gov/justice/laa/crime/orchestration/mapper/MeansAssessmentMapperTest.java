@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.mapper.meansassessment.MeansAssessmentMapper;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class MeansAssessmentMapperTest {

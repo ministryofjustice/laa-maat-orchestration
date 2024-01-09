@@ -11,6 +11,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
+import uk.gov.justice.laa.crime.orchestration.mapper.hardship.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
 
 @ExtendWith(SoftAssertionsExtension.class)

@@ -7,7 +7,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.CaseType;
 import uk.gov.justice.laa.crime.orchestration.enums.InitAssessmentResult;
-import uk.gov.justice.laa.crime.orchestration.mapper.ContributionMapper;
+import uk.gov.justice.laa.crime.orchestration.mapper.contribution.ContributionMapper;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCheckContributionRuleRequest;

@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
-import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
+import uk.gov.justice.laa.crime.orchestration.mapper.hardship.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;

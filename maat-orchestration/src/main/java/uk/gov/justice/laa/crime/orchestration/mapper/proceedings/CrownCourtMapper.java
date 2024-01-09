@@ -1,4 +1,4 @@
-package uk.gov.justice.laa.crime.orchestration.mapper;
+package uk.gov.justice.laa.crime.orchestration.mapper.proceedings;
 
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtSummaryDTO;

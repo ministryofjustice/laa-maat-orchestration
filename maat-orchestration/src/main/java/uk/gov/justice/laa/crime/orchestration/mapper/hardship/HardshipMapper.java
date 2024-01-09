@@ -1,13 +1,47 @@
-package uk.gov.justice.laa.crime.orchestration.mapper;
+package uk.gov.justice.laa.crime.orchestration.mapper.hardship;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.enums.*;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentStatusDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FrequenciesDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HRDetailDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HRDetailDescriptionDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HRDetailTypeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HRProgressActionDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HRProgressDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HRProgressResponseDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HRReasonDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HRSectionDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HRSolicitorsCostsDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipOverviewDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.NewWorkReasonDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
+import uk.gov.justice.laa.crime.orchestration.enums.DeniedIncomeDetailCode;
+import uk.gov.justice.laa.crime.orchestration.enums.ExtraExpenditureDetailCode;
+import uk.gov.justice.laa.crime.orchestration.enums.Frequency;
+import uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewDetailCode;
+import uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewDetailReason;
+import uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewDetailType;
+import uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewProgressAction;
+import uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewProgressResponse;
+import uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewStatus;
+import uk.gov.justice.laa.crime.orchestration.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.orchestration.mapper.UserMapper;
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipDetail;
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipProgress;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiFindHardshipResponse;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.DeniedIncome;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.ExtraExpenditure;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.HardshipMetadata;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.HardshipProgress;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.HardshipReview;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.SolicitorCosts;
 import uk.gov.justice.laa.crime.orchestration.util.DateUtil;
 import uk.gov.justice.laa.crime.orchestration.util.NumberUtils;
 
@@ -100,7 +134,7 @@ public class HardshipMapper {
                     .withRate(solicitorsCosts.getSolicitorRate())
                     // Converting from double to BigDecimal, truncate to 1 decimal place
                     .withHours(BigDecimal.valueOf(solicitorsCosts.getSolicitorHours())
-                                       .setScale(1, RoundingMode.DOWN))
+                            .setScale(1, RoundingMode.DOWN))
                     .withDisbursements(solicitorsCosts.getSolicitorDisb())
                     .withEstimatedTotal(solicitorsCosts.getSolicitorEstimatedTotalCost());
         }
@@ -174,28 +208,28 @@ public class HardshipMapper {
                         HRSectionDTO.builder()
                                 .detailType(hardshipReviewDetailTypeToHrDetailTypeDto(type))
                                 .detail(details.stream()
-                                                .map(apiHardshipDetail ->
-                                                             HRDetailDTO.builder()
-                                                                     .dateDue(toDate(apiHardshipDetail.getDateDue()))
-                                                                     .id(apiHardshipDetail.getId().longValue())
-                                                                     .accepted("Y".equals(
-                                                                             apiHardshipDetail.getAccepted()))
-                                                                     .amountNumber(apiHardshipDetail.getAmount())
-                                                                     .hrReasonNote(apiHardshipDetail.getReasonNote())
-                                                                     .otherDescription(
-                                                                             apiHardshipDetail.getOtherDescription())
-                                                                     .detailDescription(
-                                                                             hardshipReviewDetailCodeToHrDetailDescriptionDto(
-                                                                                     apiHardshipDetail.getDetailCode())
-                                                                     )
-                                                                     .frequency(frequencyToFrequenciesDto(
-                                                                             apiHardshipDetail.getFrequency())
-                                                                     )
-                                                                     .reason(hardshipReviewDetailReasonToHrReasonDto(
-                                                                             apiHardshipDetail.getDetailReason()))
-                                                                     .build()
-                                                )
-                                                .collect(Collectors.toList()))
+                                        .map(apiHardshipDetail ->
+                                                HRDetailDTO.builder()
+                                                        .dateDue(toDate(apiHardshipDetail.getDateDue()))
+                                                        .id(apiHardshipDetail.getId().longValue())
+                                                        .accepted("Y".equals(
+                                                                apiHardshipDetail.getAccepted()))
+                                                        .amountNumber(apiHardshipDetail.getAmount())
+                                                        .hrReasonNote(apiHardshipDetail.getReasonNote())
+                                                        .otherDescription(
+                                                                apiHardshipDetail.getOtherDescription())
+                                                        .detailDescription(
+                                                                hardshipReviewDetailCodeToHrDetailDescriptionDto(
+                                                                        apiHardshipDetail.getDetailCode())
+                                                        )
+                                                        .frequency(frequencyToFrequenciesDto(
+                                                                apiHardshipDetail.getFrequency())
+                                                        )
+                                                        .reason(hardshipReviewDetailReasonToHrReasonDto(
+                                                                apiHardshipDetail.getDetailReason()))
+                                                        .build()
+                                        )
+                                        .collect(Collectors.toList()))
                                 .build()));
         return hrSectionDTOList;
     }

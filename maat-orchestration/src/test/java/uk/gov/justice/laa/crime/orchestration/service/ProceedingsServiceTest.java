@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
+import uk.gov.justice.laa.crime.orchestration.mapper.proceedings.ProceedingsMapper;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationResponse;
 

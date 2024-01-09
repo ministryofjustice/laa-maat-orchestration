@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
-import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
+import uk.gov.justice.laa.crime.orchestration.mapper.meansassessment.MeansAssessmentMapper;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiCreateMeansAssessmentRequest;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiGetMeansAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiMeansAssessmentResponse;

@@ -11,6 +11,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
+import uk.gov.justice.laa.crime.orchestration.mapper.proceedings.ProceedingsMapper;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiUserSession;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationResponse;
