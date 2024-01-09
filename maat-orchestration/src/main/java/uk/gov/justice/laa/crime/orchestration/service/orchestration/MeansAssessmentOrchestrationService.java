@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
 import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
 import uk.gov.justice.laa.crime.orchestration.service.MeansAssessmentService;
@@ -16,16 +17,10 @@ import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 @RequiredArgsConstructor
 public class MeansAssessmentOrchestrationService {
 
-    private final MeansAssessmentService meansAssessmentService;
     private final ContributionService contributionService;
     private final ProceedingsService proceedingsService;
+    private final MeansAssessmentService meansAssessmentService;
     private final MaatCourtDataService maatCourtDataService;
-    private static final String DB_ASSESSMENT_POST_PROCESSING_PART_1 = "post_assessment_processing_part_1";
-    private static final String DB_ASSESSMENT_POST_PROCESSING_PART_2 = "post_assessment_processing_part_2";
-    private static final String DB_ASSESSMENT_POST_PROCESSING_PART_1_C3 = "post_assessment_processing_part_1_c3";
-    private static final String DB_PRE_UPDATE_CC_APPLICATION = "pre_update_cc_application";
-    private static final String DB_PACKAGE_ASSESSMENTS = "assessments";
-    private static final String DB_PACKAGE_APPLICATION = "application";
 
     public FinancialAssessmentDTO find(int assessmentId, int applicantId) {
         return meansAssessmentService.find(assessmentId, applicantId);
@@ -57,24 +52,21 @@ public class MeansAssessmentOrchestrationService {
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
                     request.getApplicationDTO(),
                     request.getUserDTO(),
-                    DB_PACKAGE_ASSESSMENTS,
-                    DB_ASSESSMENT_POST_PROCESSING_PART_1_C3)
+                    StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3)
             );
 
             // call pre_update_cc_application with the calculated contribution and map the application
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
                     contributionService.calculate(request),
                     request.getUserDTO(),
-                    DB_PACKAGE_APPLICATION,
-                    DB_PRE_UPDATE_CC_APPLICATION)
+                    StoredProcedure.PRE_UPDATE_CC_APPLICATION)
             );
         } else {
             // call post_processing_part1 and map the application
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
                     request.getApplicationDTO(),
                     request.getUserDTO(),
-                    DB_PACKAGE_ASSESSMENTS,
-                    DB_ASSESSMENT_POST_PROCESSING_PART_1)
+                    StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1)
             );
         }
         proceedingsService.updateApplication(request);
@@ -83,8 +75,7 @@ public class MeansAssessmentOrchestrationService {
         ApplicationDTO application = maatCourtDataService.invokeStoredProcedure(
                 request.getApplicationDTO(),
                 request.getUserDTO(),
-                DB_PACKAGE_ASSESSMENTS,
-                DB_ASSESSMENT_POST_PROCESSING_PART_2);
+                StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2);
         application.setTransactionId(null);
         return application;
     }

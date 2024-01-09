@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
 @Slf4j
@@ -15,15 +16,15 @@ public class MaatCourtDataService {
 
     private final MaatCourtDataApiService maatCourtDataApiService;
 
-    public ApplicationDTO invokeStoredProcedure(ApplicationDTO application, UserDTO user, String packageName,
-                                                String procedureName) {
+    public ApplicationDTO invokeStoredProcedure(ApplicationDTO application, UserDTO user,
+                                                StoredProcedure storedProcedure) {
 
         return maatCourtDataApiService.executeStoredProcedure(
                 StoredProcedureRequest.builder()
-                        .application(application)
                         .user(user)
-                        .dbPackageName(packageName)
-                        .procedureName(procedureName)
+                        .application(application)
+                        .dbPackageName(storedProcedure.getPackageName())
+                        .procedureName(storedProcedure.getProcedureName())
                         .build()
         );
     }
