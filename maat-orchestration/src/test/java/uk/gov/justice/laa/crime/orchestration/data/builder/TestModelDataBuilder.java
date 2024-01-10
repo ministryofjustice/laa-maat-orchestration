@@ -23,10 +23,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -122,6 +119,7 @@ public class TestModelDataBuilder {
 
     public static ApiPerformHardshipResponse getApiPerformHardshipResponse() {
         return new ApiPerformHardshipResponse()
+                .withHardshipReviewId(Constants.HARDSHIP_REVIEW_ID)
                 .withReviewResult(HardshipReviewResult.PASS)
                 .withDisposableIncome(Constants.DISPOSABLE_INCOME)
                 .withHardshipReviewId(Constants.HARDSHIP_REVIEW_ID)
@@ -444,6 +442,7 @@ public class TestModelDataBuilder {
                 .repOrderDecision(getRepOrderDecisionDTO())
                 .partnerContraryInterestDTO(getContraryInterestDTO())
                 .iojResult(RESULT_PASS)
+                .assessmentSummary(Collections.EMPTY_LIST)
                 .build();
     }
 

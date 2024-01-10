@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,9 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WorkflowRequest {
+    @NotNull
     private UserDTO userDTO;
+    @NotNull
     private ApplicationDTO applicationDTO;
     private boolean isC3Enabled;
 }

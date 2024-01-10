@@ -1,9 +1,56 @@
 server:
   port: 8089
 
+
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          hardship:
+            token-uri: http://localhost:${wiremock.server.port}/oauth2/token
+          ccc:
+            token-uri: http://localhost:${wiremock.server.port}/oauth2/token
+          ccp:
+            token-uri: http://localhost:${wiremock.server.port}/oauth2/token
+          cma:
+            token-uri: http://localhost:${wiremock.server.port}/oauth2/token
+          validation:
+            token-uri: http://localhost:${wiremock.server.port}/oauth2/token
+          maat-api:
+            token-uri: http://localhost:${wiremock.server.port}/oauth2/token
+        registration:
+          hardship:
+            client-id: dummy-client
+            client-secret: dummy-secret
+            authorization-grant-type: client_credentials
+          ccc:
+            client-id: dummy-client
+            client-secret: dummy-secret
+            authorization-grant-type: client_credentials
+          ccp:
+            client-id: dummy-client
+            client-secret: dummy-client
+            authorization-grant-type: client_credentials
+          cma:
+            client-id: dummy-client
+            client-secret: dummy-client
+            authorization-grant-type: client_credentials
+          validation:
+            client-id: dummy-client
+            client-secret: dummy-client
+            authorization-grant-type: client_credentials
+          maat-api:
+            client-id: dummy-client
+            client-secret: dummy-client
+            authorization-grant-type: client_credentials
+      resource-server:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI}
+
 services:
   hardship-api:
-    base-url: http://localhost:9999
+    base-url: http://localhost:${wiremock.server.port}
     endpoints:
       find-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/{hardshipReviewId}
       create-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/

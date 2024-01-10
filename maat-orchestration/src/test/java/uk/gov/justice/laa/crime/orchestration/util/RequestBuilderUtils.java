@@ -15,6 +15,10 @@ public class RequestBuilderUtils {
         return buildRequest(method, endpoint, true);
     }
 
+    public static MockHttpServletRequestBuilder buildRequest(HttpMethod method, String endpoint, Boolean withAuth) {
+        return buildRequest(method, endpoint, withAuth);
+    }
+
     public static MockHttpServletRequestBuilder buildRequest(HttpMethod method, String endpoint, boolean withAuth) {
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.request(method, endpoint);
         if (withAuth) {
