@@ -65,7 +65,7 @@ dependencies {
 	testImplementation "org.springframework.boot:spring-boot-starter-test"
 	testImplementation "org.springframework.security:spring-security-test"
 	testImplementation "com.squareup.okhttp3:okhttp:$versions.okhttpVersion"
-	testImplementation "com.github.tomakehurst:wiremock-jre8-standalone:$versions.wiremockVersion"
+	testImplementation "org.springframework.cloud:spring-cloud-starter-contract-stub-runner:4.0.1"
 }
 
 jacoco {

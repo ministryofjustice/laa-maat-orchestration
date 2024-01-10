@@ -12,9 +12,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
+import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.service.MeansAssessmentOrchestrationService;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -73,18 +75,12 @@ class MeansAssessmentControllerTest {
 
     @Test
     void givenValidRequest_whenCreateIsInvoked_thenOkResponseIsReturned() throws Exception {
-        String requestBody = objectMapper.writeValueAsString(
-                WorkflowRequest.builder()
-                        .applicationDTO(
-                                ApplicationDTO.builder()
-                                        .build()
-                        ).build()
-        );
 
         when(orchestrationService.create(any(WorkflowRequest.class)))
                 .thenReturn(new ApplicationDTO());
 
-        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, objectMapper.writeValueAsString(
+                        TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL, true))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
@@ -97,34 +93,24 @@ class MeansAssessmentControllerTest {
 
     @Test
     void givenWebClientFailure_whenCreateIsInvoked_thenInternalServerErrorResponseIsReturned() throws Exception {
-        String requestBody = objectMapper.writeValueAsString(
-                WorkflowRequest.builder()
-                        .applicationDTO(
-                                ApplicationDTO.builder()
-                                        .build()
-                        ).build()
-        );
 
         when(orchestrationService.create(any(WorkflowRequest.class)))
                 .thenThrow(new APIClientException());
 
-        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, objectMapper.writeValueAsString(
+                        TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL, true))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
     void givenValidRequest_whenUpdateIsInvoked_thenOkResponseIsReturned() throws Exception {
-        String requestBody = objectMapper.writeValueAsString(
-                WorkflowRequest.builder()
-                        .applicationDTO(new ApplicationDTO())
-                        .build()
-        );
 
         when(orchestrationService.update(any(WorkflowRequest.class)))
                 .thenReturn(new ApplicationDTO());
 
-        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, objectMapper.writeValueAsString(
+                        TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL, true))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
@@ -137,17 +123,13 @@ class MeansAssessmentControllerTest {
 
     @Test
     void givenWebClientFailure_whenUpdateIsInvoked_thenInternalServerErrorResponseIsReturned() throws Exception {
-        String requestBody = objectMapper.writeValueAsString(
-                WorkflowRequest.builder()
-                        .applicationDTO(new ApplicationDTO())
-                        .build()
-        );
 
         when(orchestrationService.update(any(WorkflowRequest.class)))
                 .thenThrow(new APIClientException());
 
-        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
-                .andExpect(status().is5xxServerError())
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, objectMapper.writeValueAsString(
+                        TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL, true))
+                .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
