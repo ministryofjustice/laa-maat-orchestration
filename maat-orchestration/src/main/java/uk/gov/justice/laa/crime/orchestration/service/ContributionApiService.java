@@ -55,7 +55,7 @@ public class ContributionApiService {
         List<ApiContributionSummary> response = contributionApiClient.get(
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getContributionApi().getEndpoints().getCheckContributionRuleUrl(),
+                configuration.getContributionApi().getEndpoints().getContributionSummariesUrl(),
                 Collections.emptyMap(),
                 repId
         );
