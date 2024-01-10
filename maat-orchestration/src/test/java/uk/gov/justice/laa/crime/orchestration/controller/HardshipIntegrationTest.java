@@ -43,8 +43,6 @@ import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGive
 @AutoConfigureWireMock(port = 9999)
 @AutoConfigureObservability
 class HardshipIntegrationTest {
-
-    private static final String ERROR_MSG = "Call to service MAAT-API failed.";
     private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/hardship";
 
     private MockMvc mvc;
