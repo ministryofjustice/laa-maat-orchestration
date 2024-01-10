@@ -64,7 +64,7 @@ git clone git@github.com:ministryofjustice/laa-maat-orchestration.git
 cd maat-orchestration
 ```
 
-Makesure tests all testes are passed by running following ‘gradle’ Command
+Make sure all testes are passed by running following ‘gradle’ Command
 
 ```sh
 ./gradlew clean test

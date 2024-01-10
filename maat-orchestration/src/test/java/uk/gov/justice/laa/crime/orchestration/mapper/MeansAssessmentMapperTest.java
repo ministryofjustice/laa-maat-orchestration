@@ -13,7 +13,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.orchestration.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.*;
-import uk.gov.justice.laa.crime.orchestration.util.NumberUtils;
+import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getApplicationDTOForMeansAssessmentMapper;
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toLocalDateTime;
+import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class MeansAssessmentMapperTest {

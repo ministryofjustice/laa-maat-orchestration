@@ -9,7 +9,7 @@ import uk.gov.justice.laa.crime.orchestration.enums.*;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOverview;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.*;
-import uk.gov.justice.laa.crime.orchestration.util.NumberUtils;
+import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toDate;
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toLocalDateTime;
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toTimeStamp;
+import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
+import static uk.gov.justice.laa.crime.util.DateUtil.toTimeStamp;
 
 @Component
 @RequiredArgsConstructor
