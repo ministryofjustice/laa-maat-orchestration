@@ -12,7 +12,7 @@
     "frequency": {
       "type": "object",
       "description": "Hardship payment frequency",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.Frequency"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.Frequency"
     }
   },
   "extends": {

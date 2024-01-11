@@ -1,6 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.data;
 
-import uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewResult;
+import uk.gov.justice.laa.crime.enums.HardshipReviewResult;
 
 import java.math.BigDecimal;
 import java.time.Instant;

@@ -10,8 +10,8 @@ import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBu
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.enums.MagCourtOutcome;
-import uk.gov.justice.laa.crime.orchestration.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.*;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
@@ -83,7 +83,7 @@ class MeansAssessmentMapperTest {
 
         softly.assertThat(apiMeansAssessmentRequest.getRepId())
                 .isEqualTo(NumberUtils.toInteger(applicationDTO.getRepId()));
-        softly.assertThat(apiMeansAssessmentRequest.getAssessmentStatus().getValue())
+        softly.assertThat(apiMeansAssessmentRequest.getAssessmentStatus().getStatus())
                 .isEqualTo(assessmentStatusDTO.getStatus());
         softly.assertThat(apiMeansAssessmentRequest.getCmuId())
                 .isEqualTo(caseManagementUnitDTO.getCmuId().intValue());

@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
-import uk.gov.justice.laa.crime.orchestration.enums.CurrentStatus;
+import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 
 @Slf4j
@@ -51,13 +51,13 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             if (courtType == CourtType.MAGISTRATE) {
                 hardshipOverview.setMagCourtHardship(newHardship);
                 AssessmentStatusDTO assessmentStatusDTO = newHardship.getAsessmentStatus();
-                if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
+                if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getStatus().equals(assessmentStatusDTO.getStatus())) {
                     application = processMagCourtHardshipRules(request);
                 }
             } else if (courtType == CourtType.CROWN_COURT) {
                 hardshipOverview.setCrownCourtHardship(newHardship);
                 AssessmentStatusDTO assessmentStatusDTO = newHardship.getAsessmentStatus();
-                if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
+                if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getStatus().equals(assessmentStatusDTO.getStatus())) {
                     application = checkActionsAndUpdateApplication(request);
                 }
             }
@@ -82,13 +82,13 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             if (courtType == CourtType.MAGISTRATE) {
                 AssessmentStatusDTO assessmentStatusDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO()
                         .getHardship().getMagCourtHardship().getAsessmentStatus();
-                if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
+                if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getStatus().equals(assessmentStatusDTO.getStatus())) {
                     request.setApplicationDTO(processMagCourtHardshipRules(request));
                 }
             } else if (courtType == CourtType.CROWN_COURT) {
                 AssessmentStatusDTO assessmentStatusDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO()
                         .getHardship().getCrownCourtHardship().getAsessmentStatus();
-                if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getValue().equals(assessmentStatusDTO.getStatus())) {
+                if (assessmentStatusDTO != null && CurrentStatus.COMPLETE.getStatus().equals(assessmentStatusDTO.getStatus())) {
                     request.setApplicationDTO(checkActionsAndUpdateApplication(request));
                 }
             }

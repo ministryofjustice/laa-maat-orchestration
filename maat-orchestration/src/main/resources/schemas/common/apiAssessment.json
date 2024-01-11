@@ -7,12 +7,12 @@
     "assessmentType": {
       "type": "object",
       "description": "The type of assessment",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.AssessmentType"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.AssessmentType"
     },
     "status": {
       "type": "object",
       "description": "The assessment status",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.CurrentStatus"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.CurrentStatus"
     },
     "result": {
       "type": "object",
@@ -26,7 +26,7 @@
     },
     "newWorkReason": {
       "description": "New Work Reason",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.NewWorkReason"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.NewWorkReason"
     }
   },
   "additionalProperties": false,

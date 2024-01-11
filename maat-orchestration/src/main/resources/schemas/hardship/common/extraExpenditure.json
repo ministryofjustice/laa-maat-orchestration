@@ -8,12 +8,12 @@
     "reasonCode": {
       "type": "object",
       "description": "The hardship review details reasons code",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewDetailReason"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.HardshipReviewDetailReason"
     },
     "itemCode": {
       "type": "object",
       "description": "Expenditure specific codes",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.ExtraExpenditureDetailCode"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.ExtraExpenditureDetailCode"
     }
   },
   "extends": {

@@ -7,7 +7,7 @@
   "properties": {
     "reviewType": {
       "description": "Review Type Info",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.ReviewType"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.ReviewType"
     },
     "usn": {
       "type": "integer",

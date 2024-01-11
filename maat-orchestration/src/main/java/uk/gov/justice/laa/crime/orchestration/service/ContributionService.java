@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.enums.CaseType;
-import uk.gov.justice.laa.crime.orchestration.enums.InitAssessmentResult;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.InitAssessmentResult;
 import uk.gov.justice.laa.crime.orchestration.mapper.ContributionMapper;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
@@ -15,7 +15,7 @@ import uk.gov.justice.laa.crime.orchestration.model.contribution.common.ApiContr
 
 import java.util.List;
 
-import static uk.gov.justice.laa.crime.orchestration.enums.CurrentStatus.COMPLETE;
+import static uk.gov.justice.laa.crime.enums.CurrentStatus.COMPLETE;
 
 @Slf4j
 @Service
@@ -63,7 +63,7 @@ public class ContributionService {
     protected boolean isCalculateContributionReqd(final ApplicationDTO applicationDTO) {
         PassportedDTO passportedDTO = applicationDTO.getPassportedDTO();
         if (passportedDTO != null && passportedDTO.getAssessementStatusDTO() != null &&
-                COMPLETE.getValue().equals(passportedDTO.getAssessementStatusDTO().getStatus())) {
+                COMPLETE.getStatus().equals(passportedDTO.getAssessementStatusDTO().getStatus())) {
             return true;
         }
 
@@ -73,12 +73,12 @@ public class ContributionService {
             if (financialAssessmentDTO != null) {
                 InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
                 if (initialAssessmentDTO != null && initialAssessmentDTO.getAssessmnentStatusDTO() != null &&
-                        COMPLETE.getValue().equals(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus())) {
+                        COMPLETE.getStatus().equals(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus())) {
                     CaseDetailDTO caseDetailsDTO = applicationDTO.getCaseDetailsDTO();
                     String initResult = initialAssessmentDTO.getResult();
                     boolean isFullComplete = financialAssessmentDTO.getFull() != null &&
                             financialAssessmentDTO.getFull().getAssessmnentStatusDTO() != null &&
-                            COMPLETE.getValue().equals(financialAssessmentDTO.getFull().getAssessmnentStatusDTO().getStatus());
+                            COMPLETE.getStatus().equals(financialAssessmentDTO.getFull().getAssessmnentStatusDTO().getStatus());
                     return isFullComplete || InitAssessmentResult.PASS.getResult().equals(initResult) ||
                             (caseDetailsDTO != null && CaseType.APPEAL_CC.getCaseType().equals(caseDetailsDTO.getCaseType()) &&
                                     InitAssessmentResult.FAIL.getResult().equals(initResult));
