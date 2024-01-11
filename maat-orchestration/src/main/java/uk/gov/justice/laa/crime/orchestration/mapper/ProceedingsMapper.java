@@ -77,6 +77,25 @@ public class ProceedingsMapper extends CrownCourtMapper {
         return ccpCrownCourtSummary;
     }
 
+    private CrownCourtSummaryDTO apiCrownCourtSummaryToCrownCourtSummaryDto(ApiCrownCourtSummary apiCrownCourtSummary) {
+        return CrownCourtSummaryDTO.builder()
+                .ccRepId(apiCrownCourtSummary.getRepId().longValue())
+                .ccRepType(new SysGenString(apiCrownCourtSummary.getRepType()))
+                .ccRepOrderDate(DateUtil.toDate(apiCrownCourtSummary.getRepOrderDate()))
+                .sentenceOrderDate(DateUtil.toDate(apiCrownCourtSummary.getSentenceOrderDate()))
+                .ccWithDrawalDate(DateUtil.toDate(apiCrownCourtSummary.getWithdrawalDate()))
+                .repOrderDecision(new SysGenString(apiCrownCourtSummary.getRepOrderDecision()))
+                .inPrisoned(apiCrownCourtSummary.getIsImprisoned())
+                .benchWarrantyIssued(apiCrownCourtSummary.getIsWarrantIssued())
+                .evidenceProvisionFee(
+                        EvidenceFeeDTO.builder()
+                                .feeLevel(apiCrownCourtSummary.getEvidenceFeeLevel())
+                                .build())
+                .outcomeDTOs(
+                        apiRepOrderCrownCourtOutcomesToOutcomeDtos(apiCrownCourtSummary.getRepOrderCrownCourtOutcome()))
+                .build();
+    }
+
     private ApiPassportAssessment applicationDtoToPassportAssessment(ApplicationDTO application) {
         PassportedDTO passported = application.getPassportedDTO();
 
@@ -137,6 +156,14 @@ public class ProceedingsMapper extends CrownCourtMapper {
         crownCourtSummary.setRepOrderDecision(new SysGenString(response.getCrownRepOrderDecision()));
         crownCourtSummary.setCcRepType(new SysGenString(response.getCrownRepOrderType()));
 
+        return application;
+    }
+
+    public ApplicationDTO updateCrownCourtResponseToApplicationDto(ApiUpdateCrownCourtResponse response,
+                                                                   ApplicationDTO application) {
+
+        application.setTimestamp(Timestamp.valueOf(response.getModifiedDateTime()));
+        apiCrownCourtSummaryToCrownCourtSummaryDto(response.getCrownCourtSummary());
         return application;
     }
 
