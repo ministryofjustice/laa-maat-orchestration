@@ -9,6 +9,7 @@ import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationResponse;
+import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateCrownCourtResponse;
 
 import java.util.Collections;
 
@@ -28,6 +29,19 @@ public class ProceedingsApiService {
                 new ParameterizedTypeReference<>() {
                 },
                 configuration.getCrownCourtApi().getEndpoints().getUpdateApplicationUrl(),
+                Collections.emptyMap()
+        );
+
+        log.info(String.format(RESPONSE_STRING, response));
+        return response;
+    }
+
+    public ApiUpdateCrownCourtResponse updateCrownCourt(ApiUpdateApplicationRequest request) {
+        ApiUpdateCrownCourtResponse response = crownCourtApiClient.put(
+                request,
+                new ParameterizedTypeReference<>() {
+                },
+                configuration.getCrownCourtApi().getEndpoints().getUpdateCrownCourtUrl(),
                 Collections.emptyMap()
         );
 

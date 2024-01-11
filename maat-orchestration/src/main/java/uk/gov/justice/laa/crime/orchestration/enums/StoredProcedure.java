@@ -15,7 +15,9 @@ public enum StoredProcedure {
     PROCESS_ACTIVITY(Package.MATRIX_ACTIVITY, "process_activity"),
     DETERMINE_MAGS_REP_DECISION(Package.ASSESSMENT, "determine_mags_rep_decision"),
     PRE_UPDATE_CC_APPLICATION(Package.APPLICATION, "pre_update_cc_application"),
-    GET_APPLICATION_CORRESPONDENCE(Package.CORRESPONDENCE, "get_application_correspondence");
+    GET_APPLICATION_CORRESPONDENCE(Package.CORRESPONDENCE, "get_application_correspondence"),
+    UPDATE_CC_APPLICANT_AND_APPLICATION(Package.CROWN_COURT, "update_cc_applicant_and_application"),
+    UPDATE_DBMS_TRANSACTION_ID(Package.APPLICATION, "update_dbms_transaction_id");
 
     final String packageName;
     final String procedureName;
