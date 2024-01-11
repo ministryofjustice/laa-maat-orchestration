@@ -33,7 +33,7 @@ class ProceedingsServiceTest {
         when(proceedingsMapper.workflowRequestToUpdateApplicationRequest(any(WorkflowRequest.class)))
                 .thenReturn(new ApiUpdateApplicationRequest());
 
-        when(proceedingsApiService.update(any(ApiUpdateApplicationRequest.class)))
+        when(proceedingsApiService.updateApplication(any(ApiUpdateApplicationRequest.class)))
                 .thenReturn(new ApiUpdateApplicationResponse());
 
         proceedingsService.updateApplication(WorkflowRequest.builder().applicationDTO(new ApplicationDTO()).build());

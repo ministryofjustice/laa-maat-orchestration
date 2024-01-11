@@ -22,7 +22,7 @@ public class ProceedingsApiService {
     private final ServicesConfiguration configuration;
     private static final String RESPONSE_STRING = "Response from Crown Court API Service: %s";
 
-    public ApiUpdateApplicationResponse update(ApiUpdateApplicationRequest request) {
+    public ApiUpdateApplicationResponse updateApplication(ApiUpdateApplicationRequest request) {
         ApiUpdateApplicationResponse response = crownCourtApiClient.put(
                 request,
                 new ParameterizedTypeReference<>() {

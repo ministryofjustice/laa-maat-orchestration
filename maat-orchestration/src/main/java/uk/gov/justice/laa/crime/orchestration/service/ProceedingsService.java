@@ -21,7 +21,7 @@ public class ProceedingsService {
         ApiUpdateApplicationRequest apiUpdateApplicationRequest =
                 proceedingsMapper.workflowRequestToUpdateApplicationRequest(request);
         ApiUpdateApplicationResponse updateApplicationResponse =
-                proceedingsApiService.update(apiUpdateApplicationRequest);
+                proceedingsApiService.updateApplication(apiUpdateApplicationRequest);
         proceedingsMapper.updateApplicationResponseToApplicationDto(
                 updateApplicationResponse, request.getApplicationDTO()
         );

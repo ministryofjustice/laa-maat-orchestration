@@ -29,7 +29,7 @@ class ProceedingsApiServiceTest {
 
     @Test
     void givenValidRequest_whenUpdateIsInvoked_thenCrownCourtApplicationIsUpdated() {
-        proceedingsApiService.update(new ApiUpdateApplicationRequest());
+        proceedingsApiService.updateApplication(new ApiUpdateApplicationRequest());
 
         verify(crownCourtApiClient)
                 .put(any(ApiUpdateApplicationRequest.class), any(), anyString(), anyMap());
