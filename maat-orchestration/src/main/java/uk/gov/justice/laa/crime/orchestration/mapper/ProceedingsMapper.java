@@ -46,6 +46,19 @@ public class ProceedingsMapper extends CrownCourtMapper {
         CrownCourtOverviewDTO crownCourtOverview = application.getCrownCourtOverviewDTO();
         CrownCourtSummaryDTO crownCourtSummary = crownCourtOverview.getCrownCourtSummaryDTO();
 
+        ApiCrownCourtSummary ccpCrownCourtSummary =
+                crownCourtSummaryDtoToApiCrownCourtSummary(crownCourtSummary);
+
+        UserDTO userDTO = workflowRequest.getUserDTO();
+        return updateApplicationRequest
+                .withCrownCourtSummary(ccpCrownCourtSummary)
+                .withApplicantHistoryId(NumberUtils.toInteger(application.getApplicantDTO().getApplicantHistoryId()))
+                .withCrownRepId(NumberUtils.toInteger(crownCourtSummary.getCcRepId()))
+                .withIsImprisoned(crownCourtSummary.getInPrisoned())
+                .withUserSession(userMapper.userDtoToUserSession(userDTO));
+    }
+
+    private ApiCrownCourtSummary crownCourtSummaryDtoToApiCrownCourtSummary(CrownCourtSummaryDTO crownCourtSummary) {
         ApiCrownCourtSummary ccpCrownCourtSummary = new ApiCrownCourtSummary();
         ccpCrownCourtSummary.setRepOrderDecision(crownCourtSummary.getRepOrderDecision().getValue());
         ccpCrownCourtSummary.setRepOrderDate(DateUtil.toLocalDateTime(crownCourtSummary.getCcRepOrderDate()));
@@ -61,14 +74,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         if (null != crownCourtSummary.getOutcomeDTOs()) {
             ccpCrownCourtSummary.setCrownCourtOutcome(crownCourtSummaryDtoToCrownCourtOutcomes(crownCourtSummary));
         }
-
-        UserDTO userDTO = workflowRequest.getUserDTO();
-        return updateApplicationRequest
-                .withCrownCourtSummary(ccpCrownCourtSummary)
-                .withApplicantHistoryId(NumberUtils.toInteger(application.getApplicantDTO().getApplicantHistoryId()))
-                .withCrownRepId(NumberUtils.toInteger(crownCourtSummary.getCcRepId()))
-                .withIsImprisoned(crownCourtSummary.getInPrisoned())
-                .withUserSession(userMapper.userDtoToUserSession(userDTO));
+        return ccpCrownCourtSummary;
     }
 
     private ApiPassportAssessment applicationDtoToPassportAssessment(ApplicationDTO application) {

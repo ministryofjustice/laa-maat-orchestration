@@ -20,11 +20,11 @@ public class CrownCourtMapper {
 
         return outcomeDTOs.stream()
                 .map(outcomeDTO ->
-                        new ApiCrownCourtOutcome()
-                                .withOutcome(CrownCourtOutcome.getFrom(outcomeDTO.getOutcome()))
-                                .withOutComeType(outcomeDTO.getOutComeType())
-                                .withDateSet(DateUtil.toLocalDateTime(outcomeDTO.getDateSet()))
-                                .withDescription(outcomeDTO.getDescription())
+                             new ApiCrownCourtOutcome()
+                                     .withOutcome(CrownCourtOutcome.getFrom(outcomeDTO.getOutcome()))
+                                     .withOutComeType(outcomeDTO.getOutComeType())
+                                     .withDateSet(DateUtil.toLocalDateTime(outcomeDTO.getDateSet()))
+                                     .withDescription(outcomeDTO.getDescription())
                 ).toList();
     }
 }
