@@ -5,7 +5,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.enums.*;
+import uk.gov.justice.laa.crime.enums.*;
+import uk.gov.justice.laa.crime.orchestration.enums.AppealType;
+import uk.gov.justice.laa.crime.orchestration.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOverview;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiUserSession;
@@ -295,7 +297,7 @@ public class MeansAssessmentDataBuilder {
 
     private static FrequenciesDTO getFrequencyDTO(Frequency frequency) {
         return FrequenciesDTO.builder()
-                .annualWeighting((long) frequency.getAnnualWeighting())
+                .annualWeighting((long) frequency.getWeighting())
                 .description(frequency.getDescription())
                 .code(frequency.getCode())
                 .build();
@@ -471,7 +473,7 @@ public class MeansAssessmentDataBuilder {
         apiInitialMeansAssessment.setResultReason(InitAssessmentResult.PASS.getReason());
         if (null != currentStatus) {
             ApiAssessmentStatus apiAssessmentStatus = new ApiAssessmentStatus();
-            apiAssessmentStatus.setStatus(currentStatus.getValue());
+            apiAssessmentStatus.setStatus(currentStatus.getStatus());
             apiAssessmentStatus.setDescription(currentStatus.getDescription());
             apiInitialMeansAssessment.setAssessmentStatus(apiAssessmentStatus);
         }
@@ -500,7 +502,7 @@ public class MeansAssessmentDataBuilder {
         ApiAssessmentStatus assessmentStatus = null;
         if (currentStatus != null) {
             assessmentStatus = new ApiAssessmentStatus()
-                    .withStatus(currentStatus.getValue())
+                    .withStatus(currentStatus.getStatus())
                     .withDescription(currentStatus.getDescription());
         }
         return new ApiFullMeansAssessment()
@@ -658,7 +660,7 @@ public class MeansAssessmentDataBuilder {
 
     public static AssessmentStatusDTO getAssessmentStatusDTO(CurrentStatus status) {
         return AssessmentStatusDTO.builder()
-                .status(status.getValue())
+                .status(status.getStatus())
                 .description(status.getDescription())
                 .build();
     }
@@ -737,7 +739,7 @@ public class MeansAssessmentDataBuilder {
                         .withType(WorkType.INITIAL_ASSESSMENT)
                         .withResult(RESULT_PASS)
                         .withReviewType(ReviewType.ER.getCode())
-                        .withStatus(CurrentStatus.IN_PROGRESS.getValue())
+                        .withStatus(CurrentStatus.IN_PROGRESS.getStatus())
         );
     }
 

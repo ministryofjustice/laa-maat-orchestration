@@ -23,7 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
+import uk.gov.justice.laa.crime.enums.CourtType;
 
 import java.util.List;
 import java.util.Map;

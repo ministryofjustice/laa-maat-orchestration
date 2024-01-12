@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import uk.gov.justice.laa.crime.commons.dto.ErrorDTO;
+import uk.gov.justice.laa.crime.dto.ErrorDTO;
 import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.commons.tracing.TraceIdHandler;
 

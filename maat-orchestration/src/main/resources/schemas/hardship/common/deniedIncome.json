@@ -12,7 +12,7 @@
     "itemCode": {
       "type": "object",
       "description": "The hardship denied income codes",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.DeniedIncomeDetailCode"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.DeniedIncomeDetailCode"
     }
   },
   "extends": {

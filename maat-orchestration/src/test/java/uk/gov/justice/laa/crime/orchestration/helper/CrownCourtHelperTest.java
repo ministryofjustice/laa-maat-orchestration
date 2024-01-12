@@ -6,9 +6,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.CaseDetailDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.OutcomeDTO;
-import uk.gov.justice.laa.crime.orchestration.enums.CaseType;
-import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
-import uk.gov.justice.laa.crime.orchestration.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 

@@ -55,12 +55,12 @@
     "magCourtOutcome": {
       "type": "object",
       "description": "Magistrate Court Outcome",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.MagCourtOutcome"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.MagCourtOutcome"
     },
     "caseType": {
       "type": "object",
       "description": "The case type",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.CaseType"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.CaseType"
     },
     "appealType": {
       "type": "string",
@@ -74,7 +74,7 @@
         "outcome": {
           "type": "object",
           "description": "The appeal outcome",
-          "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.CrownCourtAppealOutcome"
+          "existingJavaType": "uk.gov.justice.laa.crime.enums.CrownCourtAppealOutcome"
         },
         "dateSet": {
           "type": "string",

@@ -2,9 +2,9 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.enums.*;
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipDetail;
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipProgress;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
@@ -214,7 +214,7 @@ public class HardshipMapper {
         return FrequenciesDTO.builder()
                 .code(frequency.getCode())
                 .description(frequency.getDescription())
-                .annualWeighting((long) frequency.getAnnualWeighting())
+                .annualWeighting((long) frequency.getWeighting())
                 .build();
     }
 
