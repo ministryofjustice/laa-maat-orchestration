@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -28,8 +29,7 @@ class MaatCourtDataServiceTest {
         maatCourtDataService.invokeStoredProcedure(
                 new ApplicationDTO(),
                 new UserDTO(),
-                "ASSESSMENTS",
-                "TEST_SP"
+                StoredProcedure.PROCESS_ACTIVITY
         );
         verify(maatCourtDataApiService).executeStoredProcedure(any(StoredProcedureRequest.class));
     }

@@ -13,6 +13,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
+import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.HardshipOrchestrationService;
 
@@ -83,7 +84,9 @@ class HardshipOrchestrationServiceTest {
 
         WorkflowRequest workflowRequest = setupCreateStubs(CourtType.MAGISTRATE, CurrentStatus.COMPLETE);
 
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                                                        any(StoredProcedure.class)
+        ))
                 .thenReturn(workflowRequest.getApplicationDTO());
         when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
                 .thenReturn(false);
@@ -106,7 +109,9 @@ class HardshipOrchestrationServiceTest {
         applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
         when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                                                        any(StoredProcedure.class)
+        ))
                 .thenReturn(applicationDTO);
         when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
                 .thenReturn(true);
@@ -135,7 +140,9 @@ class HardshipOrchestrationServiceTest {
         when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
 
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                                                        any(StoredProcedure.class)
+        ))
                 .thenReturn(applicationDTO);
 
         ApplicationDTO expected = orchestrationService.create(workflowRequest);
@@ -216,7 +223,8 @@ class HardshipOrchestrationServiceTest {
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), eq(CourtType.MAGISTRATE)))
                 .thenReturn(getAssessmentSummaryDTO());
 
-        doThrow(new APIClientException()).when(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
+        doThrow(new APIClientException()).when(assessmentSummaryService)
+                .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(APIClientException.class);
@@ -267,7 +275,9 @@ class HardshipOrchestrationServiceTest {
 
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
 
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                                                        any(StoredProcedure.class)
+        ))
                 .thenReturn(workflowRequest.getApplicationDTO());
         when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
                 .thenReturn(false);
@@ -287,7 +297,9 @@ class HardshipOrchestrationServiceTest {
         applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
         when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                                                        any(StoredProcedure.class)
+        ))
                 .thenReturn(applicationDTO);
         when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
                 .thenReturn(true);
@@ -313,7 +325,9 @@ class HardshipOrchestrationServiceTest {
         when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
 
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                                                        any(StoredProcedure.class)
+        ))
                 .thenReturn(applicationDTO);
 
         ApplicationDTO expected = orchestrationService.update(workflowRequest);
@@ -416,7 +430,9 @@ class HardshipOrchestrationServiceTest {
                 .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
         when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                                                        any(StoredProcedure.class)
+        ))
                 .thenThrow(new APIClientException());
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(APIClientException.class);
