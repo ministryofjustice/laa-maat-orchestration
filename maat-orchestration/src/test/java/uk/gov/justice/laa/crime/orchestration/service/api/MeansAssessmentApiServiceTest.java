@@ -1,4 +1,4 @@
-package uk.gov.justice.laa.crime.orchestration.service;
+package uk.gov.justice.laa.crime.orchestration.service.api;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +12,6 @@ import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiCreateMeansAssessmentRequest;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiUpdateMeansAssessmentRequest;
-import uk.gov.justice.laa.crime.orchestration.service.api.MeansAssessmentApiService;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;

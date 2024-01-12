@@ -1,4 +1,4 @@
-package uk.gov.justice.laa.crime.orchestration.service;
+package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +12,10 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
-import uk.gov.justice.laa.crime.orchestration.service.orchestration.MeansAssessmentOrchestrationService;
+import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
+import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
+import uk.gov.justice.laa.crime.orchestration.service.MeansAssessmentService;
+import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;

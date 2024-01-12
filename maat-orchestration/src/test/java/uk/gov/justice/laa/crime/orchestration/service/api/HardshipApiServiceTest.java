@@ -1,4 +1,4 @@
-package uk.gov.justice.laa.crime.orchestration.service;
+package uk.gov.justice.laa.crime.orchestration.service.api;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

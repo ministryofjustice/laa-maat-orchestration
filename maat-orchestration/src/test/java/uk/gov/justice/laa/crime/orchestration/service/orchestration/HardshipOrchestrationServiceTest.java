@@ -1,4 +1,4 @@
-package uk.gov.justice.laa.crime.orchestration.service;
+package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +15,7 @@ import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
-import uk.gov.justice.laa.crime.orchestration.service.orchestration.HardshipOrchestrationService;
+import uk.gov.justice.laa.crime.orchestration.service.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
