@@ -29,7 +29,7 @@ public class CrownCourtController {
 
     private final CrownCourtOrchestrationService orchestrationService;
 
-    @PutMapping(value = "/update-crown-court", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Update Crown Court")
     @ApiResponse(responseCode = "200",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
