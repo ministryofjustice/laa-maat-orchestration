@@ -27,8 +27,16 @@ class ProceedingsApiServiceTest {
     private ServicesConfiguration configuration = MockServicesConfiguration.getConfiguration(1000);
 
     @Test
-    void givenValidRequest_whenUpdateIsInvoked_thenCrownCourtApplicationIsUpdated() {
+    void givenValidRequest_whenUpdateIsInvoked_thenAPIRequestIsSent() {
         proceedingsApiService.updateApplication(new ApiUpdateApplicationRequest());
+
+        verify(crownCourtApiClient)
+                .put(any(ApiUpdateApplicationRequest.class), any(), anyString(), anyMap());
+    }
+
+    @Test
+    void givenValidRequest_whenUpdateCrownCourtIsInvoked_thenAPIRequestIsSent() {
+        proceedingsApiService.updateCrownCourt(new ApiUpdateApplicationRequest());
 
         verify(crownCourtApiClient)
                 .put(any(ApiUpdateApplicationRequest.class), any(), anyString(), anyMap());

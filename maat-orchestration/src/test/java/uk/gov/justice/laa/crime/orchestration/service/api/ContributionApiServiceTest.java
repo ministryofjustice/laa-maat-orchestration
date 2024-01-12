@@ -40,6 +40,12 @@ class ContributionApiServiceTest {
         contributionApiService.isContributionRule(new ApiMaatCheckContributionRuleRequest());
         verify(contributionApiClient)
                 .post(any(ApiMaatCheckContributionRuleRequest.class), any(), anyString(), anyMap());
+    }
 
+    @Test
+void givenValidRequest_whenGetContributionSummaryIsInvoked_thenContributionServiceIsCalled() {
+        contributionApiService.getContributionSummary(1L);
+        verify(contributionApiClient)
+                .get(any(), anyString(), anyMap(), anyLong());
     }
 }
