@@ -6,12 +6,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.enums.InitAssessmentResult;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.mapper.ContributionMapper;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
 
@@ -134,4 +134,29 @@ class ContributionServiceTest {
                         .build())
                 .build();
         assertThat(contributionService.isCalculateContributionReqd(applicationDTO)).isTrue();
-    }}
+    }
+
+    @Test
+    void givenApplicationDTOWithInProgressPassported_whenIsCalculateContributionReqdIsCalled_thenFalseIsReturned() {
+        ApplicationDTO applicationDTO = ApplicationDTO.builder()
+                .passportedDTO(PassportedDTO.builder()
+                        .assessementStatusDTO(AssessmentStatusDTO.builder()
+                                .status(CurrentStatus.IN_PROGRESS.getStatus())
+                                .build())
+                        .build())
+                .build();
+        assertThat(contributionService.isCalculateContributionReqd(applicationDTO)).isFalse();
+    }
+
+    @Test
+    void givenInitialAssessmentWithNoStatus_whenIsCalculateContributionReqdIsCalled_thenFalseIsReturned() {
+        ApplicationDTO applicationDTO = ApplicationDTO.builder()
+                .assessmentDTO(AssessmentDTO.builder()
+                        .financialAssessmentDTO(FinancialAssessmentDTO.builder()
+                                .initial(InitialAssessmentDTO.builder().build())
+                                .build())
+                        .build())
+                .build();
+        assertThat(contributionService.isCalculateContributionReqd(applicationDTO)).isFalse();
+    }
+}
