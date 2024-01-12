@@ -33,8 +33,6 @@ import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWith
 @AutoConfigureMockMvc(addFilters = false)
 class HardshipControllerTest {
 
-    private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/hardship";
-
     @Autowired
     private MockMvc mvc;
 
@@ -43,6 +41,8 @@ class HardshipControllerTest {
 
     @MockBean
     private HardshipOrchestrationService orchestrationService;
+
+    private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/hardship";
 
     @Test
     void givenValidRequest_whenFindIsInvoked_thenOkResponseIsReturned() throws Exception {
@@ -90,7 +90,6 @@ class HardshipControllerTest {
 
     @Test
     void givenWebClientFailure_whenCreateIsInvoked_thenInternalServerErrorResponseIsReturned() throws Exception {
-
         when(orchestrationService.create(any(WorkflowRequest.class)))
                 .thenThrow(new APIClientException());
 
