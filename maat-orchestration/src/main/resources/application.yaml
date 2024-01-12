@@ -69,6 +69,7 @@ services:
       create-url: ${services.hardship-api.base-url}/api/internal/v1/hardship
       update-url: ${services.hardship-api.base-url}/api/internal/v1/hardship
       rollback-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/rollback
+
   contribution-api:
     base-url: ${CCC_API_BASE_URL}
     endpoints:
@@ -76,6 +77,7 @@ services:
       calculate-contribution-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/calculate-contribution
       check-contribution-rule-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/check-contribution-rule
       contribution-summaries-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/summaries
+
   crown-court-api:
     base-url: ${CCP_API_BASE_URL}
     endpoints:
@@ -88,8 +90,7 @@ services:
       find-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means/{financialAssessmentId}/applicantId/{applicantId}
       create-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means
       update-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means
-  validation-api:
-    base-url: ${VALIDATION_API_BASE_URL}
+
   maat-api:
     base-url: ${MAAT_API_BASE_URL}
     endpoints:
