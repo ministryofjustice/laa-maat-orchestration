@@ -12,7 +12,7 @@
     "frequency": {
       "type": "object",
       "description": "The Frequency of Applicant",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.Frequency"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.Frequency"
     },
     "amount": {
       "type": "number",
@@ -38,17 +38,17 @@
     "detailType": {
       "type": "object",
       "description": "Hardship review detail type",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewDetailType"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.HardshipReviewDetailType"
     },
     "detailCode": {
       "type": "object",
       "description": "The Hardship Review Detail code",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewDetailCode"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.HardshipReviewDetailCode"
     },
     "detailReason": {
       "type": "object",
       "description": "The Hardship Review Detail reasons code",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewDetailReason"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.HardshipReviewDetailReason"
     },
     "userCreated": {
       "type": "string",

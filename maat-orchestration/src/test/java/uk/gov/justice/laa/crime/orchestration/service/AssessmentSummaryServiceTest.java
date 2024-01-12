@@ -8,7 +8,7 @@ import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
-import uk.gov.justice.laa.crime.orchestration.enums.CourtType;
+import uk.gov.justice.laa.crime.enums.CourtType;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -8,7 +8,7 @@
     "reviewResult": {
       "description": "The review result",
       "type": "object",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewResult"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.HardshipReviewResult"
     },
     "postHardshipDisposableIncome": {
       "type": "number",

@@ -5,7 +5,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.enums.*;
+import uk.gov.justice.laa.crime.enums.*;
+import uk.gov.justice.laa.crime.orchestration.enums.AppealType;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiUserSession;
@@ -864,7 +865,7 @@ public class TestModelDataBuilder {
                                                 .frequency(FrequenciesDTO.builder()
                                                         .code(Frequency.ANNUALLY.getCode())
                                                         .annualWeighting(
-                                                                (long) Frequency.ANNUALLY.getAnnualWeighting())
+                                                                (long) Frequency.ANNUALLY.getWeighting())
                                                         .description(Frequency.ANNUALLY.getDescription())
                                                         .build())
                                                 .amountNumber(BigDecimal.valueOf(2000.00))
@@ -900,7 +901,7 @@ public class TestModelDataBuilder {
                                                 .frequency(FrequenciesDTO.builder()
                                                         .code(Frequency.MONTHLY.getCode())
                                                         .annualWeighting(
-                                                                (long) Frequency.MONTHLY.getAnnualWeighting())
+                                                                (long) Frequency.MONTHLY.getWeighting())
                                                         .description(Frequency.MONTHLY.getDescription())
                                                         .build())
                                                 .amountNumber(BigDecimal.valueOf(1500.00))
@@ -916,7 +917,7 @@ public class TestModelDataBuilder {
 
     public static AssessmentStatusDTO getAssessmentStatusDTO(CurrentStatus status) {
         return AssessmentStatusDTO.builder()
-                .status(status.getValue())
+                .status(status.getStatus())
                 .description(status.getDescription())
                 .build();
     }
