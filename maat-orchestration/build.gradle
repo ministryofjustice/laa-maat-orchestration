@@ -1,11 +1,10 @@
-import org.springframework.boot.gradle.plugin.SpringBootPlugin
-
 plugins {
 	id "java"
 	id "jacoco"
 	id "org.sonarqube" version "4.4.1.3373"
 	id "info.solidsoft.pitest" version "1.15.0"
 	id "org.springframework.boot" version "3.1.5"
+	id 'io.spring.dependency-management' version '1.1.4'
 	id "org.jsonschema2dataclass" version "6.0.0"
 }
 
@@ -18,10 +17,8 @@ java {
 
 def versions = [
 		pitest                  : "1.15.3",
-		sentryVersion			: "7.1.0",
 		springdocVersion        : "2.3.0",
 		crimeCommonsVersion     : "2.13.6",
-		okhttpVersion           : "4.12.0",
 		wmStubRunnerVersion    	: "4.0.1"
 ]
 
@@ -37,34 +34,21 @@ repositories {
 
 dependencies {
 
-	implementation platform("io.sentry:sentry-bom:$versions.sentryVersion")
-	implementation platform(SpringBootPlugin.BOM_COORDINATES)
-	annotationProcessor platform(SpringBootPlugin.BOM_COORDINATES)
+	implementation "uk.gov.justice.service.laa-crime:crime-commons-spring-boot-starter-rest-client:$versions.crimeCommonsVersion"
+	implementation "uk.gov.justice.service.laa-crime:crime-commons-classes:$versions.crimeCommonsVersion"
 
-	implementation "io.sentry:sentry-logback"
-	implementation "io.sentry:sentry-spring-boot-starter"
-
-	implementation "org.apache.commons:commons-lang3"
 	implementation "io.micrometer:micrometer-registry-prometheus"
 	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$versions.springdocVersion"
 
-	implementation "org.springframework.boot:spring-boot-starter-web"
-	implementation "org.springframework.boot:spring-boot-starter-webflux"
 	implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
 	implementation "org.springframework.boot:spring-boot-starter-security"
-	implementation "org.springframework.boot:spring-boot-starter-actuator"
 	implementation "org.springframework.boot:spring-boot-starter-validation"
-
-	implementation "uk.gov.justice.service.laa-crime:crime-commons-spring-boot-starter-rest-client:$versions.crimeCommonsVersion"
-	implementation "uk.gov.justice.service.laa-crime:crime-commons-classes:$versions.crimeCommonsVersion"
 
 	compileOnly "org.projectlombok:lombok"
 	annotationProcessor "org.projectlombok:lombok"
 
 	testImplementation "org.pitest:pitest:$versions.pitest"
-	testImplementation "org.springframework.boot:spring-boot-starter-test"
 	testImplementation "org.springframework.security:spring-security-test"
-	testImplementation "com.squareup.okhttp3:okhttp:$versions.okhttpVersion"
 	testImplementation "org.springframework.cloud:spring-cloud-starter-contract-stub-runner:$versions.wmStubRunnerVersion"
 }
 
