@@ -1,11 +1,10 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.enums.AppealType;
 import uk.gov.justice.laa.crime.orchestration.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOverview;
@@ -348,7 +347,6 @@ public class MeansAssessmentDataBuilder {
         );
     }
 
-    @NotNull
     private static NewWorkReasonDTO getNewWorkReasonDTO() {
         return NewWorkReasonDTO.builder()
                 .code(NEW_WORK_REASON_STRING)

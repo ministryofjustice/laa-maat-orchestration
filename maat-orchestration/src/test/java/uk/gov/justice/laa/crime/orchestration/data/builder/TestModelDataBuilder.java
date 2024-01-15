@@ -1,11 +1,10 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.enums.AppealType;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
@@ -699,7 +698,6 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    @NotNull
     private static List<HRProgressDTO> getHrProgressDTOs() {
         return List.of(
                 HRProgressDTO.builder()
