@@ -53,6 +53,20 @@ public class WiremockStubs {
                     .withBody(response)));
     }
 
+    public static void stubForCheckContributionsRule() {
+        stubFor(post(urlMatching(CCC_URL + "/check-contribution-rule"))
+            .willReturn(WireMock.ok()
+                    .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                    .withBody(Boolean.TRUE.toString())));
+    }
+
+    public static void stubForInvokeStoredProcedure(String response) {
+        stubFor(post(urlMatching(MAAT_API_URL))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
+
     public static void stubForInvokeStoredProcedure(String currentState, String response) {
         stubFor(post(urlMatching(MAAT_API_URL))
             .inScenario("invokeStoredProcedure")
@@ -61,6 +75,7 @@ public class WiremockStubs {
                     .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                     .withBody(response)));
     }
+
     public static void stubForInvokeStoredProcedure(String currentState, String nextState, String response) {
         stubFor(post(urlMatching(MAAT_API_URL))
             .inScenario("invokeStoredProcedure")

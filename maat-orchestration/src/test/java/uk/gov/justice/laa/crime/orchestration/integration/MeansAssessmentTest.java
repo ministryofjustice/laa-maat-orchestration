@@ -7,7 +7,9 @@ import com.github.tomakehurst.wiremock.stubbing.Scenario;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Import;
@@ -38,11 +40,11 @@ import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
 @DirtiesContext
-// @TestInstance(TestInstance.Lifecycle.PER_CLASS) TODO: Is this annotation needed?
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import({OrchestrationTestConfiguration.class, WiremockStubs.class})
 @SpringBootTest(classes = OrchestrationTestConfiguration.class, webEnvironment = DEFINED_PORT)
 @AutoConfigureWireMock(port = 9999)
-// @AutoConfigureObservability TODO: Is this annotation needed? Not sure what it does
+@AutoConfigureObservability
 public class MeansAssessmentTest {
 
     private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/cma";

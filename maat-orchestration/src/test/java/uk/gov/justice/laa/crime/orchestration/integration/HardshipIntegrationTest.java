@@ -26,9 +26,8 @@ import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.enums.CourtType;
 
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.*;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -36,7 +35,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
-// TODO: Refactor this to use the new WiremockStub util class
 @DirtiesContext
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(OrchestrationTestConfiguration.class)
@@ -171,23 +169,6 @@ class HardshipIntegrationTest {
         verifyStubForUpdateHardship();
     }
 
-    private void stubForOAuth() throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> token = Map.of(
-                "expires_in", 3600,
-                "token_type", "Bearer",
-                "access_token", UUID.randomUUID()
-        );
-
-        wiremock.stubFor(
-                post("/oauth2/token").willReturn(
-                        WireMock.ok()
-                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                                .withBody(mapper.writeValueAsString(token))
-                )
-        );
-    }
-
     private void stubForUpdateHardship() throws JsonProcessingException {
         wiremock.stubFor(put(urlMatching("/api/internal/v1/hardship/.*"))
                 .willReturn(
@@ -196,7 +177,10 @@ class HardshipIntegrationTest {
                                 .withBody(objectMapper.writeValueAsString(TestModelDataBuilder.getApiPerformHardshipResponse()))
                 )
         );
-        stubForCalculateContribution();
+        stubForInvokeStoredProcedure(objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO()));
+        stubForCheckContributionsRule();
+        stubForCalculateContributions(objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
+        stubForGetContributionsSummary(objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary())));
         stubForOAuth();
     }
 
@@ -227,44 +211,11 @@ class HardshipIntegrationTest {
                                 .withBody(objectMapper.writeValueAsString(TestModelDataBuilder.getApiFindHardshipResponse()))
                 )
         );
-        stubForCalculateContribution();
+        stubForInvokeStoredProcedure(objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO()));
+        stubForCheckContributionsRule();
+        stubForCalculateContributions(objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
+        stubForGetContributionsSummary(objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary())));
         stubForOAuth();
-    }
-
-    private void stubForCalculateContribution() throws JsonProcessingException {
-        wiremock.stubFor(post(urlMatching("/api/internal/v1/assessment/execute-stored-procedure"))
-                .willReturn(
-                        WireMock.ok()
-                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                                .withBody(objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO()))
-                )
-        );
-
-        wiremock.stubFor(post(urlMatching("/api/internal/v1/contribution/check-contribution-rule"))
-                .willReturn(
-                        WireMock.ok()
-                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                                .withBody(Boolean.TRUE.toString())
-                )
-        );
-
-        wiremock.stubFor(post(urlMatching("/api/internal/v1/contribution/calculate-contribution"))
-                .willReturn(
-                        WireMock.ok()
-                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                                .withBody(objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()))
-                )
-        );
-
-        wiremock.stubFor(get(urlMatching("/api/internal/v1/contribution/summaries"))
-                .willReturn(
-                        WireMock.ok()
-                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                                .withBody(objectMapper.writeValueAsString(
-                                        List.of(TestModelDataBuilder.getApiContributionSummary())
-                                ))
-                )
-        );
     }
 
     private static void verifyStubForCreateHardship() {
