@@ -1,6 +1,5 @@
 package uk.gov.justice.laa.crime.orchestration.integration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -21,6 +20,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
+import uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
@@ -28,9 +28,8 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.*;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -40,7 +39,7 @@ import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGive
 
 @DirtiesContext
 // @TestInstance(TestInstance.Lifecycle.PER_CLASS) TODO: Is this annotation needed?
-@Import(OrchestrationTestConfiguration.class)
+@Import({OrchestrationTestConfiguration.class, WiremockStubs.class})
 @SpringBootTest(classes = OrchestrationTestConfiguration.class, webEnvironment = DEFINED_PORT)
 @AutoConfigureWireMock(port = 9999)
 // @AutoConfigureObservability TODO: Is this annotation needed? Not sure what it does
@@ -48,9 +47,7 @@ public class MeansAssessmentTest {
 
     private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/cma";
     private static final String CMA_URL = "/api/internal/v1/assessment/means";
-    private static final String CCP_URL = "/api/internal/v1/proceedings";
-    private static final String CCC_URL = "/api/internal/v1/contribution";
-    private static final String MAAT_API_URL = "/api/internal/v1/assessment/execute-stored-procedure";
+
     private MockMvc mvc;
     @Autowired
     private ObjectMapper objectMapper;
@@ -77,7 +74,7 @@ public class MeansAssessmentTest {
         String response = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiGetMeansAssessmentResponse());
 
         stubForOAuth();
-        wiremock.stubFor(get(urlMatching(CMA_URL + "/" + Constants.FINANCIAL_ASSESSMENT_ID))
+        stubFor(get(urlMatching(CMA_URL + "/" + Constants.FINANCIAL_ASSESSMENT_ID))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response)));
@@ -111,7 +108,7 @@ public class MeansAssessmentTest {
     @Test
     void givenApiClientException_whenFindIsInvoked_thenInternalServerErrorIsReturned() throws Exception {
         stubForOAuth();
-        wiremock.stubFor(get(urlMatching(CMA_URL + "/" + Constants.FINANCIAL_ASSESSMENT_ID))
+        stubFor(get(urlMatching(CMA_URL + "/" + Constants.FINANCIAL_ASSESSMENT_ID))
                 .willReturn(WireMock.serverError()));
 
         String findAssessmentUrl = String.format(
@@ -141,52 +138,14 @@ public class MeansAssessmentTest {
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(cmaResponse)));
-        wiremock.stubFor((put(urlMatching(CCP_URL))
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(ccpResponse))));
-        wiremock.stubFor(post(urlMatching(CCC_URL + "/calculate-contribution"))
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(cccCalculateResponse)));
-        wiremock.stubFor(get(urlMatching(CCC_URL + "/summaries"))
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(cccSummariesResponse)));
-        wiremock.stubFor(post(urlMatching(MAAT_API_URL))
-                .inScenario("invokeStoredProcedure")
-                .whenScenarioStateIs(Scenario.STARTED)
-                .willSetStateTo("DB_GET_APPLICATION_CORRESPONDENCE")
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(maatApiResponse)));
-        wiremock.stubFor(post(urlMatching(MAAT_API_URL))
-                .inScenario("invokeStoredProcedure")
-                .whenScenarioStateIs("DB_GET_APPLICATION_CORRESPONDENCE")
-                .willSetStateTo("DB_ASSESSMENT_POST_PROCESSING_PART_1_C3")
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(maatApiResponse)));
-        wiremock.stubFor(post(urlMatching(MAAT_API_URL))
-                .inScenario("invokeStoredProcedure")
-                .whenScenarioStateIs("DB_ASSESSMENT_POST_PROCESSING_PART_1_C3")
-                .willSetStateTo("DB_PRE_UPDATE_CC_APPLICATION")
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(maatApiResponse)));
-        wiremock.stubFor(post(urlMatching(MAAT_API_URL))
-                .inScenario("invokeStoredProcedure")
-                .whenScenarioStateIs("DB_PRE_UPDATE_CC_APPLICATION")
-                .willSetStateTo("DB_ASSESSMENT_POST_PROCESSING_PART_2")
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(maatApiResponse)));
-        wiremock.stubFor(post(urlMatching(MAAT_API_URL))
-                .inScenario("invokeStoredProcedure")
-                .whenScenarioStateIs("DB_ASSESSMENT_POST_PROCESSING_PART_2")
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(maatApiResponse)));
+        stubForUpdateCrownCourtProceedings(ccpResponse);
+        stubForCalculateContributions(cccCalculateResponse);
+        stubForGetContributionsSummary(cccSummariesResponse);
+        stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
+        stubForInvokeStoredProcedure("DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", maatApiResponse);
+        stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", "DB_PRE_UPDATE_CC_APPLICATION", maatApiResponse);
+        stubForInvokeStoredProcedure("DB_PRE_UPDATE_CC_APPLICATION", "DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
+        stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk());
@@ -247,52 +206,14 @@ public class MeansAssessmentTest {
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(cmaResponse)));
-        wiremock.stubFor((put(urlMatching(CCP_URL))
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(ccpResponse))));
-        wiremock.stubFor(post(urlMatching(CCC_URL + "/calculate-contribution"))
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(cccCalculateResponse)));
-        wiremock.stubFor(get(urlMatching(CCC_URL + "/summaries"))
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(cccSummariesResponse)));
-        wiremock.stubFor(post(urlMatching(MAAT_API_URL))
-                .inScenario("invokeStoredProcedure")
-                .whenScenarioStateIs(Scenario.STARTED)
-                .willSetStateTo("DB_GET_APPLICATION_CORRESPONDENCE")
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(maatApiResponse)));
-        wiremock.stubFor(post(urlMatching(MAAT_API_URL))
-                .inScenario("invokeStoredProcedure")
-                .whenScenarioStateIs("DB_GET_APPLICATION_CORRESPONDENCE")
-                .willSetStateTo("DB_ASSESSMENT_POST_PROCESSING_PART_1_C3")
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(maatApiResponse)));
-        wiremock.stubFor(post(urlMatching(MAAT_API_URL))
-                .inScenario("invokeStoredProcedure")
-                .whenScenarioStateIs("DB_ASSESSMENT_POST_PROCESSING_PART_1_C3")
-                .willSetStateTo("DB_PRE_UPDATE_CC_APPLICATION")
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(maatApiResponse)));
-        wiremock.stubFor(post(urlMatching(MAAT_API_URL))
-                .inScenario("invokeStoredProcedure")
-                .whenScenarioStateIs("DB_PRE_UPDATE_CC_APPLICATION")
-                .willSetStateTo("DB_ASSESSMENT_POST_PROCESSING_PART_2")
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(maatApiResponse)));
-        wiremock.stubFor(post(urlMatching(MAAT_API_URL))
-                .inScenario("invokeStoredProcedure")
-                .whenScenarioStateIs("DB_ASSESSMENT_POST_PROCESSING_PART_2")
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(maatApiResponse)));
+        stubForUpdateCrownCourtProceedings(ccpResponse);
+        stubForCalculateContributions(cccCalculateResponse);
+        stubForGetContributionsSummary(cccSummariesResponse);
+        stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
+        stubForInvokeStoredProcedure("DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", maatApiResponse);
+        stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", "DB_PRE_UPDATE_CC_APPLICATION", maatApiResponse);
+        stubForInvokeStoredProcedure("DB_PRE_UPDATE_CC_APPLICATION", "DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
+        stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk());
@@ -329,21 +250,5 @@ public class MeansAssessmentTest {
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
                 .andExpect(status().isInternalServerError());
-    }
-
-    // TODO: Can this be located somewhere common for any integration test to import?
-    // Need to pass in wiremock object if located in common
-    private void stubForOAuth() throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> token = Map.of(
-                "expires_in", 3600,
-                "token_type", "Bearer",
-                "access_token", UUID.randomUUID()
-        );
-
-        wiremock.stubFor(post("/oauth2/token")
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(mapper.writeValueAsString(token))));
     }
 }
