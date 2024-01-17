@@ -31,6 +31,7 @@ class ContributionMapperTest {
     @InjectSoftAssertions
     private SoftAssertions softly;
 
+    // TODO: Add unit test scenarios for appealOutcome, regularOutcome and multipleOutcome for last outcome mapper
     @Test
     void givenValidWorkflowRequest_whenContributionMapperIsInvoked_thenMappingIsCorrect() {
         WorkflowRequest workflowRequest = TestModelDataBuilder

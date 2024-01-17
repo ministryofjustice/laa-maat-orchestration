@@ -388,7 +388,6 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    // TODO: Check existing builders to see if they can use new methods for certain objects
     public static WorkflowRequest buildWorkFlowRequest(CourtType courtType) {
         return WorkflowRequest.builder()
                 .userDTO(getUserDTO())

@@ -125,14 +125,7 @@ public class MeansAssessmentTest {
         String ccpResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
         String cccCalculateResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse());
         String cccSummariesResponse = objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary()));
-        // applicationDTO is overwritten by the applicationDTO below following first call to invokeSP
-        // when this then gets mapped as part of calculate contribution it look through the list of outcomeDTOs and gets last one
-        // mapper assumes last should be an appealOutcome however in test data we are only setting one outcome
-        // this has outcome of CONVICTED which is not a valid appealOutcome (poss as we are only setting one outcome in test data)
-        // Is only one outcome in list valid? If so then mapper should be updated as it assumes there should always be 2 outcomes
-        ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT);
-//        applicationDTO.setMagsOutcomeDTO(TestModelDataBuilder.getOutcomeDTO());
-        String maatApiResponse = objectMapper.writeValueAsString(applicationDTO);
+        String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT));
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
 
         stubForOAuth();
@@ -192,14 +185,7 @@ public class MeansAssessmentTest {
         String ccpResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
         String cccCalculateResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse());
         String cccSummariesResponse = objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary()));
-        // applicationDTO is overwritten by the applicationDTO below following first call to invokeSP
-        // when this then gets mapped as part of calculate contribution it look through the list of outcomeDTOs and gets last one
-        // mapper assumes last should be an appealOutcome however in test data we are only setting one outcome
-        // this has outcome of CONVICTED which is not a valid appealOutcome (poss as we are only setting one outcome in test data)
-        // Is only one outcome in list valid? If so then mapper should be updated as it assumes there should always be 2 outcomes
-        ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT);
-//        applicationDTO.setMagsOutcomeDTO(TestModelDataBuilder.getOutcomeDTO());
-        String maatApiResponse = objectMapper.writeValueAsString(applicationDTO);
+        String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT));
 
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
 
