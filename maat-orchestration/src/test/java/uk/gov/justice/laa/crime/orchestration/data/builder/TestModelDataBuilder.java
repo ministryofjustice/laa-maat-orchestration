@@ -518,7 +518,7 @@ public class TestModelDataBuilder {
                 .repOrderDecision(REP_ORDER_DECISION_GRANTED)
                 .inPrisoned(Boolean.TRUE)
                 .evidenceProvisionFee(getEvidenceFeeDTO())
-                .outcomeDTOs(List.of(getOutcomeDTO()))
+                .outcomeDTOs(List.of(getOutcomeDTO(CourtType.CROWN_COURT), getOutcomeDTO()))
                 .build();
     }
 

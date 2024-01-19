@@ -81,11 +81,11 @@ public class ContributionMapper extends CrownCourtMapper {
 
     private LastOutcome getLastCrownCourtOutcome(final Collection<OutcomeDTO> crownCourtOutcomeList) {
         return crownCourtOutcomeList.stream()
+                .reduce((first, second) -> second)
                 .filter(outcome -> outcome.getOutComeType().equals("APPEAL")) // TODO: Need to add outcomeType enum to compare against???
                 .map(appealOutcome -> new LastOutcome()
                         .withDateSet(toLocalDateTime(appealOutcome.getDateSet()))
                         .withOutcome(CrownCourtAppealOutcome.getFrom(appealOutcome.getOutcome())))
-                .findFirst()
                 .orElse(null);
     }
 
