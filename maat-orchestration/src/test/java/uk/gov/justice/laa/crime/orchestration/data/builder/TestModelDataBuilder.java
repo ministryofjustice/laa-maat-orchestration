@@ -8,6 +8,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.AppealType;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.orchestration.model.common.ApiRepOrderCrownCourtOutcome;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiUserSession;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.common.ApiContributionSummary;
@@ -43,6 +44,7 @@ public class TestModelDataBuilder {
     private static final SysGenString REP_ORDER_DECISION_GRANTED = new SysGenString("Granted");
     private static final SysGenString CC_REP_TYPE_THROUGH_ORDER = new SysGenString("Through Order");
     private static final LocalDateTime CC_REP_ORDER_DATETIME = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
+    private static final LocalDateTime CC_WITHDRAWAL_DATETIME = LocalDateTime.of(2022, 10, 14, 0, 0, 0);
     private static final LocalDateTime SENTENCE_ORDER_DATETIME = CC_REP_ORDER_DATETIME.plus(1, ChronoUnit.DAYS);
     private static final LocalDateTime DATETIME_RECEIVED = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
     private static final Date ASSESSMENT_DATE =
@@ -212,13 +214,22 @@ public class TestModelDataBuilder {
 
     public static ApiCrownCourtSummary getApiCrownCourtSummary() {
         return new ApiCrownCourtSummary()
-                .withEvidenceFeeLevel(EVIDENCE_FEE_LEVEL_1)
-                .withCrownCourtOutcome(List.of(getApiCrownCourtOutcome(CrownCourtOutcome.CONVICTED)))
-                .withRepOrderDate(CC_REP_ORDER_DATETIME)
-                .withRepType(CC_REP_TYPE_THROUGH_ORDER.getValue())
-                .withRepOrderDecision(REP_ORDER_DECISION_GRANTED.getValue())
                 .withRepId(REP_ID)
-                .withSentenceOrderDate(SENTENCE_ORDER_DATETIME);
+                .withRepType(CC_REP_TYPE_THROUGH_ORDER.getValue())
+                .withRepOrderDate(CC_REP_ORDER_DATETIME)
+                .withSentenceOrderDate(SENTENCE_ORDER_DATETIME)
+                .withWithdrawalDate(CC_WITHDRAWAL_DATETIME)
+                .withRepOrderDecision(REP_ORDER_DECISION_GRANTED.getValue())
+                .withIsImprisoned(Boolean.TRUE)
+                .withIsWarrantIssued(Boolean.TRUE)
+                .withEvidenceFeeLevel(EVIDENCE_FEE_LEVEL_1)
+                .withCrownCourtOutcome(List.of(getApiCrownCourtOutcome(CrownCourtOutcome.CONVICTED)));
+    }
+
+    public static ApiRepOrderCrownCourtOutcome getApiRepOrderCrownCourtOutcome() {
+        return new ApiRepOrderCrownCourtOutcome()
+                .withOutcome(CrownCourtOutcome.CONVICTED)
+                .withOutcomeDate(SENTENCE_ORDER_DATETIME);
     }
 
     public static ApiCrownCourtOutcome getApiCrownCourtOutcome(CrownCourtOutcome crownCourtOutcome) {
@@ -269,6 +280,12 @@ public class TestModelDataBuilder {
                 .withModifiedDateTime(DATE_MODIFIED_DATETIME)
                 .withCrownRepOrderDecision(REP_ORDER_DECISION_GRANTED.toString())
                 .withCrownRepOrderType(CC_REP_TYPE_THROUGH_ORDER.toString());
+    }
+
+    public static ApiUpdateCrownCourtResponse getApiUpdateCrownCourtResponse() {
+        return new ApiUpdateCrownCourtResponse()
+                .withModifiedDateTime(DATE_MODIFIED_DATETIME)
+                .withCrownCourtSummary(getApiCrownCourtSummary());
     }
 
     public static ApplicationDTO getApplicationDTOWithBlankHardship(CourtType courtType) {
@@ -503,8 +520,10 @@ public class TestModelDataBuilder {
                 .ccRepType(CC_REP_TYPE_THROUGH_ORDER)
                 .ccRepOrderDate(Date.from(CC_REP_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .sentenceOrderDate(Date.from(SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .ccWithDrawalDate(Date.from(CC_WITHDRAWAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .repOrderDecision(REP_ORDER_DECISION_GRANTED)
                 .inPrisoned(Boolean.TRUE)
+                .benchWarrantyIssued(Boolean.TRUE)
                 .evidenceProvisionFee(getEvidenceFeeDTO())
                 .outcomeDTOs(List.of(getOutcomeDTO(CourtType.CROWN_COURT)))
                 .build();

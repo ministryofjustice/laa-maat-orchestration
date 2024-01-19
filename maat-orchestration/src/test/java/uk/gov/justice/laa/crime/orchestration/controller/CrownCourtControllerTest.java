@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +15,14 @@ import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.CrownCourtOrchestrationService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.justice.laa.crime.orchestration.util.RequestBuilderUtils.buildRequestGivenContent;
+import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionIdGivenContent;
 
 @WebMvcTest(CrownCourtController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -38,44 +40,43 @@ class CrownCourtControllerTest {
 
     private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/crown-court";
 
-    @Test
-    void givenValidRequest_whenUpdateIsInvoked_thenOkResponseIsReturned() throws Exception {
-        String requestBody = objectMapper.writeValueAsString(
+    private String buildRequestBody() throws JsonProcessingException {
+        return objectMapper.writeValueAsString(
                 WorkflowRequest.builder()
+                        .userDTO(UserDTO.builder().build())
                         .applicationDTO(
                                 ApplicationDTO.builder()
                                         .build()
                         ).build()
         );
+    }
+
+    @Test
+    void givenValidRequest_whenUpdateIsInvoked_thenOkResponseIsReturned() throws Exception {
+        String requestBody = buildRequestBody();
 
         when(orchestrationService.update(any(WorkflowRequest.class)))
                 .thenReturn(new ApplicationDTO());
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
     void givenInvalidRequest_whenUpdateIsInvoked_thenBadRequestResponseIsReturned() throws Exception {
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, "", ENDPOINT_URL))
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, "", ENDPOINT_URL, true))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void givenWebClientFailure_whenUpdateIsInvoked_thenInternalServerErrorResponseIsReturned() throws Exception {
-        String requestBody = objectMapper.writeValueAsString(
-                WorkflowRequest.builder()
-                        .applicationDTO(
-                                ApplicationDTO.builder()
-                                        .build()
-                        ).build()
-        );
+        String requestBody = buildRequestBody();
 
         when(orchestrationService.update(any(WorkflowRequest.class)))
                 .thenThrow(new APIClientException());
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isInternalServerError());
     }
 }

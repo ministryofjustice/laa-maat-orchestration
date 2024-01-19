@@ -30,6 +30,7 @@ class ContributionServiceTest {
 
     @Mock
     private ContributionApiService contributionApiService;
+
     @Mock
     private MaatCourtDataService maatCourtDataService;
 
@@ -56,31 +57,31 @@ class ContributionServiceTest {
     }
 
     @Test
-    void givenApplicationDTOWithNoAssessment_whenIsCalculateContributionReqdIsCalled_thenFalseIsReturned() {
+    void givenApplicationDTOWithNoAssessment_whenIsRecalculationRequiredIsInvoked_thenFalseIsReturned() {
         ApplicationDTO applicationDTO = ApplicationDTO.builder().build();
-        assertThat(contributionService.isCalculateContributionReqd(applicationDTO)).isFalse();
+        assertThat(contributionService.isRecalculationRequired(applicationDTO)).isFalse();
     }
 
     @Test
-    void givenApplicationDTOWithNoFinancialAssessment_whenIsCalculateContributionReqdIsCalled_thenFalseIsReturned() {
+    void givenApplicationDTOWithNoFinancialAssessment_whenIsRecalculationRequiredIsInvoked_thenFalseIsReturned() {
         ApplicationDTO applicationDTO = ApplicationDTO.builder()
                 .assessmentDTO(AssessmentDTO.builder().build())
                 .build();
-        assertThat(contributionService.isCalculateContributionReqd(applicationDTO)).isFalse();
+        assertThat(contributionService.isRecalculationRequired(applicationDTO)).isFalse();
     }
 
     @Test
-    void givenApplicationDTOWithNoInitialAssessment_whenIsCalculateContributionReqdIsCalled_thenFalseIsReturned() {
+    void givenApplicationDTOWithNoInitialAssessment_whenIsRecalculationRequiredIsInvoked_thenFalseIsReturned() {
         ApplicationDTO applicationDTO = ApplicationDTO.builder()
                 .assessmentDTO(AssessmentDTO.builder()
                         .financialAssessmentDTO(FinancialAssessmentDTO.builder().build())
                         .build())
                 .build();
-        assertThat(contributionService.isCalculateContributionReqd(applicationDTO)).isFalse();
+        assertThat(contributionService.isRecalculationRequired(applicationDTO)).isFalse();
     }
 
     @Test
-    void givenApplicationDTOWithInProgressInitialAssessment_whenIsCalculateContributionReqdIsCalled_thenFalseIsReturned() {
+    void givenApplicationDTOWithInProgressInitialAssessment_whenIsRecalculationRequiredIsInvoked_thenFalseIsReturned() {
         ApplicationDTO applicationDTO = ApplicationDTO.builder()
                 .assessmentDTO(AssessmentDTO.builder()
                         .financialAssessmentDTO(FinancialAssessmentDTO.builder()
@@ -92,11 +93,11 @@ class ContributionServiceTest {
                                 .build())
                         .build())
                 .build();
-        assertThat(contributionService.isCalculateContributionReqd(applicationDTO)).isFalse();
+        assertThat(contributionService.isRecalculationRequired(applicationDTO)).isFalse();
     }
 
     @Test
-    void givenApplicationDTOWithInProgressFullAndPassedInitAssessment_whenIsCalculateContributionReqdIsCalled_thenTrueIsReturned() {
+    void givenApplicationDTOWithInProgressFullAndPassedInitAssessment_whenIsRecalculationRequiredIsInvoked_thenTrueIsReturned() {
         ApplicationDTO applicationDTO = ApplicationDTO.builder()
                 .assessmentDTO(AssessmentDTO.builder()
                         .financialAssessmentDTO(FinancialAssessmentDTO.builder()
@@ -114,11 +115,11 @@ class ContributionServiceTest {
                                 .build())
                         .build())
                 .build();
-        assertThat(contributionService.isCalculateContributionReqd(applicationDTO)).isTrue();
+        assertThat(contributionService.isRecalculationRequired(applicationDTO)).isTrue();
     }
 
     @Test
-    void givenAppealCC_whenIsCalculateContributionReqdIsCalled_thenTrueIsReturned() {
+    void givenAppealCC_whenIsRecalculationRequiredIsInvoked_thenTrueIsReturned() {
         ApplicationDTO applicationDTO = ApplicationDTO.builder()
                 .caseDetailsDTO(CaseDetailDTO.builder()
                         .caseType(CaseType.APPEAL_CC.getCaseType())
@@ -134,11 +135,11 @@ class ContributionServiceTest {
                                 .build())
                         .build())
                 .build();
-        assertThat(contributionService.isCalculateContributionReqd(applicationDTO)).isTrue();
+        assertThat(contributionService.isRecalculationRequired(applicationDTO)).isTrue();
     }
 
     @Test
-    void givenApplicationDTOWithInProgressPassported_whenIsCalculateContributionReqdIsCalled_thenFalseIsReturned() {
+    void givenApplicationDTOWithInProgressPassported_whenIsRecalculationRequiredIsInvoked_thenFalseIsReturned() {
         ApplicationDTO applicationDTO = ApplicationDTO.builder()
                 .passportedDTO(PassportedDTO.builder()
                         .assessementStatusDTO(AssessmentStatusDTO.builder()
@@ -146,11 +147,11 @@ class ContributionServiceTest {
                                 .build())
                         .build())
                 .build();
-        assertThat(contributionService.isCalculateContributionReqd(applicationDTO)).isFalse();
+        assertThat(contributionService.isRecalculationRequired(applicationDTO)).isFalse();
     }
 
     @Test
-    void givenInitialAssessmentWithNoStatus_whenIsCalculateContributionReqdIsCalled_thenFalseIsReturned() {
+    void givenInitialAssessmentWithNoStatus_whenIsRecalculationRequiredIsInvoked_thenFalseIsReturned() {
         ApplicationDTO applicationDTO = ApplicationDTO.builder()
                 .assessmentDTO(AssessmentDTO.builder()
                         .financialAssessmentDTO(FinancialAssessmentDTO.builder()
@@ -158,6 +159,6 @@ class ContributionServiceTest {
                                 .build())
                         .build())
                 .build();
-        assertThat(contributionService.isCalculateContributionReqd(applicationDTO)).isFalse();
+        assertThat(contributionService.isRecalculationRequired(applicationDTO)).isFalse();
     }
 }
