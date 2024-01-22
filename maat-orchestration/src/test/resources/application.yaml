@@ -71,7 +71,7 @@ services:
   cma-api:
     base-url: http://localhost:${wiremock.server.port}
     endpoints:
-      find-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means/{financialAssessmentId}/applicantId/{applicantId}
+      find-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means/{financialAssessmentId}
       create-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means
       update-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means
   maat-api:
