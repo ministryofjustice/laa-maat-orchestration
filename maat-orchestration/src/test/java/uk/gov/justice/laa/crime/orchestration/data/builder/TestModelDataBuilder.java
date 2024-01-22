@@ -23,7 +23,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,12 +44,12 @@ public class TestModelDataBuilder {
     private static final SysGenString CC_REP_TYPE_THROUGH_ORDER = new SysGenString("Through Order");
     private static final LocalDateTime CC_REP_ORDER_DATETIME = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
     private static final LocalDateTime CC_WITHDRAWAL_DATETIME = LocalDateTime.of(2022, 10, 14, 0, 0, 0);
-    private static final LocalDateTime SENTENCE_ORDER_DATETIME = CC_REP_ORDER_DATETIME.plus(1, ChronoUnit.DAYS);
+    private static final LocalDateTime SENTENCE_ORDER_DATETIME = CC_REP_ORDER_DATETIME.plusDays(1);
     private static final LocalDateTime DATETIME_RECEIVED = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
     private static final Date ASSESSMENT_DATE =
-            Date.from(DATETIME_RECEIVED.plus(2, ChronoUnit.DAYS).toInstant(ZoneOffset.UTC));
-    private static final LocalDateTime COMMITAL_DATETIME = DATETIME_RECEIVED.plus(1, ChronoUnit.DAYS);
-    private static final LocalDateTime DECISION_DATETIME = COMMITAL_DATETIME.plus(1, ChronoUnit.DAYS);
+            Date.from(DATETIME_RECEIVED.plusDays(2).toInstant(ZoneOffset.UTC));
+    private static final LocalDateTime COMMITAL_DATETIME = DATETIME_RECEIVED.plusDays(1);
+    private static final LocalDateTime DECISION_DATETIME = COMMITAL_DATETIME.plusDays(1);
     private static final SysGenString CONTRIBUTION_BASED_ON = new SysGenString("Means");
     private static final LocalDateTime CONTRIBUTION_CALCULATION_DATETIME = LocalDateTime.of(2022, 10, 5, 0, 0, 0);
     private static final Date CONTRIBUTION_CALCULATION_DATE =
@@ -459,7 +458,7 @@ public class TestModelDataBuilder {
                 .repOrderDecision(getRepOrderDecisionDTO())
                 .partnerContraryInterestDTO(getContraryInterestDTO())
                 .iojResult(RESULT_PASS)
-                .assessmentSummary(Collections.EMPTY_LIST)
+                .assessmentSummary(Collections.emptyList())
                 .build();
     }
 
