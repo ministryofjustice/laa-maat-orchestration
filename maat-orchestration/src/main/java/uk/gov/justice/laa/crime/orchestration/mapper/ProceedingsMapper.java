@@ -32,7 +32,6 @@ public class ProceedingsMapper extends CrownCourtMapper {
                 .withDecisionDate(DateUtil.toLocalDateTime(application.getDecisionDate()))
                 .withCommittalDate(DateUtil.toLocalDateTime(application.getCommittalDate()))
                 .withDateReceived(DateUtil.toLocalDateTime(application.getDateReceived()))
-                .withCrownCourtSummary(applicationDtoToCrownCourtSummary(application))
                 .withIojAppeal(
                         new ApiIOJAppeal()
                                 .withDecisionResult(
@@ -66,6 +65,8 @@ public class ProceedingsMapper extends CrownCourtMapper {
         ccpCrownCourtSummary.setSentenceOrderDate(DateUtil.toLocalDateTime(crownCourtSummary.getSentenceOrderDate()));
         ccpCrownCourtSummary.setRepId(NumberUtils.toInteger(crownCourtSummary.getCcRepId()));
         ccpCrownCourtSummary.setWithdrawalDate(DateUtil.toLocalDateTime(crownCourtSummary.getCcWithDrawalDate()));
+        ccpCrownCourtSummary.setIsImprisoned(crownCourtSummary.getInPrisoned());
+        ccpCrownCourtSummary.setIsWarrantIssued(crownCourtSummary.getBenchWarrantyIssued());
 
         if (null != crownCourtSummary.getEvidenceProvisionFee()) {
             ccpCrownCourtSummary.setEvidenceFeeLevel(crownCourtSummary.getEvidenceProvisionFee().getFeeLevel());
@@ -74,6 +75,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         if (null != crownCourtSummary.getOutcomeDTOs()) {
             ccpCrownCourtSummary.setCrownCourtOutcome(crownCourtSummaryDtoToCrownCourtOutcomes(crownCourtSummary));
         }
+
         return ccpCrownCourtSummary;
     }
 
@@ -135,18 +137,6 @@ public class ProceedingsMapper extends CrownCourtMapper {
         return assessment;
     }
 
-    private ApiCrownCourtSummary applicationDtoToCrownCourtSummary(ApplicationDTO application) {
-        CrownCourtSummaryDTO crownCourtSummary = application.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO();
-        return new ApiCrownCourtSummary()
-                .withRepId(NumberUtils.toInteger(crownCourtSummary.getCcRepId()))
-                .withRepOrderDecision(crownCourtSummary.getRepOrderDecision().getValue())
-                .withRepType(crownCourtSummary.getCcRepType().getValue())
-                .withRepOrderDate(DateUtil.toLocalDateTime(crownCourtSummary.getCcRepOrderDate()))
-                .withWithdrawalDate(DateUtil.toLocalDateTime(crownCourtSummary.getCcWithDrawalDate()))
-                .withSentenceOrderDate(DateUtil.toLocalDateTime(crownCourtSummary.getSentenceOrderDate()))
-                .withEvidenceFeeLevel(crownCourtSummary.getEvidenceProvisionFee().getFeeLevel());
-    }
-
     public ApplicationDTO updateApplicationResponseToApplicationDto(ApiUpdateApplicationResponse response,
                                                                     ApplicationDTO application) {
 
@@ -163,7 +153,9 @@ public class ProceedingsMapper extends CrownCourtMapper {
                                                                    ApplicationDTO application) {
 
         application.setTimestamp(Timestamp.valueOf(response.getModifiedDateTime()));
-        apiCrownCourtSummaryToCrownCourtSummaryDto(response.getCrownCourtSummary());
+        application.getCrownCourtOverviewDTO().setCrownCourtSummaryDTO(
+                apiCrownCourtSummaryToCrownCourtSummaryDto(response.getCrownCourtSummary())
+        );
         return application;
     }
 
