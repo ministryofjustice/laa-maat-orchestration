@@ -10,6 +10,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationResponse;
+import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateCrownCourtResponse;
 import uk.gov.justice.laa.crime.orchestration.service.api.ProceedingsApiService;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -41,6 +42,22 @@ class ProceedingsServiceTest {
         verify(proceedingsMapper)
                 .updateApplicationResponseToApplicationDto(any(ApiUpdateApplicationResponse.class),
                                                            any(ApplicationDTO.class)
+                );
+    }
+
+    @Test
+    void givenWorkflowRequest_whenUpdateCrownCourtIsInvoked_thenApiServiceIsCalledAndApplicationUpdated() {
+        when(proceedingsMapper.workflowRequestToUpdateApplicationRequest(any(WorkflowRequest.class)))
+                .thenReturn(new ApiUpdateApplicationRequest());
+
+        when(proceedingsApiService.updateCrownCourt(any(ApiUpdateApplicationRequest.class)))
+                .thenReturn(new ApiUpdateCrownCourtResponse());
+
+        proceedingsService.updateCrownCourt(WorkflowRequest.builder().applicationDTO(new ApplicationDTO()).build());
+
+        verify(proceedingsMapper)
+                .updateCrownCourtResponseToApplicationDto(any(ApiUpdateCrownCourtResponse.class),
+                                                          any(ApplicationDTO.class)
                 );
     }
 }
