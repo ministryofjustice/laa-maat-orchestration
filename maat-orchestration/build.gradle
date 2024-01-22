@@ -18,7 +18,7 @@ java {
 def versions = [
 		pitest                  : "1.15.3",
 		springdocVersion        : "2.3.0",
-		crimeCommonsVersion     : "2.13.6",
+		crimeCommonsVersion     : "2.17.0",
 		wmStubRunnerVersion    	: "4.0.1"
 ]
 
