@@ -37,6 +37,8 @@ dependencies {
 	implementation "uk.gov.justice.service.laa-crime:crime-commons-spring-boot-starter-rest-client:$versions.crimeCommonsVersion"
 	implementation "uk.gov.justice.service.laa-crime:crime-commons-classes:$versions.crimeCommonsVersion"
 
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
 	implementation "io.micrometer:micrometer-registry-prometheus"
 	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$versions.springdocVersion"
 
@@ -70,9 +72,9 @@ jacocoTestReport {
 	afterEvaluate {
 		classDirectories.setFrom(files(classDirectories.files.collect {
 			fileTree(dir: it, exclude: [
-					"**/entity/**",
 					"**/dto/**",
-					"**/config/**"
+					"**/config/**",
+					"**/model/**"
 			])
 		}))
 	}
@@ -102,8 +104,8 @@ tasks.named("sonar") {
 
 sonar {
 	properties {
-		property "sonar.exclusions", "**/dto/**.java , **/config/**.java, **/enums/**.java, **/exception/**.java"
-		property "sonar.coverage.exclusions", "**/MAATOrchestrationApplication.java"
+		property "sonar.exclusions", "**/dto/**.java , **/model/**.java, **/config/**.java, **/enums/**.java, **/exception/**.java"
+		property "sonar.coverage.exclusions", "**/MAATOrchestrationApplication.java, **/model/**.java"
 		property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
 		property "sonar.projectKey", "ministryofjustice_laa-maat-orchestration"
 		property "sonar.organization", "ministryofjustice"

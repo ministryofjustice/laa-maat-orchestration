@@ -7,6 +7,8 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationResponse;
+import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateCrownCourtResponse;
+import uk.gov.justice.laa.crime.orchestration.service.api.ProceedingsApiService;
 
 @Slf4j
 @Service
@@ -20,9 +22,19 @@ public class ProceedingsService {
         ApiUpdateApplicationRequest apiUpdateApplicationRequest =
                 proceedingsMapper.workflowRequestToUpdateApplicationRequest(request);
         ApiUpdateApplicationResponse updateApplicationResponse =
-                proceedingsApiService.update(apiUpdateApplicationRequest);
+                proceedingsApiService.updateApplication(apiUpdateApplicationRequest);
         proceedingsMapper.updateApplicationResponseToApplicationDto(
                 updateApplicationResponse, request.getApplicationDTO()
+        );
+    }
+
+    public void updateCrownCourt(WorkflowRequest request) {
+        ApiUpdateApplicationRequest apiUpdateApplicationRequest =
+                proceedingsMapper.workflowRequestToUpdateApplicationRequest(request);
+        ApiUpdateCrownCourtResponse updateCrownCourtResponse =
+                proceedingsApiService.updateCrownCourt(apiUpdateApplicationRequest);
+        proceedingsMapper.updateCrownCourtResponseToApplicationDto(
+                updateCrownCourtResponse, request.getApplicationDTO()
         );
     }
 }

@@ -14,6 +14,7 @@ import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
+import uk.gov.justice.laa.crime.orchestration.service.api.HardshipApiService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -43,7 +44,7 @@ class HardshipServiceTest {
     void givenWorkflowRequest_whenCreateHardshipIsInvoked_thenRequestIsMappedAndApiServiceIsCalled() {
         when(hardshipMapper.workflowRequestToPerformHardshipRequest(any(WorkflowRequest.class)))
                 .thenReturn(TestModelDataBuilder.getApiPerformHardshipRequest());
-        hardshipService.createHardship(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
+        hardshipService.create(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         verify(hardshipApiService).create(any(ApiPerformHardshipRequest.class));
     }
 
@@ -53,7 +54,7 @@ class HardshipServiceTest {
                 .thenReturn(TestModelDataBuilder.getApiPerformHardshipRequest());
         when(hardshipApiService.update(any(ApiPerformHardshipRequest.class)))
                 .thenReturn(new ApiPerformHardshipResponse());
-        hardshipService.updateHardship(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
+        hardshipService.update(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         verify(hardshipApiService).update(any(ApiPerformHardshipRequest.class));
         verify(hardshipMapper).performHardshipResponseToApplicationDTO(any(ApiPerformHardshipResponse.class), any(ApplicationDTO.class));
     }
@@ -64,7 +65,7 @@ class HardshipServiceTest {
                 .thenReturn(TestModelDataBuilder.getApiPerformHardshipRequest());
         when(hardshipApiService.rollback(any(ApiPerformHardshipRequest.class)))
                 .thenReturn(new ApiPerformHardshipResponse());
-        hardshipService.rollbackHardship(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
+        hardshipService.rollback(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         verify(hardshipApiService).rollback(any(ApiPerformHardshipRequest.class));
     }
 }

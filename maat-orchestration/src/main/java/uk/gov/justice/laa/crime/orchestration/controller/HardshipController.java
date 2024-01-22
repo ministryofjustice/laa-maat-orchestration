@@ -16,7 +16,7 @@ import uk.gov.justice.laa.crime.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.service.HardshipOrchestrationService;
+import uk.gov.justice.laa.crime.orchestration.service.orchestration.HardshipOrchestrationService;
 
 import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_ID;
 

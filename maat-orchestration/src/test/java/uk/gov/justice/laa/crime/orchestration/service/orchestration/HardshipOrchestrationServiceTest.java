@@ -1,4 +1,4 @@
-package uk.gov.justice.laa.crime.orchestration.service;
+package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +13,9 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
+import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
+import uk.gov.justice.laa.crime.orchestration.service.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -54,7 +56,7 @@ class HardshipOrchestrationServiceTest {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(courtType);
 
         ApiPerformHardshipResponse performHardshipResponse = getApiPerformHardshipResponse();
-        when(hardshipService.createHardship(workflowRequest))
+        when(hardshipService.create(workflowRequest))
                 .thenReturn(performHardshipResponse);
 
         HardshipReviewDTO hardshipReviewDTO = HardshipReviewDTO.builder().build();
@@ -82,7 +84,9 @@ class HardshipOrchestrationServiceTest {
 
         WorkflowRequest workflowRequest = setupCreateStubs(CourtType.MAGISTRATE, CurrentStatus.COMPLETE);
 
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                                                        any(StoredProcedure.class)
+        ))
                 .thenReturn(workflowRequest.getApplicationDTO());
         when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
                 .thenReturn(false);
@@ -103,9 +107,11 @@ class HardshipOrchestrationServiceTest {
         ContributionsDTO contributionsDTO = getContributionsDTO();
         ApplicationDTO applicationDTO = getApplicationDTOWithHardship(CourtType.MAGISTRATE);
         applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
-        when(contributionService.calculateContribution(workflowRequest))
+        when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                                                        any(StoredProcedure.class)
+        ))
                 .thenReturn(applicationDTO);
         when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
                 .thenReturn(true);
@@ -131,10 +137,12 @@ class HardshipOrchestrationServiceTest {
         applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship()
                 .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
-        when(contributionService.calculateContribution(workflowRequest))
+        when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
 
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                                                        any(StoredProcedure.class)
+        ))
                 .thenReturn(applicationDTO);
 
         ApplicationDTO expected = orchestrationService.create(workflowRequest);
@@ -203,7 +211,7 @@ class HardshipOrchestrationServiceTest {
     void givenMagCourt_whenCreateIsInvokedAndExceptionThrownInCreateHardship_thenRollbackHardshipIsInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
         ApiPerformHardshipResponse performHardshipResponse = getApiPerformHardshipResponse();
-        when(hardshipService.createHardship(workflowRequest))
+        when(hardshipService.create(workflowRequest))
                 .thenReturn(performHardshipResponse);
 
         HardshipReviewDTO hardshipReviewDTO = getHardshipOverviewDTO(CourtType.MAGISTRATE).getMagCourtHardship();
@@ -215,18 +223,19 @@ class HardshipOrchestrationServiceTest {
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), eq(CourtType.MAGISTRATE)))
                 .thenReturn(getAssessmentSummaryDTO());
 
-        doThrow(new APIClientException()).when(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
+        doThrow(new APIClientException()).when(assessmentSummaryService)
+                .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(APIClientException.class);
-        Mockito.verify(hardshipService, times(1)).rollbackHardship(any());
+        Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
     @Test
     void givenMagCourt_whenCreateIsInvokedAndExceptionThrownInFind_thenRollbackHardshipIsInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
         ApiPerformHardshipResponse performHardshipResponse = getApiPerformHardshipResponse();
-        when(hardshipService.createHardship(workflowRequest))
+        when(hardshipService.create(workflowRequest))
                 .thenReturn(performHardshipResponse);
 
         HardshipReviewDTO hardshipReviewDTO = getHardshipOverviewDTO(CourtType.MAGISTRATE).getMagCourtHardship();
@@ -237,14 +246,14 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(APIClientException.class);
-        Mockito.verify(hardshipService, times(1)).rollbackHardship(any());
+        Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
     @Test
     void givenMagCourt_whenCreateIsInvokedAndExceptionThrownInGetSummary_thenRollbackHardshipIsInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
         ApiPerformHardshipResponse performHardshipResponse = getApiPerformHardshipResponse();
-        when(hardshipService.createHardship(workflowRequest))
+        when(hardshipService.create(workflowRequest))
                 .thenReturn(performHardshipResponse);
 
         HardshipReviewDTO hardshipReviewDTO = getHardshipOverviewDTO(CourtType.MAGISTRATE).getMagCourtHardship();
@@ -258,7 +267,7 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(APIClientException.class);
-        Mockito.verify(hardshipService, times(1)).rollbackHardship(any());
+        Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
     @Test
@@ -266,7 +275,9 @@ class HardshipOrchestrationServiceTest {
 
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
 
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                                                        any(StoredProcedure.class)
+        ))
                 .thenReturn(workflowRequest.getApplicationDTO());
         when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
                 .thenReturn(false);
@@ -284,9 +295,11 @@ class HardshipOrchestrationServiceTest {
         ContributionsDTO contributionsDTO = getContributionsDTO();
         ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
         applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
-        when(contributionService.calculateContribution(workflowRequest))
+        when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                                                        any(StoredProcedure.class)
+        ))
                 .thenReturn(applicationDTO);
         when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
                 .thenReturn(true);
@@ -309,10 +322,12 @@ class HardshipOrchestrationServiceTest {
         applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship()
                 .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
-        when(contributionService.calculateContribution(workflowRequest))
+        when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
 
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                                                        any(StoredProcedure.class)
+        ))
                 .thenReturn(applicationDTO);
 
         ApplicationDTO expected = orchestrationService.update(workflowRequest);
@@ -413,13 +428,15 @@ class HardshipOrchestrationServiceTest {
 
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship()
                 .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
-        when(contributionService.calculateContribution(workflowRequest))
+        when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class), any(), any()))
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                                                        any(StoredProcedure.class)
+        ))
                 .thenThrow(new APIClientException());
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(APIClientException.class);
-        Mockito.verify(hardshipService, times(1)).rollbackHardship(any());
+        Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
     @Test
@@ -432,11 +449,11 @@ class HardshipOrchestrationServiceTest {
 
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship()
                 .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
-        when(contributionService.calculateContribution(workflowRequest))
+        when(contributionService.calculate(workflowRequest))
                 .thenThrow(new APIClientException());
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(APIClientException.class);
-        Mockito.verify(hardshipService, times(1)).rollbackHardship(any());
+        Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
 }

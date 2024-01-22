@@ -35,7 +35,7 @@ public class AssessmentSummaryService {
                             assessmentSummaryDTO.setResult(summaryDTO.getResult());
                             assessmentSummaryDTO.setReviewType(summaryDTO.getReviewType());
                             assessmentSummaryDTO.setAssessmentDate(summaryDTO.getAssessmentDate());
-                        },() -> assessmentSummary.add(summaryDTO)
+                        }, () -> assessmentSummary.add(summaryDTO)
                 );
     }
 }

@@ -10,6 +10,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationResponse;
+import uk.gov.justice.laa.crime.orchestration.service.api.ProceedingsApiService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -32,7 +33,7 @@ class ProceedingsServiceTest {
         when(proceedingsMapper.workflowRequestToUpdateApplicationRequest(any(WorkflowRequest.class)))
                 .thenReturn(new ApiUpdateApplicationRequest());
 
-        when(proceedingsApiService.update(any(ApiUpdateApplicationRequest.class)))
+        when(proceedingsApiService.updateApplication(any(ApiUpdateApplicationRequest.class)))
                 .thenReturn(new ApiUpdateApplicationResponse());
 
         proceedingsService.updateApplication(WorkflowRequest.builder().applicationDTO(new ApplicationDTO()).build());
