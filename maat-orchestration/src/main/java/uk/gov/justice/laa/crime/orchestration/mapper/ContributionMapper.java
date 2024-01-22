@@ -2,16 +2,18 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.enums.*;
+import uk.gov.justice.laa.crime.orchestration.enums.AppealType;
+import uk.gov.justice.laa.crime.orchestration.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiAssessment;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.LastOutcome;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.orchestration.util.NumberUtils;
+import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -19,8 +21,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toDate;
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toLocalDateTime;
+import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
 
 @Component
 @RequiredArgsConstructor

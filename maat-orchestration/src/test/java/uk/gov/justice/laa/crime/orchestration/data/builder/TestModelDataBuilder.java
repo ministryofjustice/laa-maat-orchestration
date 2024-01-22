@@ -1,11 +1,11 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.enums.*;
+import uk.gov.justice.laa.crime.orchestration.enums.AppealType;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiUserSession;
@@ -23,12 +23,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.*;
+import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
 
 @Component
 public class TestModelDataBuilder {
@@ -89,6 +89,8 @@ public class TestModelDataBuilder {
             Date.from(Instant.ofEpochSecond(DATE_COMPLETED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
     private static final Integer HARDSHIP_DETAIL_ID = 12345;
     private static final Integer CMU_ID = 50;
+    private static final String OTHER_HOUSING_NOTES = "Other Housing Notes";
+    private static final String ASSESSMENT_NOTES = "ASSESSMENT NOTES";
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
         return new ApiFindHardshipResponse()
@@ -117,6 +119,7 @@ public class TestModelDataBuilder {
 
     public static ApiPerformHardshipResponse getApiPerformHardshipResponse() {
         return new ApiPerformHardshipResponse()
+                .withHardshipReviewId(Constants.HARDSHIP_REVIEW_ID)
                 .withReviewResult(HardshipReviewResult.PASS)
                 .withDisposableIncome(Constants.DISPOSABLE_INCOME)
                 .withHardshipReviewId(Constants.HARDSHIP_REVIEW_ID)
@@ -429,6 +432,7 @@ public class TestModelDataBuilder {
                 .decisionDate(Date.from(DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .applicantDTO(getApplicantDTO())
                 .assessmentDTO(getAssessmentDTO())
+                .caseManagementUnitDTO(getCaseManagementUnitDTO())
                 .crownCourtOverviewDTO(getCrownCourtOverviewDTOForContribution())
                 .caseDetailsDTO(getCaseDetailDTO())
                 .offenceDTO(getOffenceDTO())
@@ -436,13 +440,30 @@ public class TestModelDataBuilder {
                 .magsOutcomeDTO(getOutcomeDTO(CourtType.MAGISTRATE))
                 .passportedDTO(getPassportedDTO())
                 .repOrderDecision(getRepOrderDecisionDTO())
+                .partnerContraryInterestDTO(getContraryInterestDTO())
                 .iojResult(RESULT_PASS)
+                .assessmentSummary(Collections.EMPTY_LIST)
+                .build();
+    }
+
+    public static ChildWeightingDTO getChildWeightingDTO() {
+        return ChildWeightingDTO.builder()
+                .weightingId(37L)
+                .noOfChildren(1)
+                .build();
+    }
+
+    public static ContraryInterestDTO getContraryInterestDTO() {
+        return ContraryInterestDTO.builder()
+                .code("ContraryInterest")
+                .description("Contrary Interest")
                 .build();
     }
 
     public static ApplicantDTO getApplicantDTO() {
         return ApplicantDTO.builder()
                 .applicantHistoryId(APPLICANT_HISTORY_ID.longValue())
+                .employmentStatusDTO(getEmploymentStatusDTO())
                 .build();
     }
 
@@ -607,9 +628,11 @@ public class TestModelDataBuilder {
 
     public static FullAssessmentDTO getFullAssessmentDTO() {
         return FullAssessmentDTO.builder()
+                .assessmentNotes(ASSESSMENT_NOTES)
                 .assessmentDate(ASSESSMENT_DATE)
                 .result(RESULT_PASS)
                 .assessmnentStatusDTO(getAssessmentStatusDTO())
+                .otherHousingNote(OTHER_HOUSING_NOTES)
                 .build();
     }
 
@@ -617,9 +640,15 @@ public class TestModelDataBuilder {
         return InitialAssessmentDTO.builder()
                 .result(RESULT_FAIL)
                 .newWorkReason(getNewWorkReasonDTO())
+                .reviewType(getReviewTypeDTO())
                 .assessmnentStatusDTO(getAssessmentStatusDTO())
+                .totalAggregatedIncome(TOTAL_AGGREGATED_INCOME.doubleValue())
+                .sectionSummaries(List.of(getSectionSummaryDTO()))
+                .childWeightings(List.of(getChildWeightingDTO()))
                 .build();
     }
+
+
 
     private static CaseManagementUnitDTO getCaseManagementUnitDTO() {
         return CaseManagementUnitDTO.builder()
@@ -669,7 +698,6 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    @NotNull
     private static List<HRProgressDTO> getHrProgressDTOs() {
         return List.of(
                 HRProgressDTO.builder()
@@ -727,13 +755,13 @@ public class TestModelDataBuilder {
 
     public static IncomeEvidenceSummaryDTO getIncomeEvidenceSummaryDTO() {
         return IncomeEvidenceSummaryDTO.builder()
-                .upliftAppliedDate(new Date(2023, 11, 18))
-                .upliftRemovedDate(new Date(2023, 11, 18))
+                .upliftAppliedDate(toDate(LocalDateTime.of(2023, 11, 18, 0, 0, 0)))
+                .upliftRemovedDate(toDate(LocalDateTime.of(2023, 11, 18, 0, 0, 0)))
                 .incomeEvidenceNotes("Income Evidence Notes")
                 .applicantIncomeEvidenceList(List.of(getEvidenceDTO()))
                 .partnerIncomeEvidenceList(List.of(getEvidenceDTO()))
-                .evidenceReceivedDate(new Date(2023, 02, 18))
-                .evidenceDueDate(new Date(2023, 03, 18))
+                .evidenceReceivedDate(toDate(LocalDateTime.of(2023, 2, 18, 0, 0, 0)))
+                .evidenceDueDate(toDate(LocalDateTime.of(2023, 3, 18, 0, 0, 0)))
                 .upliftsAvailable(true)
                 .build();
     }
@@ -742,7 +770,7 @@ public class TestModelDataBuilder {
         return EvidenceDTO.builder()
                 .id(EVIDENCE_ID.longValue())
                 .evidenceTypeDTO(getEvidenceTypeDTO())
-                .dateReceived(new Date(2023, 11, 18))
+                .dateReceived(toDate(LocalDateTime.of(2023, 11, 18, 0, 0, 0)))
                 .otherDescription("OTHER DESCRIPTION")
                 .selected(true)
                 .build();
@@ -758,8 +786,8 @@ public class TestModelDataBuilder {
     private static AppealDTO getAppealDTO() {
         return AppealDTO.builder()
                 .available(true)
-                .appealReceivedDate(new Date(2023, 03, 18))
-                .appealSentenceOrderDate(new Date(2023, 8, 3))
+                .appealReceivedDate(toDate(LocalDateTime.of(2023, 3, 18, 0, 0, 0)))
+                .appealSentenceOrderDate(toDate(LocalDateTime.of(2023, 8, 3, 0, 0, 0)))
                 .appealTypeDTO(getAppealTypeDTO())
                 .build();
     }
@@ -805,7 +833,7 @@ public class TestModelDataBuilder {
     private static OffenceDTO getOffenceDTO() {
         return OffenceDTO.builder()
                 .offenceType("Offence Type")
-                .contributionCap(Double.valueOf(100))
+                .contributionCap(100.0)
                 .build();
     }
 
@@ -835,7 +863,7 @@ public class TestModelDataBuilder {
                                                 .frequency(FrequenciesDTO.builder()
                                                         .code(Frequency.ANNUALLY.getCode())
                                                         .annualWeighting(
-                                                                (long) Frequency.ANNUALLY.getAnnualWeighting())
+                                                                (long) Frequency.ANNUALLY.getWeighting())
                                                         .description(Frequency.ANNUALLY.getDescription())
                                                         .build())
                                                 .amountNumber(BigDecimal.valueOf(2000.00))
@@ -871,7 +899,7 @@ public class TestModelDataBuilder {
                                                 .frequency(FrequenciesDTO.builder()
                                                         .code(Frequency.MONTHLY.getCode())
                                                         .annualWeighting(
-                                                                (long) Frequency.MONTHLY.getAnnualWeighting())
+                                                                (long) Frequency.MONTHLY.getWeighting())
                                                         .description(Frequency.MONTHLY.getDescription())
                                                         .build())
                                                 .amountNumber(BigDecimal.valueOf(1500.00))
@@ -887,9 +915,59 @@ public class TestModelDataBuilder {
 
     public static AssessmentStatusDTO getAssessmentStatusDTO(CurrentStatus status) {
         return AssessmentStatusDTO.builder()
-                .status(status.getValue())
+                .status(status.getStatus())
                 .description(status.getDescription())
                 .build();
     }
 
+    public static EmploymentStatusDTO getEmploymentStatusDTO() {
+        return EmploymentStatusDTO.builder()
+                .code("EMPLOY")
+                .description("Employed")
+                .build();
+    }
+
+    public static ApplicationDTO getApplicationDTOForMeansAssessmentMapper(Boolean isFullAssessmentAvailable) {
+        ApplicationDTO applicationDTO = new ApplicationDTO();
+        AssessmentDTO assessmentDTO = new AssessmentDTO();
+        FinancialAssessmentDTO financialAssessmentDTO = getFinancialAssessmentDTOForMeansAssessmentMapper(isFullAssessmentAvailable);
+        assessmentDTO.setFinancialAssessmentDTO(financialAssessmentDTO);
+        applicationDTO.setAssessmentDTO(assessmentDTO);
+        return applicationDTO;
+    }
+
+    private static FinancialAssessmentDTO getFinancialAssessmentDTOForMeansAssessmentMapper(Boolean isFullAssessmentAvailable) {
+        FinancialAssessmentDTO financialAssessmentDTO = new FinancialAssessmentDTO();
+        InitialAssessmentDTO initialAssessmentDTO = getInitialAssessmentDTOForMeansAssessmentMapper();
+        FullAssessmentDTO fullAssessmentDTO = getFullAssessmentDTOForMeansAssessmentMapper();
+        financialAssessmentDTO.setInitial(initialAssessmentDTO);
+        financialAssessmentDTO.setFull(fullAssessmentDTO);
+        financialAssessmentDTO.setFullAvailable(isFullAssessmentAvailable);
+        return financialAssessmentDTO;
+    }
+
+    private static FullAssessmentDTO getFullAssessmentDTOForMeansAssessmentMapper() {
+        FullAssessmentDTO fullAssessmentDTO = getFullAssessmentDTO();
+        fullAssessmentDTO.setSectionSummaries(List.of(getAssessmentSectionSummaryDTOForMeansAssessmentMapper()));
+        return fullAssessmentDTO;
+    }
+
+    private static InitialAssessmentDTO getInitialAssessmentDTOForMeansAssessmentMapper() {
+        InitialAssessmentDTO initialAssessmentDTO = new InitialAssessmentDTO();
+        initialAssessmentDTO.setReviewType(new ReviewTypeDTO());
+        initialAssessmentDTO.setSectionSummaries(List.of(getAssessmentSectionSummaryDTOForMeansAssessmentMapper()));
+        ChildWeightingDTO childWeightingDTO = new ChildWeightingDTO();
+        childWeightingDTO.setWeightingId(37L);
+        initialAssessmentDTO.setChildWeightings(List.of(childWeightingDTO));
+        return initialAssessmentDTO;
+    }
+
+    private static AssessmentSectionSummaryDTO getAssessmentSectionSummaryDTOForMeansAssessmentMapper() {
+        AssessmentSectionSummaryDTO assessmentSectionSummaryDTO = new AssessmentSectionSummaryDTO();
+        assessmentSectionSummaryDTO.setSection(SECTION);
+        AssessmentDetailDTO assessmentDetailDTO = new AssessmentDetailDTO();
+        assessmentDetailDTO.setCriteriaDetailsId(CRITERIA_DETAIL_ID.longValue());
+        assessmentSectionSummaryDTO.setAssessmentDetail(List.of(assessmentDetailDTO));
+        return assessmentSectionSummaryDTO;
+    }
 }

@@ -3,9 +3,9 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.OutcomeDTO;
-import uk.gov.justice.laa.crime.orchestration.enums.CrownCourtOutcome;
+import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOutcome;
-import uk.gov.justice.laa.crime.orchestration.util.DateUtil;
+import uk.gov.justice.laa.crime.util.DateUtil;
 
 import java.util.Collection;
 import java.util.List;

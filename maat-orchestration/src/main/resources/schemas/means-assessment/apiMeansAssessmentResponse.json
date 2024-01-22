@@ -57,7 +57,7 @@
     "assessmentType": {
       "description": "Type of as Assessment - Initial, full etc.",
       "type": "object",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.AssessmentType"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.AssessmentType"
     },
     "initResult": {
       "type": "string",
@@ -74,7 +74,7 @@
     },
     "fassInitStatus": {
       "description": "Assessment Status",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.CurrentStatus"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.CurrentStatus"
     },
     "fullResult": {
       "type": "string",
@@ -91,7 +91,7 @@
     },
     "fassFullStatus": {
       "description": "Assessment Status",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.CurrentStatus"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.CurrentStatus"
     },
     "assessmentSectionSummary": {
       "description": "Assessment section summary",
@@ -122,7 +122,7 @@
     },
     "reviewType": {
       "description": "Review Type Info",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.ReviewType"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.ReviewType"
     },
     "updated": {
       "type": "string",

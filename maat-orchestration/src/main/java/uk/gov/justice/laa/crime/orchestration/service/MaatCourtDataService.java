@@ -11,7 +11,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 @Service
 @RequiredArgsConstructor
 public class MaatCourtDataService {
-    MaatCourtDataApiService maatCourtDataApiService;
+    private final MaatCourtDataApiService maatCourtDataApiService;
 
     ApplicationDTO invokeStoredProcedure(ApplicationDTO application, UserDTO user, String packageName, String procedureName) {
         return maatCourtDataApiService.executeStoredProcedure(StoredProcedureRequest.builder()

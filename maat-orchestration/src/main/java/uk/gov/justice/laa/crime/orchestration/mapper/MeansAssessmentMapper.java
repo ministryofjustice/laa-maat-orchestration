@@ -3,13 +3,13 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.enums.*;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOverview;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.*;
-import uk.gov.justice.laa.crime.orchestration.util.NumberUtils;
+import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -19,9 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toDate;
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toLocalDateTime;
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toTimeStamp;
+import static uk.gov.justice.laa.crime.util.DateUtil.*;
 
 @Component
 @RequiredArgsConstructor
@@ -395,7 +393,7 @@ public class MeansAssessmentMapper {
         FrequenciesDTO frequenciesDTO = new FrequenciesDTO();
         if (frequency != null) {
             frequenciesDTO.setDescription(frequency.getDescription());
-            frequenciesDTO.setAnnualWeighting((long) frequency.getAnnualWeighting());
+            frequenciesDTO.setAnnualWeighting((long) frequency.getWeighting());
             frequenciesDTO.setCode(frequency.getCode());
         }
         return frequenciesDTO;

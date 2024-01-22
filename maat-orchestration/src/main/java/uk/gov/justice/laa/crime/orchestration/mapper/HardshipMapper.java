@@ -2,14 +2,13 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.enums.*;
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipDetail;
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipProgress;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
-import uk.gov.justice.laa.crime.orchestration.util.DateUtil;
-import uk.gov.justice.laa.crime.orchestration.util.NumberUtils;
+import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -20,7 +19,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -45,7 +45,7 @@ public class HardshipMapper {
         HardshipReview hardship = new HardshipReview()
                 .withCourtType(courtType)
                 .withTotalAnnualDisposableIncome(current.getDisposableIncome())
-                .withReviewDate(DateUtil.toLocalDateTime(current.getReviewDate()))
+                .withReviewDate(toLocalDateTime(current.getReviewDate()))
                 .withExtraExpenditure(hrSectionDtosToExtraExpenditures(current.getSection()))
                 .withDeniedIncome(hrSectionDtosToDeniedIncomes(current.getSection()))
                 .withSolicitorCosts(hrSolicitorCostsDtoToSolicitorCosts(current.getSolictorsCosts()));
@@ -100,7 +100,7 @@ public class HardshipMapper {
                     .withRate(solicitorsCosts.getSolicitorRate())
                     // Converting from double to BigDecimal, truncate to 1 decimal place
                     .withHours(BigDecimal.valueOf(solicitorsCosts.getSolicitorHours())
-                                       .setScale(1, RoundingMode.DOWN))
+                            .setScale(1, RoundingMode.DOWN))
                     .withDisbursements(solicitorsCosts.getSolicitorDisb())
                     .withEstimatedTotal(solicitorsCosts.getSolicitorEstimatedTotalCost());
         }
@@ -116,9 +116,9 @@ public class HardshipMapper {
                         .withResponse(HardshipReviewProgressResponse.getFrom(
                                 item.getProgressResponse().getResponse())
                         )
-                        .withDateTaken(DateUtil.toLocalDateTime(item.getDateRequested()))
-                        .withDateCompleted(DateUtil.toLocalDateTime(item.getDateCompleted()))
-                        .withDateRequired(DateUtil.toLocalDateTime(item.getDateRequired()))
+                        .withDateTaken(toLocalDateTime(item.getDateRequested()))
+                        .withDateCompleted(toLocalDateTime(item.getDateCompleted()))
+                        .withDateRequired(toLocalDateTime(item.getDateRequired()))
                 ).collect(Collectors.toList());
     }
 
@@ -174,28 +174,28 @@ public class HardshipMapper {
                         HRSectionDTO.builder()
                                 .detailType(hardshipReviewDetailTypeToHrDetailTypeDto(type))
                                 .detail(details.stream()
-                                                .map(apiHardshipDetail ->
-                                                             HRDetailDTO.builder()
-                                                                     .dateDue(toDate(apiHardshipDetail.getDateDue()))
-                                                                     .id(apiHardshipDetail.getId().longValue())
-                                                                     .accepted("Y".equals(
-                                                                             apiHardshipDetail.getAccepted()))
-                                                                     .amountNumber(apiHardshipDetail.getAmount())
-                                                                     .hrReasonNote(apiHardshipDetail.getReasonNote())
-                                                                     .otherDescription(
-                                                                             apiHardshipDetail.getOtherDescription())
-                                                                     .detailDescription(
-                                                                             hardshipReviewDetailCodeToHrDetailDescriptionDto(
-                                                                                     apiHardshipDetail.getDetailCode())
-                                                                     )
-                                                                     .frequency(frequencyToFrequenciesDto(
-                                                                             apiHardshipDetail.getFrequency())
-                                                                     )
-                                                                     .reason(hardshipReviewDetailReasonToHrReasonDto(
-                                                                             apiHardshipDetail.getDetailReason()))
-                                                                     .build()
-                                                )
-                                                .collect(Collectors.toList()))
+                                        .map(apiHardshipDetail ->
+                                                HRDetailDTO.builder()
+                                                        .dateDue(toDate(apiHardshipDetail.getDateDue()))
+                                                        .id(apiHardshipDetail.getId().longValue())
+                                                        .accepted("Y".equals(
+                                                                apiHardshipDetail.getAccepted()))
+                                                        .amountNumber(apiHardshipDetail.getAmount())
+                                                        .hrReasonNote(apiHardshipDetail.getReasonNote())
+                                                        .otherDescription(
+                                                                apiHardshipDetail.getOtherDescription())
+                                                        .detailDescription(
+                                                                hardshipReviewDetailCodeToHrDetailDescriptionDto(
+                                                                        apiHardshipDetail.getDetailCode())
+                                                        )
+                                                        .frequency(frequencyToFrequenciesDto(
+                                                                apiHardshipDetail.getFrequency())
+                                                        )
+                                                        .reason(hardshipReviewDetailReasonToHrReasonDto(
+                                                                apiHardshipDetail.getDetailReason()))
+                                                        .build()
+                                        )
+                                        .collect(Collectors.toList()))
                                 .build()));
         return hrSectionDTOList;
     }
@@ -214,7 +214,7 @@ public class HardshipMapper {
         return FrequenciesDTO.builder()
                 .code(frequency.getCode())
                 .description(frequency.getDescription())
-                .annualWeighting((long) frequency.getAnnualWeighting())
+                .annualWeighting((long) frequency.getWeighting())
                 .build();
     }
 

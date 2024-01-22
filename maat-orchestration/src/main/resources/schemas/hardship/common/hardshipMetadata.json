@@ -16,7 +16,7 @@
     "reviewStatus": {
       "description": "The review status",
       "type": "object",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.HardshipReviewStatus"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.HardshipReviewStatus"
     },
     "userSession": {
       "type": "object",
@@ -26,7 +26,7 @@
     "reviewReason": {
       "description": "The review reason",
       "type": "object",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.NewWorkReason"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.NewWorkReason"
     },
     "notes": {
       "type": "string",

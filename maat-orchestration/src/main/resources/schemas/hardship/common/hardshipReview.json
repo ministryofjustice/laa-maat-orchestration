@@ -9,7 +9,7 @@
     "courtType": {
       "description": "The Court Type",
       "type": "object",
-      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.CourtType"
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.CourtType"
     },
     "totalAnnualDisposableIncome": {
       "type": "number",

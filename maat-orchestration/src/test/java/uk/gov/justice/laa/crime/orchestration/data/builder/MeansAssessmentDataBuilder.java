@@ -1,11 +1,12 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.enums.*;
+import uk.gov.justice.laa.crime.orchestration.enums.AppealType;
+import uk.gov.justice.laa.crime.orchestration.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOverview;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiUserSession;
@@ -19,8 +20,9 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toDate;
-import static uk.gov.justice.laa.crime.orchestration.util.DateUtil.toTimeStamp;
+import static uk.gov.justice.laa.crime.orchestration.data.Constants.FINANCIAL_ASSESSMENT_ID;
+import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.util.DateUtil.toTimeStamp;
 
 @Component
 public class MeansAssessmentDataBuilder {
@@ -50,7 +52,7 @@ public class MeansAssessmentDataBuilder {
     private static final Frequency PARTNER_FREQUENCY = Frequency.TWO_WEEKLY;
     private static final BigDecimal APPLICANT_VALUE = BigDecimal.valueOf(1000);
     private static final Integer ASSESSMENT_DETAIL_ID = 134;
-    private static final Integer CRITERIA_DETAIL_ID = 135;
+    public static final Integer CRITERIA_DETAIL_ID = 135;
     private static final BigDecimal APPLICANT_ANNUAL_TOTAL = BigDecimal.valueOf(12000);
     private static final BigDecimal PARTNER_ANNUAL_TOTAL = BigDecimal.valueOf(12000);
     private static final BigDecimal ANNUAL_TOTAL = APPLICANT_ANNUAL_TOTAL.add(PARTNER_ANNUAL_TOTAL);
@@ -106,6 +108,8 @@ public class MeansAssessmentDataBuilder {
     private static final LocalDateTime PARTNER_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2020, 9, 13, 0, 0, 0);
     private static final LocalDateTime APPLICANT_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2020, 10, 1, 0, 0, 0);
     public static final Date APPEAL_RECEIVED_DATE = new GregorianCalendar(2023, Calendar.MARCH, 18).getTime();
+
+    private static final LocalDateTime APPLICATION_TIMESTAMP = LocalDateTime.of(2022, 10, 1, 0, 0, 0);
     public static final Date APPEAL_SENTENCE_ORDER_DATE = new GregorianCalendar(2023, Calendar.AUGUST, 3).getTime();
     public static final String OTHER_DESCRIPTION = "OTHER DESCRIPTION";
     private static final Integer EXTRA_EVIDENCE_ID = 52473;
@@ -266,7 +270,7 @@ public class MeansAssessmentDataBuilder {
                 .build();
     }
 
-    private static AssessmentSectionSummaryDTO getSectionSummaryDTO() {
+    public static AssessmentSectionSummaryDTO getSectionSummaryDTO() {
         return AssessmentSectionSummaryDTO.builder()
                 .assessmentDetail(List.of(getSectionDetail()))
                 .annualTotal(ANNUAL_TOTAL.doubleValue())
@@ -292,7 +296,7 @@ public class MeansAssessmentDataBuilder {
 
     private static FrequenciesDTO getFrequencyDTO(Frequency frequency) {
         return FrequenciesDTO.builder()
-                .annualWeighting((long) frequency.getAnnualWeighting())
+                .annualWeighting((long) frequency.getWeighting())
                 .description(frequency.getDescription())
                 .code(frequency.getCode())
                 .build();
@@ -319,7 +323,7 @@ public class MeansAssessmentDataBuilder {
                 .build();
     }
 
-    private static ReviewTypeDTO getReviewTypeDTO() {
+    public static ReviewTypeDTO getReviewTypeDTO() {
         return ReviewTypeDTO.builder()
                 .description(ReviewType.ER.getDescription())
                 .code(ReviewType.ER.getCode())
@@ -343,7 +347,6 @@ public class MeansAssessmentDataBuilder {
         );
     }
 
-    @NotNull
     private static NewWorkReasonDTO getNewWorkReasonDTO() {
         return NewWorkReasonDTO.builder()
                 .code(NEW_WORK_REASON_STRING)
@@ -443,7 +446,7 @@ public class MeansAssessmentDataBuilder {
 
     public static ApiGetMeansAssessmentResponse getApiGetMeansAssessmentResponse() {
         return new ApiGetMeansAssessmentResponse()
-                .withId(Constants.FINANCIAL_ASSESSMENT_ID)
+                .withId(FINANCIAL_ASSESSMENT_ID)
                 .withCriteriaId(CRITERIA_ID)
                 .withFullAvailable(true)
                 .withUsn(USN)
@@ -468,7 +471,7 @@ public class MeansAssessmentDataBuilder {
         apiInitialMeansAssessment.setResultReason(InitAssessmentResult.PASS.getReason());
         if (null != currentStatus) {
             ApiAssessmentStatus apiAssessmentStatus = new ApiAssessmentStatus();
-            apiAssessmentStatus.setStatus(currentStatus.getValue());
+            apiAssessmentStatus.setStatus(currentStatus.getStatus());
             apiAssessmentStatus.setDescription(currentStatus.getDescription());
             apiInitialMeansAssessment.setAssessmentStatus(apiAssessmentStatus);
         }
@@ -497,7 +500,7 @@ public class MeansAssessmentDataBuilder {
         ApiAssessmentStatus assessmentStatus = null;
         if (currentStatus != null) {
             assessmentStatus = new ApiAssessmentStatus()
-                    .withStatus(currentStatus.getValue())
+                    .withStatus(currentStatus.getStatus())
                     .withDescription(currentStatus.getDescription());
         }
         return new ApiFullMeansAssessment()
@@ -655,14 +658,14 @@ public class MeansAssessmentDataBuilder {
 
     public static AssessmentStatusDTO getAssessmentStatusDTO(CurrentStatus status) {
         return AssessmentStatusDTO.builder()
-                .status(status.getValue())
+                .status(status.getStatus())
                 .description(status.getDescription())
                 .build();
     }
 
     public static FinancialAssessmentDTO getFinancialAssessmentDto() {
         return FinancialAssessmentDTO.builder()
-                .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
+                .id(FINANCIAL_ASSESSMENT_ID.longValue())
                 .criteriaId(CRITERIA_ID.longValue())
                 .usn(USN.longValue())
                 .fullAvailable(true)
@@ -671,4 +674,71 @@ public class MeansAssessmentDataBuilder {
                 .incomeEvidence(getIncomeEvidenceSummaryDTO())
                 .build();
     }
+
+    public static ApiMeansAssessmentResponse getApiMeansAssessmentResponse() {
+        return new ApiMeansAssessmentResponse()
+                .withAssessmentId(FINANCIAL_ASSESSMENT_ID)
+                .withAssessmentSectionSummary(getAssessmentSectionSummary())
+                .withAssessmentSummary(getAssessmentSummary())
+                .withAssessmentType(AssessmentType.HARDSHIP)
+                .withFullAssessmentAvailable(Boolean.TRUE)
+                .withFullAssessmentDate(FULL_ASSESSMENT_DATE)
+                .withInitialAssessmentDate(INITIAL_ASSESSMENT_DATE)
+                .withFullAssessmentDate(FULL_ASSESSMENT_DATE)
+                .withAdjustedIncomeValue(ADJUSTED_INCOME_VALUE)
+                .withAdjustedLivingAllowance(ADJUSTED_LIVING_ALLOWANCE)
+                .withApplicationTimestamp(APPLICATION_TIMESTAMP)
+                .withChildWeightings(getAssessmentChildWeightings())
+                .withCriteriaId(CRITERIA_DETAIL_ID)
+                .withFassFullStatus(CurrentStatus.COMPLETE)
+                .withFassInitStatus(CurrentStatus.IN_PROGRESS)
+                .withFullResult(RESULT_PASS)
+                .withFullResultReason(RESULT_REASON)
+                .withFullThreshold(BigDecimal.valueOf(100))
+                .withInitResult(RESULT_PASS)
+                .withInitResultReason(RESULT_REASON)
+                .withLowerThreshold(LOWER_THRESHOLD)
+                .withRepId(REP_ID)
+                .withReviewType(ReviewType.ER)
+                .withTotalAggregatedExpense(AGGREGATED_EXPENSE)
+                .withTotalAggregatedIncome(TOTAL_AGGREGATED_INCOME)
+                .withTotalAnnualDisposableIncome(ANNUAL_DISPOSABLE_INCOME)
+                .withTransactionDateTime(APPLICATION_TIMESTAMP)
+                .withUpdated(APPLICATION_TIMESTAMP)
+                .withUpperThreshold(UPPER_THRESHOLD);
+
+    }
+
+    private static List<ApiAssessmentSectionSummary> getAssessmentSectionSummary(){
+        return List.of(
+                new ApiAssessmentSectionSummary()
+                        .withAssessmentType(AssessmentType.HARDSHIP)
+                        .withAnnualTotal(ANNUAL_TOTAL)
+                        .withAssessmentDetails(List.of(new ApiAssessmentDetail()
+                                .withId(ASSESSMENT_DETAIL_ID)
+                                .withAssessmentDetailCode(CRITERIA_DETAIL_CODE)
+                                .withApplicantAmount(APPLICANT_VALUE)
+                                .withAssessmentDescription(ASSESSMENT_DESCRIPTION)
+                                .withCriteriaDetailId(CRITERIA_DETAIL_ID)
+                                .withApplicantFrequency(FREQUENCY)
+                                .withPartnerAmount(PARTNER_AMOUNT)
+                                .withPartnerFrequency(PARTNER_FREQUENCY)
+                                .withDateModified(DATE_MODIFIED)))
+                        .withApplicantAnnualTotal(APPLICANT_ANNUAL_TOTAL)
+                        .withPartnerAnnualTotal(PARTNER_ANNUAL_TOTAL)
+                        .withSection(SECTION));
+    }
+
+    private static List<ApiAssessmentSummary> getAssessmentSummary(){
+        return List.of(
+                new ApiAssessmentSummary()
+                        .withId(ASSESSMENT_DETAIL_ID)
+                        .withAssessmentDate(FULL_ASSESSMENT_DATE)
+                        .withType(WorkType.INITIAL_ASSESSMENT)
+                        .withResult(RESULT_PASS)
+                        .withReviewType(ReviewType.ER.getCode())
+                        .withStatus(CurrentStatus.IN_PROGRESS.getStatus())
+        );
+    }
+
 }

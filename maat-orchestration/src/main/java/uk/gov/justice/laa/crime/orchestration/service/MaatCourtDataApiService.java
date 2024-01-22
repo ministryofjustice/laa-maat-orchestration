@@ -27,7 +27,7 @@ public class MaatCourtDataApiService {
                 request,
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getHardshipApi().getEndpoints().getCreateUrl(),
+                configuration.getMaatApi().getEndpoints().getCallStoredProcUrl(),
                 Collections.emptyMap()
         );
 
