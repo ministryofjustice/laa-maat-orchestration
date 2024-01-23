@@ -44,7 +44,7 @@ public class ContributionMapper extends CrownCourtMapper {
         String appealType = crownCourtOverviewDTO.getAppealDTO().getAppealTypeDTO().getCode();
         LocalDateTime effectiveDate = toLocalDateTime(contributionsDTO.getEffectiveDate());
 
-        return new ApiMaatCalculateContributionRequest()
+        ApiMaatCalculateContributionRequest request = new ApiMaatCalculateContributionRequest()
                 .withUserCreated(user.getUserName())
                 .withRepId(NumberUtils.toInteger(application.getRepId()))
                 .withApplId(NumberUtils.toInteger(application.getApplicantDTO().getId()))
@@ -68,24 +68,33 @@ public class ContributionMapper extends CrownCourtMapper {
                 )
                 .withDateUpliftApplied(toLocalDateTime(incomeEvidenceSummaryDTO.getUpliftAppliedDate()))
                 .withDateUpliftRemoved(toLocalDateTime(incomeEvidenceSummaryDTO.getUpliftRemovedDate()))
-                .withDisposableIncomeAfterCrownHardship(
-                        hardshipOverviewDTO.getCrownCourtHardship().getDisposableIncomeAfterHardship())
-                .withDisposableIncomeAfterMagHardship(
-                        hardshipOverviewDTO.getMagCourtHardship().getDisposableIncomeAfterHardship())
                 .withTotalAnnualDisposableIncome(
                         Boolean.TRUE.equals(financialAssessmentDTO.getFullAvailable())
                                 ? BigDecimal.valueOf(financialAssessmentDTO.getFull().getTotalAnnualDisposableIncome())
                                 : null
                 );
+
+        if (hardshipOverviewDTO.getCrownCourtHardship() != null) {
+            request.withDisposableIncomeAfterCrownHardship(
+                hardshipOverviewDTO.getCrownCourtHardship().getDisposableIncomeAfterHardship());
+        }
+
+        if (hardshipOverviewDTO.getMagCourtHardship() != null) {
+            request.withDisposableIncomeAfterMagHardship(
+                    hardshipOverviewDTO.getMagCourtHardship().getDisposableIncomeAfterHardship());
+        }
+
+        return request;
     }
 
     private LastOutcome getLastCrownCourtOutcome(final Collection<OutcomeDTO> crownCourtOutcomeList) {
-        return crownCourtOutcomeList.stream().reduce((first, second) -> second)
-                .map(outcome ->
-                        new LastOutcome()
-                                .withDateSet(toLocalDateTime(outcome.getDateSet()))
-                                .withOutcome(CrownCourtAppealOutcome.getFrom(outcome.getOutcome()))
-                ).orElse(null);
+        return crownCourtOutcomeList.stream()
+                .reduce((first, second) -> second)
+                .filter(outcome -> outcome.getOutComeType().equals(CrownCourtOutcomeType.APPEAL.getType()))
+                .map(appealOutcome -> new LastOutcome()
+                        .withDateSet(toLocalDateTime(appealOutcome.getDateSet()))
+                        .withOutcome(CrownCourtAppealOutcome.getFrom(appealOutcome.getOutcome())))
+                .orElse(null);
     }
 
     private List<ApiAssessment> applicationDtoToAssessments(final ApplicationDTO application) {

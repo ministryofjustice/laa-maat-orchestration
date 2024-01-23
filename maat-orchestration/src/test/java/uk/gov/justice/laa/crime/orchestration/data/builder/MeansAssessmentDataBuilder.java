@@ -10,6 +10,7 @@ import uk.gov.justice.laa.crime.orchestration.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOverview;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiUserSession;
+import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.*;
 
 import java.math.BigDecimal;
@@ -138,6 +139,7 @@ public class MeansAssessmentDataBuilder {
                 .assessmentDTO(getAssessmentDTO())
                 .crownCourtOverviewDTO(getCrownCourtOverviewDTOForContribution())
                 .caseDetailsDTO(getCaseDetailDTO())
+                .caseManagementUnitDTO(getCaseManagementUnitDTO())
                 .offenceDTO(getOffenceDTO())
                 .statusDTO(getRepStatusDTO())
                 .magsOutcomeDTO(getOutcomeDTO(CourtType.MAGISTRATE))
@@ -150,7 +152,15 @@ public class MeansAssessmentDataBuilder {
     public static ApplicantDTO getApplicantDTO() {
         return ApplicantDTO.builder()
                 .id(Constants.APPLICANT_ID.longValue())
+                .employmentStatusDTO(getEmploymentStatusDTO())
                 .applicantHistoryId(APPLICANT_HISTORY_ID.longValue())
+                .build();
+    }
+
+    public static EmploymentStatusDTO getEmploymentStatusDTO() {
+        return EmploymentStatusDTO.builder()
+                .code("EMPLOY")
+                .description("Employed")
                 .build();
     }
 
@@ -197,6 +207,12 @@ public class MeansAssessmentDataBuilder {
     public static CaseDetailDTO getCaseDetailDTO() {
         return CaseDetailDTO.builder()
                 .caseType(CaseType.EITHER_WAY.getCaseType())
+                .build();
+    }
+
+    private static CaseManagementUnitDTO getCaseManagementUnitDTO() {
+        return CaseManagementUnitDTO.builder()
+                .cmuId(CMU_ID.longValue())
                 .build();
     }
 
@@ -741,4 +757,11 @@ public class MeansAssessmentDataBuilder {
         );
     }
 
+    public static ApiUpdateApplicationResponse getApiUpdateApplicationResponse() {
+        return new ApiUpdateApplicationResponse()
+                .withModifiedDateTime(DATE_MODIFIED)
+                .withCrownRepOrderDecision(REP_ORDER_DECISION_GRANTED.getValue())
+                .withCrownRepOrderType(CC_REP_TYPE_THROUGH_ORDER.getValue())
+                .withCrownRepOrderDate(CC_REP_ORDER_DATETIME);
+    }
 }
