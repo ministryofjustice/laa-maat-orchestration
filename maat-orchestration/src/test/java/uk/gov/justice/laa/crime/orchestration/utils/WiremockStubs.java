@@ -16,7 +16,7 @@ public class WiremockStubs {
 
     private static final String CCP_URL = "/api/internal/v1/proceedings";
     private static final String CCC_URL = "/api/internal/v1/contribution";
-    private static final String MAAT_API_URL = "/api/internal/v1/assessment/execute-stored-procedure";
+    private static final String MAAT_API_ASSESSMENT_URL = "/api/internal/v1/assessment";
 
     public static void stubForOAuth() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
@@ -39,11 +39,19 @@ public class WiremockStubs {
                     .withBody(response))));
     }
 
+    public static void assertStubForUpdateCrownCourtProceedings(int times) {
+        verify(exactly(times), putRequestedFor(urlPathMatching(CCP_URL)));
+    }
+
     public static void stubForCalculateContributions(String response) {
         stubFor(post(urlMatching(CCC_URL + "/calculate-contribution"))
             .willReturn(WireMock.ok()
                     .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                     .withBody(response)));
+    }
+
+    public static void assertStubForCalculateContributions(int times) {
+        verify(exactly(times), postRequestedFor(urlPathMatching(CCC_URL + "/calculate-contribution")));
     }
 
     public static void stubForGetContributionsSummary(String response) {
@@ -53,6 +61,10 @@ public class WiremockStubs {
                     .withBody(response)));
     }
 
+    public static void assertStubForGetContributionsSummary(int times) {
+        verify(exactly(times), getRequestedFor(urlPathMatching(CCC_URL + "/summaries")));
+    }
+
     public static void stubForCheckContributionsRule() {
         stubFor(post(urlMatching(CCC_URL + "/check-contribution-rule"))
             .willReturn(WireMock.ok()
@@ -60,15 +72,19 @@ public class WiremockStubs {
                     .withBody(Boolean.TRUE.toString())));
     }
 
+    public static void assertStubForCheckContributionsRule(int times) {
+        verify(exactly(times), postRequestedFor(urlPathMatching(CCC_URL + "/check-contribution-rule")));
+    }
+
     public static void stubForInvokeStoredProcedure(String response) {
-        stubFor(post(urlMatching(MAAT_API_URL))
+        stubFor(post(urlMatching(MAAT_API_ASSESSMENT_URL + "/execute-stored-procedure"))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response)));
     }
 
     public static void stubForInvokeStoredProcedure(String currentState, String response) {
-        stubFor(post(urlMatching(MAAT_API_URL))
+        stubFor(post(urlMatching(MAAT_API_ASSESSMENT_URL + "/execute-stored-procedure"))
             .inScenario("invokeStoredProcedure")
             .whenScenarioStateIs("DB_ASSESSMENT_POST_PROCESSING_PART_2")
             .willReturn(WireMock.ok()
@@ -77,12 +93,16 @@ public class WiremockStubs {
     }
 
     public static void stubForInvokeStoredProcedure(String currentState, String nextState, String response) {
-        stubFor(post(urlMatching(MAAT_API_URL))
+        stubFor(post(urlMatching(MAAT_API_ASSESSMENT_URL + "/execute-stored-procedure"))
             .inScenario("invokeStoredProcedure")
             .whenScenarioStateIs(currentState)
             .willSetStateTo(nextState)
             .willReturn(WireMock.ok()
                     .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                     .withBody(response)));
+    }
+
+    public static void assertStubForInvokeStoredProcedure(int times) {
+        verify(exactly(times), postRequestedFor(urlPathMatching(MAAT_API_ASSESSMENT_URL + "/execute-stored-procedure")));
     }
 }

@@ -24,7 +24,6 @@ import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 
 import java.util.List;
 
@@ -141,7 +140,10 @@ public class MeansAssessmentTest {
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk());
-        // TODO: Verify the various stubs were called x amount of times
+        assertStubForUpdateCrownCourtProceedings(1);
+        assertStubForCalculateContributions(1);
+        assertStubForGetContributionsSummary(1);
+        assertStubForInvokeStoredProcedure(5);
     }
 
     @Test
@@ -202,7 +204,10 @@ public class MeansAssessmentTest {
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk());
-        // TODO: Verify the various stubs were called x amount of times
+        assertStubForUpdateCrownCourtProceedings(1);
+        assertStubForCalculateContributions(1);
+        assertStubForGetContributionsSummary(1);
+        assertStubForInvokeStoredProcedure(5);
     }
 
     @Test

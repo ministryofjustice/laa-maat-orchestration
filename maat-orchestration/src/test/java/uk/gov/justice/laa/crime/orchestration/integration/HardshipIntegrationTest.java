@@ -221,18 +221,18 @@ class HardshipIntegrationTest {
     private static void verifyStubForCreateHardship() {
         verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
         verify(exactly(1), getRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
-        verify(exactly(3), postRequestedFor(urlPathMatching("/api/internal/v1/assessment/execute-stored-procedure")));
-        verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/contribution/check-contribution-rule")));
-        verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/contribution/calculate-contribution")));
-        verify(exactly(1), getRequestedFor(urlPathMatching("/api/internal/v1/contribution/summaries")));
+        assertStubForInvokeStoredProcedure(3);
+        assertStubForCheckContributionsRule(1);
+        assertStubForCalculateContributions(1);
+        assertStubForGetContributionsSummary(1);
     }
 
     private static void verifyStubForUpdateHardship() {
         verify(exactly(1), putRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
-        verify(exactly(3), postRequestedFor(urlPathMatching("/api/internal/v1/assessment/execute-stored-procedure")));
-        verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/contribution/check-contribution-rule")));
-        verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/contribution/calculate-contribution")));
-        verify(exactly(1), getRequestedFor(urlPathMatching("/api/internal/v1/contribution/summaries")));
+        assertStubForInvokeStoredProcedure(3);
+        assertStubForCheckContributionsRule(1);
+        assertStubForCalculateContributions(1);
+        assertStubForGetContributionsSummary(1);
     }
 
 
