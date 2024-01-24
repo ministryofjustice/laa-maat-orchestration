@@ -9,6 +9,7 @@ import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
+import uk.gov.justice.laa.crime.orchestration.service.api.HardshipApiService;
 
 @Slf4j
 @Service
@@ -23,20 +24,20 @@ public class HardshipService {
         return hardshipMapper.findHardshipResponseToHardshipDto(hardship);
     }
 
-    public ApiPerformHardshipResponse createHardship(WorkflowRequest request) {
+    public ApiPerformHardshipResponse create(WorkflowRequest request) {
         ApiPerformHardshipRequest performHardshipRequest =
                 hardshipMapper.workflowRequestToPerformHardshipRequest(request);
         return hardshipApiService.create(performHardshipRequest);
     }
 
-    public void updateHardship(WorkflowRequest request) {
+    public void update(WorkflowRequest request) {
         ApiPerformHardshipRequest performHardshipRequest =
                 hardshipMapper.workflowRequestToPerformHardshipRequest(request);
         ApiPerformHardshipResponse apiPerformHardshipResponse = hardshipApiService.update(performHardshipRequest);
         hardshipMapper.performHardshipResponseToApplicationDTO(apiPerformHardshipResponse, request.getApplicationDTO());
     }
 
-    public ApiPerformHardshipResponse rollbackHardship(WorkflowRequest request) {
+    public ApiPerformHardshipResponse rollback(WorkflowRequest request) {
         ApiPerformHardshipRequest performHardshipRequest =
                 hardshipMapper.workflowRequestToPerformHardshipRequest(request);
         return hardshipApiService.rollback(performHardshipRequest);

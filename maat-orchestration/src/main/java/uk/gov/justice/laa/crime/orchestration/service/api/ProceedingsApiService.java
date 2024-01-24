@@ -1,4 +1,4 @@
-package uk.gov.justice.laa.crime.orchestration.service;
+package uk.gov.justice.laa.crime.orchestration.service.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +9,7 @@ import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationResponse;
+import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateCrownCourtResponse;
 
 import java.util.Collections;
 
@@ -22,12 +23,25 @@ public class ProceedingsApiService {
     private final ServicesConfiguration configuration;
     private static final String RESPONSE_STRING = "Response from Crown Court API Service: %s";
 
-    public ApiUpdateApplicationResponse update(ApiUpdateApplicationRequest request) {
+    public ApiUpdateApplicationResponse updateApplication(ApiUpdateApplicationRequest request) {
         ApiUpdateApplicationResponse response = crownCourtApiClient.put(
                 request,
                 new ParameterizedTypeReference<>() {
                 },
                 configuration.getCrownCourtApi().getEndpoints().getUpdateApplicationUrl(),
+                Collections.emptyMap()
+        );
+
+        log.info(String.format(RESPONSE_STRING, response));
+        return response;
+    }
+
+    public ApiUpdateCrownCourtResponse updateCrownCourt(ApiUpdateApplicationRequest request) {
+        ApiUpdateCrownCourtResponse response = crownCourtApiClient.put(
+                request,
+                new ParameterizedTypeReference<>() {
+                },
+                configuration.getCrownCourtApi().getEndpoints().getUpdateCrownCourtUrl(),
                 Collections.emptyMap()
         );
 

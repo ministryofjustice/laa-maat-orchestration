@@ -57,6 +57,7 @@ services:
       create-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/
       update-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/
       rollback-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/rollback
+
   contribution-api:
     base-url: http://localhost:${wiremock.server.port}
     endpoints:
@@ -64,16 +65,20 @@ services:
       request-transfer-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/request-transfer
       check-contribution-rule-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/check-contribution-rule
       contribution-summaries-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/summaries
+
   crown-court-api:
     base-url: http://localhost:${wiremock.server.port}
     endpoints:
       update-application-url: ${services.crown-court-api.base-url}/api/internal/v1/proceedings
+      update-crown-court-url: ${services.crown-court-api.base-url}/api/internal/v1/proceedings/update-crown-court
+
   cma-api:
     base-url: http://localhost:${wiremock.server.port}
     endpoints:
       find-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means/{financialAssessmentId}
       create-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means
       update-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means
+
   maat-api:
     base-url: http://localhost:${wiremock.server.port}
     endpoints:

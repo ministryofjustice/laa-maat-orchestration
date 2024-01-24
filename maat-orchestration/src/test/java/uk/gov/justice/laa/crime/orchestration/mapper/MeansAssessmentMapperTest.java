@@ -25,10 +25,12 @@ import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class MeansAssessmentMapperTest {
-    UserMapper userMapper = new UserMapper();
-    MeansAssessmentMapper meansAssessmentMapper = new MeansAssessmentMapper(userMapper);
+
     @InjectSoftAssertions
     private SoftAssertions softly;
+
+    UserMapper userMapper = new UserMapper();
+    MeansAssessmentMapper meansAssessmentMapper = new MeansAssessmentMapper(userMapper);
 
     @Test
     void givenApiFindHardshipResponseWithSection_whenFindHardshipResponseToHardshipDTOIsInvoked_thenMappingIsCorrect() {

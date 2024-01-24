@@ -17,8 +17,8 @@ import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
+import uk.gov.justice.laa.crime.orchestration.service.orchestration.HardshipOrchestrationService;
 import uk.gov.justice.laa.crime.enums.CourtType;
-import uk.gov.justice.laa.crime.orchestration.service.HardshipOrchestrationService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -33,8 +33,6 @@ import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWith
 @AutoConfigureMockMvc(addFilters = false)
 class HardshipControllerTest {
 
-    private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/hardship";
-
     @Autowired
     private MockMvc mvc;
 
@@ -43,6 +41,8 @@ class HardshipControllerTest {
 
     @MockBean
     private HardshipOrchestrationService orchestrationService;
+
+    private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/hardship";
 
     @Test
     void givenValidRequest_whenFindIsInvoked_thenOkResponseIsReturned() throws Exception {
@@ -90,7 +90,6 @@ class HardshipControllerTest {
 
     @Test
     void givenWebClientFailure_whenCreateIsInvoked_thenInternalServerErrorResponseIsReturned() throws Exception {
-
         when(orchestrationService.create(any(WorkflowRequest.class)))
                 .thenThrow(new APIClientException());
 
