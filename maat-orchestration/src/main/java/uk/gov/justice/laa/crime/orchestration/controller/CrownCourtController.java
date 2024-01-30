@@ -39,8 +39,9 @@ public class CrownCourtController {
     @DefaultHTTPErrorResponse
     public ResponseEntity<ApplicationDTO> updateCrownCourt(
             @Valid @RequestBody WorkflowRequest workflowRequest,
-            @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
-        log.info("Received request to update crown court");
+            @Parameter(description = "Used for tracing calls")
+            @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
+        log.info("Received request to update crown court with transaction id - " + laaTransactionId);
         return ResponseEntity.ok(orchestrationService.update(workflowRequest));
     }
 }

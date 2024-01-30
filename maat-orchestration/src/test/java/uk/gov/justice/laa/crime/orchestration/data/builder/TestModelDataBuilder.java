@@ -404,7 +404,6 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    // TODO: Check existing builders to see if they can use new methods for certain objects
     public static WorkflowRequest buildWorkFlowRequest(CourtType courtType) {
         return WorkflowRequest.builder()
                 .userDTO(getUserDTO())
@@ -537,7 +536,7 @@ public class TestModelDataBuilder {
                 .repOrderDecision(REP_ORDER_DECISION_GRANTED)
                 .inPrisoned(Boolean.TRUE)
                 .evidenceProvisionFee(getEvidenceFeeDTO())
-                .outcomeDTOs(List.of(getOutcomeDTO()))
+                .outcomeDTOs(List.of(getOutcomeDTO(CourtType.CROWN_COURT), getOutcomeDTO()))
                 .build();
     }
 
