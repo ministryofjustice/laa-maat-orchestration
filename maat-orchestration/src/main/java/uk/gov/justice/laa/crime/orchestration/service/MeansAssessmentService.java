@@ -6,10 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
-import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiCreateMeansAssessmentRequest;
-import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiGetMeansAssessmentResponse;
-import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiMeansAssessmentResponse;
-import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiUpdateMeansAssessmentRequest;
+import uk.gov.justice.laa.crime.orchestration.model.means_assessment.*;
 import uk.gov.justice.laa.crime.orchestration.service.api.MeansAssessmentApiService;
 
 @Slf4j
@@ -43,5 +40,13 @@ public class MeansAssessmentService {
         meansAssessmentMapper.meansAssessmentResponseToApplicationDto(
                 apiMeansAssessmentResponse, request.getApplicationDTO()
         );
+    }
+
+    public void rollback(WorkflowRequest request) {
+        MaatApiRollbackAssessment maatApiRollbackAssessment =
+                meansAssessmentMapper.workflowRequestToMaatApiRollbackAssessment(request);
+        FinancialAssessmentDTO financialAssessmentDTO = cmaApiService.rollback(maatApiRollbackAssessment);
+        meansAssessmentMapper.financialAssessmentDTOToApplicationDto(
+                financialAssessmentDTO, request.getApplicationDTO());
     }
 }

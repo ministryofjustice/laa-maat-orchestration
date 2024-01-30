@@ -7,10 +7,12 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiCreateMeansAssessmentRequest;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiGetMeansAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiMeansAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiUpdateMeansAssessmentRequest;
+import uk.gov.justice.laa.crime.orchestration.model.means_assessment.MaatApiRollbackAssessment;
 
 import java.util.Collections;
 
@@ -58,6 +60,18 @@ public class MeansAssessmentApiService {
                 Collections.emptyMap()
         );
 
+        log.info(String.format(RESPONSE_STRING, response));
+        return response;
+    }
+
+    public FinancialAssessmentDTO rollback(MaatApiRollbackAssessment maatApiRollbackAssessment) {
+        FinancialAssessmentDTO response = cmaApiClient.put(
+                maatApiRollbackAssessment,
+                new ParameterizedTypeReference<>() {
+                },
+                configuration.getCmaApi().getEndpoints().getRollbackUrl(),
+                Collections.emptyMap()
+        );
         log.info(String.format(RESPONSE_STRING, response));
         return response;
     }

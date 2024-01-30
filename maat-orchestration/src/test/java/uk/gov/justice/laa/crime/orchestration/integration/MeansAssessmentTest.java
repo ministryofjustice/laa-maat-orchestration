@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
@@ -169,10 +170,12 @@ class MeansAssessmentTest {
     @Test
     void givenErrorCallingMaatApi_whenCreateIsInvoked_thenInternalServerErrorIsReturned() throws Exception {
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
+        String cmaRollbackResponse = objectMapper.writeValueAsString(FinancialAssessmentDTO.builder().build());
 
         stubForOAuth();
         wiremock.stubFor(post(urlMatching(CMA_URL))
                 .willReturn(WireMock.serverError()));
+        stubForRollbackMeansAssessment(cmaRollbackResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
                 .andExpect(status().isInternalServerError());
@@ -233,10 +236,12 @@ class MeansAssessmentTest {
     @Test
     void givenErrorCallingMaatApi_whenUpdateIsInvoked_thenInternalServerErrorIsReturned() throws Exception {
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
+        String cmaRollbackResponse = objectMapper.writeValueAsString(FinancialAssessmentDTO.builder().build());
 
         stubForOAuth();
         wiremock.stubFor(put(urlMatching(CMA_URL))
                 .willReturn(WireMock.serverError()));
+        stubForRollbackMeansAssessment(cmaRollbackResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
                 .andExpect(status().isInternalServerError());

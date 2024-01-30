@@ -484,4 +484,27 @@ public class MeansAssessmentMapper {
             }
         }
     }
+
+    public MaatApiRollbackAssessment workflowRequestToMaatApiRollbackAssessment(WorkflowRequest request) {
+        FinancialAssessmentDTO financialAssessmentDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO();
+        return new MaatApiRollbackAssessment()
+                .withFinancialAssessmentId(financialAssessmentDTO.getId().intValue())
+                .withFassFullStatus("")
+                .withFassInitStatus("")
+                .withFullResult("")
+                .withInitResult("");
+    }
+
+    public void financialAssessmentDTOToApplicationDto(FinancialAssessmentDTO financialAssessmentDTO, ApplicationDTO applicationDTO) {
+        FullAssessmentDTO fullAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFull();
+        if (fullAssessmentDTO != null && financialAssessmentDTO.getFull() != null) {
+            fullAssessmentDTO.setResult(financialAssessmentDTO.getFull().getResult());
+            fullAssessmentDTO.setAssessmnentStatusDTO(financialAssessmentDTO.getFull().getAssessmnentStatusDTO());
+        }
+        InitialAssessmentDTO initialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
+        if (initialAssessmentDTO != null && financialAssessmentDTO.getInitial() != null) {
+            initialAssessmentDTO.setResult(financialAssessmentDTO.getInitial().getResult());
+            initialAssessmentDTO.setAssessmnentStatusDTO(financialAssessmentDTO.getInitial().getAssessmnentStatusDTO());
+        }
+    }
 }
