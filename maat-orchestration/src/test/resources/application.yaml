@@ -85,7 +85,6 @@ services:
       call-stored-proc-url: ${services.maat-api.base-url}/api/internal/v1/assessment/execute-stored-procedure
       rep-order-url: ${services.maat-api.base-url}/api/internal/v1/assessment/rep-orders/{repId}
 
-
 retry-config:
   max-retries: 2
   min-back-off-period: 3
