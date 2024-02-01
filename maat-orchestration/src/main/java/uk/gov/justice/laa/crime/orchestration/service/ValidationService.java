@@ -40,7 +40,7 @@ public class ValidationService {
         RepStatusDTO statusDTO = request.getApplicationDTO().getStatusDTO();
         boolean isUpdateAllowedOnApplication = statusDTO.getUpdateAllowed();
         String rorsStatus = repOrderDTO.getRorsStatus();
-        boolean isUpdateAllowedOnRepOrder = (null == rorsStatus) ? true : RepOrderStatus.getFrom(rorsStatus).isUpdateAllowed();
+        boolean isUpdateAllowedOnRepOrder = (null == rorsStatus) || RepOrderStatus.getFrom(rorsStatus).isUpdateAllowed();
         if (!isUpdateAllowedOnRepOrder && !isUpdateAllowedOnApplication) {
             throw new ValidationException(String.format(CANNOT_UPDATE_APPLICATION_STATUS, statusDTO.getDescription()));
         }
