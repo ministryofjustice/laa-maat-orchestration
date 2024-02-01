@@ -9,6 +9,7 @@ import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.RepOrderDTO;
 
 import java.util.Collections;
 
@@ -32,6 +33,17 @@ public class MaatCourtDataApiService {
         );
 
         log.info(String.format(RESPONSE_STRING, response));
+        return response;
+    }
+
+    public RepOrderDTO getRepOrderByRepId(Integer repId) {
+        var response = maatApiClient.get(
+                new ParameterizedTypeReference<RepOrderDTO>() {
+                },
+                configuration.getMaatApi().getEndpoints().getRepOrderUrl(),
+                repId
+        );
+        log.info(RESPONSE_STRING, response);
         return response;
     }
 

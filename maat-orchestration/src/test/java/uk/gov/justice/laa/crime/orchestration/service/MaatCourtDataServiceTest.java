@@ -12,6 +12,7 @@ import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith({MockitoExtension.class})
@@ -32,5 +33,11 @@ class MaatCourtDataServiceTest {
                 StoredProcedure.PROCESS_ACTIVITY
         );
         verify(maatCourtDataApiService).executeStoredProcedure(any(StoredProcedureRequest.class));
+    }
+
+    @Test
+    void givenValidRequest_whenFindRepOrderIsInvoked_thenRequestIsMappedAndApiServiceIsCalled() {
+        maatCourtDataService.findRepOrder(1000);
+        verify(maatCourtDataApiService).getRepOrderByRepId(anyInt());
     }
 }
