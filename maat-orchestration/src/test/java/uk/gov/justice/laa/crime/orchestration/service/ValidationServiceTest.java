@@ -138,6 +138,24 @@ class ValidationServiceTest {
                                 .builder()
                                 .dateModified(LocalDateTime.parse("2024-01-27T10:15:30"))
                                 .rorsStatus(null)
+                                .build()),
+                Arguments.of(WorkflowRequest
+                                .builder()
+                                .applicationDTO(
+                                        ApplicationDTO.
+                                                builder().
+                                                timestamp(DateUtil.toTimeStamp(LocalDateTime.parse("2024-01-27T10:15:30")))
+                                                .statusDTO(
+                                                        RepStatusDTO
+                                                                .builder()
+                                                                .updateAllowed(true)
+                                                                .build())
+                                                .build())
+                                .build(),
+                        RepOrderDTO
+                                .builder()
+                                .dateModified(LocalDateTime.parse("2024-01-27T10:15:30"))
+                                .rorsStatus(RepOrderStatus.CURR.getCode())
                                 .build())
 
         );
