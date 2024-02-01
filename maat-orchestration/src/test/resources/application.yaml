@@ -83,7 +83,7 @@ services:
     base-url: http://localhost:${wiremock.server.port}
     endpoints:
       call-stored-proc-url: ${services.maat-api.base-url}/api/internal/v1/assessment/execute-stored-procedure
-      get-rep-order-url: ${services.maat-api.base-url}/api/internal/v1/assessment//rep-orders/{repId}
+      rep-order-url: ${services.maat-api.base-url}/api/internal/v1/assessment/rep-orders/{repId}
 
 
 retry-config:
