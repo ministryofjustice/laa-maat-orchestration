@@ -90,7 +90,7 @@ services:
       find-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means/{financialAssessmentId}
       create-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means
       update-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means
-      rollback-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means/rollback
+      rollback-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means/rollback/{financialAssessmentId}
 
   maat-api:
     base-url: ${MAAT_API_BASE_URL}

@@ -43,10 +43,13 @@ public class MeansAssessmentService {
     }
 
     public void rollback(WorkflowRequest request) {
-        MaatApiRollbackAssessment maatApiRollbackAssessment =
-                meansAssessmentMapper.workflowRequestToMaatApiRollbackAssessment(request);
-        FinancialAssessmentDTO financialAssessmentDTO = cmaApiService.rollback(maatApiRollbackAssessment);
-        meansAssessmentMapper.financialAssessmentDTOToApplicationDto(
-                financialAssessmentDTO, request.getApplicationDTO());
+        FinancialAssessmentDTO financialAssessmentDTO = request.getApplicationDTO().getAssessmentDTO()
+                .getFinancialAssessmentDTO();
+        if (financialAssessmentDTO.getId() != null) {
+            ApiRollbackMeansAssessmentResponse apiRollbackMeansAssessmentResponse =
+                    cmaApiService.rollback(financialAssessmentDTO.getId());
+            meansAssessmentMapper.apiRollbackMeansAssessmentResponseToApplicationDto(
+                    apiRollbackMeansAssessmentResponse, request.getApplicationDTO());
+        }
     }
 }

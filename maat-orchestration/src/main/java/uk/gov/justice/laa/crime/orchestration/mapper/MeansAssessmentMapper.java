@@ -485,26 +485,25 @@ public class MeansAssessmentMapper {
         }
     }
 
-    public MaatApiRollbackAssessment workflowRequestToMaatApiRollbackAssessment(WorkflowRequest request) {
-        FinancialAssessmentDTO financialAssessmentDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO();
-        return new MaatApiRollbackAssessment()
-                .withFinancialAssessmentId(financialAssessmentDTO.getId().intValue())
-                .withFassFullStatus("")
-                .withFassInitStatus("")
-                .withFullResult("")
-                .withInitResult("");
+    public void apiRollbackMeansAssessmentResponseToApplicationDto(ApiRollbackMeansAssessmentResponse response, ApplicationDTO applicationDTO) {
+        if (AssessmentType.INIT.getType().equals(response.getAssessmentType())) {
+            InitialAssessmentDTO initialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
+            initialAssessmentDTO.setResult(response.getInitResult());
+            initialAssessmentDTO.setAssessmnentStatusDTO(mapAssessmentStatus(response.getFassInitStatus()));
+        } else if (AssessmentType.FULL.getType().equals(response.getAssessmentType())) {
+            FullAssessmentDTO fullAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFull();
+            fullAssessmentDTO.setResult(response.getFullResult());
+            fullAssessmentDTO.setAssessmnentStatusDTO(mapAssessmentStatus(response.getFassFullStatus()));
+        }
     }
 
-    public void financialAssessmentDTOToApplicationDto(FinancialAssessmentDTO financialAssessmentDTO, ApplicationDTO applicationDTO) {
-        FullAssessmentDTO fullAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFull();
-        if (fullAssessmentDTO != null && financialAssessmentDTO.getFull() != null) {
-            fullAssessmentDTO.setResult(financialAssessmentDTO.getFull().getResult());
-            fullAssessmentDTO.setAssessmnentStatusDTO(financialAssessmentDTO.getFull().getAssessmnentStatusDTO());
+    private AssessmentStatusDTO mapAssessmentStatus(CurrentStatus apiAssessmentStatus) {
+        if (apiAssessmentStatus != null) {
+            return AssessmentStatusDTO.builder()
+                    .status(apiAssessmentStatus.getStatus())
+                    .description(apiAssessmentStatus.getDescription())
+                    .build();
         }
-        InitialAssessmentDTO initialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
-        if (initialAssessmentDTO != null && financialAssessmentDTO.getInitial() != null) {
-            initialAssessmentDTO.setResult(financialAssessmentDTO.getInitial().getResult());
-            initialAssessmentDTO.setAssessmnentStatusDTO(financialAssessmentDTO.getInitial().getAssessmnentStatusDTO());
-        }
+        return AssessmentStatusDTO.builder().build();
     }
 }
