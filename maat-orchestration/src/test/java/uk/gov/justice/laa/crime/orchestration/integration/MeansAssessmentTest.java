@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.Scenario;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,20 +22,20 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
-import uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiRollbackMeansAssessmentResponse;
+import uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs;
 
 import java.util.List;
 
-import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.*;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.*;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
@@ -170,7 +173,7 @@ class MeansAssessmentTest {
     @Test
     void givenErrorCallingMaatApi_whenCreateIsInvoked_thenInternalServerErrorIsReturned() throws Exception {
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
-        String cmaRollbackResponse = objectMapper.writeValueAsString(FinancialAssessmentDTO.builder().build());
+        String cmaRollbackResponse = objectMapper.writeValueAsString(new ApiRollbackMeansAssessmentResponse());
 
         stubForOAuth();
         wiremock.stubFor(post(urlMatching(CMA_URL))
@@ -236,7 +239,7 @@ class MeansAssessmentTest {
     @Test
     void givenErrorCallingMaatApi_whenUpdateIsInvoked_thenInternalServerErrorIsReturned() throws Exception {
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
-        String cmaRollbackResponse = objectMapper.writeValueAsString(FinancialAssessmentDTO.builder().build());
+        String cmaRollbackResponse = objectMapper.writeValueAsString(new ApiRollbackMeansAssessmentResponse());
 
         stubForOAuth();
         wiremock.stubFor(put(urlMatching(CMA_URL))
