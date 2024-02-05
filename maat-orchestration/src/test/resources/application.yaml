@@ -81,9 +81,14 @@ services:
 
   maat-api:
     base-url: http://localhost:${wiremock.server.port}
+    assessments-domain: ${services.maat-api.base-url}/api/internal/v1/assessment
     endpoints:
-      call-stored-proc-url: ${services.maat-api.base-url}/api/internal/v1/assessment/execute-stored-procedure
-      rep-order-url: ${services.maat-api.base-url}/api/internal/v1/assessment/rep-orders/{repId}
+      call-stored-proc-url: ${services.maat-api.assessments-domain}/execute-stored-procedure
+      rep-order-url: ${services.maat-api.assessments-domain}/rep-orders/{repId}
+    financial-assessment-endpoints:
+      search-url: ${services.maat-api.assessments-domain}/financial-assessments/{financialAssessmentId}
+    hardship-endpoints:
+      hardship-url: ${services.maat-api.assessments-domain}/hardship/{hardshipId}
 
 retry-config:
   max-retries: 2

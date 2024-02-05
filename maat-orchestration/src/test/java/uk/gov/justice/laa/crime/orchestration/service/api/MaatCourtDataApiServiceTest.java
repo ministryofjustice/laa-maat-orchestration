@@ -18,7 +18,7 @@ import static org.mockito.Mockito.verify;
 class MaatCourtDataApiServiceTest {
 
     @Mock
-    private RestAPIClient cmaApiClient;
+    private RestAPIClient restAPIClient;
 
     @InjectMocks
     private MaatCourtDataApiService maatCourtDataApiService;
@@ -30,15 +30,31 @@ class MaatCourtDataApiServiceTest {
     void givenValidRequest_whenExecuteStoredProcedureIsInvoked_thenApplicationIsReturned() {
         maatCourtDataApiService.executeStoredProcedure(new StoredProcedureRequest());
 
-        verify(cmaApiClient)
+        verify(restAPIClient)
                 .post(any(StoredProcedureRequest.class), any(), anyString(), anyMap());
     }
 
     @Test
-    void givenValidRequest_whengetRepOrderByRepIdIsInvoked_thenRepOrderDTOIsReturned() {
+    void givenValidRequest_whenGetRepOrderByRepIdIsInvoked_thenRepOrderDTOIsReturned() {
         maatCourtDataApiService.getRepOrderByRepId(1000);
 
-        verify(cmaApiClient)
+        verify(restAPIClient)
+                .get(any(), any(), anyInt());
+    }
+
+    @Test
+    void givenValidRequest_whenGetHardshipIsInvoked_thenApiFindHardshipResponseIsReturned() {
+        maatCourtDataApiService.getHardship(1000);
+
+        verify(restAPIClient)
+                .get(any(), any(), anyInt());
+    }
+
+    @Test
+    void givenValidRequest_whenGetFinancialAssessmentIsInvoked_thenFinancialAssessmentDTOIsReturned() {
+        maatCourtDataApiService.getFinancialAssessment(1000);
+
+        verify(restAPIClient)
                 .get(any(), any(), anyInt());
     }
 }

@@ -10,6 +10,8 @@ import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.RepOrderDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiFindHardshipResponse;
 
 import java.util.Collections;
 
@@ -46,5 +48,28 @@ public class MaatCourtDataApiService {
         log.info(RESPONSE_STRING, response);
         return response;
     }
+
+
+    public ApiFindHardshipResponse getHardship(Integer hardshipReviewId) {
+        ApiFindHardshipResponse response = maatApiClient.get(
+                new ParameterizedTypeReference<>() {},
+                configuration.getMaatApi().getHardshipEndpoints().getHardshipUrl(),
+                hardshipReviewId
+        );
+
+        log.info(String.format(RESPONSE_STRING, response));
+        return response;
+    }
+
+    public FinancialAssessmentDTO getFinancialAssessment(Integer financialAssessmentId) {
+        FinancialAssessmentDTO response = maatApiClient.get(
+                new ParameterizedTypeReference<>() {},
+                configuration.getMaatApi().getFinancialAssessmentEndpoints().getSearchUrl(),
+                financialAssessmentId
+        );
+        log.info(String.format(RESPONSE_STRING, response));
+        return response;
+    }
+
 
 }

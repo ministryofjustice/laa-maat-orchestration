@@ -143,6 +143,12 @@ public class ServicesConfiguration {
         @NotNull
         private Endpoints endpoints;
 
+        @NotNull
+        private HardshipEndpoints hardshipEndpoints;
+
+        @NotNull
+        private FinancialAssessmentEndpoints financialAssessmentEndpoints;
+
         @Data
         @NoArgsConstructor
         @AllArgsConstructor
@@ -152,6 +158,23 @@ public class ServicesConfiguration {
             @NotNull
             private String repOrderUrl;
 
+        }
+
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class HardshipEndpoints {
+            @NotNull
+            private String hardshipUrl;
+        }
+
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class FinancialAssessmentEndpoints {
+
+            @NotNull
+            private String searchUrl;
         }
     }
 }

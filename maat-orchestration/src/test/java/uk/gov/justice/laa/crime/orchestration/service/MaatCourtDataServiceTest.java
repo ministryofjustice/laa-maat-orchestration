@@ -36,8 +36,21 @@ class MaatCourtDataServiceTest {
     }
 
     @Test
-    void givenValidRequest_whenFindRepOrderIsInvoked_thenRequestIsMappedAndApiServiceIsCalled() {
+    void givenValidRequest_whenFindRepOrderIsInvoked_thenGetRepOrderByRepIdIsCalled() {
         maatCourtDataService.findRepOrder(1000);
         verify(maatCourtDataApiService).getRepOrderByRepId(anyInt());
+    }
+
+    @Test
+    void givenValidRequest_whenGetHardshipIsInvoked_thenGetHardshipIsCalled() {
+        maatCourtDataService.getHardship(1000);
+        verify(maatCourtDataApiService).getHardship(anyInt());
+    }
+
+    @Test
+    void givenValidRequest_whenGetFinancialAssessmentIsInvoked_thenGetFinancialAssessmentIsCalled() {
+        maatCourtDataService.getFinancialAssessment(1000);
+        verify(maatCourtDataApiService).getFinancialAssessment(anyInt());
+
     }
 }

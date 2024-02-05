@@ -6,11 +6,11 @@ import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.AppealType;
-import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOutcome;
-import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
-import uk.gov.justice.laa.crime.orchestration.model.common.ApiRepOrderCrownCourtOutcome;
-import uk.gov.justice.laa.crime.orchestration.model.common.ApiUserSession;
+import uk.gov.justice.laa.crime.orchestration.enums.AssessmentResult;
+import uk.gov.justice.laa.crime.orchestration.model.common.*;
+import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.orchestration.model.contribution.LastOutcome;
 import uk.gov.justice.laa.crime.orchestration.model.contribution.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipDetail;
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipProgress;
@@ -19,10 +19,7 @@ import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -92,6 +89,12 @@ public class TestModelDataBuilder {
     private static final Integer CMU_ID = 50;
     private static final String OTHER_HOUSING_NOTES = "Other Housing Notes";
     private static final String ASSESSMENT_NOTES = "ASSESSMENT NOTES";
+    private static final BigDecimal TOTAL_DISPOSABLE_INCOME = BigDecimal.valueOf(500);
+    private static final Integer HARDSHIP_ID = 1234;
+    private static final Integer TEST_REP_ID = 91919;
+    private static final String TEST_USER_NAME = "mock-u";
+    private static final Integer FINANCIAL_ASSESSMENT_ID = 6781;
+    public static final LocalDateTime TEST_DATE = LocalDateTime.of(2022, 1, 1, 0, 0);
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
         return new ApiFindHardshipResponse()
@@ -986,5 +989,100 @@ public class TestModelDataBuilder {
         assessmentDetailDTO.setCriteriaDetailsId(CRITERIA_DETAIL_ID.longValue());
         assessmentSectionSummaryDTO.setAssessmentDetail(List.of(assessmentDetailDTO));
         return assessmentSectionSummaryDTO;
+    }
+
+    public static HardshipReview getHardshipReview() {
+        return new HardshipReview()
+                .withCourtType(CourtType.MAGISTRATE)
+                .withReviewDate(LocalDateTime.now())
+                .withSolicitorCosts(TestModelDataBuilder.getSolicitorsCosts())
+                .withTotalAnnualDisposableIncome(TOTAL_DISPOSABLE_INCOME)
+                .withSolicitorCosts(getSolicitorsCosts())
+                .withDeniedIncome(List.of(getDeniedIncome()))
+                .withExtraExpenditure(List.of(getExtraExpenditure().withDescription("Extra Expenditure")));
+    }
+
+    public static HardshipMetadata getHardshipMetadata() {
+        return new HardshipMetadata()
+                .withReviewReason(NewWorkReason.PRI)
+                .withCmuId(CMU_ID)
+                .withHardshipReviewId(HARDSHIP_ID)
+                .withNotes("Mock Note.")
+                .withDecisionNotes("Mock Decision Note.")
+                .withRepId(TestModelDataBuilder.TEST_REP_ID)
+                .withReviewStatus(HardshipReviewStatus.COMPLETE)
+                .withUserSession(TestModelDataBuilder.getUserSession())
+                .withFinancialAssessmentId(TestModelDataBuilder.FINANCIAL_ASSESSMENT_ID);
+    }
+
+    public static DeniedIncome getDeniedIncome() {
+        return new DeniedIncome()
+                .withAccepted(true)
+                .withAmount(BigDecimal.TEN)
+                .withFrequency(Frequency.MONTHLY)
+                .withReasonNote("Hospitalisation")
+                .withItemCode(DeniedIncomeDetailCode.MEDICAL_GROUNDS);
+    }
+
+    public static ExtraExpenditure getExtraExpenditure() {
+        return new ExtraExpenditure()
+                .withAccepted(true)
+                .withAmount(BigDecimal.TEN)
+                .withFrequency(Frequency.TWO_WEEKLY)
+                .withReasonCode(HardshipReviewDetailReason.ESSENTIAL_ITEM)
+                .withItemCode(ExtraExpenditureDetailCode.CARDS);
+    }
+
+    public static ApiUserSession getUserSession() {
+        return new ApiUserSession()
+                .withUserName(TEST_USER_NAME)
+                .withSessionId(UUID.randomUUID().toString());
+    }
+
+    public static HardshipReview getMinimalHardshipReview() {
+        return new HardshipReview()
+                .withCourtType(CourtType.MAGISTRATE)
+                .withReviewDate(LocalDateTime.now())
+                .withSolicitorCosts(TestModelDataBuilder.getSolicitorsCosts())
+                .withTotalAnnualDisposableIncome(TOTAL_DISPOSABLE_INCOME);
+    }
+
+
+    public static HardshipProgress getHardshipProgress() {
+        return new HardshipProgress()
+                .withDateTaken(LocalDateTime.of(
+                        LocalDate.ofYearDay(2022, 235), LocalTime.NOON))
+                .withDateCompleted(LocalDateTime.of(
+                        LocalDate.ofYearDay(2022, 250), LocalTime.NOON)
+                )
+                .withDateRequired(LocalDateTime.of(
+                        LocalDate.ofYearDay(2022, 300), LocalTime.NOON)
+                )
+                .withAction(HardshipReviewProgressAction.ADDITIONAL_EVIDENCE)
+                .withResponse(HardshipReviewProgressResponse.ADDITIONAL_PROVIDED);
+    }
+
+    public static ApiMaatCalculateContributionRequest buildCalculateContributionRequest() {
+        return new ApiMaatCalculateContributionRequest()
+                .withApplId(999)
+                .withRepId(999)
+                .withCaseType(CaseType.EITHER_WAY)
+                .withAppealType(AppealType.ACS)
+                .withUserCreated("TEST")
+                .withLastOutcome(buildLastOutcome())
+                .withAssessments(List.of(buildAssessment()));
+    }
+
+    public static LastOutcome buildLastOutcome() {
+        return new LastOutcome()
+                .withOutcome(CrownCourtAppealOutcome.SUCCESSFUL)
+                .withDateSet(TEST_DATE);
+    }
+
+    public static ApiAssessment buildAssessment() {
+        return new ApiAssessment()
+                .withAssessmentType(AssessmentType.INIT)
+                .withStatus(CurrentStatus.COMPLETE)
+                .withResult(AssessmentResult.PASS);
     }
 }

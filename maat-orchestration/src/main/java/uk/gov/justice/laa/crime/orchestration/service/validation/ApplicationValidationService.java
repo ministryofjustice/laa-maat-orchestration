@@ -1,4 +1,4 @@
-package uk.gov.justice.laa.crime.orchestration.service;
+package uk.gov.justice.laa.crime.orchestration.service.validation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ValidationService {
+public class ApplicationValidationService {
     public static final String CANNOT_MODIFY_APPLICATION_ERROR =
             "Application has been modified by another user";
     public static final String CANNOT_UPDATE_APPLICATION_STATUS =

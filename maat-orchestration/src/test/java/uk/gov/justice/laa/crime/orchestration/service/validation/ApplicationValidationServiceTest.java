@@ -1,4 +1,4 @@
-package uk.gov.justice.laa.crime.orchestration.service;
+package uk.gov.justice.laa.crime.orchestration.service.validation;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,21 +20,21 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static uk.gov.justice.laa.crime.orchestration.service.ValidationService.CANNOT_MODIFY_APPLICATION_ERROR;
+import static uk.gov.justice.laa.crime.orchestration.service.validation.ApplicationValidationService.CANNOT_MODIFY_APPLICATION_ERROR;
 
-class ValidationServiceTest {
+class ApplicationValidationServiceTest {
 
-    public ValidationService validationService;
+    public ApplicationValidationService applicationValidationService;
 
     @BeforeEach
     void setUp() {
-        validationService = new ValidationService();
+        applicationValidationService = new ApplicationValidationService();
     }
 
     @ParameterizedTest
     @MethodSource("validateApplicationTimestamp")
     void validateApplicationTimestamp(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        ValidationException validationException =  assertThrows(ValidationException.class, () -> validationService.
+        ValidationException validationException =  assertThrows(ValidationException.class, () -> applicationValidationService.
                 validate(workflowRequest, repOrderDTO));
         assertThat(validationException.getMessage()).isEqualTo(CANNOT_MODIFY_APPLICATION_ERROR);
     }
@@ -42,14 +42,14 @@ class ValidationServiceTest {
     @ParameterizedTest
     @MethodSource("validateApplicationStatus")
     void validateApplicationStatus(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        ValidationException validationException =  assertThrows(ValidationException.class, () -> validationService.
+        ValidationException validationException =  assertThrows(ValidationException.class, () -> applicationValidationService.
                 validate(workflowRequest, repOrderDTO));
         assertThat(validationException.getMessage()).contains("Cannot update case in status of");
     }
     @ParameterizedTest
     @MethodSource("validateApplicationStatusNoException")
     void validateApplicationStatus_noException(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        assertDoesNotThrow(() ->validationService.validate(workflowRequest, repOrderDTO));
+        assertDoesNotThrow(() -> applicationValidationService.validate(workflowRequest, repOrderDTO));
     }
 
     private static Stream<Arguments> validateApplicationTimestamp() {
