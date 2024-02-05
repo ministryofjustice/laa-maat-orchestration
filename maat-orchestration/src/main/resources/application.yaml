@@ -102,7 +102,6 @@ services:
     hardship-endpoints:
       hardship-url: ${services.maat-api.assessments-domain}/hardship/{hardshipId}
 
-
 retry-config:
   max-retries: 3
   min-back-off-period: 5
