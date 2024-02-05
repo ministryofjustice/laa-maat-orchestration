@@ -3,6 +3,7 @@ package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
@@ -28,21 +29,33 @@ public class MeansAssessmentOrchestrationService {
 
     public ApplicationDTO create(WorkflowRequest request) {
 
-        Long repId = request.getApplicationDTO().getRepId();
-        log.debug("Creating Means assessment for applicationId = " + repId);
-        meansAssessmentService.create(request);
-        ApplicationDTO application = processCrownCourtProceedings(request);
-        log.debug("Created Means assessment for applicationId = " + repId);
+        ApplicationDTO application = request.getApplicationDTO();
+        try {
+            Long repId = application.getRepId();
+            log.debug("Creating Means assessment for applicationId = " + repId);
+            meansAssessmentService.create(request);
+            application = processCrownCourtProceedings(request);
+            log.debug("Created Means assessment for applicationId = " + repId);
+        } catch (Exception ex) {
+            meansAssessmentService.rollback(request);
+            throw new APIClientException(ex.getMessage());
+        }
         return application;
     }
 
     public ApplicationDTO update(WorkflowRequest request) {
 
-        Long repId = request.getApplicationDTO().getRepId();
-        log.debug("Updating Means assessment for applicationId = " + repId);
-        meansAssessmentService.update(request);
-        ApplicationDTO application = processCrownCourtProceedings(request);
-        log.debug("Updated Means assessment for applicationId = " + repId);
+        ApplicationDTO application = request.getApplicationDTO();
+        try {
+            Long repId = application.getRepId();
+            log.debug("Updating Means assessment for applicationId = " + repId);
+            meansAssessmentService.update(request);
+            application = processCrownCourtProceedings(request);
+            log.debug("Updated Means assessment for applicationId = " + repId);
+        } catch (Exception ex) {
+            meansAssessmentService.rollback(request);
+            throw new APIClientException(ex.getMessage());
+        }
         return application;
     }
 

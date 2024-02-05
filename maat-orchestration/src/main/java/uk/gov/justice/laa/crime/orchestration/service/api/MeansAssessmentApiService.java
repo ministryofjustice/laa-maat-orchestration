@@ -10,6 +10,7 @@ import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiCreateMeansAssessmentRequest;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiGetMeansAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiMeansAssessmentResponse;
+import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiRollbackMeansAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiUpdateMeansAssessmentRequest;
 
 import java.util.Collections;
@@ -58,6 +59,19 @@ public class MeansAssessmentApiService {
                 Collections.emptyMap()
         );
 
+        log.info(String.format(RESPONSE_STRING, response));
+        return response;
+    }
+
+    public ApiRollbackMeansAssessmentResponse rollback(Long financialAssessmentId) {
+        ApiRollbackMeansAssessmentResponse response = cmaApiClient.patch(
+                "",
+                new ParameterizedTypeReference<>() {
+                },
+                configuration.getCmaApi().getEndpoints().getRollbackUrl(),
+                Collections.emptyMap(),
+                financialAssessmentId
+        );
         log.info(String.format(RESPONSE_STRING, response));
         return response;
     }

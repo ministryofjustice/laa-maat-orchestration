@@ -5,6 +5,7 @@ import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import uk.gov.justice.laa.crime.enums.AssessmentType;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
@@ -251,4 +252,37 @@ class MeansAssessmentMapperTest {
         softly.assertThat(childWeightingDTO.getId())
                 .isEqualTo(apiAssessmentChildWeighting.getId().intValue());
     }
-}
+
+    @Test
+    void givenInitialAssessment_whenApiRollbackMeansAssessmentResponseToApplicationDtoIsInvoked_thenMappingIsCorrect() {
+        ApiRollbackMeansAssessmentResponse apiRollbackMeansAssessmentResponse =
+                MeansAssessmentDataBuilder.getApiRollbackMeansAssessmentResponse(AssessmentType.INIT.getType());
+        ApplicationDTO applicationDTO = getApplicationDTOForMeansAssessmentMapper(false);
+        InitialAssessmentDTO initialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
+        meansAssessmentMapper.apiRollbackMeansAssessmentResponseToApplicationDto(
+                apiRollbackMeansAssessmentResponse, applicationDTO);
+
+        softly.assertThat(initialAssessmentDTO.getResult())
+                .isEqualTo(apiRollbackMeansAssessmentResponse.getInitResult());
+        softly.assertThat(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus())
+                .isEqualTo(apiRollbackMeansAssessmentResponse.getFassInitStatus().getStatus());
+        softly.assertThat(initialAssessmentDTO.getAssessmnentStatusDTO().getDescription())
+                .isEqualTo(apiRollbackMeansAssessmentResponse.getFassInitStatus().getDescription());
+    }
+
+    @Test
+    void givenFullAssessment_whenApiRollbackMeansAssessmentResponseToApplicationDtoIsInvoked_thenMappingIsCorrect() {
+        ApiRollbackMeansAssessmentResponse apiRollbackMeansAssessmentResponse =
+                MeansAssessmentDataBuilder.getApiRollbackMeansAssessmentResponse(AssessmentType.FULL.getType());
+        ApplicationDTO applicationDTO = getApplicationDTOForMeansAssessmentMapper(true);
+        FullAssessmentDTO fullAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFull();
+        meansAssessmentMapper.apiRollbackMeansAssessmentResponseToApplicationDto(
+                apiRollbackMeansAssessmentResponse, applicationDTO);
+
+        softly.assertThat(fullAssessmentDTO.getResult())
+                .isEqualTo(apiRollbackMeansAssessmentResponse.getFullResult());
+        softly.assertThat(fullAssessmentDTO.getAssessmnentStatusDTO().getStatus())
+                .isEqualTo(apiRollbackMeansAssessmentResponse.getFassFullStatus().getStatus());
+        softly.assertThat(fullAssessmentDTO.getAssessmnentStatusDTO().getDescription())
+                .isEqualTo(apiRollbackMeansAssessmentResponse.getFassFullStatus().getDescription());
+    }}

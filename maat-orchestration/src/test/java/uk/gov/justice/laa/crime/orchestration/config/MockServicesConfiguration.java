@@ -37,9 +37,10 @@ public class MockServicesConfiguration {
 
         ServicesConfiguration.CmaApi.Endpoints cmaEndpoints =
                 new ServicesConfiguration.CmaApi.Endpoints(
-                        "/assessment/means/{financialAssessmentId}/applicantId/{applicantId}",
+                        "/assessment/means/{financialAssessmentId}",
                         "/assessment/means",
-                        "/assessment/means"
+                        "/assessment/means",
+                        "/assessment/means/rollback/{financialAssessmentId}"
                 );
 
         ServicesConfiguration.MaatApi.Endpoints maatEndpoints =

@@ -484,4 +484,26 @@ public class MeansAssessmentMapper {
             }
         }
     }
+
+    public void apiRollbackMeansAssessmentResponseToApplicationDto(ApiRollbackMeansAssessmentResponse response, ApplicationDTO applicationDTO) {
+        if (AssessmentType.INIT.getType().equals(response.getAssessmentType())) {
+            InitialAssessmentDTO initialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
+            initialAssessmentDTO.setResult(response.getInitResult());
+            initialAssessmentDTO.setAssessmnentStatusDTO(mapAssessmentStatus(response.getFassInitStatus()));
+        } else if (AssessmentType.FULL.getType().equals(response.getAssessmentType())) {
+            FullAssessmentDTO fullAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFull();
+            fullAssessmentDTO.setResult(response.getFullResult());
+            fullAssessmentDTO.setAssessmnentStatusDTO(mapAssessmentStatus(response.getFassFullStatus()));
+        }
+    }
+
+    private AssessmentStatusDTO mapAssessmentStatus(CurrentStatus apiAssessmentStatus) {
+        if (apiAssessmentStatus != null) {
+            return AssessmentStatusDTO.builder()
+                    .status(apiAssessmentStatus.getStatus())
+                    .description(apiAssessmentStatus.getDescription())
+                    .build();
+        }
+        return AssessmentStatusDTO.builder().build();
+    }
 }

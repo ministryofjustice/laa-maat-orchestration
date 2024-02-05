@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.http.MediaType;
+import uk.gov.justice.laa.crime.orchestration.data.Constants;
 
 import java.util.Map;
 import java.util.UUID;
@@ -17,6 +18,7 @@ public class WiremockStubs {
     private static final String CCP_URL = "/api/internal/v1/proceedings";
     private static final String CCC_URL = "/api/internal/v1/contribution";
     private static final String MAAT_API_ASSESSMENT_URL = "/api/internal/v1/assessment";
+    private static final String CMA_ROLLBACK_URL = "/api/internal/v1/assessment/means/rollback/";
 
     public static void stubForOAuth() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
@@ -104,5 +106,12 @@ public class WiremockStubs {
 
     public static void assertStubForInvokeStoredProcedure(int times) {
         verify(exactly(times), postRequestedFor(urlPathMatching(MAAT_API_ASSESSMENT_URL + "/execute-stored-procedure")));
+    }
+
+    public static void stubForRollbackMeansAssessment(String response) {
+        stubFor((patch(urlMatching(CMA_ROLLBACK_URL + Constants.FINANCIAL_ASSESSMENT_ID))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response))));
     }
 }
