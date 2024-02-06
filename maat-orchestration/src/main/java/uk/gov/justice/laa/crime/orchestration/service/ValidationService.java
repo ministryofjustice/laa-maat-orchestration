@@ -6,11 +6,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.enums.RepOrderStatus;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.RepStatusDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
-import uk.gov.justice.laa.crime.orchestration.model.maat_api.ApiIsRoleActionValidRequest;
 import uk.gov.justice.laa.crime.util.DateUtil;
 
 import java.time.LocalDateTime;
@@ -63,7 +63,7 @@ public class ValidationService {
         }
     }
 
-    public Boolean isUserActionValid(ApiIsRoleActionValidRequest request) {
+    public Boolean isUserActionValid(UserValidationDTO request) {
         List<String> crimeValidationExceptionList = new ArrayList<>();
 
         if (request.getAction() == null && request.getNewWorkReason() == null && request.getSessionId() == null) {

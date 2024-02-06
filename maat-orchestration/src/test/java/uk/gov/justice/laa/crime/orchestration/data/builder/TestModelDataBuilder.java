@@ -8,6 +8,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.Action;
 import uk.gov.justice.laa.crime.orchestration.enums.AppealType;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOutcome;
@@ -20,7 +21,6 @@ import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiH
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipProgress;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.*;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
-import uk.gov.justice.laa.crime.orchestration.model.maat_api.ApiIsRoleActionValidRequest;
 import uk.gov.justice.laa.crime.util.DateUtil;
 
 import java.math.BigDecimal;
@@ -1061,28 +1061,28 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    public static ApiIsRoleActionValidRequest getApiIsRoleActionValidRequest() {
-        return new ApiIsRoleActionValidRequest()
-                .withUsername(TEST_USER_NAME)
-                .withAction(TEST_ACTION)
-                .withNewWorkReason(TEST_NEW_WORK_REASON)
-                .withSessionId("");
+    public static UserValidationDTO getUserValidationDTO() {
+        return UserValidationDTO.builder()
+                .username(TEST_USER_NAME)
+                .action(TEST_ACTION)
+                .newWorkReason(TEST_NEW_WORK_REASON)
+                .sessionId("").build();
     }
 
-    public static ApiIsRoleActionValidRequest getApiIsRoleActionValidRequestWithReservation() {
-        return new ApiIsRoleActionValidRequest()
-                .withUsername(TEST_USER_NAME)
-                .withAction(TEST_ACTION)
-                .withNewWorkReason(TEST_NEW_WORK_REASON)
-                .withSessionId(TEST_USER_SESSION);
+    public static UserValidationDTO getUserValidationDTOWithReservation() {
+        return UserValidationDTO.builder()
+                .username(TEST_USER_NAME)
+                .action(TEST_ACTION)
+                .newWorkReason(TEST_NEW_WORK_REASON)
+                .sessionId(TEST_USER_SESSION).build();
     }
 
-    public static ApiIsRoleActionValidRequest getApiIsRoleActionInvalidValidRequest() {
-        return new ApiIsRoleActionValidRequest()
-                .withUsername(TEST_USER_NAME)
-                .withAction(null)
-                .withNewWorkReason(null)
-                .withSessionId(null);
+    public static UserValidationDTO getUserValidationDTOInvalidValidRequest() {
+        return UserValidationDTO.builder()
+                .username(TEST_USER_NAME)
+                .action(null)
+                .newWorkReason(null)
+                .sessionId(null).build();
     }
 
 }
