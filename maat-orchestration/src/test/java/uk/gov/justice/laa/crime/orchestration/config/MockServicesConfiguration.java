@@ -45,7 +45,8 @@ public class MockServicesConfiguration {
 
         ServicesConfiguration.MaatApi.Endpoints maatEndpoints =
                 new ServicesConfiguration.MaatApi.Endpoints(
-                        "/assessment/means/execute-stored-procedure"
+                        "/assessment/means/execute-stored-procedure",
+                        "/assessment/rep-orders/{repId}"
                 );
 
         hardshipApi.setBaseUrl(host);

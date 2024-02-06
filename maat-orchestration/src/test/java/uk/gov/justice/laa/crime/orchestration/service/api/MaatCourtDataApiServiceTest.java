@@ -33,4 +33,12 @@ class MaatCourtDataApiServiceTest {
         verify(cmaApiClient)
                 .post(any(StoredProcedureRequest.class), any(), anyString(), anyMap());
     }
+
+    @Test
+    void givenValidRequest_whengetRepOrderByRepIdIsInvoked_thenRepOrderDTOIsReturned() {
+        maatCourtDataApiService.getRepOrderByRepId(1000);
+
+        verify(cmaApiClient)
+                .get(any(), any(), anyInt());
+    }
 }

@@ -152,6 +152,8 @@ public class ServicesConfiguration {
         public static class Endpoints {
             @NotNull
             private String callStoredProcUrl;
+            @NotNull
+            private String repOrderUrl;
 
         }
     }

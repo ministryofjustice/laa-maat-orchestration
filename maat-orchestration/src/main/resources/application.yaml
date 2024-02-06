@@ -96,6 +96,7 @@ services:
     base-url: ${MAAT_API_BASE_URL}
     endpoints:
       call-stored-proc-url: ${services.maat-api.base-url}/api/internal/v1/assessment/execute-stored-procedure
+      rep-order-url: ${services.maat-api.base-url}/api/internal/v1/assessment/rep-orders/{repId}
 
 retry-config:
   max-retries: 3
