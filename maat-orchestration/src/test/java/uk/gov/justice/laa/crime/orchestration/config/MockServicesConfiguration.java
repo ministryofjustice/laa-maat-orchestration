@@ -51,7 +51,7 @@ public class MockServicesConfiguration {
 
         ServicesConfiguration.MaatApi.UserEndpoints userEndpoints =
                 new ServicesConfiguration.MaatApi.UserEndpoints(
-                        "/api/internal/v1/users"
+                        "/api/internal/v1/users/summary/{username}"
                 );
 
         hardshipApi.setBaseUrl(host);
