@@ -143,6 +143,9 @@ public class ServicesConfiguration {
         @NotNull
         private Endpoints endpoints;
 
+        @NotNull
+        private UserEndpoints userEndpoints;
+
         @Data
         @NoArgsConstructor
         @AllArgsConstructor
@@ -152,6 +155,15 @@ public class ServicesConfiguration {
             @NotNull
             private String repOrderUrl;
 
+        }
+
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class UserEndpoints {
+
+            @NotNull
+            private String userSummaryUrl;
         }
     }
 }

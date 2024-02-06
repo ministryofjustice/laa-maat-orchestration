@@ -5,6 +5,10 @@ import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.Action;
 import uk.gov.justice.laa.crime.orchestration.enums.AppealType;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
@@ -16,13 +20,12 @@ import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiH
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipProgress;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.*;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
+import uk.gov.justice.laa.crime.orchestration.model.maat_api.ApiIsRoleActionValidRequest;
+import uk.gov.justice.laa.crime.util.DateUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -92,6 +95,17 @@ public class TestModelDataBuilder {
     private static final Integer CMU_ID = 50;
     private static final String OTHER_HOUSING_NOTES = "Other Housing Notes";
     private static final String ASSESSMENT_NOTES = "ASSESSMENT NOTES";
+    private static final LocalDateTime APPLICATION_TIMESTAMP = LocalDateTime.parse("2024-01-27T10:15:30");
+    private static final LocalDateTime REP_ORDER_MODIFIED_TIMESTAMP = LocalDateTime.parse("2023-06-27T10:15:30");
+    private static final LocalDate REP_ORDER_CREATED_TIMESTAMP = LocalDate.of(2024, Month.JANUARY, 8);
+    private static final String TEST_USER_NAME = "test-s";
+    private static final List<String> TEST_ROLE_ACTIONS = List.of("CREATE_ASSESSMENT");
+    private static final Action TEST_ACTION = Action.CREATE_ASSESSMENT;
+    private static final NewWorkReason TEST_NEW_WORK_REASON = NewWorkReason.CFC;
+    private static final List<String> TEST_NEW_WORK_REASONS = List.of("CFC");
+    private static final String TEST_USER_SESSION = "sessionId_e5712593c198";
+    private static final Integer TEST_RECORD_ID = 100;
+    private static final LocalDateTime RESERVATION_DATE = LocalDateTime.of(2022, 12, 14, 0, 0, 0);
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
         return new ApiFindHardshipResponse()
@@ -416,6 +430,33 @@ public class TestModelDataBuilder {
                 .userDTO(getUserDTO())
                 .applicationDTO(getApplicationDTO())
                 .isC3Enabled(true)
+                .build();
+    }
+
+    public static WorkflowRequest buildWorkFlowRequestForApplicationTimestampValidation(){
+        return WorkflowRequest
+                .builder()
+                .applicationDTO(
+                        ApplicationDTO
+                                .builder()
+                                .repId(123L)
+                                .timestamp(DateUtil.toTimeStamp(APPLICATION_TIMESTAMP))
+                                .build()).build();
+    }
+
+    public static WorkflowRequest buildWorkFlowRequest(boolean isUpdateAllowed){
+        return WorkflowRequest
+                .builder()
+                .applicationDTO(
+                        ApplicationDTO
+                                .builder()
+                                .repId(123L)
+                                .timestamp(DateUtil.toTimeStamp(APPLICATION_TIMESTAMP))
+                                .statusDTO(RepStatusDTO
+                                        .builder()
+                                        .updateAllowed(isUpdateAllowed)
+                                        .build())
+                                .build())
                 .build();
     }
 
@@ -987,4 +1028,61 @@ public class TestModelDataBuilder {
         assessmentSectionSummaryDTO.setAssessmentDetail(List.of(assessmentDetailDTO));
         return assessmentSectionSummaryDTO;
     }
+
+    public static RepOrderDTO buildRepOrderDTOWithModifiedDate() {
+        return RepOrderDTO.builder().dateModified(REP_ORDER_MODIFIED_TIMESTAMP).build();
+    }
+
+    public static RepOrderDTO buildRepOrderDTOWithCreatedDateAndNoModifiedDate() {
+        return RepOrderDTO.builder().dateCreated(REP_ORDER_CREATED_TIMESTAMP).dateModified(null).build();
+    }
+
+    public static RepOrderDTO buildRepOrderDTO(String rorsStatus) {
+        return RepOrderDTO.builder().dateModified(APPLICATION_TIMESTAMP).rorsStatus(rorsStatus).build();
+    }
+
+    public static UserSummaryDTO getUserSummaryDTO() {
+        return UserSummaryDTO.builder()
+                .username(TEST_USER_NAME)
+                .roleActions(TEST_ROLE_ACTIONS)
+                .newWorkReasons(TEST_NEW_WORK_REASONS)
+                .reservationsEntity(getReservationsDTO())
+                .build();
+    }
+
+    public static ReservationsDTO getReservationsDTO() {
+        return ReservationsDTO.builder()
+                .recordId(TEST_RECORD_ID)
+                .recordName("")
+                .userName(TEST_USER_NAME)
+                .userSession(TEST_USER_SESSION)
+                .reservationDate(RESERVATION_DATE)
+                .expiryDate(RESERVATION_DATE)
+                .build();
+    }
+
+    public static ApiIsRoleActionValidRequest getApiIsRoleActionValidRequest() {
+        return new ApiIsRoleActionValidRequest()
+                .withUsername(TEST_USER_NAME)
+                .withAction(TEST_ACTION)
+                .withNewWorkReason(TEST_NEW_WORK_REASON)
+                .withSessionId("");
+    }
+
+    public static ApiIsRoleActionValidRequest getApiIsRoleActionValidRequestWithReservation() {
+        return new ApiIsRoleActionValidRequest()
+                .withUsername(TEST_USER_NAME)
+                .withAction(TEST_ACTION)
+                .withNewWorkReason(TEST_NEW_WORK_REASON)
+                .withSessionId(TEST_USER_SESSION);
+    }
+
+    public static ApiIsRoleActionValidRequest getApiIsRoleActionInvalidValidRequest() {
+        return new ApiIsRoleActionValidRequest()
+                .withUsername(TEST_USER_NAME)
+                .withAction(null)
+                .withNewWorkReason(null)
+                .withSessionId(null);
+    }
+
 }

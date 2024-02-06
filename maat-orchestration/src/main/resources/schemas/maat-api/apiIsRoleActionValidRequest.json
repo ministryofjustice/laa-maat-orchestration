@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "apiIsRoleActionValidRequest.json",
+  "type": "object",
+  "title": "Check if Role Action is Valid",
+  "description": "Check if Role Action is Valid for User by getting UserSummaryDTO from MAAT API",
+  "properties": {
+    "username": {
+      "type": "string",
+      "description": "User name"
+    },
+    "action": {
+      "type": "object",
+      "description": "The user role action",
+      "existingJavaType": "uk.gov.justice.laa.crime.orchestration.enums.Action"
+    },
+    "newWorkReason": {
+      "type": "object",
+      "description": "The New Work Reason Code",
+      "existingJavaType": "uk.gov.justice.laa.crime.enums.NewWorkReason"
+    },
+    "sessionId": {
+      "type": "string",
+      "description": "The users session id"
+    }
+  },
+  "required": ["username"]
+}

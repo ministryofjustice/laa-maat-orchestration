@@ -7,6 +7,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiCreateMeansAssessmentRequest;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiGetMeansAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiMeansAssessmentResponse;
@@ -61,4 +62,18 @@ public class MeansAssessmentApiService {
         log.info(String.format(RESPONSE_STRING, response));
         return response;
     }
+
+    public UserSummaryDTO getUserSummary(String username) {
+        UserSummaryDTO userSummaryDTO = cmaApiClient.get(
+                new ParameterizedTypeReference<>() {
+                },
+                configuration.getMaatApi().getUserEndpoints().getUserSummaryUrl(),
+                username
+        );
+
+        log.info(String.format(RESPONSE_STRING, userSummaryDTO));
+        return userSummaryDTO;
+    }
+
+
 }
