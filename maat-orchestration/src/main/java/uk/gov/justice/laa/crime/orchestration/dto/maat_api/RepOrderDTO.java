@@ -1,4 +1,4 @@
-package uk.gov.justice.laa.crime.orchestration.dto.maat;
+package uk.gov.justice.laa.crime.orchestration.dto.maat_api;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

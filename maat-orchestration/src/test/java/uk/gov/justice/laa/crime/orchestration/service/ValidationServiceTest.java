@@ -8,8 +8,8 @@ import uk.gov.justice.laa.crime.enums.RepOrderStatus;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.RepStatusDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.util.DateUtil;
 
 import java.time.LocalDate;
@@ -24,6 +24,9 @@ import static uk.gov.justice.laa.crime.orchestration.service.ValidationService.C
 
 class ValidationServiceTest {
 
+    private static final LocalDateTime APPLICATION_TIMESTAMP = LocalDateTime.parse("2024-01-27T10:15:30");
+    private static final LocalDateTime REP_ORDER_MODIFIED_TIMESTAMP = LocalDateTime.parse("2023-06-27T10:15:30");
+    private static final LocalDate REP_ORDER_CREATED_TIMESTAMP = LocalDate.of(2024, Month.JANUARY, 8);
     public ValidationService validationService;
 
     @BeforeEach
@@ -34,7 +37,7 @@ class ValidationServiceTest {
     @ParameterizedTest
     @MethodSource("validateApplicationTimestamp")
     void validateApplicationTimestamp(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        ValidationException validationException =  assertThrows(ValidationException.class, () -> validationService.
+        ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.
                 validate(workflowRequest, repOrderDTO));
         assertThat(validationException.getMessage()).isEqualTo(CANNOT_MODIFY_APPLICATION_ERROR);
     }
@@ -42,38 +45,39 @@ class ValidationServiceTest {
     @ParameterizedTest
     @MethodSource("validateApplicationStatus")
     void validateApplicationStatus(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        ValidationException validationException =  assertThrows(ValidationException.class, () -> validationService.
+        ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.
                 validate(workflowRequest, repOrderDTO));
         assertThat(validationException.getMessage()).contains("Cannot update case in status of");
     }
+
     @ParameterizedTest
     @MethodSource("validateApplicationStatusNoException")
     void validateApplicationStatus_noException(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        assertDoesNotThrow(() ->validationService.validate(workflowRequest, repOrderDTO));
+        assertDoesNotThrow(() -> validationService.validate(workflowRequest, repOrderDTO));
     }
 
     private static Stream<Arguments> validateApplicationTimestamp() {
         return Stream.of(
                 Arguments.of(WorkflowRequest
-                        .builder()
+                                .builder()
                                 .applicationDTO(
                                         ApplicationDTO.
                                                 builder().
-                                                timestamp(DateUtil.toTimeStamp(LocalDateTime.parse("2024-01-27T10:15:30")))
+                                                timestamp(DateUtil.toTimeStamp(APPLICATION_TIMESTAMP))
                                                 .build()).build(),
                         RepOrderDTO
                                 .builder()
-                                .dateModified(LocalDateTime.parse("2023-06-27T10:15:30")).build()),
+                                .dateModified(REP_ORDER_MODIFIED_TIMESTAMP).build()),
                 Arguments.of(WorkflowRequest
                                 .builder()
                                 .applicationDTO(
                                         ApplicationDTO.
                                                 builder().
-                                                timestamp(DateUtil.toTimeStamp(LocalDateTime.parse("2024-01-27T10:15:30")))
+                                                timestamp(DateUtil.toTimeStamp(APPLICATION_TIMESTAMP))
                                                 .build()).build(),
                         RepOrderDTO
                                 .builder()
-                                .dateCreated(LocalDate.of(2024, Month.JANUARY, 8))
+                                .dateCreated(REP_ORDER_CREATED_TIMESTAMP)
                                 .dateModified(null).build())
         );
     }
@@ -85,7 +89,7 @@ class ValidationServiceTest {
                                 .applicationDTO(
                                         ApplicationDTO.
                                                 builder().
-                                                timestamp(DateUtil.toTimeStamp(LocalDateTime.parse("2024-01-27T10:15:30")))
+                                                timestamp(DateUtil.toTimeStamp(APPLICATION_TIMESTAMP))
                                                 .statusDTO(
                                                         RepStatusDTO
                                                                 .builder()
@@ -95,7 +99,7 @@ class ValidationServiceTest {
                                 .build(),
                         RepOrderDTO
                                 .builder()
-                                .dateModified(LocalDateTime.parse("2024-01-27T10:15:30"))
+                                .dateModified(APPLICATION_TIMESTAMP)
                                 .rorsStatus(RepOrderStatus.ERR.getCode())
                                 .build())
         );
@@ -108,7 +112,7 @@ class ValidationServiceTest {
                                 .applicationDTO(
                                         ApplicationDTO.
                                                 builder().
-                                                timestamp(DateUtil.toTimeStamp(LocalDateTime.parse("2024-01-27T10:15:30")))
+                                                timestamp(DateUtil.toTimeStamp(APPLICATION_TIMESTAMP))
                                                 .statusDTO(
                                                         RepStatusDTO
                                                                 .builder()
@@ -118,7 +122,7 @@ class ValidationServiceTest {
                                 .build(),
                         RepOrderDTO
                                 .builder()
-                                .dateModified(LocalDateTime.parse("2024-01-27T10:15:30"))
+                                .dateModified(APPLICATION_TIMESTAMP)
                                 .rorsStatus(RepOrderStatus.ERR.getCode())
                                 .build()),
                 Arguments.of(WorkflowRequest
@@ -126,7 +130,7 @@ class ValidationServiceTest {
                                 .applicationDTO(
                                         ApplicationDTO.
                                                 builder().
-                                                timestamp(DateUtil.toTimeStamp(LocalDateTime.parse("2024-01-27T10:15:30")))
+                                                timestamp(DateUtil.toTimeStamp(APPLICATION_TIMESTAMP))
                                                 .statusDTO(
                                                         RepStatusDTO
                                                                 .builder()
@@ -136,7 +140,7 @@ class ValidationServiceTest {
                                 .build(),
                         RepOrderDTO
                                 .builder()
-                                .dateModified(LocalDateTime.parse("2024-01-27T10:15:30"))
+                                .dateModified(APPLICATION_TIMESTAMP)
                                 .rorsStatus(null)
                                 .build()),
                 Arguments.of(WorkflowRequest
@@ -144,7 +148,7 @@ class ValidationServiceTest {
                                 .applicationDTO(
                                         ApplicationDTO.
                                                 builder().
-                                                timestamp(DateUtil.toTimeStamp(LocalDateTime.parse("2024-01-27T10:15:30")))
+                                                timestamp(DateUtil.toTimeStamp(APPLICATION_TIMESTAMP))
                                                 .statusDTO(
                                                         RepStatusDTO
                                                                 .builder()
@@ -154,13 +158,10 @@ class ValidationServiceTest {
                                 .build(),
                         RepOrderDTO
                                 .builder()
-                                .dateModified(LocalDateTime.parse("2024-01-27T10:15:30"))
+                                .dateModified(APPLICATION_TIMESTAMP)
                                 .rorsStatus(RepOrderStatus.CURR.getCode())
                                 .build())
 
         );
     }
-
-
-
 }
