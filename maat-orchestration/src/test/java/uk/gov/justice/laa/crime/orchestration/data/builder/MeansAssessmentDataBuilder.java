@@ -725,7 +725,7 @@ public class MeansAssessmentDataBuilder {
 
     }
 
-    private static List<ApiAssessmentSectionSummary> getAssessmentSectionSummary(){
+    private static List<ApiAssessmentSectionSummary> getAssessmentSectionSummary() {
         return List.of(
                 new ApiAssessmentSectionSummary()
                         .withAssessmentType(AssessmentType.HARDSHIP)
@@ -745,7 +745,7 @@ public class MeansAssessmentDataBuilder {
                         .withSection(SECTION));
     }
 
-    private static List<ApiAssessmentSummary> getAssessmentSummary(){
+    private static List<ApiAssessmentSummary> getAssessmentSummary() {
         return List.of(
                 new ApiAssessmentSummary()
                         .withId(ASSESSMENT_DETAIL_ID)
@@ -763,5 +763,13 @@ public class MeansAssessmentDataBuilder {
                 .withCrownRepOrderDecision(REP_ORDER_DECISION_GRANTED.getValue())
                 .withCrownRepOrderType(CC_REP_TYPE_THROUGH_ORDER.getValue())
                 .withCrownRepOrderDate(CC_REP_ORDER_DATETIME);
+    }
+    public static ApiRollbackMeansAssessmentResponse getApiRollbackMeansAssessmentResponse(String assessmentType) {
+        return new ApiRollbackMeansAssessmentResponse()
+                .withAssessmentType(assessmentType)
+                .withFassFullStatus(CurrentStatus.COMPLETE)
+                .withFullResult(AssessmentResult.PASS.toString())
+                .withFassInitStatus(CurrentStatus.COMPLETE)
+                .withInitResult(AssessmentResult.FULL.toString());
     }
 }

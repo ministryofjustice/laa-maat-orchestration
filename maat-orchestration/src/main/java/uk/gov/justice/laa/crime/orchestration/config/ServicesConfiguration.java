@@ -130,6 +130,9 @@ public class ServicesConfiguration {
 
             @NotNull
             private String updateUrl;
+
+            @NotNull
+            private String rollbackUrl;
         }
     }
 
