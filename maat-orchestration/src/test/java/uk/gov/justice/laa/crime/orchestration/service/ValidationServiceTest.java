@@ -27,7 +27,7 @@ class ValidationServiceTest {
     private static final LocalDateTime APPLICATION_TIMESTAMP = LocalDateTime.parse("2024-01-27T10:15:30");
     private static final LocalDateTime REP_ORDER_MODIFIED_TIMESTAMP = LocalDateTime.parse("2023-06-27T10:15:30");
     private static final LocalDate REP_ORDER_CREATED_TIMESTAMP = LocalDate.of(2024, Month.JANUARY, 8);
-    public ValidationService validationService;
+    private ValidationService validationService;
 
     @BeforeEach
     void setUp() {
