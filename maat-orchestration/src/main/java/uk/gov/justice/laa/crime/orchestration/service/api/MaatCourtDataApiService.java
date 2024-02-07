@@ -10,6 +10,7 @@ import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 
 import java.util.Collections;
 
@@ -45,6 +46,18 @@ public class MaatCourtDataApiService {
         );
         log.info(RESPONSE_STRING, response);
         return response;
+    }
+
+    public UserSummaryDTO getUserSummary(String username) {
+        UserSummaryDTO userSummaryDTO = maatApiClient.get(
+                new ParameterizedTypeReference<>() {
+                },
+                configuration.getMaatApi().getUserEndpoints().getUserSummaryUrl(),
+                username
+        );
+
+        log.info(String.format(RESPONSE_STRING, userSummaryDTO));
+        return userSummaryDTO;
     }
 
 }

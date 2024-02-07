@@ -49,6 +49,11 @@ public class MockServicesConfiguration {
                         "/assessment/rep-orders/{repId}"
                 );
 
+        ServicesConfiguration.MaatApi.UserEndpoints userEndpoints =
+                new ServicesConfiguration.MaatApi.UserEndpoints(
+                        "/api/internal/v1/users/summary/{username}"
+                );
+
         hardshipApi.setBaseUrl(host);
         hardshipApi.setEndpoints(hardshipEndpoints);
 
@@ -63,6 +68,7 @@ public class MockServicesConfiguration {
 
         maatApi.setBaseUrl(host);
         maatApi.setEndpoints(maatEndpoints);
+        maatApi.setUserEndpoints(userEndpoints);
 
         servicesConfiguration.setHardshipApi(hardshipApi);
         servicesConfiguration.setContributionApi(contributionApi);

@@ -29,16 +29,21 @@ class MaatCourtDataApiServiceTest {
     @Test
     void givenValidRequest_whenExecuteStoredProcedureIsInvoked_thenApplicationIsReturned() {
         maatCourtDataApiService.executeStoredProcedure(new StoredProcedureRequest());
-
         verify(cmaApiClient)
                 .post(any(StoredProcedureRequest.class), any(), anyString(), anyMap());
     }
 
     @Test
-    void givenValidRequest_whengetRepOrderByRepIdIsInvoked_thenRepOrderDTOIsReturned() {
+    void givenValidRequest_whenGetRepOrderByRepIdIsInvoked_thenRepOrderDTOIsReturned() {
         maatCourtDataApiService.getRepOrderByRepId(1000);
-
         verify(cmaApiClient)
                 .get(any(), any(), anyInt());
+    }
+
+    @Test
+    void givenValidRequest_whenGetUserSummaryIsInvoked_thenUserSummaryDTOIsReturned() {
+        maatCourtDataApiService.getUserSummary("test");
+        verify(cmaApiClient)
+                .get(any(), any(), anyString());
     }
 }
