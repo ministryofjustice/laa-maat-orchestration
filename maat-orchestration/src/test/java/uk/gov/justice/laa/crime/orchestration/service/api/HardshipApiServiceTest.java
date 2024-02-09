@@ -11,7 +11,6 @@ import uk.gov.justice.laa.crime.orchestration.config.MockServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
-import uk.gov.justice.laa.crime.orchestration.service.api.HardshipApiService;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
@@ -54,9 +53,8 @@ class HardshipApiServiceTest {
 
     @Test
     void givenValidHardshipDto_whenRollbackIsInvoked_thenHardshipIsPersisted() {
-        hardshipApiService.rollback(new ApiPerformHardshipRequest());
-
+        hardshipApiService.rollback(Constants.HARDSHIP_REVIEW_ID.longValue());
         verify(hardshipApiClient)
-                .put(any(ApiPerformHardshipRequest.class), any(), anyString(), anyMap());
+                .patch(any(), any(), anyString(), anyMap(), any());
     }
 }

@@ -3,7 +3,9 @@ package uk.gov.justice.laa.crime.orchestration.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.enums.HardshipReviewStatus;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipOverviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiFindHardshipResponse;
@@ -37,9 +39,11 @@ public class HardshipService {
         hardshipMapper.performHardshipResponseToApplicationDTO(apiPerformHardshipResponse, request.getApplicationDTO());
     }
 
-    public ApiPerformHardshipResponse rollback(WorkflowRequest request) {
-        ApiPerformHardshipRequest performHardshipRequest =
-                hardshipMapper.workflowRequestToPerformHardshipRequest(request);
-        return hardshipApiService.rollback(performHardshipRequest);
+    public void rollback(WorkflowRequest request) {
+        HardshipReviewDTO hardshipReviewDTO = hardshipMapper.getHardshipReviewDTO(request.getApplicationDTO());
+        hardshipApiService.rollback(hardshipReviewDTO.getId());
+        hardshipReviewDTO.setReviewResult(null);
+        hardshipReviewDTO.getAsessmentStatus().setStatus(HardshipReviewStatus.IN_PROGRESS.getStatus());
+        hardshipReviewDTO.getAsessmentStatus().setDescription(HardshipReviewStatus.IN_PROGRESS.getDescription());
     }
 }
