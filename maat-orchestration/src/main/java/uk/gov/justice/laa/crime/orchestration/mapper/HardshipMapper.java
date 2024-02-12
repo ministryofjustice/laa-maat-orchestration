@@ -29,21 +29,11 @@ public class HardshipMapper {
     private final UserMapper userMapper;
 
     public ApiPerformHardshipRequest workflowRequestToPerformHardshipRequest(WorkflowRequest workflowRequest) {
-        HardshipReviewDTO current;
         UserDTO userDTO = workflowRequest.getUserDTO();
         ApplicationDTO application = workflowRequest.getApplicationDTO();
-        CourtType courtType = application.getCourtType();
-        HardshipOverviewDTO hardshipOverview =
-                application.getAssessmentDTO()
-                        .getFinancialAssessmentDTO()
-                        .getHardship();
-        if (courtType == CourtType.MAGISTRATE) {
-            current = hardshipOverview.getMagCourtHardship();
-        } else {
-            current = hardshipOverview.getCrownCourtHardship();
-        }
+        HardshipReviewDTO current = getHardshipReviewDTO(application);
         HardshipReview hardship = new HardshipReview()
-                .withCourtType(courtType)
+                .withCourtType(application.getCourtType())
                 .withTotalAnnualDisposableIncome(current.getDisposableIncome())
                 .withReviewDate(toLocalDateTime(current.getReviewDate()))
                 .withExtraExpenditure(hrSectionDtosToExtraExpenditures(current.getSection()))
@@ -67,6 +57,19 @@ public class HardshipMapper {
         return new ApiPerformHardshipRequest()
                 .withHardship(hardship)
                 .withHardshipMetadata(metadata);
+    }
+
+    public HardshipReviewDTO getHardshipReviewDTO(ApplicationDTO application) {
+        CourtType courtType = application.getCourtType();
+        HardshipOverviewDTO hardshipOverview =
+                application.getAssessmentDTO()
+                        .getFinancialAssessmentDTO()
+                        .getHardship();
+        if (courtType == CourtType.MAGISTRATE) {
+            return hardshipOverview.getMagCourtHardship();
+        } else {
+            return hardshipOverview.getCrownCourtHardship();
+        }
     }
 
     private List<ExtraExpenditure> hrSectionDtosToExtraExpenditures(Collection<HRSectionDTO> sections) {
