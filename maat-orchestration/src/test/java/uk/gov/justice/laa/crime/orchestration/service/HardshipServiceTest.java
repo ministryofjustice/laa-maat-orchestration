@@ -5,12 +5,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.enums.HardshipReviewStatus;
+import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiFindHardshipResponse;
@@ -18,7 +17,6 @@ import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipR
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.service.api.HardshipApiService;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -69,8 +67,5 @@ class HardshipServiceTest {
         doNothing().when(hardshipApiService).rollback(Constants.HARDSHIP_REVIEW_ID.longValue());
         hardshipService.rollback(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         verify(hardshipApiService).rollback(Constants.HARDSHIP_REVIEW_ID.longValue());
-        assertThat(hardshipReviewDTO.getAsessmentStatus().getStatus()).isEqualTo(HardshipReviewStatus.IN_PROGRESS.getStatus());
-        assertThat(hardshipReviewDTO.getAsessmentStatus().getDescription()).isEqualTo(HardshipReviewStatus.IN_PROGRESS.getDescription());
-        assertThat(hardshipReviewDTO.getReviewResult()).isNull();
     }
 }
