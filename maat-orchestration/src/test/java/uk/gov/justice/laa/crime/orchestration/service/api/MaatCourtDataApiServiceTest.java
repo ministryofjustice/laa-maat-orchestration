@@ -11,6 +11,9 @@ import uk.gov.justice.laa.crime.orchestration.config.MockServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 
@@ -45,5 +48,26 @@ class MaatCourtDataApiServiceTest {
         maatCourtDataApiService.getUserSummary("test");
         verify(cmaApiClient)
                 .get(any(), any(), anyString());
+    }
+
+    @Test
+    void givenValidRequest_whenUpdateApplicantByIdIsInvoked_thenApplicationDTOIsReturned() {
+        maatCourtDataApiService.updateApplicantById(1000, new HashMap<String, Object>());
+        verify(cmaApiClient)
+                .patch(any(HashMap.class), any(), anyString(), anyMap(), any());
+    }
+
+    @Test
+    void givenValidRequest_whenUpdateApplicantHistoryByIdIsInvoked_thenApplicationDTOIsReturned() {
+        maatCourtDataApiService.updateApplicantHistoryById(1000, new HashMap<String, Object>());
+        verify(cmaApiClient)
+                .patch(any(HashMap.class), any(), anyString(), anyMap(), any());
+    }
+
+    @Test
+    void givenValidRequest_whenUpdateRepOrderByRepIdIsInvoked_thenApplicationDTOIsReturned() {
+        maatCourtDataApiService.updateRepOrderByRepId(1000, new HashMap<String, Object>());
+        verify(cmaApiClient)
+                .patch(any(HashMap.class), any(), anyString(), anyMap(), any());
     }
 }

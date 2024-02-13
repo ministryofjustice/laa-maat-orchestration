@@ -14,11 +14,13 @@ import uk.gov.justice.laa.crime.enums.RepOrderStatus;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.Action;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
+import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
 import java.util.stream.Stream;
 
@@ -26,8 +28,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getTestApplicationDTO;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getTestRepOrderDTO;
 import static uk.gov.justice.laa.crime.orchestration.service.ValidationService.CANNOT_MODIFY_APPLICATION_ERROR;
+
 @ExtendWith(MockitoExtension.class)
 class ValidationServiceTest {
     public static final String EXISTING_RESERVATION_SO_RESERVATION_NOT_ALLOWED = "User have an existing reservation, so reservation not allowed";
@@ -39,30 +45,8 @@ class ValidationServiceTest {
     @Mock
     private MaatCourtDataService maatCourtDataService;
 
-    @ParameterizedTest
-    @MethodSource("validateApplicationTimestamp")
-    void validateApplicationTimestamp(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        when(maatCourtDataService.findRepOrder(any())).thenReturn(repOrderDTO);
-        ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.
-                validate(workflowRequest));
-        assertThat(validationException.getMessage()).isEqualTo(CANNOT_MODIFY_APPLICATION_ERROR);
-    }
-
-    @ParameterizedTest
-    @MethodSource("validateApplicationStatus")
-    void validateApplicationStatus(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        when(maatCourtDataService.findRepOrder(any())).thenReturn(repOrderDTO);
-        ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.
-                validate(workflowRequest));
-        assertThat(validationException.getMessage()).contains("Cannot update case in status of");
-    }
-
-    @ParameterizedTest
-    @MethodSource("validateApplicationStatusNoException")
-    void validateApplicationStatus_noException(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        when(maatCourtDataService.findRepOrder(any())).thenReturn(repOrderDTO);
-        assertDoesNotThrow(() -> validationService.validate(workflowRequest));
-    }
+    @Mock
+    private MaatCourtDataApiService maatCourtDataApiService;
 
     private static Stream<Arguments> validateApplicationTimestamp() {
         return Stream.of(
@@ -107,6 +91,31 @@ class ValidationServiceTest {
                         TestModelDataBuilder
                                 .buildRepOrderDTO(RepOrderStatus.CURR.getCode()))
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource("validateApplicationTimestamp")
+    void validateApplicationTimestamp(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
+        when(maatCourtDataService.findRepOrder(any())).thenReturn(repOrderDTO);
+        ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.
+                validate(workflowRequest));
+        assertThat(validationException.getMessage()).isEqualTo(CANNOT_MODIFY_APPLICATION_ERROR);
+    }
+
+    @ParameterizedTest
+    @MethodSource("validateApplicationStatus")
+    void validateApplicationStatus(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
+        when(maatCourtDataService.findRepOrder(any())).thenReturn(repOrderDTO);
+        ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.
+                validate(workflowRequest));
+        assertThat(validationException.getMessage()).contains("Cannot update case in status of");
+    }
+
+    @ParameterizedTest
+    @MethodSource("validateApplicationStatusNoException")
+    void validateApplicationStatus_noException(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
+        when(maatCourtDataService.findRepOrder(any())).thenReturn(repOrderDTO);
+        assertDoesNotThrow(() -> validationService.validate(workflowRequest));
     }
 
     @Test
@@ -324,5 +333,65 @@ class ValidationServiceTest {
         Boolean isUserActionValid =
                 validationService.isUserActionValid(userValidationDTO);
         assertTrue(isUserActionValid);
+    }
+
+    @Test
+    void givenInValidInputWithoutApplicationDTO_whenUpdateSendToCCLFIsInvoked_thenValidationExceptionIsThrown() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.setApplicationDTO(null);
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        String action = "action";
+        assertThatThrownBy(() -> validationService.updateSendToCCLF(workflowRequest, repOrderDTO, action))
+                .isInstanceOf(ValidationException.class)
+                .hasMessage("Valid ApplicationDTO and RepOrderDTO is required");
+    }
+
+    @Test
+    void givenInValidInputWithoutRepOrderDTO_whenUpdateSendToCCLFIsInvoked_thenValidationExceptionIsThrown() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        String action = "action";
+        assertThatThrownBy(() -> validationService.updateSendToCCLF(workflowRequest, null, action))
+                .isInstanceOf(ValidationException.class)
+                .hasMessage("Valid ApplicationDTO and RepOrderDTO is required");
+    }
+
+
+    @Test
+    void givenValidInputWithUpdateAction_whenUpdateSendToCCLFIsInvoked_thenNoExceptionIsThrown() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        String action = "UPDATE";
+        assertDoesNotThrow(() -> validationService.updateSendToCCLF(workflowRequest, repOrderDTO, action));
+    }
+
+    @Test
+    void givenValidInputWithDifferentObject_whenCompareRepOrderAndApplicationDTOIsInvoked_thenOKResponseIsReturned() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        assertThat(validationService.compareRepOrderAndApplicationDTO(repOrderDTO, workflowRequest.getApplicationDTO())).isFalse();
+    }
+
+    @Test
+    void givenValidInputWithSameAttributes_whenCompareRepOrderAndApplicationDTOIsInvoked_thenOKResponseIsReturned() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        ApplicationDTO applicationDTO = getTestApplicationDTO(workflowRequest);
+        RepOrderDTO repOrderDTO = getTestRepOrderDTO(applicationDTO);
+        assertThat(validationService.compareRepOrderAndApplicationDTO(repOrderDTO, workflowRequest.getApplicationDTO())).isTrue();
+    }
+
+
+    @Test
+    void givenValidInput_whenUpdateSendToCCLFIsInvoked_thenOKResponseIsReturned() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        String action = "CREATE";
+        when(maatCourtDataApiService.updateRepOrderByRepId(any(), any())).thenReturn(repOrderDTO);
+        when(maatCourtDataApiService.updateApplicantById(any(), any())).thenReturn(repOrderDTO);
+        when(maatCourtDataApiService.updateApplicantHistoryById(any(), any())).thenReturn(repOrderDTO);
+
+        assertDoesNotThrow(() -> validationService.updateSendToCCLF(workflowRequest, repOrderDTO, action));
+        verify(maatCourtDataApiService).updateRepOrderByRepId(any(), any());
+        verify(maatCourtDataApiService).updateApplicantById(any(), any());
+        verify(maatCourtDataApiService).updateApplicantHistoryById(any(), any());
     }
 }

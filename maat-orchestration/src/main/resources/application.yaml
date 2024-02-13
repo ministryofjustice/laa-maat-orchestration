@@ -97,7 +97,10 @@ services:
     endpoints:
       call-stored-proc-url: ${services.maat-api.base-url}/api/internal/v1/assessment/execute-stored-procedure
       rep-order-url: ${services.maat-api.base-url}/api/internal/v1/assessment/rep-orders/{repId}
+      applicant-url: ${services.maat-api.base-url}/api/internal/v1/application/applicant/{id}
+      applicant-history-url: ${services.maat-api.base-url}/api/internal/v1/application/applicant/applicant-history/{id}
     user-domain: ${services.maat-api.base-url}/api/internal/v1/users
+    application-domain: ${services.maat-api.base-url}/api/internal/v1/application
     user-endpoints:
       user-summary-url: ${services.maat-api.user-domain}/summary/{username}
 retry-config:

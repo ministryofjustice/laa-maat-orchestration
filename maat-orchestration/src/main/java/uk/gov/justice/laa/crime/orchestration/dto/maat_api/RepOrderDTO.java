@@ -35,6 +35,13 @@ public class RepOrderDTO {
     private LocalDate sentenceOrderDate;
     private String evidenceFeeLevel;
     private String rorsStatus;
+    private String suppAccountCode;
+    private LocalDate dateReceived;
+    private String oftyOffenceType;
+    private LocalDate crownWithdrawalDate;
+    private Integer applicantHistoryId;
+    private String macoCourt;
+
     @Builder.Default
     private List<PassportAssessmentDTO> passportAssessments = new ArrayList<>();
     @Builder.Default

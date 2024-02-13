@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
@@ -433,7 +434,7 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    public static WorkflowRequest buildWorkFlowRequestForApplicationTimestampValidation(){
+    public static WorkflowRequest buildWorkFlowRequestForApplicationTimestampValidation() {
         return WorkflowRequest
                 .builder()
                 .applicationDTO(
@@ -444,7 +445,7 @@ public class TestModelDataBuilder {
                                 .build()).build();
     }
 
-    public static WorkflowRequest buildWorkFlowRequest(boolean isUpdateAllowed){
+    public static WorkflowRequest buildWorkFlowRequest(boolean isUpdateAllowed) {
         return WorkflowRequest
                 .builder()
                 .applicationDTO(
@@ -518,6 +519,7 @@ public class TestModelDataBuilder {
 
     public static ApplicantDTO getApplicantDTO() {
         return ApplicantDTO.builder()
+                .id(Long.valueOf(1000))
                 .applicantHistoryId(APPLICANT_HISTORY_ID.longValue())
                 .employmentStatusDTO(getEmploymentStatusDTO())
                 .build();
@@ -705,7 +707,6 @@ public class TestModelDataBuilder {
                 .childWeightings(List.of(getChildWeightingDTO()))
                 .build();
     }
-
 
 
     private static CaseManagementUnitDTO getCaseManagementUnitDTO() {
@@ -1038,7 +1039,7 @@ public class TestModelDataBuilder {
     }
 
     public static RepOrderDTO buildRepOrderDTO(String rorsStatus) {
-        return RepOrderDTO.builder().dateModified(APPLICATION_TIMESTAMP).rorsStatus(rorsStatus).build();
+        return RepOrderDTO.builder().id(1000).dateModified(APPLICATION_TIMESTAMP).rorsStatus(rorsStatus).build();
     }
 
     public static UserSummaryDTO getUserSummaryDTO() {
@@ -1083,6 +1084,38 @@ public class TestModelDataBuilder {
                 .action(null)
                 .newWorkReason(null)
                 .sessionId(null).build();
+    }
+
+    @NotNull
+    public static RepOrderDTO getTestRepOrderDTO(ApplicationDTO applicationDTO) {
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        repOrderDTO.setArrestSummonsNo(applicationDTO.getArrestSummonsNo());
+        repOrderDTO.setSuppAccountCode(applicationDTO.getArrestSummonsNo());
+        repOrderDTO.setEvidenceFeeLevel(applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getEvidenceProvisionFee().getFeeLevel());
+        repOrderDTO.setMacoCourt(null);
+        repOrderDTO.setMagsOutcome(applicationDTO.getMagsOutcomeDTO().getOutcome());
+        repOrderDTO.setDateReceived(null);
+        repOrderDTO.setCrownRepOrderDate(null);
+        repOrderDTO.setOftyOffenceType(applicationDTO.getOffenceDTO().getOffenceType());
+        repOrderDTO.setCrownWithdrawalDate(null);
+        repOrderDTO.setCaseId(applicationDTO.getCaseId());
+        repOrderDTO.setCommittalDate(null);
+        repOrderDTO.setApplicantHistoryId(null);
+        repOrderDTO.setRorsStatus(applicationDTO.getStatusDTO().getStatus());
+        repOrderDTO.setRepOrderCCOutcome(null);
+        repOrderDTO.setAppealTypeCode(applicationDTO.getCrownCourtOverviewDTO().getAppealDTO().getAppealTypeDTO().getCode());
+        return repOrderDTO;
+    }
+
+    @NotNull
+    public static ApplicationDTO getTestApplicationDTO(WorkflowRequest workflowRequest) {
+        ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
+        applicationDTO.setDateReceived(null);
+        applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().setCcRepOrderDate(null);
+        applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().setCcWithDrawalDate(null);
+        applicationDTO.setCommittalDate(null);
+        applicationDTO.getApplicantDTO().setApplicantHistoryId(null);
+        return applicationDTO;
     }
 
 }

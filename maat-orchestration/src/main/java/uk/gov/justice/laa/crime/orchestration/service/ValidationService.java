@@ -6,16 +6,21 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.enums.RepOrderStatus;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.RepStatusDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
+import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 import uk.gov.justice.laa.crime.util.DateUtil;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.ZoneId;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -25,16 +30,55 @@ public class ValidationService {
             "Application has been modified by another user";
     public static final String CANNOT_UPDATE_APPLICATION_STATUS =
             "Cannot update case in status of %s";
+    public static final String USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED =
+            "User have an existing reservation, so reservation not allowed";
     private static final String ACTION_NEW_WORK_REASON_AND_SESSION_DOES_NOT_EXIST =
             "Action, New work reason and Session does not exist";
     private static final String USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION =
             "User does not have a role capable of performing this action";
     private static final String USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE =
             "User does not have a valid New Work Reason Code";
-    public static final String USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED =
-            "User have an existing reservation, so reservation not allowed";
-
     private final MaatCourtDataService maatCourtDataService;
+    private final MaatCourtDataApiService maatCourtDataApiService;
+
+    private static String getRepOrderCcOutcome(RepOrderDTO repOrderDTO) {
+        if (repOrderDTO.getRepOrderCCOutcome() == null || repOrderDTO.getRepOrderCCOutcome().isEmpty()) return null;
+        return repOrderDTO.getRepOrderCCOutcome().get(0).getOutcome();
+    }
+
+    private static String getAppealType(ApplicationDTO applicationDTO) {
+        String appealType = null;
+        if (applicationDTO.getCrownCourtOverviewDTO() != null
+                && applicationDTO.getCrownCourtOverviewDTO().getAppealDTO() != null
+                && applicationDTO.getCrownCourtOverviewDTO().getAppealDTO().getAppealTypeDTO() != null)
+            appealType = applicationDTO.getCrownCourtOverviewDTO().getAppealDTO().getAppealTypeDTO().getCode();
+        return appealType;
+    }
+
+    private static String getOutcome(ApplicationDTO applicationDTO) {
+        String outcome = null;
+        if (applicationDTO.getCrownCourtOverviewDTO() != null
+                && applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO() != null) {
+            if (applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcOutcome() != null) {
+                outcome = applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcOutcome().getOutcome();
+            }
+        }
+        return outcome;
+    }
+
+    private static String getFeeLevel(ApplicationDTO applicationDTO) {
+        String feeLevel = null;
+        if (applicationDTO.getCrownCourtOverviewDTO() != null
+                && applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO() != null
+                && applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getEvidenceProvisionFee() != null) {
+            feeLevel = applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getEvidenceProvisionFee().getFeeLevel();
+        }
+        return feeLevel;
+    }
+
+    private static boolean isEquals(Object s1, Object s2) {
+        return Objects.equals(s1, s2);
+    }
 
     public void validate(WorkflowRequest request) {
         int repId = request.getApplicationDTO().getRepId().intValue();
@@ -93,4 +137,104 @@ public class ValidationService {
         return true;
     }
 
+    public void updateSendToCCLF(WorkflowRequest request, RepOrderDTO repOrderDTO, String action) {
+        ApplicationDTO applicationDTO = request.getApplicationDTO();
+        if (applicationDTO == null || applicationDTO.getApplicantDTO() == null || repOrderDTO == null || repOrderDTO.getId() == null) {
+            throw new ValidationException("Valid ApplicationDTO and RepOrderDTO is required");
+        }
+
+        String _action = (action != null) ? action : "UPDATE";
+        Date cclfDate = parseDate("2021-04-01");
+        Date decisionDate = applicationDTO.getDecisionDate();
+
+        if ((decisionDate.after(cclfDate) || decisionDate.equals(cclfDate)) &&
+                (_action.equals("CREATE") || !compareRepOrderAndApplicationDTO(repOrderDTO, applicationDTO))) {
+            Map<String, Object> sendToCCLFMap = new HashMap<>();
+            sendToCCLFMap.put("send_to_cclf", "Y");
+            maatCourtDataApiService.updateRepOrderByRepId(repOrderDTO.getId(), sendToCCLFMap);
+            maatCourtDataApiService.updateApplicantById(applicationDTO.getApplicantDTO().getId().intValue(), sendToCCLFMap);
+            maatCourtDataApiService.updateApplicantHistoryById(repOrderDTO.getApplicantHistoryId(), sendToCCLFMap);
+        }
+    }
+
+    public boolean compareRepOrderAndApplicationDTO(RepOrderDTO repOrderDTO, ApplicationDTO applicationDTO) {
+        String acctNumber = applicationDTO.getSupplierDTO() != null ? applicationDTO.getSupplierDTO().getAccountNumber() : null;
+        String feeLevel = getFeeLevel(applicationDTO);
+        LocalDate ccRepOrderDate = getRepOrderDate(applicationDTO);
+        LocalDate ccWithDrawalDate = getWithDrawalDate(applicationDTO);
+        String outcome = getOutcome(applicationDTO);
+        String court = applicationDTO.getMagsCourtDTO() != null ? applicationDTO.getMagsCourtDTO().getCourt() : null;
+        String magsOutcome = applicationDTO.getMagsOutcomeDTO() != null ? applicationDTO.getMagsOutcomeDTO().getOutcome() : null;
+        String offenceType = applicationDTO.getOffenceDTO() != null ? applicationDTO.getOffenceDTO().getOffenceType() : null;
+        Long applicantHistoryId = (applicationDTO.getApplicantDTO() != null
+                && applicationDTO.getApplicantDTO().getApplicantHistoryId() != null) ? applicationDTO.getApplicantDTO().getApplicantHistoryId() : -1;
+        String status = applicationDTO.getStatusDTO() != null ? applicationDTO.getStatusDTO().getStatus() : null;
+        String appealType = getAppealType(applicationDTO);
+        LocalDate lDateReceived = convertToLocalDateViaSqlDate(applicationDTO.getDateReceived());
+        LocalDate lCommittalDate = convertToLocalDateViaSqlDate(applicationDTO.getCommittalDate());
+
+        Long rApplicantHistoryId = repOrderDTO.getApplicantHistoryId() != null ? Long.valueOf(repOrderDTO.getApplicantHistoryId()) : -1;
+        String rOutcome = getRepOrderCcOutcome(repOrderDTO);
+
+        return isEquals(repOrderDTO.getArrestSummonsNo(), applicationDTO.getArrestSummonsNo())
+                && isEquals(repOrderDTO.getSuppAccountCode(), acctNumber)
+                && isEquals(repOrderDTO.getEvidenceFeeLevel(), feeLevel)
+                && isEquals(repOrderDTO.getMacoCourt(), court)
+                && isEquals(repOrderDTO.getMagsOutcome(), magsOutcome)
+                && isEquals(repOrderDTO.getDateReceived(), lDateReceived)
+                && isEquals(repOrderDTO.getCrownRepOrderDate(), ccRepOrderDate)
+                && isEquals(repOrderDTO.getOftyOffenceType(), offenceType)
+                && isEquals(repOrderDTO.getCrownWithdrawalDate(), ccWithDrawalDate)
+                && isEquals(repOrderDTO.getCaseId(), applicationDTO.getCaseId())
+                && isEquals(repOrderDTO.getCommittalDate(), lCommittalDate)
+                && isEquals(rApplicantHistoryId, applicantHistoryId)
+                && isEquals(repOrderDTO.getRorsStatus(), status)
+                && isEquals(rOutcome, outcome)
+                && isEquals(repOrderDTO.getAppealTypeCode(), appealType);
+    }
+
+    private LocalDate getWithDrawalDate(ApplicationDTO applicationDTO) {
+        LocalDate ccWithDrawalDate = null;
+        if (applicationDTO.getCrownCourtOverviewDTO() != null
+                && applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO() != null) {
+            if (applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getEvidenceProvisionFee() != null) {
+                ccWithDrawalDate = convertToLocalDateViaSqlDate(applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcWithDrawalDate());
+            }
+        }
+        return ccWithDrawalDate;
+    }
+
+    private LocalDate getRepOrderDate(ApplicationDTO applicationDTO) {
+        LocalDate ccRepOrderDate = null;
+        if (applicationDTO.getCrownCourtOverviewDTO() != null
+                && applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO() != null) {
+            if (applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getEvidenceProvisionFee() != null) {
+                ccRepOrderDate = convertToLocalDateViaSqlDate(applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcRepOrderDate());
+            }
+        }
+        return ccRepOrderDate;
+    }
+
+    private Date parseDate(String dateString) {
+        if (dateString == null) return null;
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd").parse(dateString);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    private LocalDate convertToLocalDateViaSqlDate(Date dateToConvert) {
+        if (dateToConvert == null) return null;
+        return dateToConvert.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+    }
+
+
 }
+
+
+
+
