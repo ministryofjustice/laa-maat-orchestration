@@ -12,5 +12,4 @@ import lombok.experimental.SuperBuilder;
 public class HardshipOverviewDTO extends GenericDTO {
     private HardshipReviewDTO magCourtHardship;
     private HardshipReviewDTO crownCourtHardship;
-
 }

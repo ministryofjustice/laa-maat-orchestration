@@ -10,5 +10,4 @@ import lombok.experimental.SuperBuilder;
 public class AssessmentDTO {
     private IOJAppealDTO iojAppeal;
     private FinancialAssessmentDTO financialAssessmentDTO;
-
 }

@@ -7,8 +7,8 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class FinancialAssessmentDTO extends GenericDTO {
     private Long id;
     private Long criteriaId;

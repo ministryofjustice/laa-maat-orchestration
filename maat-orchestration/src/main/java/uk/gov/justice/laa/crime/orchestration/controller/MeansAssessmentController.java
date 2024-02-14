@@ -57,7 +57,7 @@ public class MeansAssessmentController {
     public ResponseEntity<ApplicationDTO> create(
             @Valid @RequestBody WorkflowRequest workflowRequest,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
-        log.info("Received request to create hardship with transaction id - {}", laaTransactionId);
+        log.info("Received request to create means assessment with transaction id - {}", laaTransactionId);
         return ResponseEntity.ok(assessmentOrchestrationService.create(workflowRequest));
     }
 
@@ -73,7 +73,7 @@ public class MeansAssessmentController {
     public ResponseEntity<ApplicationDTO> update(
             @Valid @RequestBody WorkflowRequest workflowRequest,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
-        log.info("Received request to update hardship with transaction id - {}", laaTransactionId);
+        log.info("Received request to update means assessment with transaction id - {}", laaTransactionId);
         return ResponseEntity.ok(assessmentOrchestrationService.update(workflowRequest));
     }
 
