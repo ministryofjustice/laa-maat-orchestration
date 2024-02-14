@@ -9,6 +9,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.RepStatusDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.SendToCCLFDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
@@ -20,7 +21,10 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -149,11 +153,10 @@ public class ValidationService {
 
         if ((decisionDate.after(cclfDate) || decisionDate.equals(cclfDate)) &&
                 (_action.equals("CREATE") || !compareRepOrderAndApplicationDTO(repOrderDTO, applicationDTO))) {
-            Map<String, Object> sendToCCLFMap = new HashMap<>();
-            sendToCCLFMap.put("send_to_cclf", "Y");
-            maatCourtDataApiService.updateRepOrderByRepId(repOrderDTO.getId(), sendToCCLFMap);
-            maatCourtDataApiService.updateApplicantById(applicationDTO.getApplicantDTO().getId().intValue(), sendToCCLFMap);
-            maatCourtDataApiService.updateApplicantHistoryById(repOrderDTO.getApplicantHistoryId(), sendToCCLFMap);
+            SendToCCLFDTO sendToCCLFDTO = SendToCCLFDTO.builder().repId(repOrderDTO.getId())
+                    .applId(applicationDTO.getApplicantDTO().getId())
+                    .applHistoryId(applicationDTO.getApplicantDTO().getApplicantHistoryId()).build();
+            maatCourtDataApiService.updateSendToCCLF(sendToCCLFDTO);
         }
     }
 

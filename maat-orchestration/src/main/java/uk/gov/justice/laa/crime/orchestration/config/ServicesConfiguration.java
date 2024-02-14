@@ -161,6 +161,8 @@ public class ServicesConfiguration {
             private String applicantUrl;
             @NotNull
             private String applicantHistoryUrl;
+            @NotNull
+            private String updateSendToCCLFUrl;
 
         }
 

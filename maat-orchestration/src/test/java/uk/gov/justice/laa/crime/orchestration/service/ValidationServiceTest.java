@@ -436,14 +436,9 @@ class ValidationServiceTest {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
         String action = "CREATE";
-        when(maatCourtDataApiService.updateRepOrderByRepId(any(), any())).thenReturn(repOrderDTO);
-        when(maatCourtDataApiService.updateApplicantById(any(), any())).thenReturn(repOrderDTO);
-        when(maatCourtDataApiService.updateApplicantHistoryById(any(), any())).thenReturn(repOrderDTO);
-
+        when(maatCourtDataApiService.updateSendToCCLF(any())).thenReturn(repOrderDTO);
         assertDoesNotThrow(() -> validationService.updateSendToCCLF(workflowRequest, repOrderDTO, action));
-        verify(maatCourtDataApiService).updateRepOrderByRepId(any(), any());
-        verify(maatCourtDataApiService).updateApplicantById(any(), any());
-        verify(maatCourtDataApiService).updateApplicantHistoryById(any(), any());
+        verify(maatCourtDataApiService).updateSendToCCLF(any());
     }
 
     @Test
