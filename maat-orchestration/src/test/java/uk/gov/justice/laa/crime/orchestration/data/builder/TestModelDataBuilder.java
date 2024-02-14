@@ -6,6 +6,7 @@ import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
@@ -575,6 +576,7 @@ public class TestModelDataBuilder {
                 .ccRepId(REP_ID.longValue())
                 .ccRepType(CC_REP_TYPE_THROUGH_ORDER)
                 .ccRepOrderDate(Date.from(CC_REP_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .ccWithDrawalDate(Date.from(CC_WITHDRAWAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .sentenceOrderDate(Date.from(SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .repOrderDecision(REP_ORDER_DECISION_GRANTED)
                 .inPrisoned(Boolean.TRUE)
@@ -1118,4 +1120,14 @@ public class TestModelDataBuilder {
         return applicationDTO;
     }
 
+
+    @NotNull
+    public static RepOrderCCOutcomeDTO getRepOrderCCOutcomeDTO() {
+        return RepOrderCCOutcomeDTO.builder()
+                .id(1)
+                .repId(1)
+                .outcomeDate(LocalDateTime.now())
+                .outcome("CONVICTED")
+                .build();
+    }
 }

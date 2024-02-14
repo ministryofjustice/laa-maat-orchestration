@@ -41,12 +41,12 @@ public class ValidationService {
     private final MaatCourtDataService maatCourtDataService;
     private final MaatCourtDataApiService maatCourtDataApiService;
 
-    private static String getRepOrderCcOutcome(RepOrderDTO repOrderDTO) {
+    public static String getRepOrderCcOutcome(RepOrderDTO repOrderDTO) {
         if (repOrderDTO.getRepOrderCCOutcome() == null || repOrderDTO.getRepOrderCCOutcome().isEmpty()) return null;
         return repOrderDTO.getRepOrderCCOutcome().get(0).getOutcome();
     }
 
-    private static String getAppealType(ApplicationDTO applicationDTO) {
+    public static String getAppealType(ApplicationDTO applicationDTO) {
         String appealType = null;
         if (applicationDTO.getCrownCourtOverviewDTO() != null
                 && applicationDTO.getCrownCourtOverviewDTO().getAppealDTO() != null
@@ -55,7 +55,7 @@ public class ValidationService {
         return appealType;
     }
 
-    private static String getOutcome(ApplicationDTO applicationDTO) {
+    public static String getOutcome(ApplicationDTO applicationDTO) {
         String outcome = null;
         if (applicationDTO.getCrownCourtOverviewDTO() != null
                 && applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO() != null) {
@@ -66,7 +66,7 @@ public class ValidationService {
         return outcome;
     }
 
-    private static String getFeeLevel(ApplicationDTO applicationDTO) {
+    public static String getFeeLevel(ApplicationDTO applicationDTO) {
         String feeLevel = null;
         if (applicationDTO.getCrownCourtOverviewDTO() != null
                 && applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO() != null
@@ -193,29 +193,29 @@ public class ValidationService {
                 && isEquals(repOrderDTO.getAppealTypeCode(), appealType);
     }
 
-    private LocalDate getWithDrawalDate(ApplicationDTO applicationDTO) {
+    public LocalDate getWithDrawalDate(ApplicationDTO applicationDTO) {
         LocalDate ccWithDrawalDate = null;
         if (applicationDTO.getCrownCourtOverviewDTO() != null
                 && applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO() != null) {
-            if (applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getEvidenceProvisionFee() != null) {
+            if (applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcWithDrawalDate() != null) {
                 ccWithDrawalDate = convertToLocalDateViaSqlDate(applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcWithDrawalDate());
             }
         }
         return ccWithDrawalDate;
     }
 
-    private LocalDate getRepOrderDate(ApplicationDTO applicationDTO) {
+    public LocalDate getRepOrderDate(ApplicationDTO applicationDTO) {
         LocalDate ccRepOrderDate = null;
         if (applicationDTO.getCrownCourtOverviewDTO() != null
                 && applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO() != null) {
-            if (applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getEvidenceProvisionFee() != null) {
+            if (applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcRepOrderDate() != null) {
                 ccRepOrderDate = convertToLocalDateViaSqlDate(applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcRepOrderDate());
             }
         }
         return ccRepOrderDate;
     }
 
-    private Date parseDate(String dateString) {
+    public Date parseDate(String dateString) {
         if (dateString == null) return null;
         try {
             return new SimpleDateFormat("yyyy-MM-dd").parse(dateString);
@@ -225,7 +225,7 @@ public class ValidationService {
     }
 
 
-    private LocalDate convertToLocalDateViaSqlDate(Date dateToConvert) {
+    public LocalDate convertToLocalDateViaSqlDate(Date dateToConvert) {
         if (dateToConvert == null) return null;
         return dateToConvert.toInstant()
                 .atZone(ZoneId.systemDefault())
