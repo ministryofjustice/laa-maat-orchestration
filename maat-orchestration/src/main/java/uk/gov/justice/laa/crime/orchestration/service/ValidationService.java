@@ -3,6 +3,7 @@ package uk.gov.justice.laa.crime.orchestration.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.enums.RepOrderStatus;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -61,12 +62,10 @@ public class ValidationService {
 
     public static String getOutcome(ApplicationDTO applicationDTO) {
         String outcome = null;
-        if (applicationDTO.getCrownCourtOverviewDTO() != null
-                && applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO() != null) {
-            if (applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcOutcome() != null) {
+        if ((applicationDTO.getCrownCourtOverviewDTO() != null && applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO() != null)
+                && (applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcOutcome() != null)) {
                 outcome = applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcOutcome().getOutcome();
             }
-        }
         return outcome;
     }
 
@@ -142,20 +141,20 @@ public class ValidationService {
     }
 
     public void updateSendToCCLF(WorkflowRequest request, RepOrderDTO repOrderDTO, String action) {
-        ApplicationDTO applicationDTO = request.getApplicationDTO();
-        if (applicationDTO == null || applicationDTO.getApplicantDTO() == null || repOrderDTO == null || repOrderDTO.getId() == null) {
+        ApplicationDTO applicationDto = request.getApplicationDTO();
+        if (applicationDto == null || applicationDto.getApplicantDTO() == null || repOrderDTO == null || repOrderDTO.getId() == null) {
             throw new ValidationException("Valid ApplicationDTO and RepOrderDTO is required");
         }
 
         String _action = (action != null) ? action : "UPDATE";
         Date cclfDate = parseDate("2021-04-01");
-        Date decisionDate = applicationDTO.getDecisionDate();
+        Date decisionDate = applicationDto.getDecisionDate();
 
         if ((decisionDate.after(cclfDate) || decisionDate.equals(cclfDate)) &&
-                (_action.equals("CREATE") || !compareRepOrderAndApplicationDTO(repOrderDTO, applicationDTO))) {
+                (_action.equals("CREATE") || !compareRepOrderAndApplicationDTO(repOrderDTO, applicationDto))) {
             SendToCCLFDTO sendToCCLFDTO = SendToCCLFDTO.builder().repId(repOrderDTO.getId())
-                    .applId(applicationDTO.getApplicantDTO().getId())
-                    .applHistoryId(applicationDTO.getApplicantDTO().getApplicantHistoryId()).build();
+                    .applId(applicationDto.getApplicantDTO().getId())
+                    .applHistoryId(applicationDto.getApplicantDTO().getApplicantHistoryId()).build();
             maatCourtDataApiService.updateSendToCCLF(sendToCCLFDTO);
         }
     }
@@ -198,23 +197,21 @@ public class ValidationService {
 
     public LocalDate getWithDrawalDate(ApplicationDTO applicationDTO) {
         LocalDate ccWithDrawalDate = null;
-        if (applicationDTO.getCrownCourtOverviewDTO() != null
-                && applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO() != null) {
-            if (applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcWithDrawalDate() != null) {
+        if ((applicationDTO.getCrownCourtOverviewDTO() != null
+                && applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO() != null)
+            && (applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcWithDrawalDate() != null)) {
                 ccWithDrawalDate = convertToLocalDateViaSqlDate(applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcWithDrawalDate());
             }
-        }
         return ccWithDrawalDate;
     }
 
     public LocalDate getRepOrderDate(ApplicationDTO applicationDTO) {
         LocalDate ccRepOrderDate = null;
-        if (applicationDTO.getCrownCourtOverviewDTO() != null
-                && applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO() != null) {
-            if (applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcRepOrderDate() != null) {
+        if ((applicationDTO.getCrownCourtOverviewDTO() != null
+                && applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO() != null)
+            && (applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcRepOrderDate() != null)) {
                 ccRepOrderDate = convertToLocalDateViaSqlDate(applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getCcRepOrderDate());
             }
-        }
         return ccRepOrderDate;
     }
 
@@ -223,7 +220,7 @@ public class ValidationService {
         try {
             return new SimpleDateFormat("yyyy-MM-dd").parse(dateString);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            throw new APIClientException("Invalid date format");
         }
     }
 

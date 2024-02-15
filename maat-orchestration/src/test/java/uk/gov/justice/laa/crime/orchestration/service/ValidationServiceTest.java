@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.RepOrderStatus;
@@ -499,7 +500,7 @@ class ValidationServiceTest {
     }
 
     @Test
-    public void parseValidDate() throws ParseException {
+    void parseValidDate() throws ParseException {
         String date = "2023-01-01";
         Date result = validationService.parseDate(date);
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -508,12 +509,12 @@ class ValidationServiceTest {
     }
 
     @Test()
-    public void parseInvalidFormat() {
-        assertThatThrownBy(() -> validationService.parseDate("invalid")).isInstanceOf(RuntimeException.class);
+    void parseInvalidFormat() {
+        assertThatThrownBy(() -> validationService.parseDate("invalid")).isInstanceOf(APIClientException.class);
     }
 
     @Test()
-    public void parseNullDate() {
+    void parseNullDate() {
         assertNull(validationService.parseDate(null));
     }
 
