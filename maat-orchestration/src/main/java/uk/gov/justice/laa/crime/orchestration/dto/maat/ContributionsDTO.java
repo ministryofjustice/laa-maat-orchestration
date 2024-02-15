@@ -1,12 +1,13 @@
 package uk.gov.justice.laa.crime.orchestration.dto.maat;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import uk.gov.justice.laa.crime.orchestration.jackson.SysGenDateDeserializer;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 @Data
 @SuperBuilder
@@ -16,8 +17,10 @@ public class ContributionsDTO extends GenericDTO {
     private Long id;
     private BigDecimal monthlyContribs;
     private BigDecimal upfrontContribs;
-    private Date effectiveDate;
-    private Date calcDate;
+    @JsonDeserialize(using = SysGenDateDeserializer.class)
+    private SysGenDate effectiveDate;
+    @JsonDeserialize(using = SysGenDateDeserializer.class)
+    private SysGenDate calcDate;
     private BigDecimal capped;
     private boolean upliftApplied;
     private SysGenString basedOn;
