@@ -73,40 +73,4 @@ public class MaatCourtDataApiService {
         return response;
     }
 
-    public RepOrderDTO updateRepOrderByRepId(Integer repId, Map<String, Object> repOrderData) {
-        RepOrderDTO response = maatApiClient.patch(repOrderData,
-                new ParameterizedTypeReference<>() {
-                },
-                configuration.getMaatApi().getEndpoints().getRepOrderUrl(),
-                Map.of(),
-                repId
-        );
-        log.info(RESPONSE_STRING, response);
-        return response;
-    }
-
-    public RepOrderDTO updateApplicantById(Integer applId, Map<String, Object> applicantData) {
-        RepOrderDTO response = maatApiClient.patch(applicantData,
-                new ParameterizedTypeReference<>() {
-                },
-                configuration.getMaatApi().getEndpoints().getApplicantUrl(),
-                Map.of(),
-                applId
-        );
-        log.info(RESPONSE_STRING, response);
-        return response;
-    }
-
-    public RepOrderDTO updateApplicantHistoryById(Integer applHistoryId, Map<String, Object> applicantHistoryData) {
-        RepOrderDTO response = maatApiClient.patch(applicantHistoryData,
-                new ParameterizedTypeReference<>() {
-                },
-                configuration.getMaatApi().getEndpoints().getApplicantHistoryUrl(),
-                Map.of(),
-                applHistoryId
-        );
-        log.info(RESPONSE_STRING, response);
-        return response;
-    }
-
 }

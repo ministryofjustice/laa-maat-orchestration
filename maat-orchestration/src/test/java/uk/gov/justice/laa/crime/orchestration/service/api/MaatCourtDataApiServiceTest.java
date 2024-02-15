@@ -51,27 +51,6 @@ class MaatCourtDataApiServiceTest {
     }
 
     @Test
-    void givenValidRequest_whenUpdateApplicantByIdIsInvoked_thenApplicationDTOIsReturned() {
-        maatCourtDataApiService.updateApplicantById(1000, new HashMap<String, Object>());
-        verify(cmaApiClient)
-                .patch(any(HashMap.class), any(), anyString(), anyMap(), any());
-    }
-
-    @Test
-    void givenValidRequest_whenUpdateApplicantHistoryByIdIsInvoked_thenApplicationDTOIsReturned() {
-        maatCourtDataApiService.updateApplicantHistoryById(1000, new HashMap<String, Object>());
-        verify(cmaApiClient)
-                .patch(any(HashMap.class), any(), anyString(), anyMap(), any());
-    }
-
-    @Test
-    void givenValidRequest_whenUpdateRepOrderByRepIdIsInvoked_thenApplicationDTOIsReturned() {
-        maatCourtDataApiService.updateRepOrderByRepId(1000, new HashMap<String, Object>());
-        verify(cmaApiClient)
-                .patch(any(HashMap.class), any(), anyString(), anyMap(), any());
-    }
-
-    @Test
     void givenValidRequest_whenUpdateSendToCCLFIsInvoked_thenApplicationDTOIsReturned() {
         maatCourtDataApiService.updateSendToCCLF(SendToCCLFDTO.builder().build());
         verify(cmaApiClient)

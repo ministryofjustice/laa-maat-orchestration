@@ -158,10 +158,6 @@ public class ServicesConfiguration {
             @NotNull
             private String repOrderUrl;
             @NotNull
-            private String applicantUrl;
-            @NotNull
-            private String applicantHistoryUrl;
-            @NotNull
             private String updateSendToCCLFUrl;
 
         }
