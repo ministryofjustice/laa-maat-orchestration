@@ -261,8 +261,8 @@ public class MeansAssessmentDataBuilder {
                 .id(Constants.CONTRIBUTIONS_ID.longValue())
                 .upliftApplied(false)
                 .basedOn(CONTRIBUTION_BASED_ON)
-                .calcDate(CONTRIBUTION_CALCULATION_DATE)
-                .effectiveDate(CONTRIBUTION_EFFECTIVE_DATE)
+                .calcDate(new SysGenDate(CONTRIBUTION_CALCULATION_DATE))
+                .effectiveDate(new SysGenDate(CONTRIBUTION_EFFECTIVE_DATE))
                 .monthlyContribs(MONTHLY_CONTRIBUTION_AMOUNT)
                 .upfrontContribs(UPFRONT_CONTRIBUTION_AMOUNT)
                 .build();
@@ -306,7 +306,7 @@ public class MeansAssessmentDataBuilder {
                 .detailCode(CRITERIA_DETAIL_CODE)
                 .partnerAmount(PARTNER_AMOUNT.doubleValue())
                 .partnerFrequency(getFrequencyDTO(PARTNER_FREQUENCY))
-                .timestamp(toTimeStamp(DATE_MODIFIED))
+                .timestamp(DATE_MODIFIED)
                 .build();
     }
 
@@ -401,7 +401,7 @@ public class MeansAssessmentDataBuilder {
                 .dateReceived(toDate(DATETIME_RECEIVED))
                 .otherText(OTHER_DESCRIPTION)
                 .mandatory(true)
-                .timestamp(toTimeStamp(DATE_MODIFIED))
+                .timestamp(DATE_MODIFIED)
                 .build();
     }
 
@@ -410,7 +410,7 @@ public class MeansAssessmentDataBuilder {
                 .id(APPLICANT_EVIDENCE_ID.longValue())
                 .evidenceTypeDTO(getEvidenceTypeDTO())
                 .dateReceived(toDate(APPLICANT_EVIDENCE_RECEIVED_DATE))
-                .timestamp(toTimeStamp(DATE_MODIFIED))
+                .timestamp(DATE_MODIFIED)
                 .build();
     }
 
@@ -419,7 +419,7 @@ public class MeansAssessmentDataBuilder {
                 .id(PARTNER_EVIDENCE_ID.longValue())
                 .evidenceTypeDTO(getEvidenceTypeDTO())
                 .dateReceived(toDate(PARTNER_EVIDENCE_RECEIVED_DATE))
-                .timestamp(toTimeStamp(DATE_MODIFIED))
+                .timestamp(DATE_MODIFIED)
                 .build();
     }
 
