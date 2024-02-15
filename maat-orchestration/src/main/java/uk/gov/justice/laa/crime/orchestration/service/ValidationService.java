@@ -146,12 +146,12 @@ public class ValidationService {
             throw new ValidationException("Valid ApplicationDTO and RepOrderDTO is required");
         }
 
-        String _action = (action != null) ? action : "UPDATE";
+        String lAction = (action != null) ? action : "UPDATE";
         Date cclfDate = parseDate("2021-04-01");
         Date decisionDate = applicationDto.getDecisionDate();
 
         if ((decisionDate.after(cclfDate) || decisionDate.equals(cclfDate)) &&
-                (_action.equals("CREATE") || !compareRepOrderAndApplicationDTO(repOrderDTO, applicationDto))) {
+                (lAction.equals("CREATE") || !compareRepOrderAndApplicationDTO(repOrderDTO, applicationDto))) {
             SendToCCLFDTO sendToCCLFDTO = SendToCCLFDTO.builder().repId(repOrderDTO.getId())
                     .applId(applicationDto.getApplicantDTO().getId())
                     .applHistoryId(applicationDto.getApplicantDTO().getApplicantHistoryId()).build();
