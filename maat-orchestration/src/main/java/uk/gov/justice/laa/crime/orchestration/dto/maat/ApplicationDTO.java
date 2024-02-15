@@ -54,7 +54,6 @@ public class ApplicationDTO extends GenericDTO {
     private SupplierDTO supplierDTO;
     private ContraryInterestDTO partnerContraryInterestDTO;
     private AllowedWorkReasonDTO allowedWorkReasonDTO;
-    private DrcSummaryDTO drcSummaryDTO;
     private String transactionId;
     private Boolean applicantHasPartner;
     private boolean welshCorrepondence;
