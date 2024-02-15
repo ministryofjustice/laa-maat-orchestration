@@ -78,11 +78,8 @@ public class ApplicationDTO extends GenericDTO {
     private CommonPlatformDataDTO commonPlatformData;
 
     private BreathingSpaceDTO breathingSpaceDTO;
-    private boolean hasCurrentLinkedPartner;
-    private ApplicantDTO currentPartner;
-    private boolean partnerDetailsApplicable;
-    private String solicitorOfficeId;
-    private FdcContributionDTO latestActiveFDC;
+
+    @JsonIgnore
     private CourtType courtType;
 
 }
