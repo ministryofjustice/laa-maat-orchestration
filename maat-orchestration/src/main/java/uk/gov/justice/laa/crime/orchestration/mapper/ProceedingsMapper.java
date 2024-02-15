@@ -69,7 +69,9 @@ public class ProceedingsMapper extends CrownCourtMapper {
         ccpCrownCourtSummary.setIsWarrantIssued(crownCourtSummary.getBenchWarrantyIssued());
 
         if (null != crownCourtSummary.getEvidenceProvisionFee()) {
-            ccpCrownCourtSummary.setEvidenceFeeLevel(crownCourtSummary.getEvidenceProvisionFee().getFeeLevel());
+            ccpCrownCourtSummary.setEvidenceFeeLevel(
+                    EvidenceFeeLevel.getFrom(crownCourtSummary.getEvidenceProvisionFee().getFeeLevel())
+            );
         }
 
         if (null != crownCourtSummary.getOutcomeDTOs()) {
@@ -91,7 +93,9 @@ public class ProceedingsMapper extends CrownCourtMapper {
                 .benchWarrantyIssued(apiCrownCourtSummary.getIsWarrantIssued())
                 .evidenceProvisionFee(
                         EvidenceFeeDTO.builder()
-                                .feeLevel(apiCrownCourtSummary.getEvidenceFeeLevel())
+                                .feeLevel(apiCrownCourtSummary.getEvidenceFeeLevel().getFeeLevel())
+                                .description(new SysGenString(
+                                        apiCrownCourtSummary.getEvidenceFeeLevel().getDescription()))
                                 .build())
                 .outcomeDTOs(
                         apiRepOrderCrownCourtOutcomesToOutcomeDtos(apiCrownCourtSummary.getRepOrderCrownCourtOutcome()))

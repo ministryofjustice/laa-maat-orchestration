@@ -156,7 +156,7 @@ class ProceedingsMapperTest {
                 .isEqualTo(apiCrownCourtSummary.getIsWarrantIssued());
 
         softly.assertThat(crownCourtSummaryDTO.getEvidenceProvisionFee().getFeeLevel())
-                .isEqualTo(apiCrownCourtSummary.getEvidenceFeeLevel());
+                .isEqualTo(apiCrownCourtSummary.getEvidenceFeeLevel().getFeeLevel());
 
         checkOutcomes(crownCourtSummaryDTO.getOutcomeDTOs().stream().toList(), apiCrownCourtSummary);
     }
