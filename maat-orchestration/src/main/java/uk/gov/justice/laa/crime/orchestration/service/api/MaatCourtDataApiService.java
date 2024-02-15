@@ -21,7 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MaatCourtDataApiService {
 
-    private static final String RESPONSE_STRING = "Response from MAAT Court Data Service: %s";
+    private static final String RESPONSE_STRING = "Response from MAAT Court Data Service: {}";
     @Qualifier("maatApiClient")
     private final RestAPIClient maatApiClient;
     private final ServicesConfiguration configuration;
@@ -35,7 +35,7 @@ public class MaatCourtDataApiService {
                 Collections.emptyMap()
         );
 
-        log.info(String.format(RESPONSE_STRING, response));
+        log.info(RESPONSE_STRING, response);
         return response;
     }
 
@@ -58,7 +58,7 @@ public class MaatCourtDataApiService {
                 username
         );
 
-        log.info(String.format(RESPONSE_STRING, userSummaryDTO));
+        log.info(RESPONSE_STRING, userSummaryDTO);
         return userSummaryDTO;
     }
 
