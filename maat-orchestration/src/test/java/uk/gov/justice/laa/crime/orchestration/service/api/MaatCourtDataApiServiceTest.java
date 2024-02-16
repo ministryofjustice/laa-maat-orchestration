@@ -10,6 +10,9 @@ import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.MockServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.SendToCCLFDTO;
+
+import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
@@ -45,5 +48,12 @@ class MaatCourtDataApiServiceTest {
         maatCourtDataApiService.getUserSummary("test");
         verify(cmaApiClient)
                 .get(any(), any(), anyString());
+    }
+
+    @Test
+    void givenValidRequest_whenUpdateSendToCCLFIsInvoked_thenApplicationDTOIsReturned() {
+        maatCourtDataApiService.updateSendToCCLF(SendToCCLFDTO.builder().build());
+        verify(cmaApiClient)
+                .put(any(), any(), anyString(), anyMap());
     }
 }

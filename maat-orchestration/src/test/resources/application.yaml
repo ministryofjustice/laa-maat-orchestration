@@ -85,6 +85,7 @@ services:
     endpoints:
       call-stored-proc-url: ${services.maat-api.base-url}/api/internal/v1/assessment/execute-stored-procedure
       rep-order-url: ${services.maat-api.base-url}/api/internal/v1/assessment/rep-orders/{repId}
+      update-send-to-cclf-url: ${services.maat-api.base-url}/api/internal/v1/application/applicant/update-cclf
     user-domain: ${services.maat-api.base-url}/api/internal/v1/users
     user-endpoints:
       user-summary-url: ${services.maat-api.user-domain}/summary/{username}

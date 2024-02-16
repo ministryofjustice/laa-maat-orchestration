@@ -157,6 +157,8 @@ public class ServicesConfiguration {
             private String callStoredProcUrl;
             @NotNull
             private String repOrderUrl;
+            @NotNull
+            private String updateSendToCCLFUrl;
 
         }
 
