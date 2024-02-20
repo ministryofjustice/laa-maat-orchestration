@@ -31,9 +31,9 @@ public class HardshipMapper {
     public ApiPerformHardshipRequest workflowRequestToPerformHardshipRequest(WorkflowRequest workflowRequest) {
         UserDTO userDTO = workflowRequest.getUserDTO();
         ApplicationDTO application = workflowRequest.getApplicationDTO();
-        HardshipReviewDTO current = getHardshipReviewDTO(application);
+        HardshipReviewDTO current = getHardshipReviewDTO(application, workflowRequest.getCourtType());
         HardshipReview hardship = new HardshipReview()
-                .withCourtType(application.getCourtType())
+                .withCourtType(workflowRequest.getCourtType())
                 .withTotalAnnualDisposableIncome(current.getDisposableIncome())
                 .withReviewDate(toLocalDateTime(current.getReviewDate()))
                 .withExtraExpenditure(hrSectionDtosToExtraExpenditures(current.getSection()))
@@ -59,8 +59,7 @@ public class HardshipMapper {
                 .withHardshipMetadata(metadata);
     }
 
-    public HardshipReviewDTO getHardshipReviewDTO(ApplicationDTO application) {
-        CourtType courtType = application.getCourtType();
+    public HardshipReviewDTO getHardshipReviewDTO(ApplicationDTO application, CourtType courtType) {
         HardshipOverviewDTO hardshipOverview =
                 application.getAssessmentDTO()
                         .getFinancialAssessmentDTO()
@@ -133,9 +132,8 @@ public class HardshipMapper {
     }
 
     public void performHardshipResponseToApplicationDTO(ApiPerformHardshipResponse response,
-                                                        ApplicationDTO application) {
+                                                        ApplicationDTO application, CourtType courtType) {
         HardshipReviewDTO current;
-        CourtType courtType = application.getCourtType();
         HardshipOverviewDTO hardshipOverview =
                 application.getAssessmentDTO()
                         .getFinancialAssessmentDTO()

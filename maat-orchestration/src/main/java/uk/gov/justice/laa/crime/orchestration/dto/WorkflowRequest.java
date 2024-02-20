@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 
@@ -18,4 +19,5 @@ public class WorkflowRequest {
     @NotNull
     private ApplicationDTO applicationDTO;
     private boolean isC3Enabled;
+    private CourtType courtType;
 }

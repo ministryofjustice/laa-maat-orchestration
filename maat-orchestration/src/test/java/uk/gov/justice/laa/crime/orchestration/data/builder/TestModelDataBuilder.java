@@ -416,6 +416,7 @@ public class TestModelDataBuilder {
     public static WorkflowRequest buildWorkflowRequestWithHardship(CourtType courtType) {
         return WorkflowRequest.builder()
                 .userDTO(getUserDTO())
+                .courtType(courtType)
                 .applicationDTO(getApplicationDTOWithHardship(courtType))
                 .build();
     }
@@ -423,6 +424,7 @@ public class TestModelDataBuilder {
     public static WorkflowRequest buildWorkFlowRequest(CourtType courtType) {
         return WorkflowRequest.builder()
                 .userDTO(getUserDTO())
+                .courtType(courtType)
                 .applicationDTO(getApplicationDTO(courtType))
                 .build();
     }
@@ -657,7 +659,6 @@ public class TestModelDataBuilder {
 
     public static ApplicationDTO getApplicationDTOWithHardship(CourtType courtType) {
         return ApplicationDTO.builder()
-                .courtType(courtType)
                 .repId(REP_ID.longValue())
                 .caseManagementUnitDTO(getCaseManagementUnitDTO())
                 .crownCourtOverviewDTO(CrownCourtOverviewDTO.builder().build())

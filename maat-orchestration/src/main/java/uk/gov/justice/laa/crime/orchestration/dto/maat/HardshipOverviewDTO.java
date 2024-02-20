@@ -7,8 +7,8 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class HardshipOverviewDTO extends GenericDTO {
     private HardshipReviewDTO magCourtHardship;
     private HardshipReviewDTO crownCourtHardship;

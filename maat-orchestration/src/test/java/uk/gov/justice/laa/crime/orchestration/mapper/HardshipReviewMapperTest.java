@@ -91,7 +91,7 @@ class HardshipReviewMapperTest {
                 TestModelDataBuilder.getApplicationDTOWithBlankHardship(CourtType.CROWN_COURT);
         ApiPerformHardshipResponse response = TestModelDataBuilder.getApiPerformHardshipResponse();
 
-        hardshipMapper.performHardshipResponseToApplicationDTO(response, applicationDTO);
+        hardshipMapper.performHardshipResponseToApplicationDTO(response, applicationDTO, CourtType.CROWN_COURT);
 
         HardshipReviewDTO crownCourtHardship =
                 applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship();
@@ -105,7 +105,7 @@ class HardshipReviewMapperTest {
                 TestModelDataBuilder.getApplicationDTOWithBlankHardship(CourtType.MAGISTRATE);
         ApiPerformHardshipResponse response = TestModelDataBuilder.getApiPerformHardshipResponse();
 
-        hardshipMapper.performHardshipResponseToApplicationDTO(response, applicationDTO);
+        hardshipMapper.performHardshipResponseToApplicationDTO(response, applicationDTO, CourtType.MAGISTRATE);
 
         HardshipReviewDTO magCourtHardship =
                 applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getMagCourtHardship();

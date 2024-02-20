@@ -1,12 +1,10 @@
 package uk.gov.justice.laa.crime.orchestration.dto.maat;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.enums.EformEnum;
 import uk.gov.justice.laa.crime.orchestration.jackson.SysGenDateDeserializer;
 
@@ -71,14 +69,7 @@ public class ApplicationDTO extends GenericDTO {
     private String alertMessage;
     private Long usn;
     private EformEnum applicationType;
-
-    private ArrayList<DigitisedMeansAssessmentDTO> meansAssessments; // MW - 30/03/2017 - To support FIP changes
-
-    private CommonPlatformDataDTO commonPlatformData;
-
     private BreathingSpaceDTO breathingSpaceDTO;
-
-    @JsonIgnore
-    private CourtType courtType;
-
+    private CommonPlatformDataDTO commonPlatformData;
+    private ArrayList<DigitisedMeansAssessmentDTO> meansAssessments; // MW - 30/03/2017 - To support FIP changes
 }

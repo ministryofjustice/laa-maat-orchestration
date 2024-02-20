@@ -34,11 +34,15 @@ public class HardshipService {
         ApiPerformHardshipRequest performHardshipRequest =
                 hardshipMapper.workflowRequestToPerformHardshipRequest(request);
         ApiPerformHardshipResponse apiPerformHardshipResponse = hardshipApiService.update(performHardshipRequest);
-        hardshipMapper.performHardshipResponseToApplicationDTO(apiPerformHardshipResponse, request.getApplicationDTO());
+        hardshipMapper.performHardshipResponseToApplicationDTO(
+                apiPerformHardshipResponse, request.getApplicationDTO(), request.getCourtType()
+        );
     }
 
     public void rollback(WorkflowRequest request) {
-        HardshipReviewDTO hardshipReviewDTO = hardshipMapper.getHardshipReviewDTO(request.getApplicationDTO());
+        HardshipReviewDTO hardshipReviewDTO = hardshipMapper.getHardshipReviewDTO(
+                request.getApplicationDTO(), request.getCourtType()
+        );
         hardshipApiService.rollback(hardshipReviewDTO.getId());
     }
 }
