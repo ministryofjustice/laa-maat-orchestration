@@ -94,7 +94,7 @@ public class ValidationService {
         LocalDateTime repOrderCreatedDate = DateUtil.convertDateToDateTime(repOrderDTO.getDateCreated());
         LocalDateTime repOrderUpdatedDate = repOrderDTO.getDateModified();
         LocalDateTime repOrderTimestamp = (null != repOrderUpdatedDate) ? repOrderUpdatedDate : repOrderCreatedDate;
-        LocalDateTime applicationTimestamp = request.getApplicationDTO().getTimestamp().toLocalDateTime();
+        LocalDateTime applicationTimestamp = request.getApplicationDTO().getTimestamp();
         if (!applicationTimestamp.isEqual(repOrderTimestamp)) {
             throw new ValidationException(CANNOT_MODIFY_APPLICATION_ERROR);
         }

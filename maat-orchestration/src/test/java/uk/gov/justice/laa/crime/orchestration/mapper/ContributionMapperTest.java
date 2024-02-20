@@ -65,7 +65,7 @@ class ContributionMapperTest {
         softly.assertThat(apiMaatCalculateContributionRequest.getMonthlyContributions())
                 .isEqualTo(contribution.getMonthlyContribs());
         softly.assertThat(apiMaatCalculateContributionRequest.getEffectiveDate())
-                .isEqualTo(toLocalDateTime(contribution.getEffectiveDate()));
+                .isEqualTo(toLocalDateTime(contribution.getEffectiveDate().getValue()));
         softly.assertThat(apiMaatCalculateContributionRequest.getUpfrontContributions())
                 .isEqualTo(contribution.getUpfrontContribs());
         softly.assertThat(apiMaatCalculateContributionRequest.getRemoveContributions())
@@ -119,7 +119,7 @@ class ContributionMapperTest {
         softly.assertThat(apiMaatCalculateContributionRequest.getMonthlyContributions())
                 .isEqualTo(contribution.getMonthlyContribs());
         softly.assertThat(apiMaatCalculateContributionRequest.getEffectiveDate())
-                .isEqualTo(toLocalDateTime(contribution.getEffectiveDate()));
+                .isEqualTo(toLocalDateTime(contribution.getEffectiveDate().getValue()));
         softly.assertThat(apiMaatCalculateContributionRequest.getUpfrontContributions())
                 .isEqualTo(contribution.getUpfrontContribs());
         softly.assertThat(apiMaatCalculateContributionRequest.getRemoveContributions())

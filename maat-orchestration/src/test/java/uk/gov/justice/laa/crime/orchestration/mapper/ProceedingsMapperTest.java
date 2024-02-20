@@ -99,7 +99,7 @@ class ProceedingsMapperTest {
         CrownCourtSummaryDTO updatedCrownCourtSummaryDTO =
                 updatedApplicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO();
 
-        softly.assertThat(updatedApplicationDTO.getTimestamp().toLocalDateTime())
+        softly.assertThat(updatedApplicationDTO.getTimestamp())
                 .isEqualTo(updateApplicationResponse.getModifiedDateTime());
 
         softly.assertThat(updatedCrownCourtSummaryDTO.getCcRepOrderDate())
@@ -128,7 +128,7 @@ class ProceedingsMapperTest {
         CrownCourtSummaryDTO crownCourtSummaryDTO =
                 application.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO();
 
-        softly.assertThat(application.getTimestamp().toLocalDateTime())
+        softly.assertThat(application.getTimestamp())
                 .isEqualTo(updateCrownCourtResponse.getModifiedDateTime());
 
         softly.assertThat(crownCourtSummaryDTO.getCcRepId())
@@ -156,7 +156,7 @@ class ProceedingsMapperTest {
                 .isEqualTo(apiCrownCourtSummary.getIsWarrantIssued());
 
         softly.assertThat(crownCourtSummaryDTO.getEvidenceProvisionFee().getFeeLevel())
-                .isEqualTo(apiCrownCourtSummary.getEvidenceFeeLevel());
+                .isEqualTo(apiCrownCourtSummary.getEvidenceFeeLevel().getFeeLevel());
 
         checkOutcomes(crownCourtSummaryDTO.getOutcomeDTOs().stream().toList(), apiCrownCourtSummary);
     }

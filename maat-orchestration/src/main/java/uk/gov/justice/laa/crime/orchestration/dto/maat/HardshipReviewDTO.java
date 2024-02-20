@@ -31,5 +31,4 @@ public class HardshipReviewDTO extends GenericDTO {
     private Collection<HRProgressDTO> progress;
     // Spelling mistake in MAAT
     private AssessmentStatusDTO asessmentStatus;
-
 }

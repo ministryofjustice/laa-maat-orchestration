@@ -43,7 +43,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             // Need to refresh from DB as HardshipDetail ids may have changed
             HardshipReviewDTO newHardship = hardshipService.find(performHardshipResponse.getHardshipReviewId());
 
-            CourtType courtType = application.getCourtType();
+            CourtType courtType = request.getCourtType();
             if (courtType == CourtType.MAGISTRATE) {
                 hardshipOverview.setMagCourtHardship(newHardship);
                 AssessmentStatusDTO assessmentStatusDTO = newHardship.getAsessmentStatus();
@@ -74,7 +74,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         try {
             hardshipService.update(request);
 
-            CourtType courtType = request.getApplicationDTO().getCourtType();
+            CourtType courtType = request.getCourtType();
             if (courtType == CourtType.MAGISTRATE) {
                 AssessmentStatusDTO assessmentStatusDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO()
                         .getHardship().getMagCourtHardship().getAsessmentStatus();

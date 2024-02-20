@@ -237,7 +237,7 @@ public class TestModelDataBuilder {
                 .withRepOrderDecision(REP_ORDER_DECISION_GRANTED.getValue())
                 .withIsImprisoned(Boolean.TRUE)
                 .withIsWarrantIssued(Boolean.TRUE)
-                .withEvidenceFeeLevel(EVIDENCE_FEE_LEVEL_1)
+                .withEvidenceFeeLevel(EvidenceFeeLevel.LEVEL1)
                 .withCrownCourtOutcome(List.of(getApiCrownCourtOutcome(CrownCourtOutcome.CONVICTED)));
     }
 
@@ -416,6 +416,7 @@ public class TestModelDataBuilder {
     public static WorkflowRequest buildWorkflowRequestWithHardship(CourtType courtType) {
         return WorkflowRequest.builder()
                 .userDTO(getUserDTO())
+                .courtType(courtType)
                 .applicationDTO(getApplicationDTOWithHardship(courtType))
                 .build();
     }
@@ -423,6 +424,7 @@ public class TestModelDataBuilder {
     public static WorkflowRequest buildWorkFlowRequest(CourtType courtType) {
         return WorkflowRequest.builder()
                 .userDTO(getUserDTO())
+                .courtType(courtType)
                 .applicationDTO(getApplicationDTO(courtType))
                 .build();
     }
@@ -442,7 +444,7 @@ public class TestModelDataBuilder {
                         ApplicationDTO
                                 .builder()
                                 .repId(123L)
-                                .timestamp(DateUtil.toTimeStamp(APPLICATION_TIMESTAMP))
+                                .timestamp(APPLICATION_TIMESTAMP)
                                 .build()).build();
     }
 
@@ -453,7 +455,7 @@ public class TestModelDataBuilder {
                         ApplicationDTO
                                 .builder()
                                 .repId(123L)
-                                .timestamp(DateUtil.toTimeStamp(APPLICATION_TIMESTAMP))
+                                .timestamp(APPLICATION_TIMESTAMP)
                                 .statusDTO(RepStatusDTO
                                         .builder()
                                         .updateAllowed(isUpdateAllowed)
@@ -648,8 +650,8 @@ public class TestModelDataBuilder {
                 .id(Constants.CONTRIBUTIONS_ID.longValue())
                 .upliftApplied(false)
                 .basedOn(CONTRIBUTION_BASED_ON)
-                .calcDate(CONTRIBUTION_CALCULATION_DATE)
-                .effectiveDate(CONTRIBUTION_EFFECTIVE_DATE)
+                .calcDate(new SysGenDate(CONTRIBUTION_CALCULATION_DATE))
+                .effectiveDate(new SysGenDate(CONTRIBUTION_EFFECTIVE_DATE))
                 .monthlyContribs(MONTHLY_CONTRIBUTION_AMOUNT)
                 .upfrontContribs(UPFRONT_CONTRIBUTION_AMOUNT)
                 .build();
@@ -657,7 +659,6 @@ public class TestModelDataBuilder {
 
     public static ApplicationDTO getApplicationDTOWithHardship(CourtType courtType) {
         return ApplicationDTO.builder()
-                .courtType(courtType)
                 .repId(REP_ID.longValue())
                 .caseManagementUnitDTO(getCaseManagementUnitDTO())
                 .crownCourtOverviewDTO(CrownCourtOverviewDTO.builder().build())
