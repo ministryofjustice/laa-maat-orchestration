@@ -71,9 +71,9 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     public ApplicationDTO update(WorkflowRequest request) {
         // invoke the validation service to check that data has not been modified by another user
         // invoke the validation service to Check user has rep order reserved
-        try {
-            hardshipService.update(request);
 
+        hardshipService.update(request);
+        try {
             CourtType courtType = request.getCourtType();
             if (courtType == CourtType.MAGISTRATE) {
                 AssessmentStatusDTO assessmentStatusDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO()

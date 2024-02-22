@@ -456,4 +456,24 @@ class HardshipOrchestrationServiceTest {
         Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
+    @Test
+    void givenExceptionThrownInCreateHardshipService_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
+        when(hardshipService.create(any(WorkflowRequest.class)))
+                .thenThrow(new APIClientException());
+        assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
+                .isInstanceOf(APIClientException.class);
+
+        Mockito.verify(hardshipService, times(0)).rollback(any());
+    }
+
+    @Test
+    void givenExceptionThrownInUpdateHardshipService_whenUpdateIsInvoked_thenRollbackIsNotInvoked() {
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
+        doThrow(new APIClientException()).when(hardshipService).update(any(WorkflowRequest.class));
+        assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
+                .isInstanceOf(APIClientException.class);
+
+        Mockito.verify(hardshipService, times(0)).rollback(any());
+    }
 }
