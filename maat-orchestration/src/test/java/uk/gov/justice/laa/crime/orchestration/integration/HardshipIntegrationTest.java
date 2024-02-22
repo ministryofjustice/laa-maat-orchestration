@@ -106,7 +106,7 @@ class HardshipIntegrationTest {
                         objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL))
                 .andExpect(status().is5xxServerError());
         verify(exactly(1), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
-
+        verify(exactly(1), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
     }
 
     @Test
@@ -137,10 +137,12 @@ class HardshipIntegrationTest {
     @Test
     void givenAValidContentAndIfAnyException_whenUpdateIsInvoked_thenShouldRollback() throws Exception {
         stubForOAuth();
+        stubForUpdateHardship();
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT,
                         objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.CROWN_COURT)), ENDPOINT_URL))
                 .andExpect(status().is5xxServerError());
         verify(exactly(1), putRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
+        verify(exactly(1), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
 
     }
 
