@@ -24,7 +24,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.*;
 
-
 @ExtendWith({MockitoExtension.class})
 class HardshipOrchestrationServiceTest {
 
@@ -281,11 +280,17 @@ class HardshipOrchestrationServiceTest {
                 .thenReturn(workflowRequest.getApplicationDTO());
         when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
                 .thenReturn(false);
+        AssessmentSummaryDTO assessmentSummaryDTO = getAssessmentSummaryDTO();
+        when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), any()))
+                .thenReturn(assessmentSummaryDTO);
 
         ApplicationDTO applicationDTO = orchestrationService.update(workflowRequest);
 
         assertThat(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getMagCourtHardship())
                 .isEqualTo(getHardshipReviewDTO());
+
+        verify(assessmentSummaryService)
+                .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
     }
 
     @Test
@@ -303,6 +308,9 @@ class HardshipOrchestrationServiceTest {
                 .thenReturn(applicationDTO);
         when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
                 .thenReturn(true);
+        AssessmentSummaryDTO assessmentSummaryDTO = getAssessmentSummaryDTO();
+        when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), any()))
+                .thenReturn(assessmentSummaryDTO);
 
         ApplicationDTO expected = orchestrationService.update(workflowRequest);
 
@@ -311,6 +319,9 @@ class HardshipOrchestrationServiceTest {
 
         assertThat(expected.getCrownCourtOverviewDTO().getContribution())
                 .isEqualTo(contributionsDTO);
+
+        verify(assessmentSummaryService)
+                .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
     }
 
     @Test
@@ -329,6 +340,9 @@ class HardshipOrchestrationServiceTest {
                                                         any(StoredProcedure.class)
         ))
                 .thenReturn(applicationDTO);
+        AssessmentSummaryDTO assessmentSummaryDTO = getAssessmentSummaryDTO();
+        when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), any()))
+                .thenReturn(assessmentSummaryDTO);
 
         ApplicationDTO expected = orchestrationService.update(workflowRequest);
 
@@ -340,6 +354,8 @@ class HardshipOrchestrationServiceTest {
 
         verify(proceedingsService).updateApplication(workflowRequest);
 
+        verify(assessmentSummaryService)
+                .updateApplication(applicationDTO, assessmentSummaryDTO);
     }
 
     @Test
