@@ -11,6 +11,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
 
 @ExtendWith(SoftAssertionsExtension.class)
@@ -200,6 +201,19 @@ class HardshipReviewMapperTest {
                 .isEqualTo(other.getReasonCode());
         softly.assertThat(actualExtraExpenditure.getItemCode())
                 .isEqualTo(other.getItemCode());
+    }
+
+    @Test
+    void givenWorkflowRequestAndAction_whenGetUserValidationDTOIsInvoked_thenMappingIsCorrect() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
+        UserValidationDTO actual =
+                hardshipMapper.getUserValidationDTO(workflowRequest, TestModelDataBuilder.TEST_ACTION);
+        UserValidationDTO expected = TestModelDataBuilder.getUserValidationDTO();
+
+        softly.assertThat(actual)
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(expected);
     }
 }
 

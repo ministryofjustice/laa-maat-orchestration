@@ -19,6 +19,7 @@ public class WiremockStubs {
     private static final String CCC_URL = "/api/internal/v1/contribution";
     private static final String MAAT_API_ASSESSMENT_URL = "/api/internal/v1/assessment";
     private static final String CMA_ROLLBACK_URL = "/api/internal/v1/assessment/means/rollback/";
+    private static final String MAAT_API_USER_URL = "/api/internal/v1/users/summary/";
 
     public static void stubForOAuth() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
@@ -114,4 +115,12 @@ public class WiremockStubs {
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response))));
     }
+
+    public static void stubForGetUserSummary(String response) {
+        stubFor(get(urlMatching(MAAT_API_USER_URL + Constants.USERNAME))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
+
 }

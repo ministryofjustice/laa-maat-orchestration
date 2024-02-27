@@ -14,8 +14,12 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
+import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
+import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.service.*;
+
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -41,6 +45,12 @@ class HardshipOrchestrationServiceTest {
 
     @Mock
     private MaatCourtDataService maatCourtDataService;
+
+    @Mock
+    private ValidationService validationService;
+
+    @Mock
+    private HardshipMapper hardshipMapper;
 
     @InjectMocks
     private HardshipOrchestrationService orchestrationService;
@@ -74,6 +84,8 @@ class HardshipOrchestrationServiceTest {
 
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), eq(courtType)))
                 .thenReturn(getAssessmentSummaryDTO());
+
+        doReturn(Boolean.TRUE).when(validationService).isUserActionValid(any());
 
         return workflowRequest;
     }
@@ -489,6 +501,26 @@ class HardshipOrchestrationServiceTest {
         doThrow(new APIClientException()).when(hardshipService).update(any(WorkflowRequest.class));
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(APIClientException.class);
+
+        Mockito.verify(hardshipService, times(0)).rollback(any());
+    }
+
+    @Test
+    void givenExceptionThrownInValidationService_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
+        doThrow(new CrimeValidationException(List.of())).when(validationService).isUserActionValid(any());
+        assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
+                .isInstanceOf(CrimeValidationException.class);
+
+        Mockito.verify(hardshipService, times(0)).rollback(any());
+    }
+
+    @Test
+    void givenExceptionThrownInValidationService_whenUpdateIsInvoked_thenRollbackIsNotInvoked() {
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
+        doThrow(new CrimeValidationException(List.of())).when(validationService).isUserActionValid(any());
+        assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
+                .isInstanceOf(CrimeValidationException.class);
 
         Mockito.verify(hardshipService, times(0)).rollback(any());
     }

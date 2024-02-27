@@ -168,7 +168,7 @@ class ValidationServiceTest {
         UserSummaryDTO expectedUserSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
         when(maatCourtDataService.getUserSummary(any())).thenReturn(expectedUserSummaryDTO);
         UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTO();
-        userValidationDTO.setNewWorkReason(NewWorkReason.NEW);
+        userValidationDTO.setNewWorkReason(NewWorkReason.CFC);
         assertThatThrownBy(() -> validationService.isUserActionValid(userValidationDTO))
                 .isInstanceOf(CrimeValidationException.class)
                 .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
@@ -193,7 +193,7 @@ class ValidationServiceTest {
 
         UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTOWithReservation();
         userValidationDTO.setAction(Action.CREATE_APPLICATION);
-        userValidationDTO.setNewWorkReason(NewWorkReason.NEW);
+        userValidationDTO.setNewWorkReason(NewWorkReason.CFC);
 
         assertThatThrownBy(() -> validationService.isUserActionValid(userValidationDTO))
                 .isInstanceOf(CrimeValidationException.class)
@@ -210,7 +210,7 @@ class ValidationServiceTest {
 
         UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTOWithReservation();
         userValidationDTO.setAction(Action.CREATE_APPLICATION);
-        userValidationDTO.setNewWorkReason(NewWorkReason.NEW);
+        userValidationDTO.setNewWorkReason(NewWorkReason.CFC);
         userValidationDTO.setSessionId("");
 
         assertThatThrownBy(() -> validationService.isUserActionValid(userValidationDTO))
@@ -241,7 +241,7 @@ class ValidationServiceTest {
         when(maatCourtDataService.getUserSummary(any())).thenReturn(expectedUserSummaryDTO);
 
         UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTOWithReservation();
-        userValidationDTO.setNewWorkReason(NewWorkReason.NEW);
+        userValidationDTO.setNewWorkReason(NewWorkReason.CFC);
 
         assertThatThrownBy(() -> validationService.isUserActionValid(userValidationDTO))
                 .isInstanceOf(CrimeValidationException.class)
@@ -402,8 +402,7 @@ class ValidationServiceTest {
     void givenValidInputWithNullAction_whenUpdateSendToCCLFIsInvoked_thenNoExceptionIsThrown() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
-        String action = null;
-        assertDoesNotThrow(() -> validationService.updateSendToCCLF(workflowRequest, repOrderDTO, action));
+        assertDoesNotThrow(() -> validationService.updateSendToCCLF(workflowRequest, repOrderDTO, null));
     }
 
     @Test
@@ -412,8 +411,7 @@ class ValidationServiceTest {
         LocalDateTime DECISION_DATETIME = LocalDateTime.of(2000, 10, 13, 0, 0, 0);
         workflowRequest.getApplicationDTO().setDecisionDate(Date.from(DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()));
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
-        String action = null;
-        assertDoesNotThrow(() -> validationService.updateSendToCCLF(workflowRequest, repOrderDTO, action));
+        assertDoesNotThrow(() -> validationService.updateSendToCCLF(workflowRequest, repOrderDTO, null));
     }
 
     @Test
