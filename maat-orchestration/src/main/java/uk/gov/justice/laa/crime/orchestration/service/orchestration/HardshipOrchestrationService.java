@@ -38,28 +38,24 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         validationService.isUserActionValid(hardshipMapper.getUserValidationDTO(request, action));
         ApplicationDTO application = request.getApplicationDTO();
 
-        HardshipOverviewDTO hardshipOverview =
-                application.getAssessmentDTO()
-                        .getFinancialAssessmentDTO()
-                        .getHardship();
-
         ApiPerformHardshipResponse performHardshipResponse = hardshipService.create(request);
         try {
             // Need to refresh from DB as HardshipDetail ids may have changed
             HardshipReviewDTO newHardship = hardshipService.find(performHardshipResponse.getHardshipReviewId());
 
-            switch (courtType) {
-                case MAGISTRATE -> {
-                    hardshipOverview.setMagCourtHardship(newHardship);
-                    if (isAssessmentComplete(newHardship.getAsessmentStatus())) {
-                        application = processMagCourtHardshipRules(request);
-                    }
+            if (courtType == CourtType.MAGISTRATE) {
+                request.getApplicationDTO().getAssessmentDTO()
+                        .getFinancialAssessmentDTO()
+                        .getHardship().setMagCourtHardship(newHardship);
+                if (isAssessmentComplete(newHardship.getAsessmentStatus())) {
+                    application = processMagCourtHardshipRules(request);
                 }
-                case CROWN_COURT -> {
-                    hardshipOverview.setCrownCourtHardship(newHardship);
-                    if (isAssessmentComplete(newHardship.getAsessmentStatus())) {
-                        application = checkActionsAndUpdateApplication(request);
-                    }
+            } else if (courtType == CourtType.CROWN_COURT) {
+                request.getApplicationDTO().getAssessmentDTO()
+                        .getFinancialAssessmentDTO()
+                        .getHardship().setCrownCourtHardship(newHardship);
+                if (isAssessmentComplete(newHardship.getAsessmentStatus())) {
+                    application = checkActionsAndUpdateApplication(request);
                 }
             }
 
@@ -119,6 +115,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     private boolean isAssessmentComplete(AssessmentStatusDTO assessmentStatusDTO) {
         return assessmentStatusDTO != null && CurrentStatus.COMPLETE.getStatus().equals(assessmentStatusDTO.getStatus());
     }
+
     /**
      * This method performs the logic from the following stored procedures:
      * crown_court.check_crown_court_actions(p_application_object => p_application_object);
