@@ -2,9 +2,6 @@ package uk.gov.justice.laa.crime.orchestration.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.stream.Stream;
 
 @Getter
 @AllArgsConstructor
@@ -40,15 +37,5 @@ public enum Action {
     CREATE_MAGS_HARDSHIP("CREATE_MAGS_HARDSHIP"),
     UPDATE_CAPITAL_AND_EQUITY("UPDATE_CAPITAL_AND_EQUITY");
 
-
     private final String code;
-
-    public static Action getFrom(String code) {
-        if (StringUtils.isBlank(code)) return null;
-
-        return Stream.of(Action.values())
-                .filter(repOrderStatus -> repOrderStatus.code.equals(code))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(String.format("Role Action with value: %s does not exist.", code)));
-    }
 }

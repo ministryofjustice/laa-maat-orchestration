@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.Action;
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipDetail;
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipProgress;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
@@ -287,6 +289,17 @@ public class HardshipMapper {
                 .solicitorRate(solicitorCosts.getRate())
                 .solicitorEstimatedTotalCost(solicitorCosts.getEstimatedTotal())
                 .solicitorVat(solicitorCosts.getVat())
+                .build();
+    }
+
+    public UserValidationDTO getUserValidationDTO(WorkflowRequest request, Action action) {
+        UserDTO userDTO = request.getUserDTO();
+        HardshipReviewDTO hardshipReviewDTO = getHardshipReviewDTO(request.getApplicationDTO(), request.getCourtType());
+        return UserValidationDTO.builder()
+                .username(userDTO.getUserName())
+                .sessionId(userDTO.getUserSession())
+                .newWorkReason(NewWorkReason.getFrom(hardshipReviewDTO.getNewWorkReason().getCode()))
+                .action(action)
                 .build();
     }
 }

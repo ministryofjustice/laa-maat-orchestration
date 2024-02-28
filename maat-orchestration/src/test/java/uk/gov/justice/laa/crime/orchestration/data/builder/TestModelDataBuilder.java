@@ -23,7 +23,6 @@ import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiH
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipProgress;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.*;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
-import uk.gov.justice.laa.crime.util.DateUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -71,8 +70,7 @@ public class TestModelDataBuilder {
     private static final String CASEWORKER_NOTES = "Mock caseworker notes";
     private static final String NEW_WORK_REASON_STRING = NewWorkReason.NEW.getCode();
     private static final String USER_SESSION = "8ab0bab5-c27e-471a-babf-c3992c7a4471";
-    private static final String USERNAME = "mock-u";
-    private static final Integer REP_ID = 200;
+    public static final Integer REP_ID = 200;
     private static final BigDecimal SOLICITOR_ESTIMATED_COST = BigDecimal.valueOf(2500);
     private static final BigDecimal SOLICITOR_VAT = BigDecimal.valueOf(250);
     private static final BigDecimal SOLICITOR_DISBURSEMENTS = BigDecimal.valueOf(375);
@@ -100,11 +98,10 @@ public class TestModelDataBuilder {
     private static final LocalDateTime APPLICATION_TIMESTAMP = LocalDateTime.parse("2024-01-27T10:15:30");
     private static final LocalDateTime REP_ORDER_MODIFIED_TIMESTAMP = LocalDateTime.parse("2023-06-27T10:15:30");
     private static final LocalDate REP_ORDER_CREATED_TIMESTAMP = LocalDate.of(2024, Month.JANUARY, 8);
-    private static final String TEST_USER_NAME = "test-s";
     private static final List<String> TEST_ROLE_ACTIONS = List.of("CREATE_ASSESSMENT");
-    private static final Action TEST_ACTION = Action.CREATE_ASSESSMENT;
-    private static final NewWorkReason TEST_NEW_WORK_REASON = NewWorkReason.CFC;
-    private static final List<String> TEST_NEW_WORK_REASONS = List.of("CFC");
+    public static final Action TEST_ACTION = Action.CREATE_ASSESSMENT;
+    private static final NewWorkReason TEST_NEW_WORK_REASON = NewWorkReason.NEW;
+    private static final List<String> TEST_NEW_WORK_REASONS = List.of(NEW_WORK_REASON_STRING);
     private static final String TEST_USER_SESSION = "sessionId_e5712593c198";
     private static final Integer TEST_RECORD_ID = 100;
     private static final LocalDateTime RESERVATION_DATE = LocalDateTime.of(2022, 12, 14, 0, 0, 0);
@@ -285,7 +282,7 @@ public class TestModelDataBuilder {
 
     public static ApiUserSession getApiUserSession() {
         return new ApiUserSession()
-                .withUserName(USERNAME)
+                .withUserName(Constants.USERNAME)
                 .withSessionId(USER_SESSION);
     }
 
@@ -662,6 +659,7 @@ public class TestModelDataBuilder {
                 .repId(REP_ID.longValue())
                 .caseManagementUnitDTO(getCaseManagementUnitDTO())
                 .crownCourtOverviewDTO(CrownCourtOverviewDTO.builder().build())
+                .statusDTO(getRepStatusDTO())
                 .assessmentDTO(
                         AssessmentDTO.builder()
                                 .financialAssessmentDTO(getFinancialAssessmentDTO(courtType))
@@ -810,7 +808,7 @@ public class TestModelDataBuilder {
 
     private static UserDTO getUserDTO() {
         return UserDTO.builder()
-                .userName(USERNAME)
+                .userName(Constants.USERNAME)
                 .userSession(USER_SESSION)
                 .build();
     }
@@ -903,6 +901,7 @@ public class TestModelDataBuilder {
         return RepStatusDTO.builder()
                 .status("RepStatus")
                 .removeContribs(true)
+                .updateAllowed(true)
                 .build();
     }
 
@@ -1047,7 +1046,7 @@ public class TestModelDataBuilder {
 
     public static UserSummaryDTO getUserSummaryDTO() {
         return UserSummaryDTO.builder()
-                .username(TEST_USER_NAME)
+                .username(Constants.USERNAME)
                 .roleActions(TEST_ROLE_ACTIONS)
                 .newWorkReasons(TEST_NEW_WORK_REASONS)
                 .reservationsEntity(getReservationsDTO())
@@ -1058,7 +1057,7 @@ public class TestModelDataBuilder {
         return ReservationsDTO.builder()
                 .recordId(TEST_RECORD_ID)
                 .recordName("")
-                .userName(TEST_USER_NAME)
+                .userName(Constants.USERNAME)
                 .userSession(TEST_USER_SESSION)
                 .reservationDate(RESERVATION_DATE)
                 .expiryDate(RESERVATION_DATE)
@@ -1067,15 +1066,15 @@ public class TestModelDataBuilder {
 
     public static UserValidationDTO getUserValidationDTO() {
         return UserValidationDTO.builder()
-                .username(TEST_USER_NAME)
+                .username(Constants.USERNAME)
                 .action(TEST_ACTION)
                 .newWorkReason(TEST_NEW_WORK_REASON)
-                .sessionId("").build();
+                .sessionId(USER_SESSION).build();
     }
 
     public static UserValidationDTO getUserValidationDTOWithReservation() {
         return UserValidationDTO.builder()
-                .username(TEST_USER_NAME)
+                .username(Constants.USERNAME)
                 .action(TEST_ACTION)
                 .newWorkReason(TEST_NEW_WORK_REASON)
                 .sessionId(TEST_USER_SESSION).build();
@@ -1083,7 +1082,7 @@ public class TestModelDataBuilder {
 
     public static UserValidationDTO getUserValidationDTOInvalidValidRequest() {
         return UserValidationDTO.builder()
-                .username(TEST_USER_NAME)
+                .username(Constants.USERNAME)
                 .action(null)
                 .newWorkReason(null)
                 .sessionId(null).build();
@@ -1121,7 +1120,6 @@ public class TestModelDataBuilder {
         return applicationDTO;
     }
 
-
     @NotNull
     public static RepOrderCCOutcomeDTO getRepOrderCCOutcomeDTO() {
         return RepOrderCCOutcomeDTO.builder()
@@ -1129,6 +1127,15 @@ public class TestModelDataBuilder {
                 .repId(1)
                 .outcomeDate(LocalDateTime.now())
                 .outcome("CONVICTED")
+                .build();
+    }
+
+    public static UserSummaryDTO getUserSummaryDTO(List<String> roleActions, NewWorkReason newWorkReason) {
+        return UserSummaryDTO.builder()
+                .username(Constants.USERNAME)
+                .roleActions(roleActions)
+                .newWorkReasons(List.of(newWorkReason.getCode()))
+                .reservationsEntity(getReservationsDTO())
                 .build();
     }
 }
