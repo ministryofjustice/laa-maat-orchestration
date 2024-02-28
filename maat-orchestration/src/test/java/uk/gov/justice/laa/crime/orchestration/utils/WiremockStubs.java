@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.http.MediaType;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
+import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 
 import java.util.Map;
 import java.util.UUID;
@@ -123,4 +124,10 @@ public class WiremockStubs {
                         .withBody(response)));
     }
 
+    public static void stubForGetRepOrders(String response) {
+        stubFor(get(urlMatching(MAAT_API_ASSESSMENT_URL + "/rep-orders/" + TestModelDataBuilder.REP_ID))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
 }

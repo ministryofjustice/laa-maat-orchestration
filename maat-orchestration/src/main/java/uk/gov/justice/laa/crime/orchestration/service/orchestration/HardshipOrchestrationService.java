@@ -35,7 +35,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         // invoke the validation service to Check user has rep order reserved
         CourtType courtType = request.getCourtType();
         Action action = (courtType == CourtType.MAGISTRATE) ? Action.CREATE_MAGS_HARDSHIP : Action.CREATE_CROWN_HARDSHIP;
-        validationService.isUserActionValid(hardshipMapper.getUserValidationDTO(request, action));
+        validate(request, action);
         ApplicationDTO application = request.getApplicationDTO();
 
         ApiPerformHardshipResponse performHardshipResponse = hardshipService.create(request);
@@ -74,7 +74,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         // invoke the validation service to Check user has rep order reserved
         CourtType courtType = request.getCourtType();
         Action action = (courtType == CourtType.MAGISTRATE) ? Action.UPDATE_MAGS_HARDSHIP : Action.UPDATE_CROWN_HARDSHIP;
-        validationService.isUserActionValid(hardshipMapper.getUserValidationDTO(request, action));
+        validate(request, action);
 
         hardshipService.update(request);
         try {
@@ -99,6 +99,11 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             throw new APIClientException(ex.getMessage());
         }
         return request.getApplicationDTO();
+    }
+
+    private void validate(WorkflowRequest request, Action action) {
+        validationService.validate(request);
+        validationService.isUserActionValid(hardshipMapper.getUserValidationDTO(request, action));
     }
 
     private ApplicationDTO processMagCourtHardshipRules(WorkflowRequest request) {

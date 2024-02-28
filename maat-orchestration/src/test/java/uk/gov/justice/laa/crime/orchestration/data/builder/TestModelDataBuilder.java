@@ -70,7 +70,7 @@ public class TestModelDataBuilder {
     private static final String CASEWORKER_NOTES = "Mock caseworker notes";
     private static final String NEW_WORK_REASON_STRING = NewWorkReason.NEW.getCode();
     private static final String USER_SESSION = "8ab0bab5-c27e-471a-babf-c3992c7a4471";
-    private static final Integer REP_ID = 200;
+    public static final Integer REP_ID = 200;
     private static final BigDecimal SOLICITOR_ESTIMATED_COST = BigDecimal.valueOf(2500);
     private static final BigDecimal SOLICITOR_VAT = BigDecimal.valueOf(250);
     private static final BigDecimal SOLICITOR_DISBURSEMENTS = BigDecimal.valueOf(375);
@@ -659,6 +659,7 @@ public class TestModelDataBuilder {
                 .repId(REP_ID.longValue())
                 .caseManagementUnitDTO(getCaseManagementUnitDTO())
                 .crownCourtOverviewDTO(CrownCourtOverviewDTO.builder().build())
+                .statusDTO(getRepStatusDTO())
                 .assessmentDTO(
                         AssessmentDTO.builder()
                                 .financialAssessmentDTO(getFinancialAssessmentDTO(courtType))
@@ -900,6 +901,7 @@ public class TestModelDataBuilder {
         return RepStatusDTO.builder()
                 .status("RepStatus")
                 .removeContribs(true)
+                .updateAllowed(true)
                 .build();
     }
 
