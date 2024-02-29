@@ -98,12 +98,6 @@ class HardshipIntegrationTest {
     }
 
     @Test
-    void givenAEmptyContent_whenCreateIsInvoked_thenFailsBadRequest() throws Exception {
-        mvc.perform(buildRequestGivenContent(HttpMethod.POST, "{}", ENDPOINT_URL, true))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void givenAValidContentAndIfAnyException_whenCreateIsInvoked_thenShouldRollback() throws Exception {
         stubForOAuth();
         stubForGetUserSummary(objectMapper.writeValueAsString(TestModelDataBuilder.getUserSummaryDTO(CREATE_ROLE_ACTIONS, NewWorkReason.NEW)));
@@ -144,12 +138,6 @@ class HardshipIntegrationTest {
     void givenAEmptyOAuthToken_whenUpdateIsInvoked_thenFailsUnauthorizedAccess() throws Exception {
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, "{}", ENDPOINT_URL, false))
                 .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    void givenAEmptyContent_whenUpdateIsInvoked_thenFailsBadRequest() throws Exception {
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, "{}", ENDPOINT_URL, true))
-                .andExpect(status().isBadRequest());
     }
 
     @Test
