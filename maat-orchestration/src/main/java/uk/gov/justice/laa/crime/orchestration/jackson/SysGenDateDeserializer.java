@@ -16,11 +16,14 @@ public class SysGenDateDeserializer extends JsonDeserializer<SysGenDate> {
     public SysGenDate deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
             throws IOException {
 
-        JsonNode node = jsonParser.getCodec().readTree(jsonParser);
-        long value = node.get("value").longValue();
+        JsonNode node = jsonParser
+                .getCodec()
+                .readTree(jsonParser);
+
+        String value = node.get("value").asText();
         try {
-            return new SysGenDate(Date.from(Instant.ofEpochMilli(value)));
-        } catch (NumberFormatException e) {
+            return new SysGenDate(Date.from(Instant.parse(value)));
+        } catch (RuntimeException e) {
             throw new IllegalArgumentException("Invalid date value: " + value, e);
         }
     }
