@@ -20,16 +20,20 @@ class SysGenDateDeserializerTest {
     private final ObjectMapper mapper = new ObjectMapper();
     private final SysGenDateDeserializer deserializer = new SysGenDateDeserializer();
 
+    private static final long EPOCH_DATE = 1633039200000L;
+    private static final String ISO_DATE = "2021-09-30T22:00:00Z";
+
     @Test
     void givenValidDate_whenDeserializeIsInvoked_thenSysGenDateIsDeserialized() throws IOException {
-        JsonParser parser = factory.createParser("{\"value\": \"2021-09-30T22:00:00Z\"}");
+        String content = String.format("{\"value\": \"%s\"}", ISO_DATE);
+        JsonParser parser = factory.createParser(content);
         parser.setCodec(mapper);
 
         DeserializationContext deserializationContext = mapper.getDeserializationContext();
         SysGenDate result = deserializer.deserialize(parser, deserializationContext);
 
         assertThat(result.getValue())
-                .isEqualTo(Date.from(Instant.ofEpochMilli(1633039200000L)));
+                .isEqualTo(Date.from(Instant.ofEpochMilli(EPOCH_DATE)));
     }
 
     @Test
