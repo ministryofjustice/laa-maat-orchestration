@@ -130,6 +130,9 @@ public class ServicesConfiguration {
 
             @NotNull
             private String updateUrl;
+
+            @NotNull
+            private String rollbackUrl;
         }
     }
 
@@ -143,13 +146,29 @@ public class ServicesConfiguration {
         @NotNull
         private Endpoints endpoints;
 
+        @NotNull
+        private UserEndpoints userEndpoints;
+
         @Data
         @NoArgsConstructor
         @AllArgsConstructor
         public static class Endpoints {
             @NotNull
             private String callStoredProcUrl;
+            @NotNull
+            private String repOrderUrl;
+            @NotNull
+            private String updateSendToCCLFUrl;
 
+        }
+
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class UserEndpoints {
+
+            @NotNull
+            private String userSummaryUrl;
         }
     }
 }

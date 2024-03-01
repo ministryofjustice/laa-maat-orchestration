@@ -37,14 +37,22 @@ public class MockServicesConfiguration {
 
         ServicesConfiguration.CmaApi.Endpoints cmaEndpoints =
                 new ServicesConfiguration.CmaApi.Endpoints(
-                        "/assessment/means/{financialAssessmentId}/applicantId/{applicantId}",
+                        "/assessment/means/{financialAssessmentId}",
                         "/assessment/means",
-                        "/assessment/means"
+                        "/assessment/means",
+                        "/assessment/means/rollback/{financialAssessmentId}"
                 );
 
         ServicesConfiguration.MaatApi.Endpoints maatEndpoints =
                 new ServicesConfiguration.MaatApi.Endpoints(
-                        "/assessment/means/execute-stored-procedure"
+                        "/assessment/means/execute-stored-procedure",
+                        "/assessment/rep-orders/{repId}",
+                        "/application/applicant/update-cclf"
+                );
+
+        ServicesConfiguration.MaatApi.UserEndpoints userEndpoints =
+                new ServicesConfiguration.MaatApi.UserEndpoints(
+                        "/api/internal/v1/users/summary/{username}"
                 );
 
         hardshipApi.setBaseUrl(host);
@@ -61,6 +69,7 @@ public class MockServicesConfiguration {
 
         maatApi.setBaseUrl(host);
         maatApi.setEndpoints(maatEndpoints);
+        maatApi.setUserEndpoints(userEndpoints);
 
         servicesConfiguration.setHardshipApi(hardshipApi);
         servicesConfiguration.setContributionApi(contributionApi);

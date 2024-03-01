@@ -14,8 +14,12 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
+import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
+import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.service.*;
+
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -23,7 +27,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.*;
-
 
 @ExtendWith({MockitoExtension.class})
 class HardshipOrchestrationServiceTest {
@@ -42,6 +45,12 @@ class HardshipOrchestrationServiceTest {
 
     @Mock
     private MaatCourtDataService maatCourtDataService;
+
+    @Mock
+    private ValidationService validationService;
+
+    @Mock
+    private HardshipMapper hardshipMapper;
 
     @InjectMocks
     private HardshipOrchestrationService orchestrationService;
@@ -75,6 +84,8 @@ class HardshipOrchestrationServiceTest {
 
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), eq(courtType)))
                 .thenReturn(getAssessmentSummaryDTO());
+
+        doReturn(Boolean.TRUE).when(validationService).isUserActionValid(any());
 
         return workflowRequest;
     }
@@ -281,11 +292,17 @@ class HardshipOrchestrationServiceTest {
                 .thenReturn(workflowRequest.getApplicationDTO());
         when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
                 .thenReturn(false);
+        AssessmentSummaryDTO assessmentSummaryDTO = getAssessmentSummaryDTO();
+        when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), any()))
+                .thenReturn(assessmentSummaryDTO);
 
         ApplicationDTO applicationDTO = orchestrationService.update(workflowRequest);
 
         assertThat(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getMagCourtHardship())
                 .isEqualTo(getHardshipReviewDTO());
+
+        verify(assessmentSummaryService)
+                .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
     }
 
     @Test
@@ -303,6 +320,9 @@ class HardshipOrchestrationServiceTest {
                 .thenReturn(applicationDTO);
         when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
                 .thenReturn(true);
+        AssessmentSummaryDTO assessmentSummaryDTO = getAssessmentSummaryDTO();
+        when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), any()))
+                .thenReturn(assessmentSummaryDTO);
 
         ApplicationDTO expected = orchestrationService.update(workflowRequest);
 
@@ -311,6 +331,9 @@ class HardshipOrchestrationServiceTest {
 
         assertThat(expected.getCrownCourtOverviewDTO().getContribution())
                 .isEqualTo(contributionsDTO);
+
+        verify(assessmentSummaryService)
+                .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
     }
 
     @Test
@@ -329,6 +352,9 @@ class HardshipOrchestrationServiceTest {
                                                         any(StoredProcedure.class)
         ))
                 .thenReturn(applicationDTO);
+        AssessmentSummaryDTO assessmentSummaryDTO = getAssessmentSummaryDTO();
+        when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), any()))
+                .thenReturn(assessmentSummaryDTO);
 
         ApplicationDTO expected = orchestrationService.update(workflowRequest);
 
@@ -340,6 +366,8 @@ class HardshipOrchestrationServiceTest {
 
         verify(proceedingsService).updateApplication(workflowRequest);
 
+        verify(assessmentSummaryService)
+                .updateApplication(applicationDTO, assessmentSummaryDTO);
     }
 
     @Test
@@ -456,4 +484,44 @@ class HardshipOrchestrationServiceTest {
         Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
+    @Test
+    void givenExceptionThrownInCreateHardshipService_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
+        when(hardshipService.create(any(WorkflowRequest.class)))
+                .thenThrow(new APIClientException());
+        assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
+                .isInstanceOf(APIClientException.class);
+
+        Mockito.verify(hardshipService, times(0)).rollback(any());
+    }
+
+    @Test
+    void givenExceptionThrownInUpdateHardshipService_whenUpdateIsInvoked_thenRollbackIsNotInvoked() {
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
+        doThrow(new APIClientException()).when(hardshipService).update(any(WorkflowRequest.class));
+        assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
+                .isInstanceOf(APIClientException.class);
+
+        Mockito.verify(hardshipService, times(0)).rollback(any());
+    }
+
+    @Test
+    void givenExceptionThrownInValidationService_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
+        doThrow(new CrimeValidationException(List.of())).when(validationService).isUserActionValid(any());
+        assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
+                .isInstanceOf(CrimeValidationException.class);
+
+        Mockito.verify(hardshipService, times(0)).rollback(any());
+    }
+
+    @Test
+    void givenExceptionThrownInValidationService_whenUpdateIsInvoked_thenRollbackIsNotInvoked() {
+        WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
+        doThrow(new CrimeValidationException(List.of())).when(validationService).isUserActionValid(any());
+        assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
+                .isInstanceOf(CrimeValidationException.class);
+
+        Mockito.verify(hardshipService, times(0)).rollback(any());
+    }
 }

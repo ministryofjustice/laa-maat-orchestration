@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.Action;
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipDetail;
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipProgress;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
@@ -29,21 +31,11 @@ public class HardshipMapper {
     private final UserMapper userMapper;
 
     public ApiPerformHardshipRequest workflowRequestToPerformHardshipRequest(WorkflowRequest workflowRequest) {
-        HardshipReviewDTO current;
         UserDTO userDTO = workflowRequest.getUserDTO();
         ApplicationDTO application = workflowRequest.getApplicationDTO();
-        CourtType courtType = application.getCourtType();
-        HardshipOverviewDTO hardshipOverview =
-                application.getAssessmentDTO()
-                        .getFinancialAssessmentDTO()
-                        .getHardship();
-        if (courtType == CourtType.MAGISTRATE) {
-            current = hardshipOverview.getMagCourtHardship();
-        } else {
-            current = hardshipOverview.getCrownCourtHardship();
-        }
+        HardshipReviewDTO current = getHardshipReviewDTO(application, workflowRequest.getCourtType());
         HardshipReview hardship = new HardshipReview()
-                .withCourtType(courtType)
+                .withCourtType(workflowRequest.getCourtType())
                 .withTotalAnnualDisposableIncome(current.getDisposableIncome())
                 .withReviewDate(toLocalDateTime(current.getReviewDate()))
                 .withExtraExpenditure(hrSectionDtosToExtraExpenditures(current.getSection()))
@@ -67,6 +59,18 @@ public class HardshipMapper {
         return new ApiPerformHardshipRequest()
                 .withHardship(hardship)
                 .withHardshipMetadata(metadata);
+    }
+
+    public HardshipReviewDTO getHardshipReviewDTO(ApplicationDTO application, CourtType courtType) {
+        HardshipOverviewDTO hardshipOverview =
+                application.getAssessmentDTO()
+                        .getFinancialAssessmentDTO()
+                        .getHardship();
+        if (courtType == CourtType.MAGISTRATE) {
+            return hardshipOverview.getMagCourtHardship();
+        } else {
+            return hardshipOverview.getCrownCourtHardship();
+        }
     }
 
     private List<ExtraExpenditure> hrSectionDtosToExtraExpenditures(Collection<HRSectionDTO> sections) {
@@ -130,9 +134,8 @@ public class HardshipMapper {
     }
 
     public void performHardshipResponseToApplicationDTO(ApiPerformHardshipResponse response,
-                                                        ApplicationDTO application) {
+                                                        ApplicationDTO application, CourtType courtType) {
         HardshipReviewDTO current;
-        CourtType courtType = application.getCourtType();
         HardshipOverviewDTO hardshipOverview =
                 application.getAssessmentDTO()
                         .getFinancialAssessmentDTO()
@@ -286,6 +289,17 @@ public class HardshipMapper {
                 .solicitorRate(solicitorCosts.getRate())
                 .solicitorEstimatedTotalCost(solicitorCosts.getEstimatedTotal())
                 .solicitorVat(solicitorCosts.getVat())
+                .build();
+    }
+
+    public UserValidationDTO getUserValidationDTO(WorkflowRequest request, Action action) {
+        UserDTO userDTO = request.getUserDTO();
+        HardshipReviewDTO hardshipReviewDTO = getHardshipReviewDTO(request.getApplicationDTO(), request.getCourtType());
+        return UserValidationDTO.builder()
+                .username(userDTO.getUserName())
+                .sessionId(userDTO.getUserSession())
+                .newWorkReason(NewWorkReason.getFrom(hardshipReviewDTO.getNewWorkReason().getCode()))
+                .action(action)
                 .build();
     }
 }

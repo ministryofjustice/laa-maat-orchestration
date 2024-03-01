@@ -5,11 +5,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
@@ -17,8 +18,7 @@ import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipR
 import uk.gov.justice.laa.crime.orchestration.service.api.HardshipApiService;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith({MockitoExtension.class})
 class HardshipServiceTest {
@@ -56,16 +56,18 @@ class HardshipServiceTest {
                 .thenReturn(new ApiPerformHardshipResponse());
         hardshipService.update(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         verify(hardshipApiService).update(any(ApiPerformHardshipRequest.class));
-        verify(hardshipMapper).performHardshipResponseToApplicationDTO(any(ApiPerformHardshipResponse.class), any(ApplicationDTO.class));
+        verify(hardshipMapper).performHardshipResponseToApplicationDTO(
+                any(ApiPerformHardshipResponse.class), any(ApplicationDTO.class), any(CourtType.class)
+        );
     }
 
     @Test
     void givenWorkflowRequest_whenRollbackHardshipIsInvoked_thenRequestIsMappedAndApiServiceIsCalled() {
-        when(hardshipMapper.workflowRequestToPerformHardshipRequest(any(WorkflowRequest.class)))
-                .thenReturn(TestModelDataBuilder.getApiPerformHardshipRequest());
-        when(hardshipApiService.rollback(any(ApiPerformHardshipRequest.class)))
-                .thenReturn(new ApiPerformHardshipResponse());
+        HardshipReviewDTO hardshipReviewDTO = TestModelDataBuilder.getHardshipReviewDTO();
+        when(hardshipMapper.getHardshipReviewDTO(any(ApplicationDTO.class), any(CourtType.class)))
+                .thenReturn(hardshipReviewDTO);
+        doNothing().when(hardshipApiService).rollback(Constants.HARDSHIP_REVIEW_ID.longValue());
         hardshipService.rollback(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
-        verify(hardshipApiService).rollback(any(ApiPerformHardshipRequest.class));
+        verify(hardshipApiService).rollback(Constants.HARDSHIP_REVIEW_ID.longValue());
     }
 }

@@ -1,10 +1,17 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderCCOutcomeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.Action;
 import uk.gov.justice.laa.crime.orchestration.enums.AppealType;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
@@ -19,10 +26,7 @@ import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -66,8 +70,7 @@ public class TestModelDataBuilder {
     private static final String CASEWORKER_NOTES = "Mock caseworker notes";
     private static final String NEW_WORK_REASON_STRING = NewWorkReason.NEW.getCode();
     private static final String USER_SESSION = "8ab0bab5-c27e-471a-babf-c3992c7a4471";
-    private static final String USERNAME = "mock-u";
-    private static final Integer REP_ID = 200;
+    public static final Integer REP_ID = 200;
     private static final BigDecimal SOLICITOR_ESTIMATED_COST = BigDecimal.valueOf(2500);
     private static final BigDecimal SOLICITOR_VAT = BigDecimal.valueOf(250);
     private static final BigDecimal SOLICITOR_DISBURSEMENTS = BigDecimal.valueOf(375);
@@ -92,6 +95,16 @@ public class TestModelDataBuilder {
     private static final Integer CMU_ID = 50;
     private static final String OTHER_HOUSING_NOTES = "Other Housing Notes";
     private static final String ASSESSMENT_NOTES = "ASSESSMENT NOTES";
+    private static final LocalDateTime APPLICATION_TIMESTAMP = LocalDateTime.parse("2024-01-27T10:15:30");
+    private static final LocalDateTime REP_ORDER_MODIFIED_TIMESTAMP = LocalDateTime.parse("2023-06-27T10:15:30");
+    private static final LocalDate REP_ORDER_CREATED_TIMESTAMP = LocalDate.of(2024, Month.JANUARY, 8);
+    private static final List<String> TEST_ROLE_ACTIONS = List.of("CREATE_ASSESSMENT");
+    public static final Action TEST_ACTION = Action.CREATE_ASSESSMENT;
+    private static final NewWorkReason TEST_NEW_WORK_REASON = NewWorkReason.NEW;
+    private static final List<String> TEST_NEW_WORK_REASONS = List.of(NEW_WORK_REASON_STRING);
+    private static final String TEST_USER_SESSION = "sessionId_e5712593c198";
+    private static final Integer TEST_RECORD_ID = 100;
+    private static final LocalDateTime RESERVATION_DATE = LocalDateTime.of(2022, 12, 14, 0, 0, 0);
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
         return new ApiFindHardshipResponse()
@@ -221,7 +234,7 @@ public class TestModelDataBuilder {
                 .withRepOrderDecision(REP_ORDER_DECISION_GRANTED.getValue())
                 .withIsImprisoned(Boolean.TRUE)
                 .withIsWarrantIssued(Boolean.TRUE)
-                .withEvidenceFeeLevel(EVIDENCE_FEE_LEVEL_1)
+                .withEvidenceFeeLevel(EvidenceFeeLevel.LEVEL1)
                 .withCrownCourtOutcome(List.of(getApiCrownCourtOutcome(CrownCourtOutcome.CONVICTED)));
     }
 
@@ -269,7 +282,7 @@ public class TestModelDataBuilder {
 
     public static ApiUserSession getApiUserSession() {
         return new ApiUserSession()
-                .withUserName(USERNAME)
+                .withUserName(Constants.USERNAME)
                 .withSessionId(USER_SESSION);
     }
 
@@ -400,6 +413,7 @@ public class TestModelDataBuilder {
     public static WorkflowRequest buildWorkflowRequestWithHardship(CourtType courtType) {
         return WorkflowRequest.builder()
                 .userDTO(getUserDTO())
+                .courtType(courtType)
                 .applicationDTO(getApplicationDTOWithHardship(courtType))
                 .build();
     }
@@ -407,6 +421,7 @@ public class TestModelDataBuilder {
     public static WorkflowRequest buildWorkFlowRequest(CourtType courtType) {
         return WorkflowRequest.builder()
                 .userDTO(getUserDTO())
+                .courtType(courtType)
                 .applicationDTO(getApplicationDTO(courtType))
                 .build();
     }
@@ -416,6 +431,33 @@ public class TestModelDataBuilder {
                 .userDTO(getUserDTO())
                 .applicationDTO(getApplicationDTO())
                 .isC3Enabled(true)
+                .build();
+    }
+
+    public static WorkflowRequest buildWorkFlowRequestForApplicationTimestampValidation() {
+        return WorkflowRequest
+                .builder()
+                .applicationDTO(
+                        ApplicationDTO
+                                .builder()
+                                .repId(123L)
+                                .timestamp(APPLICATION_TIMESTAMP)
+                                .build()).build();
+    }
+
+    public static WorkflowRequest buildWorkFlowRequest(boolean isUpdateAllowed) {
+        return WorkflowRequest
+                .builder()
+                .applicationDTO(
+                        ApplicationDTO
+                                .builder()
+                                .repId(123L)
+                                .timestamp(APPLICATION_TIMESTAMP)
+                                .statusDTO(RepStatusDTO
+                                        .builder()
+                                        .updateAllowed(isUpdateAllowed)
+                                        .build())
+                                .build())
                 .build();
     }
 
@@ -477,6 +519,7 @@ public class TestModelDataBuilder {
 
     public static ApplicantDTO getApplicantDTO() {
         return ApplicantDTO.builder()
+                .id(Long.valueOf(1000))
                 .applicantHistoryId(APPLICANT_HISTORY_ID.longValue())
                 .employmentStatusDTO(getEmploymentStatusDTO())
                 .build();
@@ -532,6 +575,7 @@ public class TestModelDataBuilder {
                 .ccRepId(REP_ID.longValue())
                 .ccRepType(CC_REP_TYPE_THROUGH_ORDER)
                 .ccRepOrderDate(Date.from(CC_REP_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .ccWithDrawalDate(Date.from(CC_WITHDRAWAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .sentenceOrderDate(Date.from(SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .repOrderDecision(REP_ORDER_DECISION_GRANTED)
                 .inPrisoned(Boolean.TRUE)
@@ -603,8 +647,8 @@ public class TestModelDataBuilder {
                 .id(Constants.CONTRIBUTIONS_ID.longValue())
                 .upliftApplied(false)
                 .basedOn(CONTRIBUTION_BASED_ON)
-                .calcDate(CONTRIBUTION_CALCULATION_DATE)
-                .effectiveDate(CONTRIBUTION_EFFECTIVE_DATE)
+                .calcDate(new SysGenDate(CONTRIBUTION_CALCULATION_DATE))
+                .effectiveDate(new SysGenDate(CONTRIBUTION_EFFECTIVE_DATE))
                 .monthlyContribs(MONTHLY_CONTRIBUTION_AMOUNT)
                 .upfrontContribs(UPFRONT_CONTRIBUTION_AMOUNT)
                 .build();
@@ -612,10 +656,10 @@ public class TestModelDataBuilder {
 
     public static ApplicationDTO getApplicationDTOWithHardship(CourtType courtType) {
         return ApplicationDTO.builder()
-                .courtType(courtType)
                 .repId(REP_ID.longValue())
                 .caseManagementUnitDTO(getCaseManagementUnitDTO())
                 .crownCourtOverviewDTO(CrownCourtOverviewDTO.builder().build())
+                .statusDTO(getRepStatusDTO())
                 .assessmentDTO(
                         AssessmentDTO.builder()
                                 .financialAssessmentDTO(getFinancialAssessmentDTO(courtType))
@@ -664,7 +708,6 @@ public class TestModelDataBuilder {
                 .childWeightings(List.of(getChildWeightingDTO()))
                 .build();
     }
-
 
 
     private static CaseManagementUnitDTO getCaseManagementUnitDTO() {
@@ -765,7 +808,7 @@ public class TestModelDataBuilder {
 
     private static UserDTO getUserDTO() {
         return UserDTO.builder()
-                .userName(USERNAME)
+                .userName(Constants.USERNAME)
                 .userSession(USER_SESSION)
                 .build();
     }
@@ -858,6 +901,7 @@ public class TestModelDataBuilder {
         return RepStatusDTO.builder()
                 .status("RepStatus")
                 .removeContribs(true)
+                .updateAllowed(true)
                 .build();
     }
 
@@ -986,5 +1030,112 @@ public class TestModelDataBuilder {
         assessmentDetailDTO.setCriteriaDetailsId(CRITERIA_DETAIL_ID.longValue());
         assessmentSectionSummaryDTO.setAssessmentDetail(List.of(assessmentDetailDTO));
         return assessmentSectionSummaryDTO;
+    }
+
+    public static RepOrderDTO buildRepOrderDTOWithModifiedDate() {
+        return RepOrderDTO.builder().dateModified(REP_ORDER_MODIFIED_TIMESTAMP).build();
+    }
+
+    public static RepOrderDTO buildRepOrderDTOWithCreatedDateAndNoModifiedDate() {
+        return RepOrderDTO.builder().dateCreated(REP_ORDER_CREATED_TIMESTAMP).dateModified(null).build();
+    }
+
+    public static RepOrderDTO buildRepOrderDTO(String rorsStatus) {
+        return RepOrderDTO.builder().id(1000).dateModified(APPLICATION_TIMESTAMP).rorsStatus(rorsStatus).build();
+    }
+
+    public static UserSummaryDTO getUserSummaryDTO() {
+        return UserSummaryDTO.builder()
+                .username(Constants.USERNAME)
+                .roleActions(TEST_ROLE_ACTIONS)
+                .newWorkReasons(TEST_NEW_WORK_REASONS)
+                .reservationsEntity(getReservationsDTO())
+                .build();
+    }
+
+    public static ReservationsDTO getReservationsDTO() {
+        return ReservationsDTO.builder()
+                .recordId(TEST_RECORD_ID)
+                .recordName("")
+                .userName(Constants.USERNAME)
+                .userSession(TEST_USER_SESSION)
+                .reservationDate(RESERVATION_DATE)
+                .expiryDate(RESERVATION_DATE)
+                .build();
+    }
+
+    public static UserValidationDTO getUserValidationDTO() {
+        return UserValidationDTO.builder()
+                .username(Constants.USERNAME)
+                .action(TEST_ACTION)
+                .newWorkReason(TEST_NEW_WORK_REASON)
+                .sessionId(USER_SESSION).build();
+    }
+
+    public static UserValidationDTO getUserValidationDTOWithReservation() {
+        return UserValidationDTO.builder()
+                .username(Constants.USERNAME)
+                .action(TEST_ACTION)
+                .newWorkReason(TEST_NEW_WORK_REASON)
+                .sessionId(TEST_USER_SESSION).build();
+    }
+
+    public static UserValidationDTO getUserValidationDTOInvalidValidRequest() {
+        return UserValidationDTO.builder()
+                .username(Constants.USERNAME)
+                .action(null)
+                .newWorkReason(null)
+                .sessionId(null).build();
+    }
+
+    @NotNull
+    public static RepOrderDTO getTestRepOrderDTO(ApplicationDTO applicationDTO) {
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        repOrderDTO.setArrestSummonsNo(applicationDTO.getArrestSummonsNo());
+        repOrderDTO.setSuppAccountCode(applicationDTO.getArrestSummonsNo());
+        repOrderDTO.setEvidenceFeeLevel(applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getEvidenceProvisionFee().getFeeLevel());
+        repOrderDTO.setMacoCourt(null);
+        repOrderDTO.setMagsOutcome(applicationDTO.getMagsOutcomeDTO().getOutcome());
+        repOrderDTO.setDateReceived(null);
+        repOrderDTO.setCrownRepOrderDate(null);
+        repOrderDTO.setOftyOffenceType(applicationDTO.getOffenceDTO().getOffenceType());
+        repOrderDTO.setCrownWithdrawalDate(null);
+        repOrderDTO.setCaseId(applicationDTO.getCaseId());
+        repOrderDTO.setCommittalDate(null);
+        repOrderDTO.setApplicantHistoryId(null);
+        repOrderDTO.setRorsStatus(applicationDTO.getStatusDTO().getStatus());
+        repOrderDTO.setRepOrderCCOutcome(null);
+        repOrderDTO.setAppealTypeCode(applicationDTO.getCrownCourtOverviewDTO().getAppealDTO().getAppealTypeDTO().getCode());
+        return repOrderDTO;
+    }
+
+    @NotNull
+    public static ApplicationDTO getTestApplicationDTO(WorkflowRequest workflowRequest) {
+        ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
+        applicationDTO.setDateReceived(null);
+        applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().setCcRepOrderDate(null);
+        applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().setCcWithDrawalDate(null);
+        applicationDTO.setCommittalDate(null);
+        applicationDTO.getApplicantDTO().setApplicantHistoryId(null);
+        return applicationDTO;
+    }
+
+    @NotNull
+    public static RepOrderCCOutcomeDTO getRepOrderCCOutcomeDTO() {
+        return RepOrderCCOutcomeDTO.builder()
+                .id(1)
+                .repId(1)
+                .outcomeDate(LocalDateTime.now())
+                .outcome("CONVICTED")
+                .build();
+    }
+
+    public static UserSummaryDTO getUserSummaryDTO(List<String> roleActions, NewWorkReason newWorkReason) {
+        return UserSummaryDTO.builder()
+                .username(Constants.USERNAME)
+                .roleActions(roleActions)
+                .newWorkReasons(List.of(newWorkReason.getCode()))
+                .reservationsEntity(getReservationsDTO())
+                .build();
     }
 }

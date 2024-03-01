@@ -117,7 +117,7 @@ class MeansAssessmentControllerTest {
 
     @Test
     void givenInvalidRequest_whenUpdateIsInvoked_thenBadRequestResponseIsReturned() throws Exception {
-        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, "requestBody", ENDPOINT_URL, true))
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, "", ENDPOINT_URL, true))
                 .andExpect(status().isBadRequest());
     }
 

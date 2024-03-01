@@ -20,10 +20,12 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.orchestration.enums.Action;
 
 import java.util.List;
 
@@ -43,6 +45,8 @@ import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGive
 @AutoConfigureObservability
 class HardshipIntegrationTest {
     private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/hardship";
+    private static final List<String> UPDATE_ROLE_ACTIONS = List.of(Action.UPDATE_MAGS_HARDSHIP.getCode(), Action.UPDATE_CROWN_HARDSHIP.getCode());
+    private static final List<String> CREATE_ROLE_ACTIONS = List.of(Action.CREATE_CROWN_HARDSHIP.getCode(), Action.CREATE_MAGS_HARDSHIP.getCode());
 
     private MockMvc mvc;
 
@@ -94,25 +98,27 @@ class HardshipIntegrationTest {
     }
 
     @Test
-    void givenAEmptyContent_whenCreateIsInvoked_thenFailsBadRequest() throws Exception {
-        mvc.perform(buildRequestGivenContent(HttpMethod.POST, "{}", ENDPOINT_URL, true))
-                .andExpect(status().isBadRequest());
+    void givenAValidContentAndIfAnyException_whenCreateIsInvoked_thenShouldRollback() throws Exception {
+        stubForOAuth();
+        stubForGetUserSummary(objectMapper.writeValueAsString(TestModelDataBuilder.getUserSummaryDTO(CREATE_ROLE_ACTIONS, NewWorkReason.NEW)));
+        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST,
+                        objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL))
+                .andExpect(status().is5xxServerError());
+        verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
+        verify(exactly(1), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
     }
 
     @Test
-    void givenAValidContentAndIfAnyException_whenCreateIsInvoked_thenShouldRollback() throws Exception {
+    void givenMissingRoleAction_whenCreateIsInvoked_thenRollbackIsNotInvoked() throws Exception {
         stubForOAuth();
-        wiremock.stubFor(post(urlMatching("/api/internal/v1/hardship/.*"))
-                .willReturn(
-                        WireMock.ok()
-                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                                .withBody(objectMapper.writeValueAsString(TestModelDataBuilder.getApiPerformHardshipResponse()))
-                )
-        );
-        mvc.perform(buildRequestGivenContent(HttpMethod.POST, objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL))
+        stubForGetUserSummary(objectMapper.writeValueAsString(TestModelDataBuilder.getUserSummaryDTO(null, NewWorkReason.NEW)));
+        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST,
+                        objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL))
                 .andExpect(status().is5xxServerError());
-        verify(exactly(1), putRequestedFor(urlPathMatching("/api/internal/v1/hardship/rollback")));
-
+        verify(exactly(1), getRequestedFor(urlPathMatching("/api/internal/v1/users/summary/.*")));
+        verify(exactly(0), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
     }
 
     @Test
@@ -135,25 +141,27 @@ class HardshipIntegrationTest {
     }
 
     @Test
-    void givenAEmptyContent_whenUpdateIsInvoked_thenFailsBadRequest() throws Exception {
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, "{}", ENDPOINT_URL, true))
-                .andExpect(status().isBadRequest());
+    void givenAValidContentAndIfAnyException_whenUpdateIsInvoked_thenShouldRollback() throws Exception {
+        stubForOAuth();
+        stubForUpdateHardship();
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT,
+                        objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.CROWN_COURT)), ENDPOINT_URL))
+                .andExpect(status().is5xxServerError());
+        verify(exactly(1), putRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
+        verify(exactly(1), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
+
     }
 
     @Test
-    void givenAValidContentAndIfAnyException_whenUpdateIsInvoked_thenShouldRollback() throws Exception {
+    void givenMissingRoleAction_whenUpdateIsInvoked_thenRollbackIsNotInvoked() throws Exception {
         stubForOAuth();
-        wiremock.stubFor(put(urlMatching("/api/internal/v1/hardship/.*"))
-                .willReturn(
-                        WireMock.ok()
-                                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                                .withBody(objectMapper.writeValueAsString(TestModelDataBuilder.getApiPerformHardshipResponse()))
-                )
-        );
-        mvc.perform(buildRequestGivenContent(HttpMethod.POST, objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL))
+        stubForGetUserSummary(objectMapper.writeValueAsString(TestModelDataBuilder.getUserSummaryDTO(null, NewWorkReason.NEW)));
+        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT,
+                        objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL))
                 .andExpect(status().is5xxServerError());
-        verify(exactly(1), putRequestedFor(urlPathMatching("/api/internal/v1/hardship/rollback")));
-
+        verify(exactly(1), getRequestedFor(urlPathMatching("/api/internal/v1/users/summary/.*")));
+        verify(exactly(0), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
     }
 
     @Test
@@ -181,6 +189,8 @@ class HardshipIntegrationTest {
         stubForCheckContributionsRule();
         stubForCalculateContributions(objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
         stubForGetContributionsSummary(objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary())));
+        stubForGetUserSummary(objectMapper.writeValueAsString(TestModelDataBuilder.getUserSummaryDTO(UPDATE_ROLE_ACTIONS, NewWorkReason.NEW)));
+        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
         stubForOAuth();
     }
 
@@ -215,6 +225,8 @@ class HardshipIntegrationTest {
         stubForCheckContributionsRule();
         stubForCalculateContributions(objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
         stubForGetContributionsSummary(objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary())));
+        stubForGetUserSummary(objectMapper.writeValueAsString(TestModelDataBuilder.getUserSummaryDTO(CREATE_ROLE_ACTIONS, NewWorkReason.NEW)));
+        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
         stubForOAuth();
     }
 

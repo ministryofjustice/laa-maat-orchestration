@@ -12,14 +12,14 @@ import uk.gov.justice.laa.crime.orchestration.model.means_assessment.*;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.justice.laa.crime.util.DateUtil.*;
+import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -248,7 +248,7 @@ public class MeansAssessmentMapper {
         evidenceDTO.setId(ofNullable(apiIncomeEvidence.getId()).map(Integer::longValue).orElse(0L));
         evidenceDTO.setOtherDescription(apiIncomeEvidence.getOtherText());
         evidenceDTO.setDateReceived(toDate(apiIncomeEvidence.getDateReceived()));
-        evidenceDTO.setTimestamp(toTimeStamp(apiIncomeEvidence.getDateModified()));
+        evidenceDTO.setTimestamp(apiIncomeEvidence.getDateModified());
         return evidenceDTO;
     }
 
@@ -260,7 +260,7 @@ public class MeansAssessmentMapper {
         extraEvidenceDTO.setEvidenceTypeDTO(getEvidenceTypeDTO(apiIncomeEvidence.getApiEvidenceType()));
         extraEvidenceDTO.setMandatory(Boolean.valueOf(apiIncomeEvidence.getMandatory()));
         extraEvidenceDTO.setOtherText(apiIncomeEvidence.getOtherText());
-        extraEvidenceDTO.setTimestamp(toTimeStamp(apiIncomeEvidence.getDateModified()));
+        extraEvidenceDTO.setTimestamp(apiIncomeEvidence.getDateModified());
         return extraEvidenceDTO;
     }
 
@@ -381,7 +381,7 @@ public class MeansAssessmentMapper {
             assessmentDetailDTO.setApplicantAmount(ofNullable(apiAssessmentDetail.getApplicantAmount()).map(BigDecimal::doubleValue).orElse(0.0));
             assessmentDetailDTO.setCriteriaDetailsId(ofNullable(apiAssessmentDetail.getCriteriaDetailId()).map(Integer::longValue).orElse(0L));
             assessmentDetailDTO.setId(ofNullable(apiAssessmentDetail.getId()).map(Integer::longValue).orElse(0L));
-            assessmentDetailDTO.setTimestamp(toTimeStamp(apiAssessmentDetail.getDateModified()));
+            assessmentDetailDTO.setTimestamp(apiAssessmentDetail.getDateModified());
             assessmentDetailDTO.setApplicantFrequency(getFrequency(apiAssessmentDetail.getApplicantFrequency()));
             assessmentDetailDTO.setPartnerFrequency(getFrequency(apiAssessmentDetail.getPartnerFrequency()));
             assessmentDetailDTOS.add(assessmentDetailDTO);
@@ -401,13 +401,12 @@ public class MeansAssessmentMapper {
 
     public void meansAssessmentResponseToApplicationDto(final ApiMeansAssessmentResponse apiResponse, ApplicationDTO applicationDTO) {
         applicationDTO.setRepId(ofNullable(apiResponse.getRepId()).map(Integer::longValue).orElse(applicationDTO.getRepId()));
-        applicationDTO.setPassportedDTO(new PassportedDTO());
         if (apiResponse.getApplicationTimestamp() != null) {
-            applicationDTO.setTimestamp(Timestamp.valueOf(apiResponse.getApplicationTimestamp()));
+            applicationDTO.setTimestamp(apiResponse.getApplicationTimestamp());
         }
         FinancialAssessmentDTO financialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO();
         financialAssessmentDTO.setId(ofNullable(apiResponse.getAssessmentId()).map(Integer::longValue).orElse(0L));
-        financialAssessmentDTO.setTimestamp(Timestamp.valueOf(apiResponse.getUpdated()));
+        financialAssessmentDTO.setTimestamp(apiResponse.getUpdated());
 
         if (Boolean.TRUE.equals(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable())) {
             mapFullAssessmentDTO(financialAssessmentDTO.getFull(), apiResponse);
@@ -483,5 +482,27 @@ public class MeansAssessmentMapper {
                 }
             }
         }
+    }
+
+    public void apiRollbackMeansAssessmentResponseToApplicationDto(ApiRollbackMeansAssessmentResponse response, ApplicationDTO applicationDTO) {
+        if (AssessmentType.INIT.getType().equals(response.getAssessmentType())) {
+            InitialAssessmentDTO initialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
+            initialAssessmentDTO.setResult(response.getInitResult());
+            initialAssessmentDTO.setAssessmnentStatusDTO(mapAssessmentStatus(response.getFassInitStatus()));
+        } else if (AssessmentType.FULL.getType().equals(response.getAssessmentType())) {
+            FullAssessmentDTO fullAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFull();
+            fullAssessmentDTO.setResult(response.getFullResult());
+            fullAssessmentDTO.setAssessmnentStatusDTO(mapAssessmentStatus(response.getFassFullStatus()));
+        }
+    }
+
+    private AssessmentStatusDTO mapAssessmentStatus(CurrentStatus apiAssessmentStatus) {
+        if (apiAssessmentStatus != null) {
+            return AssessmentStatusDTO.builder()
+                    .status(apiAssessmentStatus.getStatus())
+                    .description(apiAssessmentStatus.getDescription())
+                    .build();
+        }
+        return AssessmentStatusDTO.builder().build();
     }
 }

@@ -68,7 +68,7 @@ services:
       find-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/{hardshipReviewId}
       create-url: ${services.hardship-api.base-url}/api/internal/v1/hardship
       update-url: ${services.hardship-api.base-url}/api/internal/v1/hardship
-      rollback-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/rollback
+      rollback-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/{hardshipReviewId}
 
   contribution-api:
     base-url: ${CCC_API_BASE_URL}
@@ -90,12 +90,18 @@ services:
       find-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means/{financialAssessmentId}
       create-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means
       update-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means
+      rollback-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means/rollback/{financialAssessmentId}
 
   maat-api:
     base-url: ${MAAT_API_BASE_URL}
     endpoints:
       call-stored-proc-url: ${services.maat-api.base-url}/api/internal/v1/assessment/execute-stored-procedure
-
+      rep-order-url: ${services.maat-api.base-url}/api/internal/v1/assessment/rep-orders/{repId}
+      update-send-to-cclf-url: ${services.maat-api.base-url}/api/internal/v1/application/applicant/update-cclf
+    user-domain: ${services.maat-api.base-url}/api/internal/v1/users
+    application-domain: ${services.maat-api.base-url}/api/internal/v1/application
+    user-endpoints:
+      user-summary-url: ${services.maat-api.user-domain}/summary/{username}
 retry-config:
   max-retries: 3
   min-back-off-period: 5

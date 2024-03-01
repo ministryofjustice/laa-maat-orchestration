@@ -11,6 +11,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
 
 @ExtendWith(SoftAssertionsExtension.class)
@@ -91,7 +92,7 @@ class HardshipReviewMapperTest {
                 TestModelDataBuilder.getApplicationDTOWithBlankHardship(CourtType.CROWN_COURT);
         ApiPerformHardshipResponse response = TestModelDataBuilder.getApiPerformHardshipResponse();
 
-        hardshipMapper.performHardshipResponseToApplicationDTO(response, applicationDTO);
+        hardshipMapper.performHardshipResponseToApplicationDTO(response, applicationDTO, CourtType.CROWN_COURT);
 
         HardshipReviewDTO crownCourtHardship =
                 applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship();
@@ -105,7 +106,7 @@ class HardshipReviewMapperTest {
                 TestModelDataBuilder.getApplicationDTOWithBlankHardship(CourtType.MAGISTRATE);
         ApiPerformHardshipResponse response = TestModelDataBuilder.getApiPerformHardshipResponse();
 
-        hardshipMapper.performHardshipResponseToApplicationDTO(response, applicationDTO);
+        hardshipMapper.performHardshipResponseToApplicationDTO(response, applicationDTO, CourtType.MAGISTRATE);
 
         HardshipReviewDTO magCourtHardship =
                 applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getMagCourtHardship();
@@ -200,6 +201,19 @@ class HardshipReviewMapperTest {
                 .isEqualTo(other.getReasonCode());
         softly.assertThat(actualExtraExpenditure.getItemCode())
                 .isEqualTo(other.getItemCode());
+    }
+
+    @Test
+    void givenWorkflowRequestAndAction_whenGetUserValidationDTOIsInvoked_thenMappingIsCorrect() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
+        UserValidationDTO actual =
+                hardshipMapper.getUserValidationDTO(workflowRequest, TestModelDataBuilder.TEST_ACTION);
+        UserValidationDTO expected = TestModelDataBuilder.getUserValidationDTO();
+
+        softly.assertThat(actual)
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(expected);
     }
 }
 

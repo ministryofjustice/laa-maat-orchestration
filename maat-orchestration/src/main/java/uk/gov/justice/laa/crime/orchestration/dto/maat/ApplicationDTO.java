@@ -1,11 +1,12 @@
 package uk.gov.justice.laa.crime.orchestration.dto.maat;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.enums.EformEnum;
+import uk.gov.justice.laa.crime.orchestration.jackson.SysGenDateDeserializer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,8 +26,10 @@ public class ApplicationDTO extends GenericDTO {
     private Date dateReceived;
     private Date dateOfSignature;
     private Date committalDate;
+    @JsonDeserialize(using = SysGenDateDeserializer.class)
     private SysGenDate magsCourtOutcomeDate;
     private Date magsWithdrawalDate;
+    @JsonDeserialize(using = SysGenDateDeserializer.class)
     private SysGenDate dateStatusSet;
     private Date dateStatusDue;
     private Date decisionDate;
@@ -49,7 +52,6 @@ public class ApplicationDTO extends GenericDTO {
     private SupplierDTO supplierDTO;
     private ContraryInterestDTO partnerContraryInterestDTO;
     private AllowedWorkReasonDTO allowedWorkReasonDTO;
-    private DrcSummaryDTO drcSummaryDTO;
     private String transactionId;
     private Boolean applicantHasPartner;
     private boolean welshCorrepondence;
@@ -67,17 +69,7 @@ public class ApplicationDTO extends GenericDTO {
     private String alertMessage;
     private Long usn;
     private EformEnum applicationType;
-
-    private ArrayList<DigitisedMeansAssessmentDTO> meansAssessments; // MW - 30/03/2017 - To support FIP changes
-
-    private CommonPlatformDataDTO commonPlatformData;
-
     private BreathingSpaceDTO breathingSpaceDTO;
-    private boolean hasCurrentLinkedPartner;
-    private ApplicantDTO currentPartner;
-    private boolean partnerDetailsApplicable;
-    private String solicitorOfficeId;
-    private FdcContributionDTO latestActiveFDC;
-    private CourtType courtType;
-
+    private CommonPlatformDataDTO commonPlatformData;
+    private ArrayList<DigitisedMeansAssessmentDTO> meansAssessments; // MW - 30/03/2017 - To support FIP changes
 }

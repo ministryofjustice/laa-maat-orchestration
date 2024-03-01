@@ -61,17 +61,15 @@ public class HardshipApiService {
         return response;
     }
 
-    public ApiPerformHardshipResponse rollback(ApiPerformHardshipRequest request) {
-        ApiPerformHardshipResponse response = hardshipApiClient.put(
-                request,
+    public void rollback(Long hardshipReviewId) {
+        hardshipApiClient.patch(
+                "",
                 new ParameterizedTypeReference<>() {
                 },
                 configuration.getHardshipApi().getEndpoints().getRollbackUrl(),
-                Collections.emptyMap()
+                Collections.emptyMap(),
+                hardshipReviewId
         );
-
-        log.info(String.format(RESPONSE_STRING, response));
-        return response;
     }
 
 }

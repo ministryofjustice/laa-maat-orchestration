@@ -11,7 +11,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith({MockitoExtension.class})
@@ -32,5 +32,17 @@ class MaatCourtDataServiceTest {
                 StoredProcedure.PROCESS_ACTIVITY
         );
         verify(maatCourtDataApiService).executeStoredProcedure(any(StoredProcedureRequest.class));
+    }
+
+    @Test
+    void givenValidRequest_whenFindRepOrderIsInvoked_thenRequestIsMappedAndApiServiceIsCalled() {
+        maatCourtDataService.findRepOrder(1000);
+        verify(maatCourtDataApiService).getRepOrderByRepId(anyInt());
+    }
+
+    @Test
+    void givenValidRequest_whenGetUserSummaryIsInvoked_thenRequestIsMappedAndApiServiceIsCalled() {
+        maatCourtDataService.getUserSummary("test");
+        verify(maatCourtDataApiService).getUserSummary(anyString());
     }
 }
