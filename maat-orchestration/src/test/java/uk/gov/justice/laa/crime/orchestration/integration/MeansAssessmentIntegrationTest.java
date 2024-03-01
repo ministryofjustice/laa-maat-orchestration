@@ -45,18 +45,22 @@ import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGive
 @SpringBootTest(classes = OrchestrationTestConfiguration.class, webEnvironment = DEFINED_PORT)
 @AutoConfigureWireMock(port = 9999)
 @AutoConfigureObservability
-class MeansAssessmentTest {
+class MeansAssessmentIntegrationTest {
 
     private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/cma";
     private static final String CMA_URL = "/api/internal/v1/assessment/means";
 
     private MockMvc mvc;
+
     @Autowired
     private ObjectMapper objectMapper;
+
     @Autowired
     private FilterChainProxy springSecurityFilterChain;
+
     @Autowired
     private WebApplicationContext webApplicationContext;
+
     @Autowired
     private WireMockServer wiremock;
 
