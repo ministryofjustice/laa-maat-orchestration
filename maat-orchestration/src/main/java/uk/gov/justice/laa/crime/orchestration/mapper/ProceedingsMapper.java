@@ -23,7 +23,6 @@ public class ProceedingsMapper extends CrownCourtMapper {
 
         ApplicationDTO application = workflowRequest.getApplicationDTO();
         ApiUpdateApplicationRequest updateApplicationRequest = new ApiUpdateApplicationRequest()
-                .withLaaTransactionId(UUID.randomUUID().toString())
                 .withRepId(NumberUtils.toInteger(application.getRepId()))
                 .withCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()))
                 .withMagCourtOutcome(MagCourtOutcome.getFrom(application.getMagsOutcomeDTO().getOutcome()))

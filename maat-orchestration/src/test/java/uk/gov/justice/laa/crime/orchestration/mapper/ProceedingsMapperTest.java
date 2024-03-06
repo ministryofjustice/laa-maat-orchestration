@@ -55,7 +55,6 @@ class ProceedingsMapperTest {
 
         softly.assertThat(actualApplicationRequest)
                 .usingRecursiveComparison()
-                .ignoringFields("laaTransactionId")
                 .isEqualTo(expectedApplicationRequest);
 
 
@@ -84,7 +83,6 @@ class ProceedingsMapperTest {
 
         softly.assertThat(actualApplicationRequest)
                 .usingRecursiveComparison()
-                .ignoringFields("laaTransactionId")
                 .isEqualTo(expectedApplicationRequest);
     }
 
