@@ -54,4 +54,12 @@ class SysGenDateDeserializerTest {
         assertThat(deserializer.deserialize(parser, deserializationContext)).isNull();
     }
 
+    @Test
+    void givenANullValue_whenDeserializeIsInvoked_thenNullIsReturned() throws IOException {
+        JsonParser parser = factory.createParser("{\"value\":\"null\"}");
+        parser.setCodec(mapper);
+        DeserializationContext deserializationContext = mapper.getDeserializationContext();
+        assertThat(deserializer.deserialize(parser, deserializationContext)).isNull();
+    }
+
 }

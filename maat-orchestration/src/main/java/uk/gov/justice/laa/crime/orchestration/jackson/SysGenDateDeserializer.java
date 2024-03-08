@@ -13,6 +13,8 @@ import java.util.Date;
 
 public class SysGenDateDeserializer extends JsonDeserializer<SysGenDate> {
 
+    private static String NULL_VALUE = "null";
+
     @Override
     public SysGenDate deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
             throws IOException {
@@ -23,7 +25,7 @@ public class SysGenDateDeserializer extends JsonDeserializer<SysGenDate> {
 
         String value = node.get("value").asText();
         try {
-            if (StringUtils.isNotBlank(value)) {
+            if (StringUtils.isNotBlank(value) && !value.trim().equals(NULL_VALUE)) {
                 return new SysGenDate(Date.from(Instant.parse(value)));
             }
         } catch (RuntimeException e) {
