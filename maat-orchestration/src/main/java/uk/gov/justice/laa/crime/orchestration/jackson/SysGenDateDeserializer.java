@@ -13,7 +13,7 @@ import java.util.Date;
 
 public class SysGenDateDeserializer extends JsonDeserializer<SysGenDate> {
 
-    private static String NULL_VALUE = "null";
+    private static final String NULL_VALUE = "null";
 
     @Override
     public SysGenDate deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
