@@ -5,10 +5,6 @@
   "title": "Rep Order Request",
   "description": "Data contract for process rep order request",
   "properties": {
-    "laaTransactionId": {
-      "type": "string",
-      "description": "The txn / correlation UUID"
-    },
     "repId": {
       "type": "integer",
       "description": "MAAT / Rep Id"
