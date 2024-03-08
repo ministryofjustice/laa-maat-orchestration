@@ -11,11 +11,9 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
-import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
-import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
-import uk.gov.justice.laa.crime.orchestration.service.MeansAssessmentService;
-import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
+import uk.gov.justice.laa.crime.orchestration.service.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,6 +34,8 @@ class MeansAssessmentOrchestrationServiceTest {
     @Mock
     private MaatCourtDataService maatCourtDataService;
 
+    @Mock
+    private AssessmentSummaryService assessmentSummaryService;
     @InjectMocks
     private MeansAssessmentOrchestrationService orchestrationService;
 
@@ -73,6 +73,7 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(maatCourtDataService).invokeStoredProcedure(applicationDTO, workflowRequest.getUserDTO(),
                                                            StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
         );
+        verify(assessmentSummaryService, times(1)).getSummary(any());
     }
 
     @Test
@@ -98,6 +99,7 @@ class MeansAssessmentOrchestrationServiceTest {
                                                            workflowRequest.getUserDTO(),
                                                            StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
         );
+        verify(assessmentSummaryService, times(1)).getSummary(any());
     }
 
     @Test
@@ -130,6 +132,7 @@ class MeansAssessmentOrchestrationServiceTest {
                                                            workflowRequest.getUserDTO(),
                                                            StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
         );
+        verify(assessmentSummaryService, times(1)).getSummary(any());
     }
 
     @Test
@@ -155,6 +158,7 @@ class MeansAssessmentOrchestrationServiceTest {
                                                            workflowRequest.getUserDTO(),
                                                            StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
         );
+        verify(assessmentSummaryService, times(1)).getSummary(any());
     }
 
 }

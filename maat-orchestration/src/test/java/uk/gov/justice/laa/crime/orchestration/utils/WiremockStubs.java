@@ -43,6 +43,13 @@ public class WiremockStubs {
                     .withBody(response))));
     }
 
+    public static void stubForGetAssessment(int financialAssessmentId, String response) {
+        stubFor((get(urlMatching(MAAT_API_ASSESSMENT_URL + "/financial-assessments/" + financialAssessmentId))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response))));
+    }
+
     public static void assertStubForUpdateCrownCourtProceedings(int times) {
         verify(exactly(times), putRequestedFor(urlPathMatching(CCP_URL)));
     }

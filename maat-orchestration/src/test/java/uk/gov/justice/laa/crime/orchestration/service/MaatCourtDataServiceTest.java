@@ -45,4 +45,10 @@ class MaatCourtDataServiceTest {
         maatCourtDataService.getUserSummary("test");
         verify(maatCourtDataApiService).getUserSummary(anyString());
     }
+
+    @Test
+    void givenValidRequest_whenGetFinancialAssessmentIsInvoked_thenRequestIsMappedAndApiServiceIsCalled() {
+        maatCourtDataService.getFinancialAssessment(1000);
+        verify(maatCourtDataApiService).getFinancialAssessment(anyInt());
+    }
 }

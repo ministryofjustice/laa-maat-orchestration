@@ -2,12 +2,16 @@ package uk.gov.justice.laa.crime.orchestration.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.enums.AssessmentType;
+import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
-import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.util.DateUtil;
 
 import java.util.Collection;
+import java.util.Date;
 
 @Slf4j
 @Service
@@ -18,8 +22,8 @@ public class AssessmentSummaryService {
                 .id(hardshipReviewDTO.getId())
                 .status(hardshipReviewDTO.getAsessmentStatus().getStatus())
                 .type(courtType == CourtType.CROWN_COURT
-                              ? "Hardship Review - Crown Court"
-                              : "Hardship Review - Magistrate"
+                        ? "Hardship Review - Crown Court"
+                        : "Hardship Review - Magistrate"
                 )
                 .result(hardshipReviewDTO.getReviewResult())
                 .assessmentDate(hardshipReviewDTO.getReviewDate()).build();
@@ -37,5 +41,22 @@ public class AssessmentSummaryService {
                             assessmentSummaryDTO.setAssessmentDate(summaryDTO.getAssessmentDate());
                         }, () -> assessmentSummary.add(summaryDTO)
                 );
+    }
+
+    public AssessmentSummaryDTO getSummary(FinancialAssessmentDTO financialAssessmentDTO) {
+        boolean isFullAssessment = AssessmentType.FULL.equals(AssessmentType.getFrom(financialAssessmentDTO.getAssessmentType()));
+        String status = isFullAssessment ? financialAssessmentDTO.getFassFullStatus() : financialAssessmentDTO.getFassInitStatus();
+        String type = isFullAssessment ? "Full Means Test" : "Initial Assessment";
+        String result = isFullAssessment ? financialAssessmentDTO.getFullResult() : financialAssessmentDTO.getInitResult();
+        Date assessmentDate = isFullAssessment ? DateUtil.toDate(financialAssessmentDTO.getFullAssessmentDate()) : DateUtil.toDate(financialAssessmentDTO.getInitialAssessmentDate());
+
+        return AssessmentSummaryDTO.builder()
+                .id(Long.valueOf(financialAssessmentDTO.getId()))
+                .status(status)
+                .type(type)
+                .result(result)
+                .assessmentDate(assessmentDate)
+                .reviewType(financialAssessmentDTO.getRtCode())
+                .build();
     }
 }

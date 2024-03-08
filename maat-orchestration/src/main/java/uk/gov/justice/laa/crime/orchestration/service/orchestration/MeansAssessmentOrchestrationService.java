@@ -6,12 +6,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
-import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
-import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
-import uk.gov.justice.laa.crime.orchestration.service.MeansAssessmentService;
-import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
+import uk.gov.justice.laa.crime.orchestration.service.*;
 
 @Slf4j
 @Service
@@ -22,6 +20,8 @@ public class MeansAssessmentOrchestrationService {
     private final ProceedingsService proceedingsService;
     private final MeansAssessmentService meansAssessmentService;
     private final MaatCourtDataService maatCourtDataService;
+    private final AssessmentSummaryService assessmentSummaryService;
+
 
     public FinancialAssessmentDTO find(int assessmentId, int applicantId) {
         return meansAssessmentService.find(assessmentId, applicantId);
@@ -89,6 +89,11 @@ public class MeansAssessmentOrchestrationService {
                 request.getApplicationDTO(),
                 request.getUserDTO(),
                 StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2);
+
+        int financialAssessmentId = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getId().intValue();
+        AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(maatCourtDataService.getFinancialAssessment(financialAssessmentId));
+        assessmentSummaryService.updateApplication(application, assessmentSummaryDTO);
+
         application.setTransactionId(null);
         return application;
     }
