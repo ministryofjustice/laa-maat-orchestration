@@ -285,7 +285,7 @@ public class HardshipMapper {
     private HRSolicitorsCostsDTO solicitorCostsToHrSolicitorsCostsDto(SolicitorCosts solicitorCosts) {
         return HRSolicitorsCostsDTO.builder()
                 .solicitorDisb(solicitorCosts.getDisbursements())
-                .solicitorHours(solicitorCosts.getHours().doubleValue())
+                .solicitorHours(NumberUtils.toDouble(solicitorCosts.getHours()))
                 .solicitorRate(solicitorCosts.getRate())
                 .solicitorEstimatedTotalCost(solicitorCosts.getEstimatedTotal())
                 .solicitorVat(solicitorCosts.getVat())
