@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
@@ -59,6 +60,9 @@ class MeansAssessmentOrchestrationServiceTest {
         ))
                 .thenReturn(applicationDTO);
 
+        when(maatCourtDataService.getFinancialAssessment(Constants.FINANCIAL_ASSESSMENT_ID))
+                .thenReturn(TestModelDataBuilder.getMaatApiFinancialAssessmentDTO());
+
         ApplicationDTO actual = orchestrationService.create(workflowRequest);
 
         assertThat(actual.getCrownCourtOverviewDTO().getContribution())
@@ -73,7 +77,7 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(maatCourtDataService).invokeStoredProcedure(applicationDTO, workflowRequest.getUserDTO(),
                                                            StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
         );
-        verify(assessmentSummaryService, times(1)).getSummary(any());
+        verify(assessmentSummaryService, times(1)).getSummary(any(FinancialAssessmentDTO.class));
     }
 
     @Test
