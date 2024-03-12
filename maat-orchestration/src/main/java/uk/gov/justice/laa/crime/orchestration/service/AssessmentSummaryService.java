@@ -45,10 +45,22 @@ public class AssessmentSummaryService {
 
     public AssessmentSummaryDTO getSummary(FinancialAssessmentDTO financialAssessmentDTO) {
         boolean isFullAssessment = AssessmentType.FULL.equals(AssessmentType.getFrom(financialAssessmentDTO.getAssessmentType()));
-        String status = isFullAssessment ? financialAssessmentDTO.getFassFullStatus() : financialAssessmentDTO.getFassInitStatus();
-        String type = isFullAssessment ? "Full Means Test" : "Initial Assessment";
-        String result = isFullAssessment ? financialAssessmentDTO.getFullResult() : financialAssessmentDTO.getInitResult();
-        Date assessmentDate = isFullAssessment ? DateUtil.toDate(financialAssessmentDTO.getFullAssessmentDate()) : DateUtil.toDate(financialAssessmentDTO.getInitialAssessmentDate());
+        String status = null;
+        String type = null;
+        String result = null;
+        Date assessmentDate = null;
+
+        if(isFullAssessment) {
+            status = financialAssessmentDTO.getFassFullStatus();
+            type = "Full Means Test";
+            result = financialAssessmentDTO.getFullResult();
+            assessmentDate = DateUtil.toDate(financialAssessmentDTO.getFullAssessmentDate());
+        } else {
+            status = financialAssessmentDTO.getFassInitStatus();
+            type = "Initial Assessment";
+            result = financialAssessmentDTO.getInitResult();
+            assessmentDate = DateUtil.toDate(financialAssessmentDTO.getInitialAssessmentDate());
+        }
 
         return AssessmentSummaryDTO.builder()
                 .id(Long.valueOf(financialAssessmentDTO.getId()))
