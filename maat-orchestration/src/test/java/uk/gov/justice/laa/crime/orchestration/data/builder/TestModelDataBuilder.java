@@ -23,7 +23,6 @@ import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiH
 import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipProgress;
 import uk.gov.justice.laa.crime.orchestration.model.crown_court.*;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
-import uk.gov.justice.laa.crime.util.DateUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -37,6 +36,10 @@ import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
 
 @Component
 public class TestModelDataBuilder {
+    public static final Integer REP_ID = 200;
+    public static final Action TEST_ACTION = Action.CREATE_ASSESSMENT;
+    public static final String RT_CODE = "DEF";
+    public static final String RT_CODE_ER = "ER";
     private static final Integer EVIDENCE_ID = 9552473;
     private static final String INCOME_EVIDENCE_DESCRIPTION = "Tax Return";
     private static final String INCOME_EVIDENCE = "TAX RETURN";
@@ -71,7 +74,6 @@ public class TestModelDataBuilder {
     private static final String CASEWORKER_NOTES = "Mock caseworker notes";
     private static final String NEW_WORK_REASON_STRING = NewWorkReason.NEW.getCode();
     private static final String USER_SESSION = "8ab0bab5-c27e-471a-babf-c3992c7a4471";
-    public static final Integer REP_ID = 200;
     private static final BigDecimal SOLICITOR_ESTIMATED_COST = BigDecimal.valueOf(2500);
     private static final BigDecimal SOLICITOR_VAT = BigDecimal.valueOf(250);
     private static final BigDecimal SOLICITOR_DISBURSEMENTS = BigDecimal.valueOf(375);
@@ -100,13 +102,11 @@ public class TestModelDataBuilder {
     private static final LocalDateTime REP_ORDER_MODIFIED_TIMESTAMP = LocalDateTime.parse("2023-06-27T10:15:30");
     private static final LocalDate REP_ORDER_CREATED_TIMESTAMP = LocalDate.of(2024, Month.JANUARY, 8);
     private static final List<String> TEST_ROLE_ACTIONS = List.of("CREATE_ASSESSMENT");
-    public static final Action TEST_ACTION = Action.CREATE_ASSESSMENT;
     private static final NewWorkReason TEST_NEW_WORK_REASON = NewWorkReason.NEW;
     private static final List<String> TEST_NEW_WORK_REASONS = List.of(NEW_WORK_REASON_STRING);
     private static final String TEST_USER_SESSION = "sessionId_e5712593c198";
     private static final Integer TEST_RECORD_ID = 100;
     private static final LocalDateTime RESERVATION_DATE = LocalDateTime.of(2022, 12, 14, 0, 0, 0);
-    public static final String RT_CODE = "DEF";
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
         return new ApiFindHardshipResponse()
@@ -680,7 +680,7 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    private static FinancialAssessmentDTO getFinancialAssessmentDTO() {
+    public static FinancialAssessmentDTO getFinancialAssessmentDTO() {
         return FinancialAssessmentDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
                 .full(getFullAssessmentDTO())
@@ -1162,8 +1162,8 @@ public class TestModelDataBuilder {
                 .status(CurrentStatus.COMPLETE.getStatus())
                 .type("Full Means Test")
                 .result(RESULT_PASS)
-                .assessmentDate(DateUtil.toDate(FULL_ASSESSMENT_DATE))
-                .reviewType(RT_CODE)
+                .assessmentDate(ASSESSMENT_DATE)
+                .reviewType(RT_CODE_ER)
                 .build();
     }
 
@@ -1172,9 +1172,8 @@ public class TestModelDataBuilder {
                 .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
                 .status(CurrentStatus.COMPLETE.getStatus())
                 .type("Initial Assessment")
-                .result(RESULT_PASS)
-                .assessmentDate(DateUtil.toDate(INITIAL_ASSESSMENT_DATE))
-                .reviewType(RT_CODE)
+                .result(RESULT_FAIL)
+                .reviewType(RT_CODE_ER)
                 .build();
     }
 }

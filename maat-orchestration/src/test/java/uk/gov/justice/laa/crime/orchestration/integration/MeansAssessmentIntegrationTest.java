@@ -76,7 +76,7 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
-    void givenValidIds_whenFindIsInvoked_thenAssessmentIsReturned () throws Exception {
+    void givenValidIds_whenFindIsInvoked_thenAssessmentIsReturned() throws Exception {
         String response = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiGetMeansAssessmentResponse());
 
         stubForOAuth();
@@ -124,14 +124,13 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
-    void givenValidRequestData_whenCreateIsInvoked_thenAssessmentIsCreated () throws Exception {
+    void givenValidRequestData_whenCreateIsInvoked_thenAssessmentIsCreated() throws Exception {
         String cmaResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiMeansAssessmentResponse());
         String ccpResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
         String cccCalculateResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse());
         String cccSummariesResponse = objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary()));
         String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT));
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
-        String getAssessmentResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getMaatApiFinancialAssessmentDTO());
 
         stubForOAuth();
         wiremock.stubFor(post(urlMatching(CMA_URL))
@@ -141,7 +140,6 @@ class MeansAssessmentIntegrationTest {
         stubForUpdateCrownCourtProceedings(ccpResponse);
         stubForCalculateContributions(cccCalculateResponse);
         stubForGetContributionsSummary(cccSummariesResponse);
-        stubForGetAssessment(Constants.FINANCIAL_ASSESSMENT_ID, getAssessmentResponse);
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
         stubForInvokeStoredProcedure("DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", maatApiResponse);
         stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", "DB_PRE_UPDATE_CC_APPLICATION", maatApiResponse);
@@ -191,14 +189,13 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
-    void givenValidRequestData_whenUpdateIsInvoked_thenAssessmentIsUpdated () throws Exception {
+    void givenValidRequestData_whenUpdateIsInvoked_thenAssessmentIsUpdated() throws Exception {
         String cmaResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiMeansAssessmentResponse());
         String ccpResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
         String cccCalculateResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse());
         String cccSummariesResponse = objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary()));
         String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT));
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
-        String getAssessmentResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getMaatApiFinancialAssessmentDTO());
 
         stubForOAuth();
         wiremock.stubFor(put(urlMatching(CMA_URL))
@@ -208,7 +205,6 @@ class MeansAssessmentIntegrationTest {
         stubForUpdateCrownCourtProceedings(ccpResponse);
         stubForCalculateContributions(cccCalculateResponse);
         stubForGetContributionsSummary(cccSummariesResponse);
-        stubForGetAssessment(Constants.FINANCIAL_ASSESSMENT_ID, getAssessmentResponse);
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
         stubForInvokeStoredProcedure("DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", maatApiResponse);
         stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", "DB_PRE_UPDATE_CC_APPLICATION", maatApiResponse);

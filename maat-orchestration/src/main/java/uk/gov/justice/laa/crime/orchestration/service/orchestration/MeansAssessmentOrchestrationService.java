@@ -90,8 +90,7 @@ public class MeansAssessmentOrchestrationService {
                 request.getUserDTO(),
                 StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2);
 
-        int financialAssessmentId = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getId().intValue();
-        AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(maatCourtDataService.getFinancialAssessment(financialAssessmentId));
+        AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO());
         assessmentSummaryService.updateApplication(application, assessmentSummaryDTO);
 
         application.setTransactionId(null);
