@@ -9,6 +9,7 @@ import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.SendToCCLFDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
@@ -71,6 +72,17 @@ public class MaatCourtDataApiService {
         );
         log.info(RESPONSE_STRING, response);
         return response;
+    }
+
+    public FinancialAssessmentDTO getFinancialAssessment(int financialAssessmentId) {
+        FinancialAssessmentDTO financialAssessmentDTO = maatApiClient.get(
+                new ParameterizedTypeReference<>() {
+                },
+                configuration.getMaatApi().getEndpoints().getGetAssessmentUrl(),
+                financialAssessmentId
+        );
+        log.info(RESPONSE_STRING, financialAssessmentDTO);
+        return financialAssessmentDTO;
     }
 
 }

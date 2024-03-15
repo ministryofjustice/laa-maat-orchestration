@@ -159,14 +159,14 @@ public class ServicesConfiguration {
             private String repOrderUrl;
             @NotNull
             private String updateSendToCCLFUrl;
-
+            @NotNull
+            private String getAssessmentUrl;
         }
 
         @Data
         @NoArgsConstructor
         @AllArgsConstructor
         public static class UserEndpoints {
-
             @NotNull
             private String userSummaryUrl;
         }

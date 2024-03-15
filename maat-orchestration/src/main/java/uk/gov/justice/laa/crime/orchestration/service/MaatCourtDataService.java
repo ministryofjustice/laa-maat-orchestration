@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
@@ -38,4 +39,7 @@ public class MaatCourtDataService {
     public UserSummaryDTO getUserSummary(String userName) {
         return maatCourtDataApiService.getUserSummary(userName);
     }
+
+    public FinancialAssessmentDTO getFinancialAssessment(int financialAssessmentId) {return maatCourtDataApiService.getFinancialAssessment(financialAssessmentId);}
+
 }

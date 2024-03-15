@@ -76,7 +76,7 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
-    void givenValidIds_whenFindIsInvoked_thenAssessmentIsReturned () throws Exception {
+    void givenValidIds_whenFindIsInvoked_thenAssessmentIsReturned() throws Exception {
         String response = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiGetMeansAssessmentResponse());
 
         stubForOAuth();
@@ -124,7 +124,7 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
-    void givenValidRequestData_whenCreateIsInvoked_thenAssessmentIsCreated () throws Exception {
+    void givenValidRequestData_whenCreateIsInvoked_thenAssessmentIsCreated() throws Exception {
         String cmaResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiMeansAssessmentResponse());
         String ccpResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
         String cccCalculateResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse());
@@ -189,13 +189,12 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
-    void givenValidRequestData_whenUpdateIsInvoked_thenAssessmentIsUpdated () throws Exception {
+    void givenValidRequestData_whenUpdateIsInvoked_thenAssessmentIsUpdated() throws Exception {
         String cmaResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiMeansAssessmentResponse());
         String ccpResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
         String cccCalculateResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse());
         String cccSummariesResponse = objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary()));
         String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT));
-
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
 
         stubForOAuth();
