@@ -41,8 +41,8 @@ public class MaatCourtDataApiService {
     }
 
     public RepOrderDTO getRepOrderByRepId(Integer repId) {
-        var response = maatApiClient.get(
-                new ParameterizedTypeReference<RepOrderDTO>() {
+        RepOrderDTO response = maatApiClient.get(
+                new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getEndpoints().getRepOrderUrl(),
                 repId

@@ -42,7 +42,7 @@ class HardshipServiceTest {
 
     @Test
     void givenWorkflowRequest_whenCreateHardshipIsInvoked_thenRequestIsMappedAndApiServiceIsCalled() {
-        when(hardshipMapper.workflowRequestToPerformHardshipRequest(any(WorkflowRequest.class)))
+        when(hardshipMapper.workflowRequestToPerformHardshipRequest(any(WorkflowRequest.class), anyBoolean()))
                 .thenReturn(TestModelDataBuilder.getApiPerformHardshipRequest());
         hardshipService.create(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         verify(hardshipApiService).create(any(ApiPerformHardshipRequest.class));
@@ -50,7 +50,7 @@ class HardshipServiceTest {
 
     @Test
     void givenWorkflowRequest_whenUpdateHardshipIsInvoked_thenRequestIsMappedAndApiServiceIsCalled() {
-        when(hardshipMapper.workflowRequestToPerformHardshipRequest(any(WorkflowRequest.class)))
+        when(hardshipMapper.workflowRequestToPerformHardshipRequest(any(WorkflowRequest.class), anyBoolean()))
                 .thenReturn(TestModelDataBuilder.getApiPerformHardshipRequest());
         when(hardshipApiService.update(any(ApiPerformHardshipRequest.class)))
                 .thenReturn(new ApiPerformHardshipResponse());
