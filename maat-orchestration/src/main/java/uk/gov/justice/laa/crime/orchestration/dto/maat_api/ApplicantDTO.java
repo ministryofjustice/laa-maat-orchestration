@@ -1,6 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.dto.maat_api;
 
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +15,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ApplicantDTO implements Serializable {
-    @JsonValue
+
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public ApplicantDTO(int id) {
+        this.id = id;
+    }
+
     private Integer id;
     private String firstName;
     private String lastName;
