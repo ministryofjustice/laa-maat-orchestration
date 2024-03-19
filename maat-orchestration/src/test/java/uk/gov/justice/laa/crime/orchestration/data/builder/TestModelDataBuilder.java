@@ -1061,7 +1061,7 @@ public class TestModelDataBuilder {
                 .recordId(TEST_RECORD_ID)
                 .recordName("")
                 .userName(Constants.USERNAME)
-                .userSession(TEST_USER_SESSION)
+                .userSession(USER_SESSION)
                 .reservationDate(RESERVATION_DATE)
                 .expiryDate(RESERVATION_DATE)
                 .build();

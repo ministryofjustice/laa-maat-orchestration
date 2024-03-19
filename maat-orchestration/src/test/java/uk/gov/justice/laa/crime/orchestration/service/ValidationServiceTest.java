@@ -44,7 +44,6 @@ import static uk.gov.justice.laa.crime.orchestration.service.ValidationService.C
 
 @ExtendWith(MockitoExtension.class)
 class ValidationServiceTest {
-    public static final String ACTION_NEW_WORK_REASON_AND_SESSION_DOES_NOT_EXIST = "Action, New work reason and Session does not exist";
     private static final LocalDateTime CC_WITHDRAWAL_DATETIME = LocalDateTime.of(2022, 10, 14, 0, 0, 0);
     private static final LocalDateTime CC_REP_ORDER_DATETIME = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
 
@@ -131,7 +130,7 @@ class ValidationServiceTest {
         UserSummaryDTO expectedUserSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
         when(maatCourtDataService.getUserSummary(any())).thenReturn(expectedUserSummaryDTO);
         Boolean isUserActionValid =
-                validationService.isUserActionValid(TestModelDataBuilder.getUserValidationDTOWithReservation());
+                validationService.isUserActionValid(TestModelDataBuilder.getUserValidationDTO());
         assertTrue(isUserActionValid);
     }
 
@@ -140,7 +139,7 @@ class ValidationServiceTest {
     void givenInputWithExistingReservation_whenIsUserActionValidIsInvoked_thenExceptionIsThrown() throws CrimeValidationException {
         UserSummaryDTO expectedUserSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
         when(maatCourtDataService.getUserSummary(any())).thenReturn(expectedUserSummaryDTO);
-        assertThatThrownBy(() -> validationService.isUserActionValid(TestModelDataBuilder.getUserValidationDTO()))
+        assertThatThrownBy(() -> validationService.isUserActionValid(TestModelDataBuilder.getUserValidationDTOWithReservation()))
                 .isInstanceOf(CrimeValidationException.class)
                 .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
                 .contains(ValidationService.USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED);
@@ -150,7 +149,7 @@ class ValidationServiceTest {
     void givenInputWithRoleActionNotAssignedToUser_whenIsUserActionValidIsInvoked_thenExceptionIsThrown() throws CrimeValidationException {
         UserSummaryDTO expectedUserSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
         when(maatCourtDataService.getUserSummary(any())).thenReturn(expectedUserSummaryDTO);
-        UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTO();
+        UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTOWithReservation();
         userValidationDTO.setAction(Action.CREATE_APPLICATION);
         assertThatThrownBy(() -> validationService.isUserActionValid(userValidationDTO))
                 .isInstanceOf(CrimeValidationException.class)
@@ -163,7 +162,7 @@ class ValidationServiceTest {
     void givenInputWithNewWorkReasonNotAssignedToUser_whenIsUserActionValidIsInvoked_thenExceptionIsThrown() throws CrimeValidationException {
         UserSummaryDTO expectedUserSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
         when(maatCourtDataService.getUserSummary(any())).thenReturn(expectedUserSummaryDTO);
-        UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTO();
+        UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTOWithReservation();
         userValidationDTO.setNewWorkReason(NewWorkReason.CFC);
         assertThatThrownBy(() -> validationService.isUserActionValid(userValidationDTO))
                 .isInstanceOf(CrimeValidationException.class)
@@ -178,8 +177,7 @@ class ValidationServiceTest {
         UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTO();
         userValidationDTO.setSessionId("");
 
-
-        assertThatThrownBy(() -> validationService.isUserActionValid(TestModelDataBuilder.getUserValidationDTO()))
+        assertThatThrownBy(() -> validationService.isUserActionValid(userValidationDTO))
                 .isInstanceOf(CrimeValidationException.class)
                 .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
                 .contains(ValidationService.USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED);
@@ -190,7 +188,7 @@ class ValidationServiceTest {
         UserSummaryDTO expectedUserSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
         when(maatCourtDataService.getUserSummary(any())).thenReturn(expectedUserSummaryDTO);
 
-        UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTO();
+        UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTOWithReservation();
         userValidationDTO.setAction(Action.CREATE_APPLICATION);
         userValidationDTO.setNewWorkReason(NewWorkReason.CFC);
 
@@ -224,7 +222,7 @@ class ValidationServiceTest {
         UserSummaryDTO expectedUserSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
         when(maatCourtDataService.getUserSummary(any())).thenReturn(expectedUserSummaryDTO);
 
-        UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTO();
+        UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTOWithReservation();
         userValidationDTO.setAction(Action.CREATE_APPLICATION);
 
         assertThatThrownBy(() -> validationService.isUserActionValid(userValidationDTO))
@@ -239,7 +237,7 @@ class ValidationServiceTest {
         UserSummaryDTO expectedUserSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
         when(maatCourtDataService.getUserSummary(any())).thenReturn(expectedUserSummaryDTO);
 
-        UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTO();
+        UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTOWithReservation();
         userValidationDTO.setNewWorkReason(NewWorkReason.CFC);
 
         assertThatThrownBy(() -> validationService.isUserActionValid(userValidationDTO))
@@ -255,7 +253,7 @@ class ValidationServiceTest {
 
         assertThatThrownBy(() -> validationService.isUserActionValid(userValidationDTO))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ACTION_NEW_WORK_REASON_AND_SESSION_DOES_NOT_EXIST);
+                .hasMessage(ValidationService.ACTION_NEW_WORK_REASON_AND_SESSION_DOES_NOT_EXIST);
     }
 
     @Test
@@ -264,7 +262,7 @@ class ValidationServiceTest {
         userSummaryDTO.setRoleActions(null);
         when(maatCourtDataService.getUserSummary(any())).thenReturn(userSummaryDTO);
 
-        assertThatThrownBy(() -> validationService.isUserActionValid(TestModelDataBuilder.getUserValidationDTO()))
+        assertThatThrownBy(() -> validationService.isUserActionValid(TestModelDataBuilder.getUserValidationDTOWithReservation()))
                 .isInstanceOf(CrimeValidationException.class)
                 .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
                 .contains(ValidationService.USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION);
@@ -276,7 +274,7 @@ class ValidationServiceTest {
         userSummaryDTO.setNewWorkReasons(null);
         when(maatCourtDataService.getUserSummary(any())).thenReturn(userSummaryDTO);
 
-        assertThatThrownBy(() -> validationService.isUserActionValid(TestModelDataBuilder.getUserValidationDTO()))
+        assertThatThrownBy(() -> validationService.isUserActionValid(TestModelDataBuilder.getUserValidationDTOWithReservation()))
                 .isInstanceOf(CrimeValidationException.class)
                 .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
                 .contains(ValidationService.USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE);
@@ -287,7 +285,7 @@ class ValidationServiceTest {
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
         userSummaryDTO.getReservationsEntity().setUserSession("sessionId_1234");
         when(maatCourtDataService.getUserSummary(any())).thenReturn(userSummaryDTO);
-        assertThatThrownBy(() -> validationService.isUserActionValid(TestModelDataBuilder.getUserValidationDTO()))
+        assertThatThrownBy(() -> validationService.isUserActionValid(TestModelDataBuilder.getUserValidationDTOWithReservation()))
                 .isInstanceOf(CrimeValidationException.class)
                 .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
                 .contains(ValidationService.USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED);
@@ -332,7 +330,7 @@ class ValidationServiceTest {
 
     @Test
     void givenValidInputWithNoReservation_whenIsUserActionValidIsInvoked_thenOKResponseIsReturned() throws CrimeValidationException {
-        UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTOWithReservation();
+        UserValidationDTO userValidationDTO = TestModelDataBuilder.getUserValidationDTO();
         userValidationDTO.setAction(null);
         userValidationDTO.setNewWorkReason(null);
 

@@ -37,7 +37,7 @@ public class ValidationService {
             "Cannot update case in status of %s";
     public static final String USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED =
             "User have an existing reservation, so reservation not allowed";
-    private static final String ACTION_NEW_WORK_REASON_AND_SESSION_DOES_NOT_EXIST =
+    public static final String ACTION_NEW_WORK_REASON_AND_SESSION_DOES_NOT_EXIST =
             "Action, New work reason and Session does not exist";
     public static final String USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION =
             "User does not have a role capable of performing this action";
