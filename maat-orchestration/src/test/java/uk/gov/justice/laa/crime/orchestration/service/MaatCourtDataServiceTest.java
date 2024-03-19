@@ -15,6 +15,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 
@@ -54,7 +55,8 @@ class MaatCourtDataServiceTest {
     void givenValidResponseJson_whenFindRepOrderIsInvoked_ValidRepOrderDTOIsReturned() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        mapper.readValue(getRepOrderDTO(), RepOrderDTO.class);
+        RepOrderDTO repOrderDTO = mapper.readValue(getRepOrderDTO(), RepOrderDTO.class);
+        assertThat(repOrderDTO.getId()).isEqualTo(5788163);
     }
 
     String getRepOrderDTO() {
