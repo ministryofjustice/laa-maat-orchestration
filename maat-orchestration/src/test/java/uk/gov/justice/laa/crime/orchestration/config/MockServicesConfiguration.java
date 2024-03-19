@@ -47,7 +47,8 @@ public class MockServicesConfiguration {
                 new ServicesConfiguration.MaatApi.Endpoints(
                         "/assessment/means/execute-stored-procedure",
                         "/assessment/rep-orders/{repId}",
-                        "/application/applicant/update-cclf"
+                        "/application/applicant/update-cclf",
+                        "/assessment/financial-assessments/{financialAssessmentId}"
                 );
 
         ServicesConfiguration.MaatApi.UserEndpoints userEndpoints =

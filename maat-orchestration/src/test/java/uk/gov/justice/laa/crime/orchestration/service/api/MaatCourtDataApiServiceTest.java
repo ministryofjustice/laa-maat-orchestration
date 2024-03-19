@@ -56,4 +56,11 @@ class MaatCourtDataApiServiceTest {
         verify(cmaApiClient)
                 .put(any(), any(), anyString(), anyMap());
     }
+
+    @Test
+    void givenValidRequest_whenGetFinancialAssessmentIsInvoked_thenFinancialAssessmentDTOIsReturned() {
+        maatCourtDataApiService.getFinancialAssessment(1000);
+        verify(cmaApiClient)
+                .get(any(), any(), anyInt());
+    }
 }

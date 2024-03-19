@@ -20,7 +20,7 @@ public class FinancialAssessmentDTO {
     private Integer repId;
     private Integer initialAscrId;
     private String assessmentType;
-    private NewWorkReason newWorkReason;
+    private String newWorkReason;
     private LocalDateTime dateCreated;
     private String userCreated;
     private Integer cmuId;
@@ -48,6 +48,7 @@ public class FinancialAssessmentDTO {
     private String fullOtherHousingNote;
     private BigDecimal fullTotalAggregatedExpenses;
     private Integer fullAscrId;
+    private String valid;
     private LocalDateTime dateCompleted;
     private LocalDateTime updated;
     private String userModified;

@@ -36,6 +36,10 @@ import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
 
 @Component
 public class TestModelDataBuilder {
+    public static final Integer REP_ID = 200;
+    public static final Action TEST_ACTION = Action.CREATE_ASSESSMENT;
+    public static final String RT_CODE = "DEF";
+    public static final String RT_CODE_ER = "ER";
     private static final Integer EVIDENCE_ID = 9552473;
     private static final String INCOME_EVIDENCE_DESCRIPTION = "Tax Return";
     private static final String INCOME_EVIDENCE = "TAX RETURN";
@@ -70,7 +74,6 @@ public class TestModelDataBuilder {
     private static final String CASEWORKER_NOTES = "Mock caseworker notes";
     private static final String NEW_WORK_REASON_STRING = NewWorkReason.NEW.getCode();
     private static final String USER_SESSION = "8ab0bab5-c27e-471a-babf-c3992c7a4471";
-    public static final Integer REP_ID = 200;
     private static final BigDecimal SOLICITOR_ESTIMATED_COST = BigDecimal.valueOf(2500);
     private static final BigDecimal SOLICITOR_VAT = BigDecimal.valueOf(250);
     private static final BigDecimal SOLICITOR_DISBURSEMENTS = BigDecimal.valueOf(375);
@@ -99,10 +102,9 @@ public class TestModelDataBuilder {
     private static final LocalDateTime REP_ORDER_MODIFIED_TIMESTAMP = LocalDateTime.parse("2023-06-27T10:15:30");
     private static final LocalDate REP_ORDER_CREATED_TIMESTAMP = LocalDate.of(2024, Month.JANUARY, 8);
     private static final List<String> TEST_ROLE_ACTIONS = List.of("CREATE_ASSESSMENT");
-    public static final Action TEST_ACTION = Action.CREATE_ASSESSMENT;
     private static final NewWorkReason TEST_NEW_WORK_REASON = NewWorkReason.NEW;
     private static final List<String> TEST_NEW_WORK_REASONS = List.of(NEW_WORK_REASON_STRING);
-    private static final String TEST_USER_SESSION = "sessionId_e5712593c198";
+    public static final String TEST_USER_SESSION = "sessionId_e5712593c198";
     private static final Integer TEST_RECORD_ID = 100;
     private static final LocalDateTime RESERVATION_DATE = LocalDateTime.of(2022, 12, 14, 0, 0, 0);
 
@@ -478,6 +480,7 @@ public class TestModelDataBuilder {
                 .passportedDTO(getPassportedDTO())
                 .repOrderDecision(getRepOrderDecisionDTO())
                 .iojResult(RESULT_PASS)
+                .assessmentSummary(Collections.emptyList())
                 .build();
     }
 
@@ -677,7 +680,7 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    private static FinancialAssessmentDTO getFinancialAssessmentDTO() {
+    public static FinancialAssessmentDTO getFinancialAssessmentDTO() {
         return FinancialAssessmentDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
                 .full(getFullAssessmentDTO())
@@ -1058,7 +1061,7 @@ public class TestModelDataBuilder {
                 .recordId(TEST_RECORD_ID)
                 .recordName("")
                 .userName(Constants.USERNAME)
-                .userSession(TEST_USER_SESSION)
+                .userSession(USER_SESSION)
                 .reservationDate(RESERVATION_DATE)
                 .expiryDate(RESERVATION_DATE)
                 .build();
@@ -1136,6 +1139,41 @@ public class TestModelDataBuilder {
                 .roleActions(roleActions)
                 .newWorkReasons(List.of(newWorkReason.getCode()))
                 .reservationsEntity(getReservationsDTO())
+                .build();
+    }
+
+    public static uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO getMaatApiFinancialAssessmentDTO() {
+        return uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO.builder()
+                .id(Constants.FINANCIAL_ASSESSMENT_ID)
+                .fassInitStatus(CurrentStatus.COMPLETE.getStatus())
+                .fassFullStatus(CurrentStatus.COMPLETE.getStatus())
+                .assessmentType(AssessmentType.FULL.getType())
+                .initResult(RESULT_PASS)
+                .fullResult(RESULT_PASS)
+                .initialAssessmentDate(INITIAL_ASSESSMENT_DATE)
+                .fullAssessmentDate(FULL_ASSESSMENT_DATE)
+                .rtCode(RT_CODE)
+                .build();
+    }
+
+    public static AssessmentSummaryDTO getAssessmentSummaryDTOFromFullFinancialAssessment() {
+        return AssessmentSummaryDTO.builder()
+                .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
+                .status(CurrentStatus.COMPLETE.getStatus())
+                .type("Full Means Test")
+                .result(RESULT_PASS)
+                .assessmentDate(ASSESSMENT_DATE)
+                .reviewType(RT_CODE_ER)
+                .build();
+    }
+
+    public static AssessmentSummaryDTO getAssessmentSummaryDTOFromInitFinancialAssessment() {
+        return AssessmentSummaryDTO.builder()
+                .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
+                .status(CurrentStatus.COMPLETE.getStatus())
+                .type("Initial Assessment")
+                .result(RESULT_FAIL)
+                .reviewType(RT_CODE_ER)
                 .build();
     }
 }
