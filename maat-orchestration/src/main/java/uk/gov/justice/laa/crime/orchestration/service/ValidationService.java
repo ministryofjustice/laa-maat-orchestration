@@ -37,11 +37,11 @@ public class ValidationService {
             "Cannot update case in status of %s";
     public static final String USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED =
             "User have an existing reservation, so reservation not allowed";
-    private static final String ACTION_NEW_WORK_REASON_AND_SESSION_DOES_NOT_EXIST =
+    public static final String ACTION_NEW_WORK_REASON_AND_SESSION_DOES_NOT_EXIST =
             "Action, New work reason and Session does not exist";
-    private static final String USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION =
+    public static final String USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION =
             "User does not have a role capable of performing this action";
-    private static final String USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE =
+    public static final String USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE =
             "User does not have a valid New Work Reason Code";
     private final MaatCourtDataService maatCourtDataService;
     private final MaatCourtDataApiService maatCourtDataApiService;
@@ -128,8 +128,8 @@ public class ValidationService {
             crimeValidationExceptionList.add(USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE);
         }
 
-        if (request.getSessionId() != null && (userSummaryDTO.getReservationsEntity() != null
-                && userSummaryDTO.getReservationsEntity().getUserSession().equalsIgnoreCase(request.getSessionId()))) {
+        if (request.getSessionId() != null && userSummaryDTO.getReservationsEntity() != null
+                && !request.getSessionId().equalsIgnoreCase(userSummaryDTO.getReservationsEntity().getUserSession())) {
             crimeValidationExceptionList.add(USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED);
         }
 

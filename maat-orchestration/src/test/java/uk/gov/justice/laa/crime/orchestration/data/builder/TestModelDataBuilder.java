@@ -104,7 +104,7 @@ public class TestModelDataBuilder {
     private static final List<String> TEST_ROLE_ACTIONS = List.of("CREATE_ASSESSMENT");
     private static final NewWorkReason TEST_NEW_WORK_REASON = NewWorkReason.NEW;
     private static final List<String> TEST_NEW_WORK_REASONS = List.of(NEW_WORK_REASON_STRING);
-    private static final String TEST_USER_SESSION = "sessionId_e5712593c198";
+    public static final String TEST_USER_SESSION = "sessionId_e5712593c198";
     private static final Integer TEST_RECORD_ID = 100;
     private static final LocalDateTime RESERVATION_DATE = LocalDateTime.of(2022, 12, 14, 0, 0, 0);
 
@@ -1061,7 +1061,7 @@ public class TestModelDataBuilder {
                 .recordId(TEST_RECORD_ID)
                 .recordName("")
                 .userName(Constants.USERNAME)
-                .userSession(TEST_USER_SESSION)
+                .userSession(USER_SESSION)
                 .reservationDate(RESERVATION_DATE)
                 .expiryDate(RESERVATION_DATE)
                 .build();
