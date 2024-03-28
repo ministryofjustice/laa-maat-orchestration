@@ -3,12 +3,12 @@ package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
+import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.service.*;
 
 @Slf4j
@@ -38,7 +38,7 @@ public class MeansAssessmentOrchestrationService {
             log.debug("Created Means assessment for applicationId = " + repId);
         } catch (Exception ex) {
             meansAssessmentService.rollback(request);
-            throw new APIClientException(ex.getMessage());
+            throw new MaatOrchestrationException(request.getApplicationDTO());
         }
         return application;
     }
@@ -54,7 +54,7 @@ public class MeansAssessmentOrchestrationService {
             log.debug("Updated Means assessment for applicationId = " + repId);
         } catch (Exception ex) {
             meansAssessmentService.rollback(request);
-            throw new APIClientException(ex.getMessage());
+            throw new MaatOrchestrationException(request.getApplicationDTO());
         }
         return application;
     }

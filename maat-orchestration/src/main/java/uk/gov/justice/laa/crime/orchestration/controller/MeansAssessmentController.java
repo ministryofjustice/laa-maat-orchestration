@@ -16,6 +16,7 @@ import uk.gov.justice.laa.crime.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.MeansAssessmentOrchestrationService;
 
 import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_ID;
@@ -28,6 +29,7 @@ import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_
 public class MeansAssessmentController {
 
     private final MeansAssessmentOrchestrationService assessmentOrchestrationService;
+    private static final int REQUEST_ROLLED_BACK = 555;
 
     @GetMapping(value = "/{financialAssessmentId}/applicantId/{applicantId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Find Crime Means Assessment")
@@ -58,7 +60,13 @@ public class MeansAssessmentController {
             @Valid @RequestBody WorkflowRequest workflowRequest,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
         log.info("Received request to create means assessment with transaction id - {}", laaTransactionId);
-        return ResponseEntity.ok(assessmentOrchestrationService.create(workflowRequest));
+        ApplicationDTO applicationDTO;
+        try {
+            applicationDTO = assessmentOrchestrationService.create(workflowRequest);
+        } catch (MaatOrchestrationException ex) {
+            return ResponseEntity.status(REQUEST_ROLLED_BACK).body(ex.getApplicationDTO());
+        }
+        return ResponseEntity.ok(applicationDTO);
     }
 
 
@@ -74,7 +82,13 @@ public class MeansAssessmentController {
             @Valid @RequestBody WorkflowRequest workflowRequest,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
         log.info("Received request to update means assessment with transaction id - {}", laaTransactionId);
-        return ResponseEntity.ok(assessmentOrchestrationService.update(workflowRequest));
+        ApplicationDTO applicationDTO;
+        try {
+            applicationDTO = assessmentOrchestrationService.update(workflowRequest);
+        } catch (MaatOrchestrationException ex) {
+            return ResponseEntity.status(REQUEST_ROLLED_BACK).body(ex.getApplicationDTO());
+        }
+        return ResponseEntity.ok(applicationDTO);
     }
 
 }

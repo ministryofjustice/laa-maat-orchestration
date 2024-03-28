@@ -175,7 +175,7 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
-    void givenErrorCallingMaatApi_whenCreateIsInvoked_thenInternalServerErrorIsReturned() throws Exception {
+    void givenErrorCallingMaatApi_whenCreateIsInvoked_thenServerErrorIsReturned() throws Exception {
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
         String cmaRollbackResponse = objectMapper.writeValueAsString(new ApiRollbackMeansAssessmentResponse());
 
@@ -185,7 +185,7 @@ class MeansAssessmentIntegrationTest {
         stubForRollbackMeansAssessment(cmaRollbackResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().is5xxServerError());
     }
 
     @Test
@@ -240,7 +240,7 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
-    void givenErrorCallingMaatApi_whenUpdateIsInvoked_thenInternalServerErrorIsReturned() throws Exception {
+    void givenErrorCallingMaatApi_whenUpdateIsInvoked_thenServerErrorIsReturned() throws Exception {
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
         String cmaRollbackResponse = objectMapper.writeValueAsString(new ApiRollbackMeansAssessmentResponse());
 
@@ -250,6 +250,6 @@ class MeansAssessmentIntegrationTest {
         stubForRollbackMeansAssessment(cmaRollbackResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().is5xxServerError());
     }
 }
