@@ -19,18 +19,17 @@ class LocalDateTimeDeserializerTest {
     private final ObjectMapper mapper = new ObjectMapper();
     private final LocalDateTimeDeserializer deserializer = new LocalDateTimeDeserializer();
 
+    private static final String ISO_DATE = "2024-01-27T10:15:30";
+
     @Test
     void givenValidDate_whenDeserializeIsInvoked_thenLocalDateTimeIsDeserialized() throws IOException {
-        JsonParser parser = factory.createParser("1633027200000");
+        String content = String.format("\"%s\"", ISO_DATE);
+        JsonParser parser = factory.createParser(content);
         parser.setCodec(mapper);
         parser.nextToken();
 
+        LocalDateTime expected = LocalDateTime.of(2024, 1, 27, 10, 15, 30);
         LocalDateTime result = deserializer.deserialize(parser, mapper.getDeserializationContext());
-
-        LocalDateTime expected =
-                ZonedDateTime.ofInstant(Instant.ofEpochMilli(1633027200000L), ZoneId.systemDefault())
-                        .toLocalDateTime();
-
         assertThat(result).isEqualTo(expected);
     }
 }
