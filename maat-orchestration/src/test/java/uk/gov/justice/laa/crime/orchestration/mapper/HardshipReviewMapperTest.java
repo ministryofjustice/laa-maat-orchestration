@@ -40,11 +40,13 @@ class HardshipReviewMapperTest {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.CROWN_COURT);
 
         ApiPerformHardshipRequest apiPerformHardshipRequest =
-                hardshipMapper.workflowRequestToPerformHardshipRequest(workflowRequest, false);
+                hardshipMapper.workflowRequestToPerformHardshipRequest(workflowRequest, true);
         HardshipReview actualHardship = apiPerformHardshipRequest.getHardship();
 
         softly.assertThat(actualHardship.getCourtType())
                 .isEqualTo(CourtType.CROWN_COURT);
+        softly.assertThat(actualHardship.getTotalAnnualDisposableIncome().doubleValue())
+                .isEqualTo(workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getTotalAnnualDisposableIncome());
     }
 
     @Test
