@@ -6,12 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class LocalDateTimeDeserializerTest {
 
@@ -31,5 +29,28 @@ class LocalDateTimeDeserializerTest {
         LocalDateTime expected = LocalDateTime.of(2024, 1, 27, 10, 15, 30);
         LocalDateTime result = deserializer.deserialize(parser, mapper.getDeserializationContext());
         assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    void givenNullDate_whenDeserializeIsInvoked_thenNullIsReturned() throws IOException {
+        String content = "\"null\"";
+        JsonParser parser = factory.createParser(content);
+        parser.setCodec(mapper);
+        parser.nextToken();
+
+        LocalDateTime result = deserializer.deserialize(parser, mapper.getDeserializationContext());
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void givenInvalidDate_whenDeserializeIsInvoked_thenExceptionIsThrown() throws IOException {
+        String content = "\"invalid-date\"";
+        JsonParser parser = factory.createParser(content);
+        parser.setCodec(mapper);
+        parser.nextToken();
+
+        assertThatThrownBy(() -> deserializer.deserialize(parser, mapper.getDeserializationContext()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Invalid date value: invalid-date");
     }
 }
