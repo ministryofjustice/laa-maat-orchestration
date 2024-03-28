@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 public class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
 
@@ -15,8 +15,7 @@ public class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
     public LocalDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws
             IOException {
 
-        long value = jsonParser.getValueAsLong();
-        Instant instant = Instant.ofEpochMilli(value);
-        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        String dateTime = jsonParser.getValueAsString();
+        return LocalDateTime.parse(dateTime, ISO_LOCAL_DATE_TIME);
     }
 }
