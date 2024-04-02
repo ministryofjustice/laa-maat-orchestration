@@ -480,6 +480,7 @@ public class TestModelDataBuilder {
                 .repOrderDecision(getRepOrderDecisionDTO())
                 .iojResult(RESULT_PASS)
                 .assessmentSummary(Collections.emptyList())
+                .timestamp(APPLICATION_TIMESTAMP)
                 .build();
     }
 
@@ -662,6 +663,7 @@ public class TestModelDataBuilder {
                 .caseManagementUnitDTO(getCaseManagementUnitDTO())
                 .crownCourtOverviewDTO(CrownCourtOverviewDTO.builder().build())
                 .statusDTO(getRepStatusDTO())
+                .timestamp(APPLICATION_TIMESTAMP)
                 .assessmentDTO(
                         AssessmentDTO.builder()
                                 .financialAssessmentDTO(getFinancialAssessmentDTO(courtType))
