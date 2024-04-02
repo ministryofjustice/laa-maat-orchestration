@@ -30,13 +30,14 @@ public class HardshipMapper {
 
     private final UserMapper userMapper;
 
-    public ApiPerformHardshipRequest workflowRequestToPerformHardshipRequest(WorkflowRequest workflowRequest) {
+    public ApiPerformHardshipRequest workflowRequestToPerformHardshipRequest(WorkflowRequest workflowRequest, boolean isCreate) {
         UserDTO userDTO = workflowRequest.getUserDTO();
         ApplicationDTO application = workflowRequest.getApplicationDTO();
         HardshipReviewDTO current = getHardshipReviewDTO(application, workflowRequest.getCourtType());
+
         HardshipReview hardship = new HardshipReview()
                 .withCourtType(workflowRequest.getCourtType())
-                .withTotalAnnualDisposableIncome(current.getDisposableIncome())
+                .withTotalAnnualDisposableIncome(getTotalAnnualDisposableIncome(current, application, isCreate))
                 .withReviewDate(toLocalDateTime(current.getReviewDate()))
                 .withExtraExpenditure(hrSectionDtosToExtraExpenditures(current.getSection()))
                 .withDeniedIncome(hrSectionDtosToDeniedIncomes(current.getSection()))
@@ -61,6 +62,12 @@ public class HardshipMapper {
                 .withHardshipMetadata(metadata);
     }
 
+    private BigDecimal getTotalAnnualDisposableIncome(HardshipReviewDTO current, ApplicationDTO applicationDTO, boolean isCreate) {
+        return isCreate ?
+                BigDecimal.valueOf(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFull().getTotalAnnualDisposableIncome())
+                : current.getDisposableIncome();
+    }
+
     public HardshipReviewDTO getHardshipReviewDTO(ApplicationDTO application, CourtType courtType) {
         HardshipOverviewDTO hardshipOverview =
                 application.getAssessmentDTO()
@@ -79,7 +86,7 @@ public class HardshipMapper {
                         .withAmount(detail.getAmountNumber())
                         .withFrequency(Frequency.getFrom(detail.getFrequency().getCode()))
                         .withAccepted(detail.isAccepted())
-                        .withReasonCode(HardshipReviewDetailReason.getFrom(detail.getReason().getReason()))
+                        .withReasonCode(HardshipReviewDetailReason.getFrom(detail.getReason().getId().intValue()))
                         .withDescription(detail.getOtherDescription())
                         .withItemCode(ExtraExpenditureDetailCode.getFrom(detail.getDetailDescription().getCode()))
                 ).toList();
@@ -93,7 +100,7 @@ public class HardshipMapper {
                         .withAccepted(detail.isAccepted())
                         .withReasonNote(detail.getHrReasonNote())
                         .withDescription(detail.getOtherDescription())
-                        .withItemCode(DeniedIncomeDetailCode.getFrom(detail.getReason().getReason()))
+                        .withItemCode(DeniedIncomeDetailCode.getFrom(detail.getDetailDescription().getCode()))
                 ).toList();
     }
 
@@ -206,7 +213,7 @@ public class HardshipMapper {
     private HRReasonDTO hardshipReviewDetailReasonToHrReasonDto(HardshipReviewDetailReason detailReason) {
         if (detailReason != null) {
             return HRReasonDTO.builder()
-                    .reason(detailReason.getReason())
+                    .id((long) detailReason.getId())
                     .build();
         }
         // Mimic Maat, create empty object

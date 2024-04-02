@@ -38,7 +38,6 @@ import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
 public class TestModelDataBuilder {
     public static final Integer REP_ID = 200;
     public static final Action TEST_ACTION = Action.CREATE_ASSESSMENT;
-    public static final String RT_CODE = "DEF";
     public static final String RT_CODE_ER = "ER";
     private static final Integer EVIDENCE_ID = 9552473;
     private static final String INCOME_EVIDENCE_DESCRIPTION = "Tax Return";
@@ -522,7 +521,7 @@ public class TestModelDataBuilder {
 
     public static ApplicantDTO getApplicantDTO() {
         return ApplicantDTO.builder()
-                .id(Long.valueOf(1000))
+                .id(1000L)
                 .applicantHistoryId(APPLICANT_HISTORY_ID.longValue())
                 .employmentStatusDTO(getEmploymentStatusDTO())
                 .build();
@@ -697,6 +696,7 @@ public class TestModelDataBuilder {
                 .result(RESULT_PASS)
                 .assessmnentStatusDTO(getAssessmentStatusDTO())
                 .otherHousingNote(OTHER_HOUSING_NOTES)
+                .totalAnnualDisposableIncome(Constants.DISPOSABLE_INCOME.doubleValue())
                 .build();
     }
 
@@ -934,7 +934,7 @@ public class TestModelDataBuilder {
                                                 .otherDescription(HARDSHIP_OTHER_DESCRIPTION)
                                                 .reason(
                                                         HRReasonDTO.builder()
-                                                                .reason(HardshipReviewDetailReason.EVIDENCE_SUPPLIED.getReason())
+                                                                .id((long) HardshipReviewDetailReason.EVIDENCE_SUPPLIED.getId())
                                                                 .build())
                                                 .build()
                                 )
@@ -1139,20 +1139,6 @@ public class TestModelDataBuilder {
                 .roleActions(roleActions)
                 .newWorkReasons(List.of(newWorkReason.getCode()))
                 .reservationsEntity(getReservationsDTO())
-                .build();
-    }
-
-    public static uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO getMaatApiFinancialAssessmentDTO() {
-        return uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO.builder()
-                .id(Constants.FINANCIAL_ASSESSMENT_ID)
-                .fassInitStatus(CurrentStatus.COMPLETE.getStatus())
-                .fassFullStatus(CurrentStatus.COMPLETE.getStatus())
-                .assessmentType(AssessmentType.FULL.getType())
-                .initResult(RESULT_PASS)
-                .fullResult(RESULT_PASS)
-                .initialAssessmentDate(INITIAL_ASSESSMENT_DATE)
-                .fullAssessmentDate(FULL_ASSESSMENT_DATE)
-                .rtCode(RT_CODE)
                 .build();
     }
 

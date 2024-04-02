@@ -26,13 +26,13 @@ public class HardshipService {
 
     public ApiPerformHardshipResponse create(WorkflowRequest request) {
         ApiPerformHardshipRequest performHardshipRequest =
-                hardshipMapper.workflowRequestToPerformHardshipRequest(request);
+                hardshipMapper.workflowRequestToPerformHardshipRequest(request, true);
         return hardshipApiService.create(performHardshipRequest);
     }
 
     public void update(WorkflowRequest request) {
         ApiPerformHardshipRequest performHardshipRequest =
-                hardshipMapper.workflowRequestToPerformHardshipRequest(request);
+                hardshipMapper.workflowRequestToPerformHardshipRequest(request, false);
         ApiPerformHardshipResponse apiPerformHardshipResponse = hardshipApiService.update(performHardshipRequest);
         hardshipMapper.performHardshipResponseToApplicationDTO(
                 apiPerformHardshipResponse, request.getApplicationDTO(), request.getCourtType()
