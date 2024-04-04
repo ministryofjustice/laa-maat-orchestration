@@ -98,4 +98,14 @@ env:
         secretKeyRef:
             name: maat-api-oauth-client-secret
             key: MAAT_API_OAUTH_CLIENT_SECRET
+  - name: CAT_API_OAUTH_CLIENT_ID
+    valueFrom:
+        secretKeyRef:
+            name: cat-api-oauth-client-id
+            key: CAT_API_OAUTH_CLIENT_ID
+  - name: CAT_API_OAUTH_CLIENT_SECRET
+    valueFrom:
+        secretKeyRef:
+            name: cat-api-oauth-client-secret
+            key: CAT_API_OAUTH_CLIENT_SECRET
 {{- end -}}
