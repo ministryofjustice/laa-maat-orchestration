@@ -17,7 +17,9 @@ class LocalDateTimeDeserializerTest {
     private final ObjectMapper mapper = new ObjectMapper();
     private final LocalDateTimeDeserializer deserializer = new LocalDateTimeDeserializer();
 
-    private static final String ISO_DATE = "2024-01-27T10:15:30";
+    private static final String ISO_DATE = "2024-01-27T10:15:30.342+00:00";
+    private static final String TIME_STAMP = "2024-04-08T10:57:27.604182";
+    private static final String LOCAL_DATE_TIME = "2024-04-08T10:57:27";
 
     @Test
     void givenValidDate_whenDeserializeIsInvoked_thenLocalDateTimeIsDeserialized() throws IOException {
@@ -27,6 +29,30 @@ class LocalDateTimeDeserializerTest {
         parser.nextToken();
 
         LocalDateTime expected = LocalDateTime.of(2024, 1, 27, 10, 15, 30);
+        LocalDateTime result = deserializer.deserialize(parser, mapper.getDeserializationContext());
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    void givenValidDateWithNanoSeconds_whenDeserializeIsInvoked_thenLocalDateTimeIsDeserialized() throws IOException {
+        String content = String.format("\"%s\"", TIME_STAMP);
+        JsonParser parser = factory.createParser(content);
+        parser.setCodec(mapper);
+        parser.nextToken();
+
+        LocalDateTime expected = LocalDateTime.of(2024, 4, 8, 10, 57, 27);
+        LocalDateTime result = deserializer.deserialize(parser, mapper.getDeserializationContext());
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    void givenValidLocalDateTime_whenDeserializeIsInvoked_thenLocalDateTimeIsDeserialized() throws IOException {
+        String content = String.format("\"%s\"", LOCAL_DATE_TIME);
+        JsonParser parser = factory.createParser(content);
+        parser.setCodec(mapper);
+        parser.nextToken();
+
+        LocalDateTime expected = LocalDateTime.of(2024, 4, 8, 10, 57, 27);
         LocalDateTime result = deserializer.deserialize(parser, mapper.getDeserializationContext());
         assertThat(result).isEqualTo(expected);
     }
