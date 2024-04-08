@@ -102,8 +102,10 @@ class HardshipIntegrationTest {
         stubForOAuth();
         stubForGetUserSummary(objectMapper.writeValueAsString(TestModelDataBuilder.getUserSummaryDTO(CREATE_ROLE_ACTIONS, NewWorkReason.NEW)));
         stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE))
+                .replace("10:15:30", "10:15:30.423+00:00");
         mvc.perform(buildRequestGivenContent(HttpMethod.POST,
-                        objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL))
+                        requestBody, ENDPOINT_URL))
                 .andExpect(status().is5xxServerError());
         verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
         verify(exactly(1), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
@@ -114,8 +116,10 @@ class HardshipIntegrationTest {
         stubForOAuth();
         stubForGetUserSummary(objectMapper.writeValueAsString(TestModelDataBuilder.getUserSummaryDTO(null, NewWorkReason.NEW)));
         stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE))
+                .replace("10:15:30", "10:15:30.423+00:00");
         mvc.perform(buildRequestGivenContent(HttpMethod.POST,
-                        objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL))
+                        requestBody, ENDPOINT_URL))
                 .andExpect(status().is5xxServerError());
         verify(exactly(1), getRequestedFor(urlPathMatching("/api/internal/v1/users/summary/.*")));
         verify(exactly(0), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
@@ -126,7 +130,9 @@ class HardshipIntegrationTest {
 
         stubForCreateHardship();
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.POST, objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL))
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE))
+                .replace("10:15:30", "10:15:30.423+00:00");
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.crownCourtOverviewDTO.contribution.monthlyContribs").value(150.0));
 
@@ -144,8 +150,10 @@ class HardshipIntegrationTest {
     void givenAValidContentAndIfAnyException_whenUpdateIsInvoked_thenShouldRollback() throws Exception {
         stubForOAuth();
         stubForUpdateHardship();
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.CROWN_COURT))
+                .replace("10:15:30", "10:15:30.423+00:00");
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT,
-                        objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.CROWN_COURT)), ENDPOINT_URL))
+                        requestBody, ENDPOINT_URL))
                 .andExpect(status().is5xxServerError());
         verify(exactly(1), putRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
         verify(exactly(1), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
@@ -157,8 +165,10 @@ class HardshipIntegrationTest {
         stubForOAuth();
         stubForGetUserSummary(objectMapper.writeValueAsString(TestModelDataBuilder.getUserSummaryDTO(null, NewWorkReason.NEW)));
         stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE))
+                .replace("10:15:30", "10:15:30.423+00:00");
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT,
-                        objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL))
+                        requestBody, ENDPOINT_URL))
                 .andExpect(status().is5xxServerError());
         verify(exactly(1), getRequestedFor(urlPathMatching("/api/internal/v1/users/summary/.*")));
         verify(exactly(0), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
@@ -167,8 +177,10 @@ class HardshipIntegrationTest {
     @Test
     void givenAValidContent_whenUpdateIsInvoked_thenShouldSuccess() throws Exception {
         stubForUpdateHardship();
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE))
+                .replace("10:15:30", "10:15:30.423+00:00");
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT,
-                        objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)),
+                        requestBody,
                         ENDPOINT_URL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -185,7 +197,9 @@ class HardshipIntegrationTest {
                                 .withBody(objectMapper.writeValueAsString(TestModelDataBuilder.getApiPerformHardshipResponse()))
                 )
         );
-        stubForInvokeStoredProcedure(objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO()));
+        String applicationDto = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO())
+                .replace("10:15:30", "10:15:30.423+00:00");
+        stubForInvokeStoredProcedure(applicationDto);
         stubForCheckContributionsRule();
         stubForCalculateContributions(objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
         stubForGetContributionsSummary(objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary())));
@@ -221,7 +235,9 @@ class HardshipIntegrationTest {
                                 .withBody(objectMapper.writeValueAsString(TestModelDataBuilder.getApiFindHardshipResponse()))
                 )
         );
-        stubForInvokeStoredProcedure(objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO()));
+        String applicationDto = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO())
+                .replace("10:15:30", "10:15:30.423+00:00");
+        stubForInvokeStoredProcedure(applicationDto);
         stubForCheckContributionsRule();
         stubForCalculateContributions(objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
         stubForGetContributionsSummary(objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary())));

@@ -76,8 +76,10 @@ class HardshipControllerTest {
         when(orchestrationService.create(any(WorkflowRequest.class)))
                 .thenReturn(new ApplicationDTO());
 
-        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, objectMapper.writeValueAsString(
-                        TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL, true))
+        String requestBody = objectMapper.writeValueAsString(
+                TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE))
+                .replace("10:15:30", "10:15:30.423+00:00");
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
@@ -93,8 +95,10 @@ class HardshipControllerTest {
         when(orchestrationService.create(any(WorkflowRequest.class)))
                 .thenThrow(new APIClientException());
 
-        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, objectMapper.writeValueAsString(
-                        TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL, true))
+        String requestBody = objectMapper.writeValueAsString(
+                TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE))
+                .replace("10:15:30", "10:15:30.423+00:00");
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
@@ -105,8 +109,10 @@ class HardshipControllerTest {
         when(orchestrationService.update(any(WorkflowRequest.class)))
                 .thenReturn(new ApplicationDTO());
 
-        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, objectMapper.writeValueAsString(
-                        TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL, true))
+        String requestBody = objectMapper.writeValueAsString(
+                TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE))
+                .replace("10:15:30", "10:15:30.423+00:00");
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
@@ -123,8 +129,10 @@ class HardshipControllerTest {
         when(orchestrationService.update(any(WorkflowRequest.class)))
                 .thenThrow(new APIClientException());
 
-        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, objectMapper.writeValueAsString(
-                        TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE)), ENDPOINT_URL, true))
+        String requestBody = objectMapper.writeValueAsString(
+                TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE))
+                .replace("10:15:30", "10:15:30.423+00:00");
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
