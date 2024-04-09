@@ -23,7 +23,6 @@ import java.util.*;
 
 import static uk.gov.justice.laa.crime.orchestration.data.Constants.FINANCIAL_ASSESSMENT_ID;
 import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
-import static uk.gov.justice.laa.crime.util.DateUtil.toTimeStamp;
 
 @Component
 public class MeansAssessmentDataBuilder {
@@ -103,7 +102,8 @@ public class MeansAssessmentDataBuilder {
     public static final String CRITERIA_DETAIL_CODE = "Mock assessment detail code";
     public static final String ASSESSMENT_DESCRIPTION = "Mock assessment description";
     public static final BigDecimal PARTNER_AMOUNT = BigDecimal.valueOf(2000);
-    private static final LocalDateTime DATE_MODIFIED = LocalDateTime.of(2023, 10, 13, 0, 0, 0);
+    private static final LocalDateTime DATE_MODIFIED = LocalDateTime.of(2023, 10, 13, 10, 15, 30);
+    private static final LocalDateTime TIME_STAMP =  LocalDateTime.parse("2023-10-13T10:15:30");
     public static final String SECTION = "INITA";
     public static final Integer INIT_MEANS_ID = 90;
     private static final LocalDateTime PARTNER_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2020, 9, 13, 0, 0, 0);
@@ -306,7 +306,7 @@ public class MeansAssessmentDataBuilder {
                 .detailCode(CRITERIA_DETAIL_CODE)
                 .partnerAmount(PARTNER_AMOUNT.doubleValue())
                 .partnerFrequency(getFrequencyDTO(PARTNER_FREQUENCY))
-                .timestamp(DATE_MODIFIED)
+                .timestamp(TIME_STAMP)
                 .build();
     }
 
@@ -401,7 +401,7 @@ public class MeansAssessmentDataBuilder {
                 .dateReceived(toDate(DATETIME_RECEIVED))
                 .otherText(OTHER_DESCRIPTION)
                 .mandatory(true)
-                .timestamp(DATE_MODIFIED)
+                .timestamp(TIME_STAMP)
                 .build();
     }
 
@@ -410,7 +410,7 @@ public class MeansAssessmentDataBuilder {
                 .id(APPLICANT_EVIDENCE_ID.longValue())
                 .evidenceTypeDTO(getEvidenceTypeDTO())
                 .dateReceived(toDate(APPLICANT_EVIDENCE_RECEIVED_DATE))
-                .timestamp(DATE_MODIFIED)
+                .timestamp(TIME_STAMP)
                 .build();
     }
 
@@ -419,7 +419,7 @@ public class MeansAssessmentDataBuilder {
                 .id(PARTNER_EVIDENCE_ID.longValue())
                 .evidenceTypeDTO(getEvidenceTypeDTO())
                 .dateReceived(toDate(PARTNER_EVIDENCE_RECEIVED_DATE))
-                .timestamp(DATE_MODIFIED)
+                .timestamp(TIME_STAMP)
                 .build();
     }
 

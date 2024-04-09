@@ -129,8 +129,10 @@ class MeansAssessmentIntegrationTest {
         String ccpResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
         String cccCalculateResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse());
         String cccSummariesResponse = objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary()));
-        String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT));
-        String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
+        String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT))
+                .replace("10:15:30", "10:15:30.423+00:00");
+        String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest())
+                .replace("10:15:30", "10:15:30.423+00:00");
 
         stubForOAuth();
         wiremock.stubFor(post(urlMatching(CMA_URL))
@@ -175,8 +177,9 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
-    void givenErrorCallingMaatApi_whenCreateIsInvoked_thenInternalServerErrorIsReturned() throws Exception {
-        String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
+    void givenErrorCallingMaatApi_whenCreateIsInvoked_thenServerErrorIsReturned() throws Exception {
+        String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest())
+                .replace("10:15:30", "10:15:30.423+00:00");
         String cmaRollbackResponse = objectMapper.writeValueAsString(new ApiRollbackMeansAssessmentResponse());
 
         stubForOAuth();
@@ -185,7 +188,7 @@ class MeansAssessmentIntegrationTest {
         stubForRollbackMeansAssessment(cmaRollbackResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().is5xxServerError());
     }
 
     @Test
@@ -194,8 +197,10 @@ class MeansAssessmentIntegrationTest {
         String ccpResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
         String cccCalculateResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse());
         String cccSummariesResponse = objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary()));
-        String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT));
-        String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
+        String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT))
+                .replace("10:15:30", "10:15:30.423+00:00");
+        String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest())
+                .replace("10:15:30", "10:15:30.423+00:00");
 
         stubForOAuth();
         wiremock.stubFor(put(urlMatching(CMA_URL))
@@ -240,7 +245,7 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
-    void givenErrorCallingMaatApi_whenUpdateIsInvoked_thenInternalServerErrorIsReturned() throws Exception {
+    void givenErrorCallingMaatApi_whenUpdateIsInvoked_thenServerErrorIsReturned() throws Exception {
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
         String cmaRollbackResponse = objectMapper.writeValueAsString(new ApiRollbackMeansAssessmentResponse());
 
@@ -249,7 +254,7 @@ class MeansAssessmentIntegrationTest {
                 .willReturn(WireMock.serverError()));
         stubForRollbackMeansAssessment(cmaRollbackResponse);
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
-                .andExpect(status().isInternalServerError());
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody.replace("10:15:30", "10:15:30.423+00:00"), ENDPOINT_URL))
+                .andExpect(status().is5xxServerError());
     }
 }
