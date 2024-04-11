@@ -100,7 +100,7 @@ public class MeansAssessmentDataBuilder {
     public static final String ASSESSMENT_DESCRIPTION = "Mock assessment description";
     public static final BigDecimal PARTNER_AMOUNT = BigDecimal.valueOf(2000);
     private static final LocalDateTime DATE_MODIFIED = LocalDateTime.of(2023, 10, 13, 10, 15, 30);
-    private static final ZonedDateTime TIME_STAMP =  ZonedDateTime.parse("2023-10-13T10:15:30+01:00");
+    private static final ZonedDateTime TIME_STAMP =  ZonedDateTime.parse("2023-10-13T10:15:30+00:00");
     public static final String SECTION = "INITA";
     public static final Integer INIT_MEANS_ID = 90;
     private static final LocalDateTime PARTNER_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2020, 9, 13, 0, 0, 0);
