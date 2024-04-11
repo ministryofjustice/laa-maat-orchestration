@@ -42,12 +42,11 @@ class MeansAssessmentMapperTest {
 
         softly.assertThat(actual)
                 .usingRecursiveComparison()
-                .ignoringCollectionOrder()
-//                .ignoringFields("incomeEvidence.applicantIncomeEvidenceList",
-//                        "incomeEvidence.partnerIncomeEvidenceList",
-//                        "incomeEvidence.extraEvidenceList",
-//                        "full.sectionSummaries",
-//                        "initial.sectionSummaries")
+                .ignoringFields("incomeEvidence.applicantIncomeEvidenceList",
+                        "incomeEvidence.partnerIncomeEvidenceList",
+                        "incomeEvidence.extraEvidenceList",
+                        "full.sectionSummaries",
+                        "initial.sectionSummaries")
                 .isEqualTo(expected);
 
         compareIncomeEvidenceFields(actual.getIncomeEvidence().getApplicantIncomeEvidenceList(),
@@ -74,7 +73,7 @@ class MeansAssessmentMapperTest {
         softly.assertThat(actualSectionSummaryDTO.getAssessmentDetail().stream().findFirst())
                 .usingRecursiveComparison()
                 .ignoringCollectionOrder()
-                .ignoringFields("value.timestamp")
+//                .ignoringFields("value.timestamp")
                 .isEqualTo(expectedSectionSummaryDTO.getAssessmentDetail().stream().findFirst());
     }
     private void compareIncomeEvidenceFields(Collection<EvidenceDTO> actual, Collection<EvidenceDTO> expected) {
