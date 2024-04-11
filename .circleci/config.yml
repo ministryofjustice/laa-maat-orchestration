@@ -25,7 +25,7 @@ executors:
     working_directory: ~/laa-maat-orchestration/maat-orchestration
   build-executor:
     docker:
-      - image: cimg/openjdk:17.0.4
+      - image: cimg/openjdk:17.0.9
     working_directory: ~/laa-maat-orchestration/maat-orchestration
 
 # ------------------
