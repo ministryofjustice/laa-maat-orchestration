@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -94,8 +95,8 @@ public class ValidationService {
         LocalDateTime repOrderCreatedDate = DateUtil.convertDateToDateTime(repOrderDTO.getDateCreated());
         LocalDateTime repOrderUpdatedDate = repOrderDTO.getDateModified();
         LocalDateTime repOrderTimestamp = (null != repOrderUpdatedDate) ? repOrderUpdatedDate : repOrderCreatedDate;
-        LocalDateTime applicationTimestamp = request.getApplicationDTO().getTimestamp();
-        if (applicationTimestamp != null && !applicationTimestamp.isEqual(repOrderTimestamp)) {
+        ZonedDateTime applicationTimestamp = request.getApplicationDTO().getTimestamp();
+        if (applicationTimestamp != null && !applicationTimestamp.toLocalDateTime().isEqual(repOrderTimestamp)) {
             throw new ValidationException(CANNOT_MODIFY_APPLICATION_ERROR);
         }
     }

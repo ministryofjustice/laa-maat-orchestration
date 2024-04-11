@@ -10,7 +10,7 @@ import uk.gov.justice.laa.crime.orchestration.model.crown_court.*;
 import uk.gov.justice.laa.crime.util.DateUtil;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
-import java.util.UUID;
+import java.time.ZoneId;
 
 @Component
 @RequiredArgsConstructor
@@ -142,7 +142,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
     public ApplicationDTO updateApplicationResponseToApplicationDto(ApiUpdateApplicationResponse response,
                                                                     ApplicationDTO application) {
 
-        application.setTimestamp(response.getModifiedDateTime());
+        application.setTimestamp(response.getModifiedDateTime().atZone(ZoneId.systemDefault()));
         CrownCourtSummaryDTO crownCourtSummary = application.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO();
         crownCourtSummary.setCcRepOrderDate(DateUtil.toDate(response.getCrownRepOrderDate()));
         crownCourtSummary.setRepOrderDecision(new SysGenString(response.getCrownRepOrderDecision()));
@@ -154,7 +154,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
     public ApplicationDTO updateCrownCourtResponseToApplicationDto(ApiUpdateCrownCourtResponse response,
                                                                    ApplicationDTO application) {
 
-        application.setTimestamp(response.getModifiedDateTime());
+        application.setTimestamp(response.getModifiedDateTime().atZone(ZoneId.systemDefault()));
         application.getCrownCourtOverviewDTO().setCrownCourtSummaryDTO(
                 apiCrownCourtSummaryToCrownCourtSummaryDto(response.getCrownCourtSummary())
         );

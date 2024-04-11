@@ -97,7 +97,7 @@ class ProceedingsMapperTest {
         CrownCourtSummaryDTO updatedCrownCourtSummaryDTO =
                 updatedApplicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO();
 
-        softly.assertThat(updatedApplicationDTO.getTimestamp())
+        softly.assertThat(updatedApplicationDTO.getTimestamp().toLocalDateTime())
                 .isEqualTo(updateApplicationResponse.getModifiedDateTime());
 
         softly.assertThat(updatedCrownCourtSummaryDTO.getCcRepOrderDate())
@@ -126,7 +126,7 @@ class ProceedingsMapperTest {
         CrownCourtSummaryDTO crownCourtSummaryDTO =
                 application.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO();
 
-        softly.assertThat(application.getTimestamp())
+        softly.assertThat(application.getTimestamp().toLocalDateTime())
                 .isEqualTo(updateCrownCourtResponse.getModifiedDateTime());
 
         softly.assertThat(crownCourtSummaryDTO.getCcRepId())
