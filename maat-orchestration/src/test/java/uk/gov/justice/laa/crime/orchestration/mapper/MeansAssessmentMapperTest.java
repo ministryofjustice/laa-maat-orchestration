@@ -63,7 +63,7 @@ class MeansAssessmentMapperTest {
     }
 
     private void compareSectionSummariesFields(Collection<AssessmentSectionSummaryDTO> actual, Collection<AssessmentSectionSummaryDTO> expected) {
-        assertThat(actual.size()).isEqualTo(expected.size());
+        assertThat(actual).hasSameSizeAs(expected);
         AssessmentSectionSummaryDTO actualSectionSummaryDTO = actual.stream().findFirst().get();
         AssessmentSectionSummaryDTO expectedSectionSummaryDTO = expected.stream().findFirst().get();
         softly.assertThat(actualSectionSummaryDTO)
@@ -78,7 +78,7 @@ class MeansAssessmentMapperTest {
                 .isEqualTo(expectedSectionSummaryDTO.getAssessmentDetail().stream().findFirst());
     }
     private void compareIncomeEvidenceFields(Collection<EvidenceDTO> actual, Collection<EvidenceDTO> expected) {
-        assertThat(actual.size()).isEqualTo(expected.size());
+        assertThat(actual).hasSameSizeAs(expected);
         softly.assertThat(actual.stream().findFirst())
                 .usingRecursiveComparison()
                 .ignoringCollectionOrder()
@@ -87,7 +87,7 @@ class MeansAssessmentMapperTest {
     }
 
     private void compareExtraEvidenceFields(Collection<ExtraEvidenceDTO> actual, Collection<ExtraEvidenceDTO> expected) {
-        assertThat(actual.size()).isEqualTo(expected.size());
+        assertThat(actual).hasSameSizeAs(expected);
         softly.assertThat(actual.stream().findFirst())
                 .usingRecursiveComparison()
                 .ignoringCollectionOrder()
