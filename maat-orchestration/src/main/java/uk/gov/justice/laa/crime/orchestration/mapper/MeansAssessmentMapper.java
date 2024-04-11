@@ -12,6 +12,7 @@ import uk.gov.justice.laa.crime.orchestration.model.means_assessment.*;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -20,7 +21,6 @@ import java.util.UUID;
 import static java.util.Optional.ofNullable;
 import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
 import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
-import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -249,7 +249,8 @@ public class MeansAssessmentMapper {
         evidenceDTO.setId(ofNullable(apiIncomeEvidence.getId()).map(Integer::longValue).orElse(0L));
         evidenceDTO.setOtherDescription(apiIncomeEvidence.getOtherText());
         evidenceDTO.setDateReceived(toDate(apiIncomeEvidence.getDateReceived()));
-        evidenceDTO.setTimestamp(toZonedDateTime(apiIncomeEvidence.getDateModified()));
+//        evidenceDTO.setTimestamp(toZonedDateTime(apiIncomeEvidence.getDateModified()));
+        evidenceDTO.setTimestamp(apiIncomeEvidence.getDateModified().atZone(ZoneId.systemDefault()));
         return evidenceDTO;
     }
 
@@ -261,7 +262,7 @@ public class MeansAssessmentMapper {
         extraEvidenceDTO.setEvidenceTypeDTO(getEvidenceTypeDTO(apiIncomeEvidence.getApiEvidenceType()));
         extraEvidenceDTO.setMandatory(Boolean.valueOf(apiIncomeEvidence.getMandatory()));
         extraEvidenceDTO.setOtherText(apiIncomeEvidence.getOtherText());
-        extraEvidenceDTO.setTimestamp(toZonedDateTime(apiIncomeEvidence.getDateModified()));
+        extraEvidenceDTO.setTimestamp(apiIncomeEvidence.getDateModified().atZone(ZoneId.systemDefault()));
         return extraEvidenceDTO;
     }
 
@@ -382,7 +383,7 @@ public class MeansAssessmentMapper {
             assessmentDetailDTO.setApplicantAmount(ofNullable(apiAssessmentDetail.getApplicantAmount()).map(BigDecimal::doubleValue).orElse(0.0));
             assessmentDetailDTO.setCriteriaDetailsId(ofNullable(apiAssessmentDetail.getCriteriaDetailId()).map(Integer::longValue).orElse(0L));
             assessmentDetailDTO.setId(ofNullable(apiAssessmentDetail.getId()).map(Integer::longValue).orElse(0L));
-            assessmentDetailDTO.setTimestamp(toZonedDateTime(apiAssessmentDetail.getDateModified()));
+            assessmentDetailDTO.setTimestamp(apiAssessmentDetail.getDateModified().atZone(ZoneId.systemDefault()));
             assessmentDetailDTO.setApplicantFrequency(getFrequency(apiAssessmentDetail.getApplicantFrequency()));
             assessmentDetailDTO.setPartnerFrequency(getFrequency(apiAssessmentDetail.getPartnerFrequency()));
             assessmentDetailDTOS.add(assessmentDetailDTO);
@@ -403,11 +404,11 @@ public class MeansAssessmentMapper {
     public void meansAssessmentResponseToApplicationDto(final ApiMeansAssessmentResponse apiResponse, ApplicationDTO applicationDTO) {
         applicationDTO.setRepId(ofNullable(apiResponse.getRepId()).map(Integer::longValue).orElse(applicationDTO.getRepId()));
         if (apiResponse.getApplicationTimestamp() != null) {
-            applicationDTO.setTimestamp(toZonedDateTime(apiResponse.getApplicationTimestamp()));
+            applicationDTO.setTimestamp(apiResponse.getApplicationTimestamp().atZone(ZoneId.systemDefault()));
         }
         FinancialAssessmentDTO financialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO();
         financialAssessmentDTO.setId(ofNullable(apiResponse.getAssessmentId()).map(Integer::longValue).orElse(0L));
-        financialAssessmentDTO.setTimestamp(toZonedDateTime(apiResponse.getUpdated()));
+        financialAssessmentDTO.setTimestamp(apiResponse.getUpdated().atZone(ZoneId.systemDefault()));
 
         if (Boolean.TRUE.equals(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable())) {
             mapFullAssessmentDTO(financialAssessmentDTO.getFull(), apiResponse);

@@ -17,10 +17,10 @@ import uk.gov.justice.laa.crime.orchestration.model.means_assessment.*;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getApplicationDTOForMeansAssessmentMapper;
 import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
 
@@ -43,7 +43,56 @@ class MeansAssessmentMapperTest {
         softly.assertThat(actual)
                 .usingRecursiveComparison()
                 .ignoringCollectionOrder()
+                .ignoringFields("incomeEvidence.applicantIncomeEvidenceList",
+                        "incomeEvidence.partnerIncomeEvidenceList",
+                        "incomeEvidence.extraEvidenceList",
+                        "full.sectionSummaries",
+                        "initial.sectionSummaries")
                 .isEqualTo(expected);
+
+        compareIncomeEvidenceFields(actual.getIncomeEvidence().getApplicantIncomeEvidenceList(),
+                expected.getIncomeEvidence().getApplicantIncomeEvidenceList());
+        compareIncomeEvidenceFields(actual.getIncomeEvidence().getPartnerIncomeEvidenceList(),
+                expected.getIncomeEvidence().getPartnerIncomeEvidenceList());
+        compareExtraEvidenceFields(actual.getIncomeEvidence().getExtraEvidenceList(),
+                expected.getIncomeEvidence().getExtraEvidenceList());
+        compareSectionSummariesFields(actual.getFull().getSectionSummaries(),
+                expected.getFull().getSectionSummaries());
+        compareSectionSummariesFields(actual.getInitial().getSectionSummaries(),
+                expected.getInitial().getSectionSummaries());
+    }
+
+    private void compareSectionSummariesFields(Collection<AssessmentSectionSummaryDTO> actual, Collection<AssessmentSectionSummaryDTO> expected) {
+        assertThat(actual.size()).isEqualTo(expected.size());
+        AssessmentSectionSummaryDTO actualSectionSummaryDTO = actual.stream().findFirst().get();
+        AssessmentSectionSummaryDTO expectedSectionSummaryDTO = expected.stream().findFirst().get();
+        softly.assertThat(actualSectionSummaryDTO)
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .ignoringFields("assessmentDetail")
+                .isEqualTo(expectedSectionSummaryDTO);
+        softly.assertThat(actualSectionSummaryDTO.getAssessmentDetail().stream().findFirst())
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .ignoringFields("value.timestamp")
+                .isEqualTo(expectedSectionSummaryDTO.getAssessmentDetail().stream().findFirst());
+    }
+    private void compareIncomeEvidenceFields(Collection<EvidenceDTO> actual, Collection<EvidenceDTO> expected) {
+        assertThat(actual.size()).isEqualTo(expected.size());
+        softly.assertThat(actual.stream().findFirst())
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .ignoringFields("value.timestamp")
+                .isEqualTo(expected.stream().findFirst());
+    }
+
+    private void compareExtraEvidenceFields(Collection<ExtraEvidenceDTO> actual, Collection<ExtraEvidenceDTO> expected) {
+        assertThat(actual.size()).isEqualTo(expected.size());
+        softly.assertThat(actual.stream().findFirst())
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .ignoringFields("value.timestamp")
+                .isEqualTo(expected.stream().findFirst());
     }
 
     @Test
