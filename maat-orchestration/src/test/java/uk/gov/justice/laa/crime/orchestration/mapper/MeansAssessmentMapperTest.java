@@ -42,11 +42,11 @@ class MeansAssessmentMapperTest {
 
         softly.assertThat(actual)
                 .usingRecursiveComparison()
-                .ignoringFields("incomeEvidence.applicantIncomeEvidenceList",
-                        "incomeEvidence.partnerIncomeEvidenceList",
-                        "incomeEvidence.extraEvidenceList",
-                        "full.sectionSummaries",
-                        "initial.sectionSummaries")
+//                .ignoringFields("incomeEvidence.applicantIncomeEvidenceList",
+//                        "incomeEvidence.partnerIncomeEvidenceList",
+//                        "incomeEvidence.extraEvidenceList",
+//                        "full.sectionSummaries",
+//                        "initial.sectionSummaries")
                 .isEqualTo(expected);
 
         compareIncomeEvidenceFields(actual.getIncomeEvidence().getApplicantIncomeEvidenceList(),
