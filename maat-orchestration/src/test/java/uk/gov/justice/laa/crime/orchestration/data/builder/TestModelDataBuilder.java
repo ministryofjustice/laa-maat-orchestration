@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.*;
 import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
 
 @Component
 public class TestModelDataBuilder {
@@ -97,7 +98,7 @@ public class TestModelDataBuilder {
     private static final Integer CMU_ID = 50;
     private static final String OTHER_HOUSING_NOTES = "Other Housing Notes";
     private static final String ASSESSMENT_NOTES = "ASSESSMENT NOTES";
-    private static final ZonedDateTime APPLICATION_TIMESTAMP = ZonedDateTime.parse("2024-01-27T10:15:30.342+01:00");
+    private static final ZonedDateTime APPLICATION_TIMESTAMP = toZonedDateTime(LocalDateTime.parse("2024-01-27T10:15:30.342"));
     private static final LocalDateTime REP_ORDER_MODIFIED_TIMESTAMP = LocalDateTime.parse("2023-06-27T10:15:30");
     private static final LocalDate REP_ORDER_CREATED_TIMESTAMP = LocalDate.of(2024, Month.JANUARY, 8);
     private static final List<String> TEST_ROLE_ACTIONS = List.of("CREATE_ASSESSMENT");
