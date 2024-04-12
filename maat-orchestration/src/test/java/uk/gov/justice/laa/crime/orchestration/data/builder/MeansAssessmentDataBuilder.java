@@ -14,15 +14,13 @@ import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplica
 import uk.gov.justice.laa.crime.orchestration.model.means_assessment.*;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static uk.gov.justice.laa.crime.orchestration.data.Constants.FINANCIAL_ASSESSMENT_ID;
 import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
 
 @Component
 public class MeansAssessmentDataBuilder {
@@ -103,7 +101,7 @@ public class MeansAssessmentDataBuilder {
     public static final String ASSESSMENT_DESCRIPTION = "Mock assessment description";
     public static final BigDecimal PARTNER_AMOUNT = BigDecimal.valueOf(2000);
     private static final LocalDateTime DATE_MODIFIED = LocalDateTime.of(2023, 10, 13, 10, 15, 30);
-    private static final LocalDateTime TIME_STAMP =  LocalDateTime.parse("2023-10-13T10:15:30");
+    private static final ZonedDateTime TIME_STAMP =  toZonedDateTime(DATE_MODIFIED);
     public static final String SECTION = "INITA";
     public static final Integer INIT_MEANS_ID = 90;
     private static final LocalDateTime PARTNER_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2020, 9, 13, 0, 0, 0);

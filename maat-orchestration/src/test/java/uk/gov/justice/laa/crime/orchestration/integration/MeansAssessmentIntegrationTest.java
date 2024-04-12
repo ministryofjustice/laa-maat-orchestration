@@ -129,10 +129,8 @@ class MeansAssessmentIntegrationTest {
         String ccpResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
         String cccCalculateResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse());
         String cccSummariesResponse = objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary()));
-        String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT))
-                .replace("10:15:30", "10:15:30.423+00:00");
-        String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest())
-                .replace("10:15:30", "10:15:30.423+00:00");
+        String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT));
+        String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
 
         stubForOAuth();
         wiremock.stubFor(post(urlMatching(CMA_URL))
@@ -178,8 +176,7 @@ class MeansAssessmentIntegrationTest {
 
     @Test
     void givenErrorCallingMaatApi_whenCreateIsInvoked_thenServerErrorIsReturned() throws Exception {
-        String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest())
-                .replace("10:15:30", "10:15:30.423+00:00");
+        String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
         String cmaRollbackResponse = objectMapper.writeValueAsString(new ApiRollbackMeansAssessmentResponse());
 
         stubForOAuth();
@@ -197,10 +194,8 @@ class MeansAssessmentIntegrationTest {
         String ccpResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
         String cccCalculateResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse());
         String cccSummariesResponse = objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary()));
-        String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT))
-                .replace("10:15:30", "10:15:30.423+00:00");
-        String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest())
-                .replace("10:15:30", "10:15:30.423+00:00");
+        String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT));
+        String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
 
         stubForOAuth();
         wiremock.stubFor(put(urlMatching(CMA_URL))
@@ -254,7 +249,7 @@ class MeansAssessmentIntegrationTest {
                 .willReturn(WireMock.serverError()));
         stubForRollbackMeansAssessment(cmaRollbackResponse);
 
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody.replace("10:15:30", "10:15:30.423+00:00"), ENDPOINT_URL))
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
                 .andExpect(status().is5xxServerError());
     }
 }

@@ -4,15 +4,15 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uk.gov.justice.laa.crime.orchestration.jackson.LocalDateTimeDeserializer;
+import uk.gov.justice.laa.crime.commons.jackson.ZonedDateTimeDeserializer;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 public class GenericDTO {
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime timestamp;
+    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
+    private ZonedDateTime timestamp;
     private Boolean selected;
 }
