@@ -3,13 +3,13 @@ package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.Action;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
+import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.service.*;
@@ -64,7 +64,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             assessmentSummaryService.updateApplication(application, hardshipSummary);
         } catch (Exception ex) {
             hardshipService.rollback(request);
-            throw new APIClientException(ex.getMessage());
+            throw new MaatOrchestrationException(request.getApplicationDTO());
         }
         return application;
     }
@@ -96,7 +96,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             assessmentSummaryService.updateApplication(request.getApplicationDTO(), hardshipSummary);
         } catch (Exception ex) {
             hardshipService.rollback(request);
-            throw new APIClientException(ex.getMessage());
+            throw new MaatOrchestrationException(request.getApplicationDTO());
         }
         return request.getApplicationDTO();
     }

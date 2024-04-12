@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.commons.exception.APIClientException;
+import uk.gov.justice.laa.crime.orchestration.MAATOrchestrationApplication;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -15,6 +16,7 @@ import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
+import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.service.*;
@@ -238,7 +240,7 @@ class HardshipOrchestrationServiceTest {
                 .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
-                .isInstanceOf(APIClientException.class);
+                .isInstanceOf(MaatOrchestrationException.class);
         Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
@@ -256,7 +258,7 @@ class HardshipOrchestrationServiceTest {
                 .thenThrow(new APIClientException());
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
-                .isInstanceOf(APIClientException.class);
+                .isInstanceOf(MaatOrchestrationException.class);
         Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
@@ -277,7 +279,7 @@ class HardshipOrchestrationServiceTest {
                 .thenThrow(new APIClientException());
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
-                .isInstanceOf(APIClientException.class);
+                .isInstanceOf(MaatOrchestrationException.class);
         Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
@@ -463,7 +465,7 @@ class HardshipOrchestrationServiceTest {
         ))
                 .thenThrow(new APIClientException());
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
-                .isInstanceOf(APIClientException.class);
+                .isInstanceOf(MaatOrchestrationException.class);
         Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
@@ -480,7 +482,7 @@ class HardshipOrchestrationServiceTest {
         when(contributionService.calculate(workflowRequest))
                 .thenThrow(new APIClientException());
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
-                .isInstanceOf(APIClientException.class);
+                .isInstanceOf(MaatOrchestrationException.class);
         Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
