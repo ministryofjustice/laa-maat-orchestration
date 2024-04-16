@@ -1,19 +1,23 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 
 import java.util.Collection;
-import java.util.Date;
 
 @Slf4j
 @Service
 public class AssessmentSummaryService {
+
+    public static final String INITIAL_ASSESSMENT = "Initial Assessment";
+    public static final String FULL_MEANS_TEST = "Full Means Test";
 
     public AssessmentSummaryDTO getSummary(HardshipReviewDTO hardshipReviewDTO, CourtType courtType) {
         return AssessmentSummaryDTO.builder()
@@ -42,34 +46,26 @@ public class AssessmentSummaryService {
     }
 
     public AssessmentSummaryDTO getSummary(FinancialAssessmentDTO financialAssessmentDTO) {
-        String status = null;
-        String type = null;
-        String result = null;
-        Date assessmentDate = null;
-        String reviewType = null;
-
-        if (financialAssessmentDTO.getFullAvailable() != null && financialAssessmentDTO.getFullAvailable()) {
-            status = financialAssessmentDTO.getFull().getAssessmnentStatusDTO().getStatus();
-            type = "Full Means Test";
-            result = financialAssessmentDTO.getFull().getResult();
-            assessmentDate = financialAssessmentDTO.getFull().getAssessmentDate();
-            reviewType = financialAssessmentDTO.getInitial().getReviewType().getCode();
-        } else {
-            status = financialAssessmentDTO.getInitial().getAssessmnentStatusDTO().getStatus();
-            type = "Initial Assessment";
-            result = financialAssessmentDTO.getInitial().getResult();
-            assessmentDate = financialAssessmentDTO.getInitial().getAssessmentDate();
-            reviewType = financialAssessmentDTO.getInitial().getReviewType().getCode();
-
-        }
-
-        return AssessmentSummaryDTO.builder()
+        AssessmentSummaryDTO assessmentSummaryDTO = AssessmentSummaryDTO.builder()
                 .id(financialAssessmentDTO.getId())
-                .status(status)
-                .type(type)
-                .result(result)
-                .assessmentDate(assessmentDate)
-                .reviewType(reviewType)
+                .reviewType(financialAssessmentDTO.getInitial().getReviewType().getCode())
                 .build();
+
+        boolean isFullAvailable = Boolean.TRUE.equals(financialAssessmentDTO.getFullAvailable());
+        String fullAssessmentStatus = isFullAvailable ? financialAssessmentDTO.getFull().getAssessmnentStatusDTO().getStatus()
+                : "";
+        if (StringUtils.isNotBlank(fullAssessmentStatus)) {
+            assessmentSummaryDTO.setType(FULL_MEANS_TEST);
+            assessmentSummaryDTO.setStatus(CurrentStatus.getFrom(fullAssessmentStatus).getDescription());
+            assessmentSummaryDTO.setResult(financialAssessmentDTO.getFull().getResult());
+            assessmentSummaryDTO.setAssessmentDate(financialAssessmentDTO.getFull().getAssessmentDate());
+        } else {
+            assessmentSummaryDTO.setType(INITIAL_ASSESSMENT);
+            assessmentSummaryDTO.setStatus(CurrentStatus
+                    .getFrom(financialAssessmentDTO.getInitial().getAssessmnentStatusDTO().getStatus()).getDescription());
+            assessmentSummaryDTO.setResult(financialAssessmentDTO.getInitial().getResult());
+            assessmentSummaryDTO.setAssessmentDate(financialAssessmentDTO.getInitial().getAssessmentDate());
+        }
+        return assessmentSummaryDTO;
     }
 }

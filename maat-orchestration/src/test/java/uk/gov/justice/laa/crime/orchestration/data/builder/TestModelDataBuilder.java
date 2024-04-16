@@ -1148,7 +1148,7 @@ public class TestModelDataBuilder {
     public static AssessmentSummaryDTO getAssessmentSummaryDTOFromFullFinancialAssessment() {
         return AssessmentSummaryDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
-                .status(CurrentStatus.COMPLETE.getStatus())
+                .status(CurrentStatus.COMPLETE.getDescription())
                 .type("Full Means Test")
                 .result(RESULT_PASS)
                 .assessmentDate(ASSESSMENT_DATE)
@@ -1159,7 +1159,7 @@ public class TestModelDataBuilder {
     public static AssessmentSummaryDTO getAssessmentSummaryDTOFromInitFinancialAssessment() {
         return AssessmentSummaryDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
-                .status(CurrentStatus.COMPLETE.getStatus())
+                .status(CurrentStatus.COMPLETE.getDescription())
                 .type("Initial Assessment")
                 .result(RESULT_FAIL)
                 .reviewType(RT_CODE_ER)
