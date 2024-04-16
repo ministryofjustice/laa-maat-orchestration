@@ -106,4 +106,13 @@ class AssessmentSummaryServiceTest {
         assertThat(actual).isEqualTo(expected);
     }
 
+    @Test
+    void givenFinancialAssessmentDTOWithEmptyFullAssessmentStatus_whenGetSummaryIsInvoked_thenAssessmentSummaryIsReturned() {
+        FinancialAssessmentDTO financialAssessmentDTO = TestModelDataBuilder.getFinancialAssessmentDTO();
+        financialAssessmentDTO.setFullAvailable(true);
+        financialAssessmentDTO.getFull().getAssessmnentStatusDTO().setStatus("");
+        AssessmentSummaryDTO actual = assessmentSummaryService.getSummary(financialAssessmentDTO);
+        AssessmentSummaryDTO expected = TestModelDataBuilder.getAssessmentSummaryDTOFromInitFinancialAssessment();
+        assertThat(actual).isEqualTo(expected);
+    }
 }
