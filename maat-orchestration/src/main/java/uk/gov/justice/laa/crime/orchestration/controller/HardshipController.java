@@ -16,6 +16,7 @@ import uk.gov.justice.laa.crime.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.HardshipOrchestrationService;
 
 import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_ID;
@@ -28,6 +29,7 @@ import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_
 public class HardshipController {
 
     private final HardshipOrchestrationService orchestrationService;
+    private static final int REQUEST_ROLLED_BACK = 555;
 
     @GetMapping(value = "/{hardshipReviewId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Find Hardship review")
@@ -57,7 +59,13 @@ public class HardshipController {
             @Valid @RequestBody WorkflowRequest workflowRequest,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
         log.info("Received request to create hardship with transaction id - " + laaTransactionId);
-        return ResponseEntity.ok(orchestrationService.create(workflowRequest));
+        ApplicationDTO applicationDTO;
+        try {
+            applicationDTO = orchestrationService.create(workflowRequest);
+        } catch (MaatOrchestrationException ex) {
+            return ResponseEntity.status(REQUEST_ROLLED_BACK).body(ex.getApplicationDTO());
+        }
+        return ResponseEntity.ok(applicationDTO);
     }
 
 
@@ -73,7 +81,13 @@ public class HardshipController {
             @Valid @RequestBody WorkflowRequest workflowRequest,
             @Parameter(description = "Used for tracing calls") @RequestHeader(value = LAA_TRANSACTION_ID, required = false) String laaTransactionId) {
         log.info("Received request to update hardship with transaction id - " + laaTransactionId);
-        return ResponseEntity.ok(orchestrationService.update(workflowRequest));
+        ApplicationDTO applicationDTO;
+        try {
+            applicationDTO = orchestrationService.update(workflowRequest);
+        } catch (MaatOrchestrationException ex) {
+            return ResponseEntity.status(REQUEST_ROLLED_BACK).body(ex.getApplicationDTO());
+        }
+        return ResponseEntity.ok(applicationDTO);
     }
 
 }

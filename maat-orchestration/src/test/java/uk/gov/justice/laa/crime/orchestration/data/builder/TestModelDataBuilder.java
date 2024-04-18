@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.*;
 import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
 
 @Component
 public class TestModelDataBuilder {
@@ -97,7 +98,7 @@ public class TestModelDataBuilder {
     private static final Integer CMU_ID = 50;
     private static final String OTHER_HOUSING_NOTES = "Other Housing Notes";
     private static final String ASSESSMENT_NOTES = "ASSESSMENT NOTES";
-    private static final LocalDateTime APPLICATION_TIMESTAMP = LocalDateTime.parse("2024-01-27T10:15:30");
+    private static final ZonedDateTime APPLICATION_TIMESTAMP = toZonedDateTime(LocalDateTime.parse("2024-01-27T10:15:30.342"));
     private static final LocalDateTime REP_ORDER_MODIFIED_TIMESTAMP = LocalDateTime.parse("2023-06-27T10:15:30");
     private static final LocalDate REP_ORDER_CREATED_TIMESTAMP = LocalDate.of(2024, Month.JANUARY, 8);
     private static final List<String> TEST_ROLE_ACTIONS = List.of("CREATE_ASSESSMENT");
@@ -1046,7 +1047,7 @@ public class TestModelDataBuilder {
     }
 
     public static RepOrderDTO buildRepOrderDTO(String rorsStatus) {
-        return RepOrderDTO.builder().id(1000).dateModified(APPLICATION_TIMESTAMP).rorsStatus(rorsStatus).build();
+        return RepOrderDTO.builder().id(1000).dateModified(APPLICATION_TIMESTAMP.toLocalDateTime()).rorsStatus(rorsStatus).build();
     }
 
     public static UserSummaryDTO getUserSummaryDTO() {
@@ -1147,7 +1148,7 @@ public class TestModelDataBuilder {
     public static AssessmentSummaryDTO getAssessmentSummaryDTOFromFullFinancialAssessment() {
         return AssessmentSummaryDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
-                .status(CurrentStatus.COMPLETE.getStatus())
+                .status(CurrentStatus.COMPLETE.getDescription())
                 .type("Full Means Test")
                 .result(RESULT_PASS)
                 .assessmentDate(ASSESSMENT_DATE)
@@ -1158,7 +1159,7 @@ public class TestModelDataBuilder {
     public static AssessmentSummaryDTO getAssessmentSummaryDTOFromInitFinancialAssessment() {
         return AssessmentSummaryDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
-                .status(CurrentStatus.COMPLETE.getStatus())
+                .status(CurrentStatus.COMPLETE.getDescription())
                 .type("Initial Assessment")
                 .result(RESULT_FAIL)
                 .reviewType(RT_CODE_ER)

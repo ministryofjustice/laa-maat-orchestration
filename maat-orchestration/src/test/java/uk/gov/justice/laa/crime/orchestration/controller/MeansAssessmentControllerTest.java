@@ -79,8 +79,8 @@ class MeansAssessmentControllerTest {
         when(orchestrationService.create(any(WorkflowRequest.class)))
                 .thenReturn(new ApplicationDTO());
 
-        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE))
-                .replace("10:15:30", "10:15:30.423+00:00");
+        String requestBody = objectMapper
+                .writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
@@ -98,8 +98,8 @@ class MeansAssessmentControllerTest {
         when(orchestrationService.create(any(WorkflowRequest.class)))
                 .thenThrow(new APIClientException());
 
-        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE))
-                .replace("10:15:30", "10:15:30.423+00:00");
+        String requestBody = objectMapper
+                .writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
@@ -111,8 +111,8 @@ class MeansAssessmentControllerTest {
         when(orchestrationService.update(any(WorkflowRequest.class)))
                 .thenReturn(new ApplicationDTO());
 
-        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE))
-                .replace("10:15:30", "10:15:30.423+00:00");
+        String requestBody = objectMapper
+                .writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
@@ -130,8 +130,8 @@ class MeansAssessmentControllerTest {
         when(orchestrationService.update(any(WorkflowRequest.class)))
                 .thenThrow(new APIClientException());
 
-        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE))
-                .replace("10:15:30", "10:15:30.423+00:00");
+        String requestBody = objectMapper
+                .writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
