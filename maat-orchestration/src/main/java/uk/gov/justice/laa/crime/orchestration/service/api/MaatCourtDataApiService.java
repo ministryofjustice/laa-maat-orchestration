@@ -36,7 +36,6 @@ public class MaatCourtDataApiService {
                 Collections.emptyMap()
         );
 
-        log.info(RESPONSE_STRING, response);
         return response;
     }
 
