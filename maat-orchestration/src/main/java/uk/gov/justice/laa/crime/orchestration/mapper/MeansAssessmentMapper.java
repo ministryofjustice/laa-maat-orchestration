@@ -218,6 +218,7 @@ public class MeansAssessmentMapper {
                 .secondReminderDate(toDate(incomeEvidenceSummary.getSecondReminderDate()))
                 .upliftAppliedDate(toDate(incomeEvidenceSummary.getUpliftAppliedDate()))
                 .upliftRemovedDate(toDate(incomeEvidenceSummary.getUpliftRemovedDate()))
+                .enabled(Boolean.FALSE)
                 .build();
 
         List<ExtraEvidenceDTO> extraEvidenceList = new ArrayList<>();
