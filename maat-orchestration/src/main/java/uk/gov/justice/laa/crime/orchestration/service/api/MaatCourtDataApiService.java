@@ -28,15 +28,13 @@ public class MaatCourtDataApiService {
     private final ServicesConfiguration configuration;
 
     public ApplicationDTO executeStoredProcedure(StoredProcedureRequest request) {
-        ApplicationDTO response = maatApiClient.post(
+        return maatApiClient.post(
                 request,
                 new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getEndpoints().getCallStoredProcUrl(),
                 Collections.emptyMap()
         );
-
-        return response;
     }
 
     public RepOrderDTO getRepOrderByRepId(Integer repId) {
