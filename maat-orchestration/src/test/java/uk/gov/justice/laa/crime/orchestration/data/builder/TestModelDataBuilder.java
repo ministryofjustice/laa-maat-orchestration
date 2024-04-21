@@ -420,6 +420,15 @@ public class TestModelDataBuilder {
                 .build();
     }
 
+    public static WorkflowRequest buildWorkflowRequestWithCCHardship(CourtType courtType) {
+        return WorkflowRequest.builder()
+                .userDTO(getUserDTO())
+                .courtType(courtType)
+                .applicationDTO(getApplicationDTOWithCCHardship(courtType))
+                .build();
+    }
+
+
     public static WorkflowRequest buildWorkFlowRequest(CourtType courtType) {
         return WorkflowRequest.builder()
                 .userDTO(getUserDTO())
@@ -662,9 +671,39 @@ public class TestModelDataBuilder {
         return ApplicationDTO.builder()
                 .repId(REP_ID.longValue())
                 .caseManagementUnitDTO(getCaseManagementUnitDTO())
-                .crownCourtOverviewDTO(CrownCourtOverviewDTO.builder().build())
+                .crownCourtOverviewDTO(getCrownCourtOverviewDTO())
+                .applicantDTO(getApplicantDTO())
+                .offenceDTO(getOffenceDTO())
+                .magsOutcomeDTO(getOutcomeDTO(courtType))
                 .statusDTO(getRepStatusDTO())
                 .timestamp(APPLICATION_TIMESTAMP)
+                .assessmentDTO(
+                        AssessmentDTO.builder()
+                                .financialAssessmentDTO(getFinancialAssessmentDTO(courtType))
+                                .build()
+                ).build();
+    }
+
+    public static ApplicationDTO getApplicationDTOWithCCHardship(CourtType courtType) {
+        return ApplicationDTO.builder()
+                .repId(REP_ID.longValue())
+                .dateReceived(Date.from(DATETIME_RECEIVED.atZone(ZoneId.systemDefault()).toInstant()))
+                .committalDate(Date.from(COMMITAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .decisionDate(Date.from(DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .applicantDTO(getApplicantDTO())
+                .crownCourtOverviewDTO(getCrownCourtOverviewDTO())
+                .caseManagementUnitDTO(getCaseManagementUnitDTO())
+                .caseDetailsDTO(getCaseDetailDTO())
+                .offenceDTO(getOffenceDTO())
+                .magsOutcomeDTO(OutcomeDTO.builder()
+                        .outcome(MagCourtOutcome.SENT_FOR_TRIAL.getOutcome())
+                        .build())
+                .passportedDTO(getPassportedDTO())
+                .repOrderDecision(getRepOrderDecisionDTO())
+                .iojResult(RESULT_PASS)
+                .assessmentSummary(Collections.emptyList())
+                .timestamp(APPLICATION_TIMESTAMP)
+                .statusDTO(getRepStatusDTO())
                 .assessmentDTO(
                         AssessmentDTO.builder()
                                 .financialAssessmentDTO(getFinancialAssessmentDTO(courtType))
@@ -676,6 +715,7 @@ public class TestModelDataBuilder {
         return FinancialAssessmentDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
                 .full(getFullAssessmentDTO())
+                .fullAvailable(Boolean.TRUE)
                 .initial(getInitialAssessmentDTO())
                 .hardship(getHardshipOverviewDTO(courtType))
                 .incomeEvidence(getIncomeEvidenceSummaryDTO())

@@ -20,6 +20,8 @@ spring:
             token-uri: http://localhost:${wiremock.server.port}/oauth2/token
           maat-api:
             token-uri: http://localhost:${wiremock.server.port}/oauth2/token
+          cat:
+            token-uri: http://localhost:${wiremock.server.port}/oauth2/token
         registration:
           hardship:
             client-id: dummy-client
@@ -45,6 +47,11 @@ spring:
             client-id: dummy-client
             client-secret: dummy-client
             authorization-grant-type: client_credentials
+          cat:
+            client-id: dummy-client
+            client-secret: dummy-client
+            authorization-grant-type: client_credentials
+
       resource-server:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI}
@@ -90,6 +97,10 @@ services:
     user-domain: ${services.maat-api.base-url}/api/internal/v1/users
     user-endpoints:
       user-summary-url: ${services.maat-api.user-domain}/summary/{username}
+  cat-api:
+    base-url: http://localhost:${wiremock.server.port}
+    endpoints:
+      handle-eform-url: ${services.cat-api.base-url}/api/internal/v1/application-tracking-output-result
 
 retry-config:
   max-retries: 2

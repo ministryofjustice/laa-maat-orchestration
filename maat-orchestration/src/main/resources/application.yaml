@@ -32,6 +32,8 @@ spring:
             token-uri: ${VALIDATION_API_OAUTH_URL}
           maat-api:
             token-uri: ${MAAT_API_OAUTH_URL}
+          cat:
+            token-uri: ${CAT_API_OAUTH_URL}
         registration:
           hardship:
             client-id: ${HARDSHIP_API_OAUTH_CLIENT_ID}
@@ -57,6 +59,10 @@ spring:
             client-id: ${MAAT_API_OAUTH_CLIENT_ID}
             client-secret: ${MAAT_API_OAUTH_CLIENT_SECRET}
             authorization-grant-type: client_credentials
+          cat:
+            client-id: ${CAT_API_OAUTH_CLIENT_ID}
+            client-secret: ${CAT_API_OAUTH_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
       resource-server:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI}
@@ -73,6 +79,7 @@ services:
   contribution-api:
     base-url: ${CCC_API_BASE_URL}
     endpoints:
+
       request-transfer-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/request-transfer
       calculate-contribution-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/calculate-contribution
       check-contribution-rule-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/check-contribution-rule
@@ -102,6 +109,10 @@ services:
     application-domain: ${services.maat-api.base-url}/api/internal/v1/application
     user-endpoints:
       user-summary-url: ${services.maat-api.user-domain}/summary/{username}
+  cat-api:
+    base-url: ${CAT_API_BASE_URL}
+    endpoints:
+      handle-eform-url: ${services.cat-api.base-url}/api/internal/v1/application-tracking-output-result
 retry-config:
   max-retries: 3
   min-back-off-period: 5

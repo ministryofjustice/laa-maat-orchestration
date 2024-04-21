@@ -29,11 +29,11 @@ import uk.gov.justice.laa.crime.orchestration.enums.Action;
 
 import java.util.List;
 
-import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.*;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.*;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
@@ -124,7 +124,7 @@ class HardshipIntegrationTest {
     @Test
     void givenAValidContent_whenCreateIsInvoked_thenShouldCreateSuccess() throws Exception {
 
-        stubForCreateHardship();
+        stubForCreateHardship(CourtType.CROWN_COURT);
 
         String requestBody = objectMapper
                 .writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
@@ -132,7 +132,22 @@ class HardshipIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.crownCourtOverviewDTO.contribution.monthlyContribs").value(150.0));
 
-        verifyStubForCreateHardship();
+        verifyStubForCreateHardship(CourtType.MAGISTRATE);
+
+    }
+
+    @Test
+    void givenAValidCrownCourtContent_whenCreateIsInvoked_thenShouldCreateSuccess() throws Exception {
+
+        stubForCreateHardship(CourtType.CROWN_COURT);
+
+        String requestBody = objectMapper
+                .writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithCCHardship(CourtType.CROWN_COURT));
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.crownCourtOverviewDTO.contribution.monthlyContribs").value(150.0));
+
+        verifyStubForCreateHardship(CourtType.CROWN_COURT);
 
     }
 
@@ -177,7 +192,7 @@ class HardshipIntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.crownCourtOverviewDTO.contribution.monthlyContribs").value(150.0));
 
-        verifyStubForUpdateHardship();
+        verifyStubForUpdateHardship(CourtType.MAGISTRATE);
     }
 
     private void stubForUpdateHardship() throws JsonProcessingException {
@@ -210,7 +225,7 @@ class HardshipIntegrationTest {
         stubForOAuth();
     }
 
-    private void stubForCreateHardship() throws JsonProcessingException {
+    private void stubForCreateHardship(CourtType courtType) throws JsonProcessingException {
         wiremock.stubFor(post(urlMatching("/api/internal/v1/hardship/.*"))
                 .willReturn(
                         WireMock.ok()
@@ -232,23 +247,41 @@ class HardshipIntegrationTest {
         stubForGetUserSummary(objectMapper.writeValueAsString(TestModelDataBuilder.getUserSummaryDTO(CREATE_ROLE_ACTIONS, NewWorkReason.NEW)));
         stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
         stubForOAuth();
+        if (CourtType.CROWN_COURT.equals(courtType)) {
+            wiremock.stubFor(put(urlMatching("/api/internal/v1/proceedings"))
+                    .willReturn(
+                            WireMock.ok()
+                                    .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                                    .withBody(objectMapper.writeValueAsString(TestModelDataBuilder.getApiUpdateApplicationResponse()))
+                    )
+            );
+        }
     }
 
-    private static void verifyStubForCreateHardship() {
+    private static void verifyStubForCreateHardship(CourtType courtType) {
         verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
         verify(exactly(1), getRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
-        assertStubForInvokeStoredProcedure(3);
-        assertStubForCheckContributionsRule(1);
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1);
+        if (CourtType.CROWN_COURT.equals(courtType)) {
+            assertStubForHandleEformSerivce(1);
+            assertStubForInvokeStoredProcedure(4);
+        } else {
+            assertStubForCheckContributionsRule(1);
+            assertStubForInvokeStoredProcedure(3);
+        }
     }
 
-    private static void verifyStubForUpdateHardship() {
+
+    private static void verifyStubForUpdateHardship(CourtType courtType) {
         verify(exactly(1), putRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
         assertStubForInvokeStoredProcedure(3);
         assertStubForCheckContributionsRule(1);
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1);
+        if (CourtType.CROWN_COURT.equals(courtType)) {
+            assertStubForHandleEformSerivce(1);
+        }
     }
 
 }

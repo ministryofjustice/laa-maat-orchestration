@@ -10,6 +10,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.enums.Action;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
+import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.service.*;
@@ -27,12 +28,16 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     private final ValidationService validationService;
     private final HardshipMapper hardshipMapper;
 
+    private final ApplicationTrackingMapper applicationTrackingMapper;
+    private final CATDataService catDataService;
+
     public HardshipReviewDTO find(int hardshipReviewId) {
         return hardshipService.find(hardshipReviewId);
     }
 
     public ApplicationDTO create(WorkflowRequest request) {
         // invoke the validation service to Check user has rep order reserved
+
         CourtType courtType = request.getCourtType();
         Action action = (courtType == CourtType.MAGISTRATE) ? Action.CREATE_MAGS_HARDSHIP : Action.CREATE_CROWN_HARDSHIP;
         validate(request, action);
@@ -137,6 +142,8 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         proceedingsService.updateApplication(request);
 
         // Call application.handle_eform_result stored procedure OR Equivalent ATS service endpoint
+        catDataService.handleEformResult(applicationTrackingMapper.build(request));
+
 
         // Call crown_court.xx_process_activity_and_get_correspondence stored procedure
         request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
