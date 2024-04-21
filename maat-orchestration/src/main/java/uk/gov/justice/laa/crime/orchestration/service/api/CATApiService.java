@@ -7,8 +7,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
-import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.model.application_tracking.ApiCrimeApplicationTrackingRequest;
 
 import java.util.Collections;

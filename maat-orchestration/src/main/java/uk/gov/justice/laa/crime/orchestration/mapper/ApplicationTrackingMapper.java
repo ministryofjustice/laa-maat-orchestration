@@ -54,25 +54,22 @@ public class ApplicationTrackingMapper {
 
         ApplicationDTO application = workflowRequest.getApplicationDTO();
         IOJAppealDTO iojAppealDTO = application.getAssessmentDTO().getIojAppeal();
-        //ioj.setIojId();
-        Ioj ioj = new Ioj()
+        return new Ioj()
                 .withIojResult(application.getIojResult())
                 .withIojReason(application.getIojResultNote())
                 .withIojAppealResult(ReviewResult.getFrom(iojAppealDTO.getAppealDecisionResult()))
                 .withAppCreatedDate(toLocalDateTime(application.getDateCreated()));
 
-        return ioj;
     }
 
     protected Passport buildPassport(WorkflowRequest workflowRequest) {
 
         ApplicationDTO application = workflowRequest.getApplicationDTO();
         PassportedDTO passportedDTO = application.getPassportedDTO();
-        Passport passport = new Passport()
+        return new Passport()
                 .withPassportId(passportedDTO.getPassportedId() != null ? passportedDTO.getPassportedId().intValue() : null)
                 .withPassportResult(PassportAssessmentResult.getFrom(passportedDTO.getResult()))
                 .withPassportCreatedDate(passportedDTO.getDate() != null ? toLocalDateTime(passportedDTO.getDate()) : null);
-        return passport;
     }
 
     protected MeansAssessment buildMeansAssessment(WorkflowRequest workflowRequest) {
@@ -100,11 +97,10 @@ public class ApplicationTrackingMapper {
         HardshipOverviewDTO hardshipOverviewDTO = application.getAssessmentDTO().getFinancialAssessmentDTO().getHardship();
         HardshipReviewDTO hardshipReviewDTO = hardshipOverviewDTO.getCrownCourtHardship();
 
-        Hardship hardship = new Hardship()
+        return new Hardship()
                 .withHardshipId(hardshipReviewDTO.getId() != null ? hardshipReviewDTO.getId().intValue() : null)
                 .withHardshipResult(ReviewResult.getFrom(hardshipReviewDTO.getReviewResult()))
                 .withHardshipType(HardshipType.CCHARDSHIP);
-        return hardship;
     }
 
 
