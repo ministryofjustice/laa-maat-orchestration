@@ -388,6 +388,7 @@ public class MeansAssessmentDataBuilder {
                 .evidenceDueDate(toDate(INCOME_EVIDENCE_DUE_DATE))
                 .firstReminderDate(toDate(FIRST_REMINDER_DATE))
                 .secondReminderDate(toDate(SECOND_REMINDER_DATE))
+                .enabled(Boolean.FALSE)
                 .build();
     }
 
