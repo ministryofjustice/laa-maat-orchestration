@@ -82,7 +82,6 @@ services:
   contribution-api:
     base-url: ${CCC_API_BASE_URL}
     endpoints:
-
       request-transfer-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/request-transfer
       calculate-contribution-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/calculate-contribution
       check-contribution-rule-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/check-contribution-rule
