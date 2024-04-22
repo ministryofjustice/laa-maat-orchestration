@@ -652,6 +652,7 @@ public class TestModelDataBuilder {
     public static RepOrderDecisionDTO getRepOrderDecisionDTO() {
         return RepOrderDecisionDTO.builder()
                 .code(DecisionReason.GRANTED.getCode())
+                .description(new SysGenString(DecisionReason.GRANTED.getDescription()))
                 .build();
     }
 
