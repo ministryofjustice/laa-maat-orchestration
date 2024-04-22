@@ -44,7 +44,7 @@ public class TestModelDataBuilder {
     private static final String INCOME_EVIDENCE_DESCRIPTION = "Tax Return";
     private static final String INCOME_EVIDENCE = "TAX RETURN";
     private static final String EVIDENCE_FEE_LEVEL_1 = "LEVEL1";
-    private static final Integer PASSPORTED_ID = 777;
+    public static final Integer PASSPORTED_ID = 777;
     private static final Integer APPLICANT_HISTORY_ID = 666;
     private static final String RESULT_FAIL = "FAIL";
     private static final String RESULT_PASS = "PASS";
@@ -92,7 +92,7 @@ public class TestModelDataBuilder {
             Date.from(Instant.ofEpochSecond(DATE_REVIEWED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
     private static final LocalDateTime DATE_MODIFIED_DATETIME = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
     private static final LocalDateTime DATE_COMPLETED_DATETIME = LocalDateTime.of(2022, 11, 14, 0, 0, 0);
-    private static final Date DATE_COMPLETED =
+    public static final Date DATE_COMPLETED =
             Date.from(Instant.ofEpochSecond(DATE_COMPLETED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
     private static final Integer HARDSHIP_DETAIL_ID = 12345;
     private static final Integer CMU_ID = 50;
@@ -707,6 +707,7 @@ public class TestModelDataBuilder {
                 .assessmentDTO(
                         AssessmentDTO.builder()
                                 .financialAssessmentDTO(getFinancialAssessmentDTO(courtType))
+                                .iojAppeal(getIOJAppealDTO())
                                 .build()
                 ).build();
     }

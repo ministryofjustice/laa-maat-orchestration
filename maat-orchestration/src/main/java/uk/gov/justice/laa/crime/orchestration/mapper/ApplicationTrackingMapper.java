@@ -36,7 +36,7 @@ public class ApplicationTrackingMapper {
         request.setCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()));
         request.setAssessmentId(financialAssessmentDTO.getId().intValue());
         request.setAssessmentType(AssessmentType.CCHARDSHIP);
-        request.setDwpResult(passportedDTO != null ? passportedDTO.getDwpResult() : null);
+        request.setDwpResult(passportedDTO.getDwpResult());
         request.setRepDecision(repOrderDecisionDTO.getDescription() != null ? repOrderDecisionDTO.getDescription().getValue() : null);
         request.setCcRepDecision(crownCourtSummaryDTO.getRepOrderDecision() != null ? crownCourtSummaryDTO.getRepOrderDecision().getValue() : null);
         request.setMagsOutcome(application.getMagsOutcomeDTO().getOutcome());
@@ -50,11 +50,12 @@ public class ApplicationTrackingMapper {
         return request;
     }
 
-    private Ioj buildIOJ(WorkflowRequest workflowRequest) {
+    protected Ioj buildIOJ(WorkflowRequest workflowRequest) {
 
         ApplicationDTO application = workflowRequest.getApplicationDTO();
         IOJAppealDTO iojAppealDTO = application.getAssessmentDTO().getIojAppeal();
         return new Ioj()
+                .withIojId(null != iojAppealDTO.getIojId() ? iojAppealDTO.getIojId().intValue() : null)
                 .withIojResult(application.getIojResult())
                 .withIojReason(application.getIojResultNote())
                 .withIojAppealResult(ReviewResult.getFrom(iojAppealDTO.getAppealDecisionResult()))
