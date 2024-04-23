@@ -1,6 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.dto.maat;
 
-
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -13,7 +13,8 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class JobSeekerDTO extends GenericDTO {
-    private Boolean isJobSeeker;
+    @Builder.Default
+    private Boolean isJobSeeker = false;
     private Date lastSignedOn;
 
 }

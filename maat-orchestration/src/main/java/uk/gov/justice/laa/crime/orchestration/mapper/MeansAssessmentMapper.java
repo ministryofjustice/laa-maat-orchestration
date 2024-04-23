@@ -18,9 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
-import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
-import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
+import static uk.gov.justice.laa.crime.util.DateUtil.*;
 
 @Component
 @RequiredArgsConstructor
@@ -403,6 +401,7 @@ public class MeansAssessmentMapper {
 
     public void meansAssessmentResponseToApplicationDto(final ApiMeansAssessmentResponse apiResponse, ApplicationDTO applicationDTO) {
         applicationDTO.setRepId(ofNullable(apiResponse.getRepId()).map(Integer::longValue).orElse(applicationDTO.getRepId()));
+        applicationDTO.setPassportedDTO(PassportedDTO.builder().build());
         if (apiResponse.getApplicationTimestamp() != null) {
             applicationDTO.setTimestamp(toZonedDateTime(apiResponse.getApplicationTimestamp()));
         }
