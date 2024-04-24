@@ -1,6 +1,5 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.PassportAssessmentResult;
@@ -16,7 +15,6 @@ import uk.gov.justice.laa.crime.orchestration.model.application_tracking.*;
 import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
 
 @Component
-@RequiredArgsConstructor
 public class ApplicationTrackingMapper {
 
     public ApiCrimeApplicationTrackingRequest build(WorkflowRequest workflowRequest) {
