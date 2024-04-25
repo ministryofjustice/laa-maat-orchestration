@@ -44,7 +44,7 @@ public class TestModelDataBuilder {
     private static final String INCOME_EVIDENCE_DESCRIPTION = "Tax Return";
     private static final String INCOME_EVIDENCE = "TAX RETURN";
     private static final String EVIDENCE_FEE_LEVEL_1 = "LEVEL1";
-    private static final Integer PASSPORTED_ID = 777;
+    public static final Integer PASSPORTED_ID = 777;
     private static final Integer APPLICANT_HISTORY_ID = 666;
     private static final String RESULT_FAIL = "FAIL";
     private static final String RESULT_PASS = "PASS";
@@ -92,7 +92,7 @@ public class TestModelDataBuilder {
             Date.from(Instant.ofEpochSecond(DATE_REVIEWED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
     private static final LocalDateTime DATE_MODIFIED_DATETIME = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
     private static final LocalDateTime DATE_COMPLETED_DATETIME = LocalDateTime.of(2022, 11, 14, 0, 0, 0);
-    private static final Date DATE_COMPLETED =
+    public static final Date DATE_COMPLETED =
             Date.from(Instant.ofEpochSecond(DATE_COMPLETED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
     private static final Integer HARDSHIP_DETAIL_ID = 12345;
     private static final Integer CMU_ID = 50;
@@ -420,6 +420,15 @@ public class TestModelDataBuilder {
                 .build();
     }
 
+    public static WorkflowRequest buildWorkflowRequestWithCCHardship(CourtType courtType) {
+        return WorkflowRequest.builder()
+                .userDTO(getUserDTO())
+                .courtType(courtType)
+                .applicationDTO(getApplicationDTOWithCCHardship(courtType))
+                .build();
+    }
+
+
     public static WorkflowRequest buildWorkFlowRequest(CourtType courtType) {
         return WorkflowRequest.builder()
                 .userDTO(getUserDTO())
@@ -643,6 +652,7 @@ public class TestModelDataBuilder {
     public static RepOrderDecisionDTO getRepOrderDecisionDTO() {
         return RepOrderDecisionDTO.builder()
                 .code(DecisionReason.GRANTED.getCode())
+                .description(new SysGenString(DecisionReason.GRANTED.getDescription()))
                 .build();
     }
 
@@ -662,7 +672,10 @@ public class TestModelDataBuilder {
         return ApplicationDTO.builder()
                 .repId(REP_ID.longValue())
                 .caseManagementUnitDTO(getCaseManagementUnitDTO())
-                .crownCourtOverviewDTO(CrownCourtOverviewDTO.builder().build())
+                .crownCourtOverviewDTO(getCrownCourtOverviewDTO())
+                .applicantDTO(getApplicantDTO())
+                .offenceDTO(getOffenceDTO())
+                .magsOutcomeDTO(getOutcomeDTO(courtType))
                 .statusDTO(getRepStatusDTO())
                 .timestamp(APPLICATION_TIMESTAMP)
                 .assessmentDTO(
@@ -672,10 +685,39 @@ public class TestModelDataBuilder {
                 ).build();
     }
 
+    public static ApplicationDTO getApplicationDTOWithCCHardship(CourtType courtType) {
+        return ApplicationDTO.builder()
+                .repId(REP_ID.longValue())
+                .dateReceived(Date.from(DATETIME_RECEIVED.atZone(ZoneId.systemDefault()).toInstant()))
+                .committalDate(Date.from(COMMITAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .decisionDate(Date.from(DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .applicantDTO(getApplicantDTO())
+                .crownCourtOverviewDTO(getCrownCourtOverviewDTO())
+                .caseManagementUnitDTO(getCaseManagementUnitDTO())
+                .caseDetailsDTO(getCaseDetailDTO())
+                .offenceDTO(getOffenceDTO())
+                .magsOutcomeDTO(OutcomeDTO.builder()
+                        .outcome(MagCourtOutcome.SENT_FOR_TRIAL.getOutcome())
+                        .build())
+                .passportedDTO(getPassportedDTO())
+                .repOrderDecision(getRepOrderDecisionDTO())
+                .iojResult(RESULT_PASS)
+                .assessmentSummary(Collections.emptyList())
+                .timestamp(APPLICATION_TIMESTAMP)
+                .statusDTO(getRepStatusDTO())
+                .assessmentDTO(
+                        AssessmentDTO.builder()
+                                .financialAssessmentDTO(getFinancialAssessmentDTO(courtType))
+                                .iojAppeal(getIOJAppealDTO())
+                                .build()
+                ).build();
+    }
+
     private static FinancialAssessmentDTO getFinancialAssessmentDTO(CourtType courtType) {
         return FinancialAssessmentDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
                 .full(getFullAssessmentDTO())
+                .fullAvailable(Boolean.TRUE)
                 .initial(getInitialAssessmentDTO())
                 .hardship(getHardshipOverviewDTO(courtType))
                 .incomeEvidence(getIncomeEvidenceSummaryDTO())

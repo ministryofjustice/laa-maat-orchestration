@@ -17,6 +17,7 @@ import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
+import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.service.*;
@@ -53,6 +54,12 @@ class HardshipOrchestrationServiceTest {
 
     @Mock
     private HardshipMapper hardshipMapper;
+
+    @Mock
+    private CATDataService catDataService;
+
+    @Mock
+    private ApplicationTrackingMapper applicationTrackingMapper;
 
     @InjectMocks
     private HardshipOrchestrationService orchestrationService;

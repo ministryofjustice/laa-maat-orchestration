@@ -27,6 +27,9 @@ public class ServicesConfiguration {
     @NotNull
     private MaatApi maatApi;
 
+    @NotNull
+    private CATApi catApi;
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -169,6 +172,28 @@ public class ServicesConfiguration {
         public static class UserEndpoints {
             @NotNull
             private String userSummaryUrl;
+        }
+
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CATApi {
+
+        @NotNull
+        private String baseUrl;
+
+        @NotNull
+        private Endpoints endpoints;
+
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Endpoints {
+            @NotNull
+            private String handleEformUrl;
+
         }
     }
 }
