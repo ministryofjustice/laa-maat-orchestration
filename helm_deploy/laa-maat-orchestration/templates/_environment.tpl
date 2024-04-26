@@ -36,6 +36,10 @@ env:
     value: {{ .Values.validationApi.baseUrl }}
   - name: VALIDATION_API_OAUTH_URL
     value: {{ .Values.validationApi.oauthUrl }}
+  - name: CAT_API_BASE_URL
+    value: {{ .Values.catApi.baseUrl }}
+  - name: CAT_API_OAUTH_URL
+    value: {{ .Values.catApi.oauthUrl }}
   - name: JWT_ISSUER_URI
     value: {{ .Values.jwt.issuerUri }}
   - name: HARDSHIP_API_OAUTH_CLIENT_ID
