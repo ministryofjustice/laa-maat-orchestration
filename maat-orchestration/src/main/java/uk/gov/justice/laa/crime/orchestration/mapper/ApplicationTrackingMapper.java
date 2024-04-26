@@ -133,7 +133,7 @@ public class ApplicationTrackingMapper {
         return Arrays.stream(names)
                 .map(StringUtils::trim)
                 .filter(StringUtils::isNotBlank)
-                .map(WordUtils::capitalize)
+                .map(StringUtils::capitalize)
                 .collect(Collectors.joining(StringUtils.SPACE));
     }
 }
