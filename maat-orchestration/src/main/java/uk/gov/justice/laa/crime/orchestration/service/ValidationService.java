@@ -84,9 +84,9 @@ public class ValidationService {
         return Objects.equals(s1, s2);
     }
 
-    public void validate(WorkflowRequest request) {
-        int repId = request.getApplicationDTO().getRepId().intValue();
-        RepOrderDTO repOrderDTO = maatCourtDataService.findRepOrder(repId);
+    public void validate(WorkflowRequest request, RepOrderDTO repOrderDTO) {
+        //int repId = request.getApplicationDTO().getRepId().intValue();
+        //RepOrderDTO repOrderDTO = maatCourtDataService.findRepOrder(repId);
         validateApplicationTimestamp(request, repOrderDTO);
         validateApplicationStatus(request, repOrderDTO);
     }

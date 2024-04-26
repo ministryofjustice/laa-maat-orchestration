@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,6 +42,7 @@ public class RepOrderDTO {
     private LocalDate crownWithdrawalDate;
     private Integer applicantHistoryId;
     private String macoCourt;
+    private UserDTO userCreatedEntity;
 
     @Builder.Default
     private List<PassportAssessmentDTO> passportAssessments = new ArrayList<>();

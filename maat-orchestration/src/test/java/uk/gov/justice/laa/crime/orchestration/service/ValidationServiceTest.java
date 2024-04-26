@@ -103,26 +103,23 @@ class ValidationServiceTest {
     @ParameterizedTest
     @MethodSource("validateApplicationTimestamp")
     void validateApplicationTimestamp(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        when(maatCourtDataService.findRepOrder(any())).thenReturn(repOrderDTO);
         ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.
-                validate(workflowRequest));
+                validate(workflowRequest, repOrderDTO));
         assertThat(validationException.getMessage()).isEqualTo(CANNOT_MODIFY_APPLICATION_ERROR);
     }
 
     @ParameterizedTest
     @MethodSource("validateApplicationStatus")
     void validateApplicationStatus(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        when(maatCourtDataService.findRepOrder(any())).thenReturn(repOrderDTO);
         ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.
-                validate(workflowRequest));
+                validate(workflowRequest, repOrderDTO));
         assertThat(validationException.getMessage()).contains("Cannot update case in status of");
     }
 
     @ParameterizedTest
     @MethodSource("validateApplicationStatusNoException")
     void validateApplicationStatus_noException(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        when(maatCourtDataService.findRepOrder(any())).thenReturn(repOrderDTO);
-        assertDoesNotThrow(() -> validationService.validate(workflowRequest));
+        assertDoesNotThrow(() -> validationService.validate(workflowRequest, repOrderDTO));
     }
 
     @Test

@@ -245,7 +245,7 @@ class HardshipIntegrationTest {
         stubForCalculateContributions(objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
         stubForGetContributionsSummary(objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary())));
         stubForGetUserSummary(objectMapper.writeValueAsString(TestModelDataBuilder.getUserSummaryDTO(CREATE_ROLE_ACTIONS, NewWorkReason.NEW)));
-        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
+        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTOWithAssessorName()));
         stubForOAuth();
         if (CourtType.CROWN_COURT.equals(courtType)) {
             wiremock.stubFor(put(urlMatching("/api/internal/v1/proceedings"))
