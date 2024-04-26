@@ -1,7 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.PassportAssessmentResult;
@@ -74,7 +73,7 @@ public class ApplicationTrackingMapper {
         ApplicationDTO application = workflowRequest.getApplicationDTO();
         PassportedDTO passportedDTO = application.getPassportedDTO();
         PassportAssessmentDTO passportAssessmentDTO = null;
-        if(passportedDTO.getPassportedId() != null) {
+        if (passportedDTO.getPassportedId() != null) {
             passportAssessmentDTO = repOrderDTO.getPassportAssessments()
                     .stream()
                     .filter(pa -> pa.getId() == passportedDTO.getPassportedId().intValue())
@@ -85,7 +84,7 @@ public class ApplicationTrackingMapper {
         return new Passport()
                 .withPassportId(passportedDTO.getPassportedId() != null ? passportedDTO.getPassportedId().intValue() : null)
                 .withPassportResult(PassportAssessmentResult.getFrom(passportedDTO.getResult()))
-                .withPassportAssessorName( (null != passportAssessmentDTO) ?
+                .withPassportAssessorName((null != passportAssessmentDTO) ?
                         getCapitalisedFullName(passportAssessmentDTO.getUserCreatedEntity().getFirstName(),
                                 passportAssessmentDTO.getUserCreatedEntity().getSurname()) : null)
                 .withPassportCreatedDate(passportedDTO.getDate() != null ? toLocalDateTime(passportedDTO.getDate()) : null);
@@ -101,10 +100,10 @@ public class ApplicationTrackingMapper {
                 .filter(pa -> pa.getId() == financialAssessmentDTO.getId().intValue())
                 .findFirst()
                 .orElse(null);
-        assessment.setMeansAssessorName( (null !=  fa) ? getCapitalisedFullName(fa.getUserCreatedEntity().getFirstName(),
+        assessment.setMeansAssessorName((null != fa) ? getCapitalisedFullName(fa.getUserCreatedEntity().getFirstName(),
                 fa.getUserCreatedEntity().getSurname()) : null);
 
-        if (financialAssessmentDTO.getFullAvailable() !=null && financialAssessmentDTO.getFullAvailable()) {
+        if (financialAssessmentDTO.getFullAvailable() != null && financialAssessmentDTO.getFullAvailable()) {
             assessment.setMeansAssessmentStatus(financialAssessmentDTO.getFull().getAssessmnentStatusDTO().getStatus());
             assessment.setMeansAssessmentResult(MeanAssessmentResult.getFrom(financialAssessmentDTO.getFull().getResult()));
             assessment.setMeansAssessmentCreatedDate(toLocalDateTime(financialAssessmentDTO.getFull().getAssessmentDate()));
