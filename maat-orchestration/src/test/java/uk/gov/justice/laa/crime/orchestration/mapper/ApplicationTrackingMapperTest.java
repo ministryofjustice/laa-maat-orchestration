@@ -21,6 +21,8 @@ import uk.gov.justice.laa.crime.orchestration.model.application_tracking.*;
 
 import java.util.Date;
 
+import static uk.gov.justice.laa.crime.orchestration.data.Constants.ASSESSMENT_SUMMARY_ID;
+
 @ExtendWith(SoftAssertionsExtension.class)
 class ApplicationTrackingMapperTest {
 
@@ -129,6 +131,21 @@ class ApplicationTrackingMapperTest {
     }
 
     @Test
+    void giveAInValidPassportId_whenBuildPassportIsInvoked_thenMappingIsCorrect() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestWithCCHardship(CourtType.CROWN_COURT);
+        workflowRequest.getApplicationDTO().getPassportedDTO().setDate(new Date());
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTOWithAssessorName();
+        repOrderDTO.getPassportAssessments().get(0).setId(ASSESSMENT_SUMMARY_ID);
+
+        Passport passport = mapper.buildPassport(workflowRequest, repOrderDTO);
+        softly.assertThat(passport.getPassportId()).isEqualTo(TestModelDataBuilder.PASSPORTED_ID);
+        softly.assertThat(passport.getPassportResult()).isEqualTo(PassportAssessmentResult.FAIL);
+        softly.assertThat(passport.getPassportCreatedDate()).isNotNull();
+        softly.assertThat(passport.getPassportAssessorName()).isNull();
+        softly.assertAll();
+    }
+
+    @Test
     void giveAEmptyPassport_whenBuildPassportIsInvoked_thenMappingIsCorrect() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestWithCCHardship(CourtType.CROWN_COURT);
         workflowRequest.getApplicationDTO().getPassportedDTO().setPassportedId(null);
@@ -174,6 +191,22 @@ class ApplicationTrackingMapperTest {
 
     }
 
+    @Test
+    void giveAInValidAssessmentId_whenBuildMeansAssessmentIsInvoked_thenMappingIsCorrect() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestWithCCHardship(CourtType.CROWN_COURT);
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().setFullAvailable(false);
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTOWithAssessorName();
+        repOrderDTO.getFinancialAssessments().get(0).setId(ASSESSMENT_SUMMARY_ID);
+
+        MeansAssessment meansAssessment = mapper.buildMeansAssessment(workflowRequest, repOrderDTO);
+        softly.assertThat(meansAssessment.getMeansAssessmentId()).isEqualTo(Constants.FINANCIAL_ASSESSMENT_ID);
+        softly.assertThat(meansAssessment.getMeansAssessmentStatus()).isEqualTo(AssessmentStatusDTO.COMPLETE);
+        softly.assertThat(meansAssessment.getMeansAssessmentResult()).isEqualTo(MeanAssessmentResult.FAIL);
+        softly.assertThat(meansAssessment.getMeansAssessmentCreatedDate()).isNull();
+        softly.assertThat(meansAssessment.getMeansAssessorName()).isNull();
+        softly.assertAll();
+
+    }
     @Test
     void giveAValidHardship_whenBuildHardshipIsInvoked_thenMappingIsCorrect() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestWithCCHardship(CourtType.CROWN_COURT);
