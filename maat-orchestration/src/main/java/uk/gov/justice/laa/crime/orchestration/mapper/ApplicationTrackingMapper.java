@@ -101,8 +101,8 @@ public class ApplicationTrackingMapper {
                 .filter(pa -> pa.getId() == financialAssessmentDTO.getId().intValue())
                 .findFirst()
                 .orElse(null);
-        assessment.setMeansAssessorName(getCapitalisedFullName(fa.getUserCreatedEntity().getFirstName(),
-                fa.getUserCreatedEntity().getSurname()));
+        assessment.setMeansAssessorName( (null !=  fa) ? getCapitalisedFullName(fa.getUserCreatedEntity().getFirstName(),
+                fa.getUserCreatedEntity().getSurname()) : null);
 
         if (financialAssessmentDTO.getFullAvailable() !=null && financialAssessmentDTO.getFullAvailable()) {
             assessment.setMeansAssessmentStatus(financialAssessmentDTO.getFull().getAssessmnentStatusDTO().getStatus());
