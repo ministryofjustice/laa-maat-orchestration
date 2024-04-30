@@ -6,6 +6,7 @@ import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.PassportAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
@@ -1090,6 +1091,22 @@ public class TestModelDataBuilder {
 
     public static RepOrderDTO buildRepOrderDTO(String rorsStatus) {
         return RepOrderDTO.builder().id(1000).dateModified(APPLICATION_TIMESTAMP.toLocalDateTime()).rorsStatus(rorsStatus).build();
+    }
+
+    public static RepOrderDTO buildRepOrderDTOWithAssessorName() {
+        UserDTO userDTO = UserDTO.builder().firstName("FIRSTNAME").surname("SURNAME").build();
+        return RepOrderDTO.builder()
+                .id(1000)
+                .userCreatedEntity(userDTO)
+                .passportAssessments(
+                        List.of(PassportAssessmentDTO.builder()
+                                .id(PASSPORTED_ID)
+                                .userCreatedEntity(userDTO).build()))
+                .financialAssessments(
+                        List.of(uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO.builder()
+                                .id(Constants.FINANCIAL_ASSESSMENT_ID)
+                                .userCreatedEntity(userDTO).build()))
+                .dateModified(APPLICATION_TIMESTAMP.toLocalDateTime()).build();
     }
 
     public static UserSummaryDTO getUserSummaryDTO() {
