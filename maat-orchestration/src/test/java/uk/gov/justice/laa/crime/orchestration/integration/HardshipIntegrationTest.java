@@ -116,7 +116,7 @@ class HardshipIntegrationTest {
         stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
         String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().is4xxClientError());
         verify(exactly(1), getRequestedFor(urlPathMatching("/api/internal/v1/users/summary/.*")));
         verify(exactly(0), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
     }
@@ -177,7 +177,7 @@ class HardshipIntegrationTest {
         stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
         String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().is4xxClientError());
         verify(exactly(1), getRequestedFor(urlPathMatching("/api/internal/v1/users/summary/.*")));
         verify(exactly(0), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
     }

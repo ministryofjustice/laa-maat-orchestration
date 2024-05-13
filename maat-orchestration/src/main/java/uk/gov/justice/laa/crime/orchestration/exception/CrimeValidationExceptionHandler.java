@@ -7,11 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import uk.gov.justice.laa.crime.commons.tracing.TraceIdHandler;
+import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ErrorDTO;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -30,12 +30,18 @@ public class CrimeValidationExceptionHandler {
     @ExceptionHandler(CrimeValidationException.class)
     public ResponseEntity<ErrorDTO> handleCrimeValidationException(CrimeValidationException ex) {
         log.error("CrimeValidationException: ", ex);
-        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getExceptionMessage().stream().collect(Collectors.toList()));
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getExceptionMessage().stream().collect(Collectors.toList()));
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ErrorDTO> handleValidationException(ValidationException ex) {
+        log.error("ValidationException: ", ex);
+        return buildErrorResponseWithMessage(HttpStatus.BAD_REQUEST, ex.getMessage(), traceIdHandler.getTraceId());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorDTO> handleIllegalArgumentException(IllegalArgumentException ex) {
-        log.error("CrimeValidationException: ", ex);
+        log.error("IllegalArgumentException: ", ex);
         return buildErrorResponseWithMessage(HttpStatus.BAD_REQUEST, ex.getMessage(), traceIdHandler.getTraceId());
     }
 
