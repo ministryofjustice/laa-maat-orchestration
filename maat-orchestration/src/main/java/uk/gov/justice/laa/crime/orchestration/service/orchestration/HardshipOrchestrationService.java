@@ -5,13 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
-import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.Action;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
-import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
@@ -70,8 +68,6 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             // Update assessment summary view - displayed on the application tab
             AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(newHardship, courtType);
             assessmentSummaryService.updateApplication(application, hardshipSummary);
-        } catch (ValidationException | CrimeValidationException exception) {
-            throw exception;
         } catch (Exception ex) {
             hardshipService.rollback(request);
             throw new MaatOrchestrationException(request.getApplicationDTO());
@@ -110,8 +106,6 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             // Update assessment summary view - displayed on the application tab
             AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(hardshipReviewDTO, courtType);
             assessmentSummaryService.updateApplication(request.getApplicationDTO(), hardshipSummary);
-        } catch (ValidationException | CrimeValidationException exception) {
-            throw exception;
         } catch (Exception ex) {
             hardshipService.rollback(request);
             throw new MaatOrchestrationException(request.getApplicationDTO());
@@ -119,7 +113,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         return request.getApplicationDTO();
     }
 
-    private void validate(WorkflowRequest request, Action action, RepOrderDTO  repOrderDTO) {
+    private void validate(WorkflowRequest request, Action action, RepOrderDTO repOrderDTO) {
         validationService.validate(request, repOrderDTO);
         validationService.isUserActionValid(hardshipMapper.getUserValidationDTO(request, action));
     }
