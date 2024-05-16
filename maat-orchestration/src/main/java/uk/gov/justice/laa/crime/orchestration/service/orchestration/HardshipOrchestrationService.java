@@ -113,7 +113,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         return request.getApplicationDTO();
     }
 
-    private void validate(WorkflowRequest request, Action action, RepOrderDTO  repOrderDTO) {
+    private void validate(WorkflowRequest request, Action action, RepOrderDTO repOrderDTO) {
         validationService.validate(request, repOrderDTO);
         validationService.isUserActionValid(hardshipMapper.getUserValidationDTO(request, action));
     }

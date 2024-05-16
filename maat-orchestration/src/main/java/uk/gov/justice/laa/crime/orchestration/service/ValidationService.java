@@ -32,8 +32,10 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class ValidationService {
-    public static final String CANNOT_MODIFY_APPLICATION_ERROR =
-            "Application has been modified by another user";
+    public static final String CANNOT_MODIFY_APPLICATION_ERROR = """
+            Application has been modified by another user. Please try logging out and logging back in again.
+            Please contact your system administrator if this issue persists.
+            """;
     public static final String CANNOT_UPDATE_APPLICATION_STATUS =
             "Cannot update case in status of %s";
     public static final String USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED =
@@ -162,7 +164,7 @@ public class ValidationService {
         String acctNumber = applicationDTO.getSupplierDTO() != null ? applicationDTO.getSupplierDTO().getAccountNumber() : null;
         String feeLevel = getFeeLevel(applicationDTO);
         LocalDate ccRepOrderDate = getRepOrderDate(applicationDTO);
-        LocalDate ccWithDrawalDate = getWithDrawalDate(applicationDTO);
+        LocalDate ccWithdrawalDate = getWithDrawalDate(applicationDTO);
         String outcome = getOutcome(applicationDTO);
         String court = applicationDTO.getMagsCourtDTO() != null ? applicationDTO.getMagsCourtDTO().getCourt() : null;
         String magsOutcome = applicationDTO.getMagsOutcomeDTO() != null ? applicationDTO.getMagsOutcomeDTO().getOutcome() : null;
@@ -185,7 +187,7 @@ public class ValidationService {
                 && isEquals(repOrderDTO.getDateReceived(), lDateReceived)
                 && isEquals(repOrderDTO.getCrownRepOrderDate(), ccRepOrderDate)
                 && isEquals(repOrderDTO.getOftyOffenceType(), offenceType)
-                && isEquals(repOrderDTO.getCrownWithdrawalDate(), ccWithDrawalDate)
+                && isEquals(repOrderDTO.getCrownWithdrawalDate(), ccWithdrawalDate)
                 && isEquals(repOrderDTO.getCaseId(), applicationDTO.getCaseId())
                 && isEquals(repOrderDTO.getCommittalDate(), lCommittalDate)
                 && isEquals(rApplicantHistoryId, applicantHistoryId)
