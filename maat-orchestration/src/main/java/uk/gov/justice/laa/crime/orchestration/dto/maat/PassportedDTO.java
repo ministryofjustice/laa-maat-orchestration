@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.dto.maat;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -20,28 +21,45 @@ public class PassportedDTO extends GenericDTO {
 
     private Date date;
 
-    private AssessmentStatusDTO assessementStatusDTO;
-    private PassportConfirmationDTO passportConfirmationDTO;
-    private NewWorkReasonDTO newWorkReason;
-    private ReviewTypeDTO reviewType;
+    @Builder.Default
+    private AssessmentStatusDTO assessementStatusDTO = new AssessmentStatusDTO();
+    @Builder.Default
+    private PassportConfirmationDTO passportConfirmationDTO = new PassportConfirmationDTO();
+    @Builder.Default
+    private NewWorkReasonDTO newWorkReason = new NewWorkReasonDTO();
+    @Builder.Default
+    private ReviewTypeDTO reviewType = new ReviewTypeDTO();
 
     private String dwpResult;
 
-    private Boolean benefitIncomeSupport;
-    private JobSeekerDTO benefitJobSeeker;
-    private Boolean benefitGaurenteedStatePension;
-    private Boolean benefitClaimedByPartner;
-    private Boolean benefitEmploymentSupport;
-    private PartnerDTO partnerDetails;
-    private String notes;
+    @Builder.Default
+    private Boolean benefitIncomeSupport = false;
+    @Builder.Default
+    private JobSeekerDTO benefitJobSeeker = new JobSeekerDTO();
+    @Builder.Default
+    private Boolean benefitGaurenteedStatePension = false;
+    @Builder.Default
+    private Boolean benefitClaimedByPartner = false;
+    @Builder.Default
+    private Boolean benefitEmploymentSupport = false;
+    @Builder.Default
+    private Boolean benefitUniversalCredit = false;
+    @Builder.Default
+    private PartnerDTO partnerDetails = new PartnerDTO();
+    @Builder.Default
+    private String notes = "";
     private String result;
-    private Boolean under18HeardYouthCourt;
-    private Boolean under18HeardMagsCourt;
-    private Boolean under18FullEducation;
+    @Builder.Default
+    private Boolean under18HeardYouthCourt = false;
+    @Builder.Default
+    private Boolean under18HeardMagsCourt = false;
+    @Builder.Default
+    private Boolean under18FullEducation = false;
     private Boolean under16;
     private Boolean between1617;
 
-    private IncomeEvidenceSummaryDTO passportSummaryEvidenceDTO;
+    @Builder.Default
+    private IncomeEvidenceSummaryDTO passportSummaryEvidenceDTO = new IncomeEvidenceSummaryDTO();
 
     private String whoDwpChecked;
 

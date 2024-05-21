@@ -7,9 +7,11 @@ import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.Action;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
+import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.service.*;
@@ -27,15 +29,19 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     private final ValidationService validationService;
     private final HardshipMapper hardshipMapper;
 
+    private final ApplicationTrackingMapper applicationTrackingMapper;
+    private final CATDataService catDataService;
+
     public HardshipReviewDTO find(int hardshipReviewId) {
         return hardshipService.find(hardshipReviewId);
     }
 
     public ApplicationDTO create(WorkflowRequest request) {
         // invoke the validation service to Check user has rep order reserved
+
         CourtType courtType = request.getCourtType();
         Action action = (courtType == CourtType.MAGISTRATE) ? Action.CREATE_MAGS_HARDSHIP : Action.CREATE_CROWN_HARDSHIP;
-        validate(request, action);
+        validate(request, action, getRepOrderDTO(request));
         ApplicationDTO application = request.getApplicationDTO();
 
         ApiPerformHardshipResponse performHardshipResponse = hardshipService.create(request);
@@ -55,7 +61,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                         .getFinancialAssessmentDTO()
                         .getHardship().setCrownCourtHardship(newHardship);
                 if (isAssessmentComplete(newHardship.getAsessmentStatus())) {
-                    application = checkActionsAndUpdateApplication(request);
+                    application = checkActionsAndUpdateApplication(request, getRepOrderDTO(request));
                 }
             }
 
@@ -69,12 +75,18 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         return application;
     }
 
+    private RepOrderDTO getRepOrderDTO(WorkflowRequest request) {
+        int repId = request.getApplicationDTO().getRepId().intValue();
+        RepOrderDTO repOrderDTO = maatCourtDataService.findRepOrder(repId);
+        return repOrderDTO;
+    }
+
     public ApplicationDTO update(WorkflowRequest request) {
         // invoke the validation service to check that data has not been modified by another user
         // invoke the validation service to Check user has rep order reserved
         CourtType courtType = request.getCourtType();
         Action action = (courtType == CourtType.MAGISTRATE) ? Action.UPDATE_MAGS_HARDSHIP : Action.UPDATE_CROWN_HARDSHIP;
-        validate(request, action);
+        validate(request, action, getRepOrderDTO(request));
 
         hardshipService.update(request);
         try {
@@ -87,7 +99,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                 if (courtType == CourtType.MAGISTRATE) {
                     request.setApplicationDTO(processMagCourtHardshipRules(request));
                 } else if (courtType == CourtType.CROWN_COURT) {
-                    request.setApplicationDTO(checkActionsAndUpdateApplication(request));
+                    request.setApplicationDTO(checkActionsAndUpdateApplication(request, getRepOrderDTO(request)));
                 }
             }
 
@@ -101,8 +113,8 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         return request.getApplicationDTO();
     }
 
-    private void validate(WorkflowRequest request, Action action) {
-        validationService.validate(request);
+    private void validate(WorkflowRequest request, Action action, RepOrderDTO repOrderDTO) {
+        validationService.validate(request, repOrderDTO);
         validationService.isUserActionValid(hardshipMapper.getUserValidationDTO(request, action));
     }
 
@@ -126,7 +138,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
      * crown_court.check_crown_court_actions(p_application_object => p_application_object);
      * application.update_cc_application(p_application_object => p_application_object);
      */
-    private ApplicationDTO checkActionsAndUpdateApplication(WorkflowRequest request) {
+    private ApplicationDTO checkActionsAndUpdateApplication(WorkflowRequest request, RepOrderDTO repOrderDTO) {
         request.setApplicationDTO(contributionService.calculate(request));
 
         // call application.pre_update_cc_application stored procedure
@@ -137,6 +149,8 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         proceedingsService.updateApplication(request);
 
         // Call application.handle_eform_result stored procedure OR Equivalent ATS service endpoint
+        catDataService.handleEformResult(applicationTrackingMapper.build(request, repOrderDTO));
+
 
         // Call crown_court.xx_process_activity_and_get_correspondence stored procedure
         request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(

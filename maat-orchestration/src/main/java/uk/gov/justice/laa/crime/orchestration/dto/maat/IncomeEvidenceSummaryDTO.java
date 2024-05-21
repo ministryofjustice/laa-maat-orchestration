@@ -1,10 +1,12 @@
 package uk.gov.justice.laa.crime.orchestration.dto.maat;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
@@ -21,11 +23,16 @@ public class IncomeEvidenceSummaryDTO extends GenericDTO {
     private Date upliftRemovedDate;
     private Date firstReminderDate;
     private Date secondReminderDate;
-    private String incomeEvidenceNotes;
-    private Collection<EvidenceDTO> applicantIncomeEvidenceList;
-    private Collection<EvidenceDTO> partnerIncomeEvidenceList;
-    private Collection<ExtraEvidenceDTO> extraEvidenceList;
-    private Boolean enabled;
+    @Builder.Default
+    private String incomeEvidenceNotes = "";
+    @Builder.Default
+    private Collection<EvidenceDTO> applicantIncomeEvidenceList = new ArrayList<>();
+    @Builder.Default
+    private Collection<EvidenceDTO> partnerIncomeEvidenceList = new ArrayList<>();
+    @Builder.Default
+    private Collection<ExtraEvidenceDTO> extraEvidenceList = new ArrayList<>();
+    @Builder.Default
+    private Boolean enabled = Boolean.FALSE;
     private Boolean upliftsAvailable;
 
 }

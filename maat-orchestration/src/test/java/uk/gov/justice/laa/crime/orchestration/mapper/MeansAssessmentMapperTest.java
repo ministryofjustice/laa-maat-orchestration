@@ -20,7 +20,9 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getApplicationDTOForMeansAssessmentMapper;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getPassportedDTO;
 import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
 
 @ExtendWith(SoftAssertionsExtension.class)
@@ -157,6 +159,17 @@ class MeansAssessmentMapperTest {
     }
 
     @Test
+    void givenValidMeansAssessmentResponse_whenMeansAssessmentMapperIsInvoked_thenPassportDTOIsClearedOut() {
+        ApplicationDTO applicationDTO = getApplicationDTOForMeansAssessmentMapper(true);
+        applicationDTO.setPassportedDTO(getPassportedDTO());
+        ApiMeansAssessmentResponse apiMeansAssessmentResponse = MeansAssessmentDataBuilder.getApiMeansAssessmentResponse();
+        meansAssessmentMapper.meansAssessmentResponseToApplicationDto(
+                apiMeansAssessmentResponse,
+                applicationDTO);
+        assertThat(applicationDTO.getPassportedDTO())
+                .isEqualTo(PassportedDTO.builder().build());
+    }
+        @Test
     void givenValidMeansAssessmentResponse_whenMeansAssessmentMapperIsInvokedForFullAssessment_thenMappingIsCorrect() {
         ApplicationDTO applicationDTO = getApplicationDTOForMeansAssessmentMapper(true);
         FinancialAssessmentDTO financialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO();

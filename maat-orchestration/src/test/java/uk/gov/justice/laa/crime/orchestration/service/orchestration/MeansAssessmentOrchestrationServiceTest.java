@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -13,9 +15,13 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
+import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.service.*;
 
+import java.util.List;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -83,8 +89,7 @@ class MeansAssessmentOrchestrationServiceTest {
         workflowRequest.setC3Enabled(false);
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
                 any(StoredProcedure.class)
-        ))
-                .thenReturn(workflowRequest.getApplicationDTO());
+        )).thenReturn(workflowRequest.getApplicationDTO());
 
         orchestrationService.create(workflowRequest);
         verify(meansAssessmentService).create(workflowRequest);
@@ -161,4 +166,39 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(assessmentSummaryService, times(1)).getSummary(any());
     }
 
+    @Test
+    void givenCrimeValidationExceptionThrownInCMAService_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
+        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
+        doThrow(new CrimeValidationException(List.of())).when(meansAssessmentService).create(workflowRequest);
+        assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
+                .isInstanceOf(CrimeValidationException.class);
+        Mockito.verify(meansAssessmentService, times(0)).rollback(any());
+    }
+
+    @Test
+    void givenValidationExceptionThrownInCMAService_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
+        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
+        doThrow(new ValidationException()).when(meansAssessmentService).create(workflowRequest);
+        assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
+                .isInstanceOf(ValidationException.class);
+        Mockito.verify(meansAssessmentService, times(0)).rollback(any());
+    }
+
+    @Test
+    void givenCrimeValidationExceptionThrownInCMAService_whenUpdateIsInvoked_thenRollbackIsNotInvoked() {
+        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
+        doThrow(new CrimeValidationException(List.of())).when(meansAssessmentService).update(workflowRequest);
+        assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
+                .isInstanceOf(CrimeValidationException.class);
+        Mockito.verify(meansAssessmentService, times(0)).rollback(any());
+    }
+
+    @Test
+    void givenValidationExceptionThrownInCMAService_whenUpdateIsInvoked_thenRollbackIsNotInvoked() {
+        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
+        doThrow(new ValidationException()).when(meansAssessmentService).update(workflowRequest);
+        assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
+                .isInstanceOf(ValidationException.class);
+        Mockito.verify(meansAssessmentService, times(0)).rollback(any());
+    }
 }

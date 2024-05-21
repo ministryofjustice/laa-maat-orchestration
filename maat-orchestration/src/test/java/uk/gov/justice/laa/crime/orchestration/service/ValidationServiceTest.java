@@ -103,26 +103,23 @@ class ValidationServiceTest {
     @ParameterizedTest
     @MethodSource("validateApplicationTimestamp")
     void validateApplicationTimestamp(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        when(maatCourtDataService.findRepOrder(any())).thenReturn(repOrderDTO);
         ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.
-                validate(workflowRequest));
+                validate(workflowRequest, repOrderDTO));
         assertThat(validationException.getMessage()).isEqualTo(CANNOT_MODIFY_APPLICATION_ERROR);
     }
 
     @ParameterizedTest
     @MethodSource("validateApplicationStatus")
     void validateApplicationStatus(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        when(maatCourtDataService.findRepOrder(any())).thenReturn(repOrderDTO);
         ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.
-                validate(workflowRequest));
+                validate(workflowRequest, repOrderDTO));
         assertThat(validationException.getMessage()).contains("Cannot update case in status of");
     }
 
     @ParameterizedTest
     @MethodSource("validateApplicationStatusNoException")
     void validateApplicationStatus_noException(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        when(maatCourtDataService.findRepOrder(any())).thenReturn(repOrderDTO);
-        assertDoesNotThrow(() -> validationService.validate(workflowRequest));
+        assertDoesNotThrow(() -> validationService.validate(workflowRequest, repOrderDTO));
     }
 
     @Test
@@ -283,7 +280,7 @@ class ValidationServiceTest {
     @Test
     void givenValidInputAndWithDifferentSessionIdForUser_whenIsUserActionValidIsInvoked_thenFalseIsReturned() throws CrimeValidationException {
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
-        userSummaryDTO.getReservationsEntity().setUserSession("sessionId_1234");
+        userSummaryDTO.getReservationsDTO().setUserSession("sessionId_1234");
         when(maatCourtDataService.getUserSummary(any())).thenReturn(userSummaryDTO);
         assertThatThrownBy(() -> validationService.isUserActionValid(TestModelDataBuilder.getUserValidationDTOWithReservation()))
                 .isInstanceOf(CrimeValidationException.class)
@@ -322,7 +319,7 @@ class ValidationServiceTest {
         userValidationDTO.setNewWorkReason(null);
 
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
-        userSummaryDTO.getReservationsEntity().setUserSession(TEST_USER_SESSION);
+        userSummaryDTO.getReservationsDTO().setUserSession(TEST_USER_SESSION);
         when(maatCourtDataService.getUserSummary(any())).thenReturn(userSummaryDTO);
 
         assertThat(validationService.isUserActionValid(userValidationDTO)).isTrue();
@@ -335,7 +332,7 @@ class ValidationServiceTest {
         userValidationDTO.setNewWorkReason(null);
 
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
-        userSummaryDTO.setReservationsEntity(null);
+        userSummaryDTO.setReservationsDTO(null);
         when(maatCourtDataService.getUserSummary(any())).thenReturn(userSummaryDTO);
 
         Boolean isUserActionValid =

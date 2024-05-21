@@ -22,6 +22,8 @@ public class WiremockStubs {
     private static final String CMA_ROLLBACK_URL = "/api/internal/v1/assessment/means/rollback/";
     private static final String MAAT_API_USER_URL = "/api/internal/v1/users/summary/";
 
+    private static final String CAT_URL = "/api/internal/v1/application-tracking-output-result";
+
     public static void stubForOAuth() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> token = Map.of(
@@ -74,6 +76,10 @@ public class WiremockStubs {
 
     public static void assertStubForGetContributionsSummary(int times) {
         verify(exactly(times), getRequestedFor(urlPathMatching(CCC_URL + "/summaries")));
+    }
+
+    public static void assertStubForHandleEformSerivce(int times) {
+        verify(exactly(times), postRequestedFor(urlPathMatching(CAT_URL)));
     }
 
     public static void stubForCheckContributionsRule() {

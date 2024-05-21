@@ -22,6 +22,11 @@ public class MaatCourtDataService {
     public ApplicationDTO invokeStoredProcedure(ApplicationDTO application, UserDTO user,
                                                 StoredProcedure storedProcedure) {
 
+        log.info("Invoking stored procedure : {}.{} for rep-id : {}",
+                storedProcedure.getPackageName(),
+                storedProcedure.getProcedureName(),
+                application.getRepId());
+
         return maatCourtDataApiService.executeStoredProcedure(
                 StoredProcedureRequest.builder()
                         .user(user)
