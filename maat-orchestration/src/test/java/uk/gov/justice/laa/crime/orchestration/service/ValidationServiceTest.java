@@ -280,7 +280,7 @@ class ValidationServiceTest {
     @Test
     void givenValidInputAndWithDifferentSessionIdForUser_whenIsUserActionValidIsInvoked_thenFalseIsReturned() throws CrimeValidationException {
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
-        userSummaryDTO.getReservationsEntity().setUserSession("sessionId_1234");
+        userSummaryDTO.getReservationsDTO().setUserSession("sessionId_1234");
         when(maatCourtDataService.getUserSummary(any())).thenReturn(userSummaryDTO);
         assertThatThrownBy(() -> validationService.isUserActionValid(TestModelDataBuilder.getUserValidationDTOWithReservation()))
                 .isInstanceOf(CrimeValidationException.class)
@@ -319,7 +319,7 @@ class ValidationServiceTest {
         userValidationDTO.setNewWorkReason(null);
 
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
-        userSummaryDTO.getReservationsEntity().setUserSession(TEST_USER_SESSION);
+        userSummaryDTO.getReservationsDTO().setUserSession(TEST_USER_SESSION);
         when(maatCourtDataService.getUserSummary(any())).thenReturn(userSummaryDTO);
 
         assertThat(validationService.isUserActionValid(userValidationDTO)).isTrue();
@@ -332,7 +332,7 @@ class ValidationServiceTest {
         userValidationDTO.setNewWorkReason(null);
 
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
-        userSummaryDTO.setReservationsEntity(null);
+        userSummaryDTO.setReservationsDTO(null);
         when(maatCourtDataService.getUserSummary(any())).thenReturn(userSummaryDTO);
 
         Boolean isUserActionValid =
