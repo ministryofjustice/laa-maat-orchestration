@@ -6,11 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.laa.crime.common.model.orchestration.hardship.ApiPerformHardshipRequest;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.MockServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;

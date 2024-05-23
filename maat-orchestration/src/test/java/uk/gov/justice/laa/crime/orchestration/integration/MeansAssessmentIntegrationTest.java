@@ -20,13 +20,13 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.ApiRollbackMeansAssessmentResponse;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiRollbackMeansAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs;
 
 import java.util.List;

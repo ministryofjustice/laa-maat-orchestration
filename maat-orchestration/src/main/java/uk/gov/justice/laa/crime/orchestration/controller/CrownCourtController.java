@@ -13,9 +13,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.justice.laa.crime.annotation.DefaultHTTPErrorResponse;
+import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.CrownCourtOrchestrationService;
 
 import static uk.gov.justice.laa.crime.commons.common.Constants.LAA_TRANSACTION_ID;

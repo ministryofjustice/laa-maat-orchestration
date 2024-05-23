@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.commons.exception.APIClientException;
+import uk.gov.justice.laa.crime.enums.AppealType;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.RepOrderStatus;
@@ -21,7 +22,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.Action;
-import uk.gov.justice.laa.crime.orchestration.enums.AppealType;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 

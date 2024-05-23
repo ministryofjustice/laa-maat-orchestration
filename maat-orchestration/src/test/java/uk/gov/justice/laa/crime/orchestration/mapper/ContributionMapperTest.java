@@ -5,15 +5,15 @@ import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import uk.gov.justice.laa.crime.common.model.orchestration.contribution.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.orchestration.contribution.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.orchestration.contribution.ApiMaatCheckContributionRuleRequest;
+import uk.gov.justice.laa.crime.common.model.orchestration.contribution.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.enums.AppealType;
-import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
-import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCheckContributionRuleRequest;
-import uk.gov.justice.laa.crime.orchestration.model.contribution.common.ApiContributionSummary;
+
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;

@@ -5,13 +5,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.ApiCreateMeansAssessmentRequest;
+import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.ApiGetMeansAssessmentResponse;
+import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.ApiUpdateMeansAssessmentRequest;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
-import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiCreateMeansAssessmentRequest;
-import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiGetMeansAssessmentResponse;
-import uk.gov.justice.laa.crime.orchestration.model.means_assessment.ApiUpdateMeansAssessmentRequest;
+
 import uk.gov.justice.laa.crime.orchestration.service.api.MeansAssessmentApiService;
 
 import static org.mockito.ArgumentMatchers.any;

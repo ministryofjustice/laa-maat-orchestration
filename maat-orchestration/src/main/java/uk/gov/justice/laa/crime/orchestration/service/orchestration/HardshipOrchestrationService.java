@@ -3,6 +3,7 @@ package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.common.model.orchestration.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -13,7 +14,6 @@ import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.service.*;
 
 @Slf4j

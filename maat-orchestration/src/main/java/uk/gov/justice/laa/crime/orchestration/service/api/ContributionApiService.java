@@ -5,12 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.common.model.orchestration.contribution.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.orchestration.contribution.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.orchestration.contribution.ApiMaatCheckContributionRuleRequest;
+import uk.gov.justice.laa.crime.common.model.orchestration.contribution.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
-import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
-import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCheckContributionRuleRequest;
-import uk.gov.justice.laa.crime.orchestration.model.contribution.common.ApiContributionSummary;
+
 
 import java.util.Collections;
 import java.util.List;

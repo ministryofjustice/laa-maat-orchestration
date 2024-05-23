@@ -2,6 +2,16 @@ package uk.gov.justice.laa.crime.orchestration.data.builder;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtOutcome;
+import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiRepOrderCrownCourtOutcome;
+import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiUserSession;
+import uk.gov.justice.laa.crime.common.model.orchestration.contribution.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.orchestration.contribution.common.ApiContributionSummary;
+import uk.gov.justice.laa.crime.common.model.orchestration.court_data_api.hardship.ApiHardshipDetail;
+import uk.gov.justice.laa.crime.common.model.orchestration.court_data_api.hardship.ApiHardshipProgress;
+import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.*;
+import uk.gov.justice.laa.crime.common.model.orchestration.hardship.*;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -13,17 +23,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.Action;
-import uk.gov.justice.laa.crime.orchestration.enums.AppealType;
-import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOutcome;
-import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
-import uk.gov.justice.laa.crime.orchestration.model.common.ApiRepOrderCrownCourtOutcome;
-import uk.gov.justice.laa.crime.orchestration.model.common.ApiUserSession;
-import uk.gov.justice.laa.crime.orchestration.model.contribution.ApiMaatCalculateContributionResponse;
-import uk.gov.justice.laa.crime.orchestration.model.contribution.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipDetail;
-import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipProgress;
-import uk.gov.justice.laa.crime.orchestration.model.crown_court.*;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
+
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
