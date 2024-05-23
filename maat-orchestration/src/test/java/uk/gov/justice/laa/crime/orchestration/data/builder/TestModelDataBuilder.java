@@ -1114,7 +1114,7 @@ public class TestModelDataBuilder {
                 .username(Constants.USERNAME)
                 .roleActions(TEST_ROLE_ACTIONS)
                 .newWorkReasons(TEST_NEW_WORK_REASONS)
-                .reservationsEntity(getReservationsDTO())
+                .reservationsDTO(getReservationsDTO())
                 .build();
     }
 
@@ -1200,7 +1200,7 @@ public class TestModelDataBuilder {
                 .username(Constants.USERNAME)
                 .roleActions(roleActions)
                 .newWorkReasons(List.of(newWorkReason.getCode()))
-                .reservationsEntity(getReservationsDTO())
+                .reservationsDTO(getReservationsDTO())
                 .build();
     }
 

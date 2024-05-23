@@ -129,8 +129,8 @@ public class ValidationService {
             crimeValidationExceptionList.add(USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE);
         }
 
-        if (request.getSessionId() != null && userSummaryDTO.getReservationsEntity() != null
-                && !request.getSessionId().equalsIgnoreCase(userSummaryDTO.getReservationsEntity().getUserSession())) {
+        if (request.getSessionId() != null && userSummaryDTO.getReservationsDTO() != null
+                && !request.getSessionId().equalsIgnoreCase(userSummaryDTO.getReservationsDTO().getUserSession())) {
             crimeValidationExceptionList.add(USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED);
         }
 
