@@ -1,17 +1,18 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.ApiAssessmentDetail;
+import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.ApiAssessmentSectionSummary;
+import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.ApiMeansAssessmentResponse;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.enums.AppealType;
-import uk.gov.justice.laa.crime.orchestration.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOverview;
-import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
-import uk.gov.justice.laa.crime.orchestration.model.common.ApiUserSession;
-import uk.gov.justice.laa.crime.orchestration.model.crown_court.ApiUpdateApplicationResponse;
-import uk.gov.justice.laa.crime.orchestration.model.means_assessment.*;
+import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtOverview;
+import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiUserSession;
+import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiUpdateApplicationResponse;
+import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.*;
 
 import java.math.BigDecimal;
 import java.time.*;

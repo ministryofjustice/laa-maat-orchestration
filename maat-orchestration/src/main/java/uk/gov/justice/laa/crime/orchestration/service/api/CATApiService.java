@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.common.model.orchestration.application_tracking.ApiCrimeApplicationTrackingRequest;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
-import uk.gov.justice.laa.crime.orchestration.model.application_tracking.ApiCrimeApplicationTrackingRequest;
 
 import java.util.Collections;
 

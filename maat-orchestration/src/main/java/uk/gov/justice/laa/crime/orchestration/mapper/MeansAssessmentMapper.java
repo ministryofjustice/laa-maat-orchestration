@@ -3,12 +3,13 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtOverview;
+import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.*;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtOverview;
-import uk.gov.justice.laa.crime.orchestration.model.common.ApiCrownCourtSummary;
-import uk.gov.justice.laa.crime.orchestration.model.means_assessment.*;
+
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;

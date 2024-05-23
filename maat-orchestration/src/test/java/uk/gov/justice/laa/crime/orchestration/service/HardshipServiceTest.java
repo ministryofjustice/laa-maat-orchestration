@@ -5,6 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.laa.crime.common.model.orchestration.hardship.ApiFindHardshipResponse;
+import uk.gov.justice.laa.crime.common.model.orchestration.hardship.ApiPerformHardshipRequest;
+import uk.gov.justice.laa.crime.common.model.orchestration.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
@@ -12,9 +15,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiFindHardshipResponse;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipRequest;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.ApiPerformHardshipResponse;
+
 import uk.gov.justice.laa.crime.orchestration.service.api.HardshipApiService;
 
 import static org.mockito.ArgumentMatchers.any;

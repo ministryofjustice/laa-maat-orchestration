@@ -2,14 +2,15 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.common.model.orchestration.court_data_api.hardship.ApiHardshipDetail;
+import uk.gov.justice.laa.crime.common.model.orchestration.court_data_api.hardship.ApiHardshipProgress;
+import uk.gov.justice.laa.crime.common.model.orchestration.hardship.*;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.Action;
-import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipDetail;
-import uk.gov.justice.laa.crime.orchestration.model.court_data_api.hardship.ApiHardshipProgress;
-import uk.gov.justice.laa.crime.orchestration.model.hardship.*;
+
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
