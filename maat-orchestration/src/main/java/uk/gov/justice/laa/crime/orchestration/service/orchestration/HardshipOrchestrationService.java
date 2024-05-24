@@ -69,6 +69,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(newHardship, courtType);
             assessmentSummaryService.updateApplication(application, hardshipSummary);
         } catch (Exception ex) {
+            log.warn("Create Hardship Review failed with the exception: {}", ex);
             hardshipService.rollback(request);
             throw new MaatOrchestrationException(request.getApplicationDTO());
         }
@@ -107,6 +108,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(hardshipReviewDTO, courtType);
             assessmentSummaryService.updateApplication(request.getApplicationDTO(), hardshipSummary);
         } catch (Exception ex) {
+            log.warn("Update Hardship Review failed with the exception: {}", ex);
             hardshipService.rollback(request);
             throw new MaatOrchestrationException(request.getApplicationDTO());
         }
