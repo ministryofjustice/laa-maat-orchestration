@@ -41,7 +41,7 @@ public class MeansAssessmentOrchestrationService {
         } catch (ValidationException | CrimeValidationException exception) {
             throw exception;
         } catch (Exception ex) {
-            log.warn("Create Means assessment failed with the exception: {}", ex.getMessage());
+            log.warn("Create Means assessment failed with the exception: {}", ex);
             meansAssessmentService.rollback(request);
             throw new MaatOrchestrationException(request.getApplicationDTO());
         }
@@ -60,7 +60,7 @@ public class MeansAssessmentOrchestrationService {
         } catch (ValidationException | CrimeValidationException exception) {
             throw exception;
         } catch (Exception ex) {
-            log.warn("Update Means assessment failed with the exception: {}", ex.getMessage());
+            log.warn("Update Means assessment failed with the exception: {}", ex);
             meansAssessmentService.rollback(request);
             throw new MaatOrchestrationException(request.getApplicationDTO());
         }
