@@ -5,7 +5,12 @@ import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import uk.gov.justice.laa.crime.common.model.orchestration.application_tracking.*;
 import uk.gov.justice.laa.crime.enums.*;
+import uk.gov.justice.laa.crime.enums.orchestration.AssessmentType;
+import uk.gov.justice.laa.crime.enums.orchestration.HardshipType;
+import uk.gov.justice.laa.crime.enums.orchestration.MeanAssessmentResult;
+import uk.gov.justice.laa.crime.enums.orchestration.RequestSource;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -13,11 +18,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentStatusDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJDecisionReasonDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
-import uk.gov.justice.laa.crime.orchestration.enums.cat.AssessmentType;
-import uk.gov.justice.laa.crime.orchestration.enums.cat.HardshipType;
-import uk.gov.justice.laa.crime.orchestration.enums.cat.MeanAssessmentResult;
-import uk.gov.justice.laa.crime.orchestration.enums.cat.RequestSource;
-import uk.gov.justice.laa.crime.orchestration.model.application_tracking.*;
 
 import java.util.Date;
 
@@ -207,6 +207,7 @@ class ApplicationTrackingMapperTest {
         softly.assertAll();
 
     }
+
     @Test
     void giveAValidHardship_whenBuildHardshipIsInvoked_thenMappingIsCorrect() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestWithCCHardship(CourtType.CROWN_COURT);

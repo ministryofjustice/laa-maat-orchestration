@@ -18,7 +18,8 @@ java {
 def versions = [
 		pitest                  : "1.16.0",
 		springdocVersion        : "2.5.0",
-		crimeCommonsClasses     : "3.4.0",
+		commonsModSchemas       : "1.1.0",
+		crimeCommonsClasses     : "3.21.0",
 		commonsRestClient       : "3.4.0",
 		okhttpVersion           : "4.12.0",
 		wmStubRunnerVersion    	: "4.1.2"
@@ -38,6 +39,7 @@ dependencies {
 
 	implementation "uk.gov.justice.service.laa-crime:crime-commons-spring-boot-starter-rest-client:$versions.commonsRestClient:all"
 	implementation "uk.gov.justice.service.laa-crime:crime-commons-classes:$versions.crimeCommonsClasses"
+	implementation "uk.gov.justice.service.laa-crime:crime-commons-mod-schemas:$versions.commonsModSchemas"
 
 	implementation "io.micrometer:micrometer-registry-prometheus"
 	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$versions.springdocVersion"
@@ -116,16 +118,3 @@ sonar {
 	}
 }
 
-jsonSchema2Pojo {
-	executions {
-		main {
-			methods.builders = true
-			methods.buildersDynamic = true
-			methods.annotateJsr303Jakarta = true
-			fields.floatUseBigDecimal = true
-			dateTime.dateTimeType = "java.time.LocalDateTime"
-			klass.targetPackage = "uk.gov.justice.laa.crime.orchestration.model"
-			io.source.setFrom files("${project.rootDir}/src/main/resources/schemas")
-		}
-	}
-}

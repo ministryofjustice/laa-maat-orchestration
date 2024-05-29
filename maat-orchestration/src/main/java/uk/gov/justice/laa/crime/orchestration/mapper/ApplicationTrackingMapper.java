@@ -2,18 +2,18 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.common.model.orchestration.application_tracking.*;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.PassportAssessmentResult;
 import uk.gov.justice.laa.crime.enums.ReviewResult;
+import uk.gov.justice.laa.crime.enums.orchestration.AssessmentType;
+import uk.gov.justice.laa.crime.enums.orchestration.HardshipType;
+import uk.gov.justice.laa.crime.enums.orchestration.MeanAssessmentResult;
+import uk.gov.justice.laa.crime.enums.orchestration.RequestSource;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.PassportAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
-import uk.gov.justice.laa.crime.orchestration.enums.cat.AssessmentType;
-import uk.gov.justice.laa.crime.orchestration.enums.cat.HardshipType;
-import uk.gov.justice.laa.crime.orchestration.enums.cat.MeanAssessmentResult;
-import uk.gov.justice.laa.crime.orchestration.enums.cat.RequestSource;
-import uk.gov.justice.laa.crime.orchestration.model.application_tracking.*;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
