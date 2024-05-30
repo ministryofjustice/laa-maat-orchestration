@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
+import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,7 @@ public class MeansAssessmentOrchestrationService {
         } catch (Exception ex) {
             log.warn("Create Means assessment failed with the exception: {}", ex);
             meansAssessmentService.rollback(request);
+            Sentry.captureException(ex);
             throw new MaatOrchestrationException(request.getApplicationDTO());
         }
         return application;
@@ -62,6 +64,7 @@ public class MeansAssessmentOrchestrationService {
         } catch (Exception ex) {
             log.warn("Update Means assessment failed with the exception: {}", ex);
             meansAssessmentService.rollback(request);
+            Sentry.captureException(ex);
             throw new MaatOrchestrationException(request.getApplicationDTO());
         }
         return application;
