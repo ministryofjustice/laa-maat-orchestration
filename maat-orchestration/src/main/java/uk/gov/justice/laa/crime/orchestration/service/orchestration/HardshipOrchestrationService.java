@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
+import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -71,6 +72,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         } catch (Exception ex) {
             log.warn("Create Hardship Review failed with the exception: {}", ex);
             hardshipService.rollback(request);
+            Sentry.captureException(ex);
             throw new MaatOrchestrationException(request.getApplicationDTO());
         }
         return application;
@@ -110,6 +112,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         } catch (Exception ex) {
             log.warn("Update Hardship Review failed with the exception: {}", ex);
             hardshipService.rollback(request);
+            Sentry.captureException(ex);
             throw new MaatOrchestrationException(request.getApplicationDTO());
         }
         return request.getApplicationDTO();
