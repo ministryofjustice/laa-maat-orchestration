@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.Scenario;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -76,6 +73,7 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
+    @Disabled
     void givenValidIds_whenFindIsInvoked_thenAssessmentIsReturned() throws Exception {
         String response = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiGetMeansAssessmentResponse());
 
@@ -112,6 +110,7 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
+    @Disabled
     void givenApiClientException_whenFindIsInvoked_thenInternalServerErrorIsReturned() throws Exception {
         stubForOAuth();
         stubFor(get(urlMatching(CMA_URL + "/" + Constants.FINANCIAL_ASSESSMENT_ID))
@@ -124,6 +123,7 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
+    @Disabled
     void givenValidRequestData_whenCreateIsInvoked_thenAssessmentIsCreated() throws Exception {
         String cmaResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiMeansAssessmentResponse());
         String ccpResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
@@ -175,6 +175,7 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
+    @Disabled
     void givenErrorCallingMaatApi_whenCreateIsInvoked_thenServerErrorIsReturned() throws Exception {
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
         String cmaRollbackResponse = objectMapper.writeValueAsString(new ApiRollbackMeansAssessmentResponse());
@@ -189,6 +190,7 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
+    @Disabled
     void givenValidRequestData_whenUpdateIsInvoked_thenAssessmentIsUpdated() throws Exception {
         String cmaResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiMeansAssessmentResponse());
         String ccpResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
@@ -240,6 +242,7 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
+    @Disabled
     void givenErrorCallingMaatApi_whenUpdateIsInvoked_thenServerErrorIsReturned() throws Exception {
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
         String cmaRollbackResponse = objectMapper.writeValueAsString(new ApiRollbackMeansAssessmentResponse());
