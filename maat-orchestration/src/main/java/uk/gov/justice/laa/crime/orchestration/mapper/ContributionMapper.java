@@ -172,9 +172,6 @@ public class ContributionMapper extends CrownCourtMapper {
             contributionSummaryDTO.setUpliftApplied("Y".equalsIgnoreCase((apiContributionSummary.getUpliftApplied())));
             contributionSummaryDTO.setEffectiveDate(toDate(apiContributionSummary.getEffectiveDate()));
             contributionSummaryDTO.setCalcDate(toDate(apiContributionSummary.getCalcDate()));
-            contributionSummaryDTO.setFileName(apiContributionSummary.getFileName());
-            contributionSummaryDTO.setDateFileSent(toDate(apiContributionSummary.getDateSent()));
-            contributionSummaryDTO.setDateFileReceived(toDate(apiContributionSummary.getDateReceived()));
             contributionSummaryCollection.add(contributionSummaryDTO);
         }
         return contributionSummaryCollection;
