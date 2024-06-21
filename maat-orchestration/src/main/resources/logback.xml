@@ -1,7 +1,45 @@
 <configuration>
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg[%X]%n</pattern>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="uk.gov.justice.laa.crime.util.MaskingPatternLayout">
+                <maskPattern>caseId=(\w+)</maskPattern>
+                <maskPattern>arrestSummonsNo=(\w+)</maskPattern>
+                <maskPattern>solicitorName=(\w+)</maskPattern>
+                <maskPattern>solicitorEmail=([\w.-]+@[\w.-]+\.\w+)</maskPattern>
+                <maskPattern>solicitorAdminEmail=([\w.-]+@[\w.-]+\.\w+)</maskPattern>
+                <maskPattern>firstName=(\w+)</maskPattern>
+                <maskPattern>surname=(\w+)</maskPattern>
+                <maskPattern>password=(\w+)</maskPattern>
+                <maskPattern>userSession=(\w+)</maskPattern>
+                <maskPattern>ethnicity=([\w\s\&amp;\(\=\,]+)</maskPattern>
+                <maskPattern>foreignId=([\w\/]+)</maskPattern>
+                <maskPattern>gender=(\w+)</maskPattern>
+                <maskPattern>otherNames=(\w+)</maskPattern>
+                <maskPattern>dob=([\w\s\:]+)</maskPattern>
+                <maskPattern>NiNumber=(\w+)</maskPattern>
+                <maskPattern>disabled=(\w+)</maskPattern>
+                <maskPattern>disabilities=(\w+)</maskPattern>
+                <maskPattern>disabilityStatementDTO=(\w+)</maskPattern>
+                <maskPattern>email=([\w.-]+@[\w.-]+\.\w+)</maskPattern>
+                <maskPattern>mobileTelephone=([\w\s]+)</maskPattern>
+                <maskPattern>workTelephone=([\w\s]+)</maskPattern>
+                <maskPattern>homeTelephone=([\w\s]+)</maskPattern>
+                <maskPattern>line1=([\w\s\&amp;\()-]+)</maskPattern>
+                <maskPattern>line2=([\w\s\&amp;\()-]+)</maskPattern>
+                <maskPattern>line3=([\w\s\&amp;\()-]+)</maskPattern>
+                <maskPattern>postCode=([\w\s]+)</maskPattern>
+                <maskPattern>accountNumber=(\w+)</maskPattern>
+                <maskPattern>ownerName=(\w+)</maskPattern>
+                <maskPattern>branchSortCode=([\w.-]+)</maskPattern>
+                <maskPattern>VehicleRegistrationMark=(\w+)</maskPattern>
+                <maskPattern>nationaInsuranceNumber=(\w+)</maskPattern>
+                <maskPattern>dateOfBirth=([\w\s\:]+)</maskPattern>
+                <maskPattern>lastName=(\w+)</maskPattern>
+                <maskPattern>telephone=([\w\s]+)</maskPattern>
+                <maskPattern>defendantId=([\w+-]+)</maskPattern>
+                <maskPattern>debtRefNumber=(\w+)</maskPattern>
+                <pattern>%d{HH:mm:ss.SSS} traceId: %X{traceId:-} spanId: %X{spanId:-} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </layout>
         </encoder>
     </appender>
 
