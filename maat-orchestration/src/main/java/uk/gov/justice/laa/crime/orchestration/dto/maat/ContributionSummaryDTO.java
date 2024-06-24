@@ -19,8 +19,4 @@ public class ContributionSummaryDTO extends GenericDTO {
     private Boolean upliftApplied;
     private Date effectiveDate;
     private Date calcDate;
-    private String fileName;
-    private Date dateFileSent;
-    private Date dateFileReceived;
-
 }

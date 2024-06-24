@@ -916,10 +916,7 @@ public class TestModelDataBuilder {
                 .withBasedOn("Means")
                 .withUpliftApplied("Y")
                 .withEffectiveDate(LocalDateTime.parse("2023-06-27T10:15:30"))
-                .withCalcDate(LocalDateTime.parse("2023-03-01T09:00:00"))
-                .withFileName("Test")
-                .withDateSent(LocalDateTime.parse("2022-12-01T09:00:00"))
-                .withDateReceived(LocalDateTime.parse("2023-01-01T09:00:00"));
+                .withCalcDate(LocalDateTime.parse("2023-03-01T09:00:00"));
     }
 
     public static ApiMaatCalculateContributionResponse getApiMaatCalculateContributionResponse() {
