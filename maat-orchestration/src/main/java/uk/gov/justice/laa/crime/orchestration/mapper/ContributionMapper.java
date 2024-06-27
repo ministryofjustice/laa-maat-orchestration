@@ -41,7 +41,7 @@ public class ContributionMapper extends CrownCourtMapper {
 
         Collection<OutcomeDTO> outcomeDTOs = crownCourtOverviewDTO.getCrownCourtSummaryDTO().getOutcomeDTOs();
         String appealType = crownCourtOverviewDTO.getAppealDTO().getAppealTypeDTO().getCode();
-        LocalDateTime effectiveDate = toLocalDateTime(contributionsDTO.getEffectiveDate().getValue());
+        LocalDateTime effectiveDate = toLocalDateTime(contributionsDTO.getEffectiveDate()!=null?contributionsDTO.getEffectiveDate().getValue():null);
 
         ApiMaatCalculateContributionRequest request = new ApiMaatCalculateContributionRequest()
                 .withUserCreated(user.getUserName())
