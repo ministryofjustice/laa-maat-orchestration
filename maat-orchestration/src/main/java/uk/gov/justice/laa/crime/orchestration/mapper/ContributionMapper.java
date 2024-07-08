@@ -163,16 +163,18 @@ public class ContributionMapper extends CrownCourtMapper {
 
     public Collection<ContributionSummaryDTO> contributionSummaryToDto(List<ApiContributionSummary> contributionSummaries) {
         Collection<ContributionSummaryDTO> contributionSummaryCollection = new ArrayList<>();
-        for (ApiContributionSummary apiContributionSummary : contributionSummaries) {
-            ContributionSummaryDTO contributionSummaryDTO = new ContributionSummaryDTO();
-            contributionSummaryDTO.setId(Long.valueOf(apiContributionSummary.getId()));
-            contributionSummaryDTO.setMonthlyContribs(apiContributionSummary.getMonthlyContributions().doubleValue());
-            contributionSummaryDTO.setUpfrontContribs(apiContributionSummary.getUpfrontContributions().doubleValue());
-            contributionSummaryDTO.setBasedOn(apiContributionSummary.getBasedOn());
-            contributionSummaryDTO.setUpliftApplied("Y".equalsIgnoreCase((apiContributionSummary.getUpliftApplied())));
-            contributionSummaryDTO.setEffectiveDate(toDate(apiContributionSummary.getEffectiveDate()));
-            contributionSummaryDTO.setCalcDate(toDate(apiContributionSummary.getCalcDate()));
-            contributionSummaryCollection.add(contributionSummaryDTO);
+        if (null != contributionSummaries) {
+            for (ApiContributionSummary apiContributionSummary : contributionSummaries) {
+                ContributionSummaryDTO contributionSummaryDTO = new ContributionSummaryDTO();
+                contributionSummaryDTO.setId(Long.valueOf(apiContributionSummary.getId()));
+                contributionSummaryDTO.setMonthlyContribs(apiContributionSummary.getMonthlyContributions().doubleValue());
+                contributionSummaryDTO.setUpfrontContribs(apiContributionSummary.getUpfrontContributions().doubleValue());
+                contributionSummaryDTO.setBasedOn(apiContributionSummary.getBasedOn());
+                contributionSummaryDTO.setUpliftApplied("Y".equalsIgnoreCase((apiContributionSummary.getUpliftApplied())));
+                contributionSummaryDTO.setEffectiveDate(toDate(apiContributionSummary.getEffectiveDate()));
+                contributionSummaryDTO.setCalcDate(toDate(apiContributionSummary.getCalcDate()));
+                contributionSummaryCollection.add(contributionSummaryDTO);
+            }
         }
         return contributionSummaryCollection;
     }
