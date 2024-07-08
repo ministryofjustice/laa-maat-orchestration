@@ -193,4 +193,12 @@ class ContributionMapperTest {
                 .isEqualTo(toDate(apiContributionSummary.getEffectiveDate()));
         softly.assertAll();
     }
+
+    @Test
+    void givenAEmptyContributionSummaries_whenContributionMapperIsInvoked_thenMappingIsCorrect() {
+        Collection<ContributionSummaryDTO> ContributionSummaryDTOs = contributionMapper
+                .contributionSummaryToDto(null);
+        softly.assertThat(ContributionSummaryDTOs).isEmpty();
+        softly.assertAll();
+    }
 }
