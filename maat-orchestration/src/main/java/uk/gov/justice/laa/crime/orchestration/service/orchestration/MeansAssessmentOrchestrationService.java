@@ -36,6 +36,8 @@ public class MeansAssessmentOrchestrationService {
         try {
             Long repId = application.getRepId();
             log.debug("Creating Means assessment for applicationId = " + repId);
+            log.info("Creating Means assessment for applicationId = " + repId);
+            log.info("MeansAssessmentOrchestrationService.create = " + request);
             meansAssessmentService.create(request);
             application = processCrownCourtProceedings(request);
             log.debug("Created Means assessment for applicationId = " + repId);
@@ -56,6 +58,8 @@ public class MeansAssessmentOrchestrationService {
         try {
             Long repId = application.getRepId();
             log.debug("Updating Means assessment for applicationId = " + repId);
+            log.info("Updating Means assessment for applicationId = " + repId);
+            log.info("MeansAssessmentOrchestrationService.update() = " + request);
             meansAssessmentService.update(request);
             application = processCrownCourtProceedings(request);
             log.debug("Updated Means assessment for applicationId = " + repId);
@@ -71,6 +75,8 @@ public class MeansAssessmentOrchestrationService {
     }
 
     private ApplicationDTO processCrownCourtProceedings(WorkflowRequest request) {
+        log.info("MeansAssessmentOrchestrationService.processCrownCourtProceedings = " + request);
+        log.info("MeansAssessmentOrchestrationService.isC3Enabled = " + request.isC3Enabled());
         if (request.isC3Enabled()) {
             // call post_processing_part_1_c3 and map the application
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
@@ -79,12 +85,15 @@ public class MeansAssessmentOrchestrationService {
                     StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3)
             );
 
+            log.info("MeansAssessmentOrchestrationService.ASSESSMENT_POST_PROCESSING_PART_1_C3 = " + request);
+
             // call pre_update_cc_application with the calculated contribution and map the application
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
                     contributionService.calculate(request),
                     request.getUserDTO(),
                     StoredProcedure.PRE_UPDATE_CC_APPLICATION)
             );
+            log.info("MeansAssessmentOrchestrationService.PRE_UPDATE_CC_APPLICATION = " + request);
         } else {
             // call post_processing_part1 and map the application
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
@@ -95,11 +104,15 @@ public class MeansAssessmentOrchestrationService {
         }
         proceedingsService.updateApplication(request);
 
+        log.info("MeansAssessmentOrchestrationService.updateApplication = " + request);
+
         // call post_processing_part_2
         ApplicationDTO application = maatCourtDataService.invokeStoredProcedure(
                 request.getApplicationDTO(),
                 request.getUserDTO(),
                 StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2);
+
+        log.info("MeansAssessmentOrchestrationService.ASSESSMENT_POST_PROCESSING_PART_2 = " + request);
 
         AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO());
         assessmentSummaryService.updateApplication(application, assessmentSummaryDTO);
