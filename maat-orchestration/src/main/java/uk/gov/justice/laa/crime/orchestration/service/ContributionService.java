@@ -38,7 +38,7 @@ public class ContributionService {
             ApiMaatCalculateContributionResponse calculateContributionResponse =
                     contributionApiService.calculate(calculateContributionRequest);
             log.info("calculateContributionResponse --->" +calculateContributionResponse);
-            if (calculateContributionResponse != null) {
+            if (calculateContributionResponse != null && null != calculateContributionResponse.getContributionId()) {
                 if (calculateContributionResponse.getContributionId() != null) {
                     application.getCrownCourtOverviewDTO().setContribution(
                             contributionMapper.maatCalculateContributionResponseToContributionsDto(
