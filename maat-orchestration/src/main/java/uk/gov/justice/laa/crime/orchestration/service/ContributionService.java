@@ -33,8 +33,10 @@ public class ContributionService {
         log.info("start ContributionService.calculate --->");
         ApplicationDTO application = request.getApplicationDTO();
         if (isRecalculationRequired(application)) {
+            log.info("---isRecalculationRequired() --->");
             ApiMaatCalculateContributionRequest calculateContributionRequest =
                     contributionMapper.workflowRequestToMaatCalculateContributionRequest(request);
+            log.info("..Before Calling ContributionService.calculate()..");
             ApiMaatCalculateContributionResponse calculateContributionResponse =
                     contributionApiService.calculate(calculateContributionRequest);
             log.info("calculateContributionResponse --->" +calculateContributionResponse);

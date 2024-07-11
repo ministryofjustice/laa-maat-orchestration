@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
 import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
@@ -89,7 +90,7 @@ public class ContributionMapper extends CrownCourtMapper {
     private LastOutcome getLastCrownCourtOutcome(final Collection<OutcomeDTO> crownCourtOutcomeList) {
         return crownCourtOutcomeList.stream()
                 .reduce((first, second) -> second)
-                .filter(outcome -> outcome.getOutComeType().equals(CrownCourtOutcomeType.APPEAL.getType()))
+                .filter(outcome ->  outcome.getOutComeType() != null && outcome.getOutComeType().equals(CrownCourtOutcomeType.APPEAL.getType()))
                 .map(appealOutcome -> new LastOutcome()
                         .withDateSet(toLocalDateTime(appealOutcome.getDateSet()))
                         .withOutcome(CrownCourtAppealOutcome.getFrom(appealOutcome.getOutcome())))
