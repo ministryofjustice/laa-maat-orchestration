@@ -58,8 +58,6 @@ public class MeansAssessmentOrchestrationService {
         try {
             Long repId = application.getRepId();
             log.debug("Updating Means assessment for applicationId = " + repId);
-            log.info("Updating Means assessment for applicationId = " + repId);
-            log.info("MeansAssessmentOrchestrationService.update() = " + request);
             meansAssessmentService.update(request);
             application = processCrownCourtProceedings(request);
             log.debug("Updated Means assessment for applicationId = " + repId);
@@ -75,8 +73,6 @@ public class MeansAssessmentOrchestrationService {
     }
 
     private ApplicationDTO processCrownCourtProceedings(WorkflowRequest request) {
-        log.info("MeansAssessmentOrchestrationService.processCrownCourtProceedings = " + request);
-        log.info("MeansAssessmentOrchestrationService.isC3Enabled = " + request.isC3Enabled());
         if (request.isC3Enabled()) {
             // call post_processing_part_1_c3 and map the application
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
@@ -85,7 +81,7 @@ public class MeansAssessmentOrchestrationService {
                     StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3)
             );
 
-            log.info("MeansAssessmentOrchestrationService.ASSESSMENT_POST_PROCESSING_PART_1_C3 = " + request);
+            log.info("MeansAssessmentOrchestrationService.ASSESSMENT_POST_PROCESSING_PART_1_C3");
 
             // call pre_update_cc_application with the calculated contribution and map the application
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(

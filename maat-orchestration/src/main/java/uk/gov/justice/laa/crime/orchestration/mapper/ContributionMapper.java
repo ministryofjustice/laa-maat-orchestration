@@ -2,6 +2,7 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.orchestration.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.enums.*;
@@ -45,6 +46,7 @@ public class ContributionMapper extends CrownCourtMapper {
             IncomeEvidenceSummaryDTO incomeEvidenceSummaryDTO = financialAssessmentDTO.getIncomeEvidence();
             HardshipOverviewDTO hardshipOverviewDTO = financialAssessmentDTO.getHardship();
 
+            log.info("workflowRequestToMaatCalculateContributionRequest()");
             Collection<OutcomeDTO> outcomeDTOs = crownCourtOverviewDTO.getCrownCourtSummaryDTO().getOutcomeDTOs();
             String appealType = crownCourtOverviewDTO.getAppealDTO().getAppealTypeDTO().getCode();
             LocalDateTime effectiveDate = toLocalDateTime(contributionsDTO.getEffectiveDate() != null ? contributionsDTO.getEffectiveDate().getValue() : null);
@@ -112,14 +114,16 @@ public class ContributionMapper extends CrownCourtMapper {
         List<ApiAssessment> assessmentList = new ArrayList<>();
         FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
         InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
-
+        log.info("applicationDtoToAssessments.initialAssessmentDTO-->" + initialAssessmentDTO);
+        log.info("applicationDtoToAssessments.financialAssessmentDTO-->" + financialAssessmentDTO);
         assessmentList.add(
                 new ApiAssessment()
                         .withAssessmentType(AssessmentType.INIT)
                         .withResult(AssessmentResult.getFrom(initialAssessmentDTO.getResult()))
                         .withAssessmentDate(toLocalDateTime(initialAssessmentDTO.getAssessmentDate()))
                         .withNewWorkReason(NewWorkReason.getFrom(initialAssessmentDTO.getNewWorkReason().getCode()))
-                        .withStatus(CurrentStatus.getFrom(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus()))
+                        .withStatus( StringUtils.isNotBlank(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus()) ? CurrentStatus.getFrom(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus())
+                           : CurrentStatus.IN_PROGRESS)
         );
 
         FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
@@ -130,7 +134,8 @@ public class ContributionMapper extends CrownCourtMapper {
                             .withResult(AssessmentResult.getFrom(fullAssessmentDTO.getResult()))
                             .withAssessmentDate(toLocalDateTime(fullAssessmentDTO.getAssessmentDate()))
                             .withNewWorkReason(NewWorkReason.getFrom(initialAssessmentDTO.getNewWorkReason().getCode()))
-                            .withStatus(CurrentStatus.getFrom(fullAssessmentDTO.getAssessmnentStatusDTO().getStatus()))
+                            .withStatus(StringUtils.isNotBlank(fullAssessmentDTO.getAssessmnentStatusDTO().getStatus()) ? CurrentStatus.getFrom(fullAssessmentDTO.getAssessmnentStatusDTO().getStatus())
+                                    : CurrentStatus.IN_PROGRESS)
             );
         }
 
