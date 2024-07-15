@@ -127,7 +127,7 @@ public class ContributionMapper extends CrownCourtMapper {
 
         FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
         if (Boolean.TRUE.equals(financialAssessmentDTO.getFullAvailable())) {
-            log.info("applicationDtoToAssessments.financialAssessmentDTO.status-->" + initialAssessmentDTO.getAssessmnentStatusDTO().getStatus());
+            log.info("applicationDtoToAssessments.fullAssessmentDTO.status-->" + fullAssessmentDTO.getAssessmnentStatusDTO().getStatus());
             assessmentList.add(
                     new ApiAssessment()
                             .withAssessmentType(AssessmentType.FULL)
