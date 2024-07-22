@@ -93,7 +93,6 @@ public class ContributionMapper extends CrownCourtMapper {
         } catch(Exception exception) {
             log.info("exception --" + exception.getMessage());
             log.error("exception", exception);
-            exception.printStackTrace();
             throw new RuntimeException(exception);
         }
 
@@ -121,13 +120,11 @@ public class ContributionMapper extends CrownCourtMapper {
                         .withResult(AssessmentResult.getFrom(initialAssessmentDTO.getResult()))
                         .withAssessmentDate(toLocalDateTime(initialAssessmentDTO.getAssessmentDate()))
                         .withNewWorkReason(NewWorkReason.getFrom(initialAssessmentDTO.getNewWorkReason().getCode()))
-                        .withStatus( StringUtils.isNotBlank(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus()) ? CurrentStatus.getFrom(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus())
-                           : CurrentStatus.getFrom(CurrentStatus.IN_PROGRESS.getStatus()))
+                        .withStatus(CurrentStatus.getFrom(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus()))
         );
 
         FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
-        if (Boolean.TRUE.equals(financialAssessmentDTO.getFullAvailable()) && StringUtils.isNotBlank(fullAssessmentDTO.getAssessmnentStatusDTO().getStatus())
-            && StringUtils.isNotBlank(fullAssessmentDTO.getResult()) ) {
+        if (null != fullAssessmentDTO && null != fullAssessmentDTO.getCriteriaId()) {
             log.info("applicationDtoToAssessments.fullAssessmentDTO.status-->" + fullAssessmentDTO.getAssessmnentStatusDTO().getStatus());
             assessmentList.add(
                     new ApiAssessment()
@@ -135,8 +132,7 @@ public class ContributionMapper extends CrownCourtMapper {
                             .withResult(AssessmentResult.getFrom(fullAssessmentDTO.getResult()))
                             .withAssessmentDate(toLocalDateTime(fullAssessmentDTO.getAssessmentDate()))
                             .withNewWorkReason(NewWorkReason.getFrom(initialAssessmentDTO.getNewWorkReason().getCode()))
-                            .withStatus(StringUtils.isNotBlank(fullAssessmentDTO.getAssessmnentStatusDTO().getStatus()) ? CurrentStatus.getFrom(fullAssessmentDTO.getAssessmnentStatusDTO().getStatus())
-                                    : CurrentStatus.getFrom(CurrentStatus.IN_PROGRESS.getStatus()))
+                            .withStatus(CurrentStatus.getFrom(fullAssessmentDTO.getAssessmnentStatusDTO().getStatus()))
             );
         }
 
