@@ -36,66 +36,60 @@ public class ContributionMapper extends CrownCourtMapper {
         log.info("ContributionMapper.workflowRequestToMaatCalculateContributionRequest()");
         ApiMaatCalculateContributionRequest request = null;
 
-        try {
-            UserDTO user = workflowRequest.getUserDTO();
-            ApplicationDTO application = workflowRequest.getApplicationDTO();
 
-            CrownCourtOverviewDTO crownCourtOverviewDTO = application.getCrownCourtOverviewDTO();
-            ContributionsDTO contributionsDTO = crownCourtOverviewDTO.getContribution();
-            FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
-            IncomeEvidenceSummaryDTO incomeEvidenceSummaryDTO = financialAssessmentDTO.getIncomeEvidence();
-            HardshipOverviewDTO hardshipOverviewDTO = financialAssessmentDTO.getHardship();
+        UserDTO user = workflowRequest.getUserDTO();
+        ApplicationDTO application = workflowRequest.getApplicationDTO();
 
-            log.info("workflowRequestToMaatCalculateContributionRequest()");
-            Collection<OutcomeDTO> outcomeDTOs = crownCourtOverviewDTO.getCrownCourtSummaryDTO().getOutcomeDTOs();
-            String appealType = crownCourtOverviewDTO.getAppealDTO().getAppealTypeDTO().getCode();
-            LocalDateTime effectiveDate = toLocalDateTime(contributionsDTO.getEffectiveDate() != null ? contributionsDTO.getEffectiveDate().getValue() : null);
+        CrownCourtOverviewDTO crownCourtOverviewDTO = application.getCrownCourtOverviewDTO();
+        ContributionsDTO contributionsDTO = crownCourtOverviewDTO.getContribution();
+        FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
+        IncomeEvidenceSummaryDTO incomeEvidenceSummaryDTO = financialAssessmentDTO.getIncomeEvidence();
+        HardshipOverviewDTO hardshipOverviewDTO = financialAssessmentDTO.getHardship();
 
-            request = new ApiMaatCalculateContributionRequest()
-                    .withUserCreated(user.getUserName())
-                    .withRepId(NumberUtils.toInteger(application.getRepId()))
-                    .withApplId(NumberUtils.toInteger(application.getApplicantDTO().getId()))
-                    .withMagCourtOutcome(MagCourtOutcome.getFrom(application.getMagsOutcomeDTO().getOutcome()))
-                    .withCommittalDate(toLocalDateTime(application.getCommittalDate()))
-                    .withCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()))
-                    .withAssessments(applicationDtoToAssessments(application))
-                    .withContributionCap(BigDecimal.valueOf(application.getOffenceDTO().getContributionCap()))
-                    .withContributionId(NumberUtils.toInteger(contributionsDTO.getId()))
-                    .withMonthlyContributions(contributionsDTO.getMonthlyContribs())
-                    .withEffectiveDate(effectiveDate)
-                    .withUpfrontContributions(contributionsDTO.getUpfrontContribs())
-                    .withRemoveContributions(application.getStatusDTO().getRemoveContribs().toString())
-                    .withMagCourtOutcome(application.getMagsOutcomeDTO() != null ?
-                            MagCourtOutcome.getFrom(
-                                    application.getMagsOutcomeDTO().getOutcome()) : null)
-                    .withAppealType(appealType != null ? AppealType.getFrom(appealType) : null)
-                    .withLastOutcome(getLastCrownCourtOutcome(outcomeDTOs))
-                    .withCrownCourtOutcome(
-                            crownCourtSummaryDtoToCrownCourtOutcomes(crownCourtOverviewDTO.getCrownCourtSummaryDTO())
-                    )
-                    .withDateUpliftApplied(toLocalDateTime(incomeEvidenceSummaryDTO.getUpliftAppliedDate()))
-                    .withDateUpliftRemoved(toLocalDateTime(incomeEvidenceSummaryDTO.getUpliftRemovedDate()))
-                    .withTotalAnnualDisposableIncome(
-                            Boolean.TRUE.equals(financialAssessmentDTO.getFullAvailable())
-                                    ? BigDecimal.valueOf(financialAssessmentDTO.getFull().getTotalAnnualDisposableIncome())
-                                    : null
-                    );
+        log.info("workflowRequestToMaatCalculateContributionRequest()");
+        Collection<OutcomeDTO> outcomeDTOs = crownCourtOverviewDTO.getCrownCourtSummaryDTO().getOutcomeDTOs();
+        String appealType = crownCourtOverviewDTO.getAppealDTO().getAppealTypeDTO().getCode();
+        LocalDateTime effectiveDate = toLocalDateTime(contributionsDTO.getEffectiveDate() != null ? contributionsDTO.getEffectiveDate().getValue() : null);
 
-            if (hardshipOverviewDTO.getCrownCourtHardship() != null) {
-                request.withDisposableIncomeAfterCrownHardship(
-                        hardshipOverviewDTO.getCrownCourtHardship().getDisposableIncomeAfterHardship());
-            }
+        request = new ApiMaatCalculateContributionRequest()
+                .withUserCreated(user.getUserName())
+                .withRepId(NumberUtils.toInteger(application.getRepId()))
+                .withApplId(NumberUtils.toInteger(application.getApplicantDTO().getId()))
+                .withMagCourtOutcome(MagCourtOutcome.getFrom(application.getMagsOutcomeDTO().getOutcome()))
+                .withCommittalDate(toLocalDateTime(application.getCommittalDate()))
+                .withCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()))
+                .withAssessments(applicationDtoToAssessments(application))
+                .withContributionCap(BigDecimal.valueOf(application.getOffenceDTO().getContributionCap()))
+                .withContributionId(NumberUtils.toInteger(contributionsDTO.getId()))
+                .withMonthlyContributions(contributionsDTO.getMonthlyContribs())
+                .withEffectiveDate(effectiveDate)
+                .withUpfrontContributions(contributionsDTO.getUpfrontContribs())
+                .withRemoveContributions(application.getStatusDTO().getRemoveContribs().toString())
+                .withMagCourtOutcome(application.getMagsOutcomeDTO() != null ?
+                        MagCourtOutcome.getFrom(
+                                application.getMagsOutcomeDTO().getOutcome()) : null)
+                .withAppealType(appealType != null ? AppealType.getFrom(appealType) : null)
+                .withLastOutcome(getLastCrownCourtOutcome(outcomeDTOs))
+                .withCrownCourtOutcome(
+                        crownCourtSummaryDtoToCrownCourtOutcomes(crownCourtOverviewDTO.getCrownCourtSummaryDTO())
+                )
+                .withDateUpliftApplied(toLocalDateTime(incomeEvidenceSummaryDTO.getUpliftAppliedDate()))
+                .withDateUpliftRemoved(toLocalDateTime(incomeEvidenceSummaryDTO.getUpliftRemovedDate()))
+                .withTotalAnnualDisposableIncome(
+                        Boolean.TRUE.equals(financialAssessmentDTO.getFullAvailable())
+                                ? BigDecimal.valueOf(financialAssessmentDTO.getFull().getTotalAnnualDisposableIncome())
+                                : null
+                );
 
-            if (hardshipOverviewDTO.getMagCourtHardship() != null) {
-                request.withDisposableIncomeAfterMagHardship(
-                        hardshipOverviewDTO.getMagCourtHardship().getDisposableIncomeAfterHardship());
-            }
-        } catch(Exception exception) {
-            log.info("exception --" + exception.getMessage());
-            log.error("exception", exception);
-            throw new RuntimeException(exception);
+        if (hardshipOverviewDTO.getCrownCourtHardship() != null) {
+            request.withDisposableIncomeAfterCrownHardship(
+                    hardshipOverviewDTO.getCrownCourtHardship().getDisposableIncomeAfterHardship());
         }
 
+        if (hardshipOverviewDTO.getMagCourtHardship() != null) {
+            request.withDisposableIncomeAfterMagHardship(
+                    hardshipOverviewDTO.getMagCourtHardship().getDisposableIncomeAfterHardship());
+        }
         return request;
     }
 
