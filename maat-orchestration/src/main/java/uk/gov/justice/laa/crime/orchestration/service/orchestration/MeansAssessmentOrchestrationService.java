@@ -59,7 +59,7 @@ public class MeansAssessmentOrchestrationService {
         try {
             Long repId = application.getRepId();
             log.debug("Updating Means assessment for applicationId = " + repId);
-            og.info("MeansAssessmentOrchestrationService.update = " + request);
+            log.info("MeansAssessmentOrchestrationService.update = " + request);
             printStatus(request.getApplicationDTO(), "Before calling processCrownCourtProceedings");
             meansAssessmentService.update(request);
             application = processCrownCourtProceedings(request);
