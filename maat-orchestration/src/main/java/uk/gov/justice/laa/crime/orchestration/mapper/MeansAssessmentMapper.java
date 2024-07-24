@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtOverview;
@@ -23,6 +24,7 @@ import static uk.gov.justice.laa.crime.util.DateUtil.*;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class MeansAssessmentMapper {
     private final UserMapper userMapper;
 
@@ -410,9 +412,13 @@ public class MeansAssessmentMapper {
         financialAssessmentDTO.setId(ofNullable(apiResponse.getAssessmentId()).map(Integer::longValue).orElse(0L));
         financialAssessmentDTO.setTimestamp(toZonedDateTime(apiResponse.getUpdated()));
 
+
         if (Boolean.TRUE.equals(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable())) {
+            log.info("meansAssessmentResponseToApplicationDto.mapFullAssessmentDTO");
             mapFullAssessmentDTO(financialAssessmentDTO.getFull(), apiResponse);
+            log.info("meansAssessmentResponseToApplicationDto.mapFullAssessmentDTO");
         } else {
+            log.info("meansAssessmentResponseToApplicationDto.mapInitialAssessmentDTO");
             mapInitialAssessmentDTO(financialAssessmentDTO.getInitial(), apiResponse);
             financialAssessmentDTO.setFullAvailable(apiResponse.getFullAssessmentAvailable());
         }
@@ -426,6 +432,8 @@ public class MeansAssessmentMapper {
         fullAssessmentDTO.setTotalAnnualDisposableIncome(ofNullable(apiResponse.getTotalAnnualDisposableIncome()).map(BigDecimal::doubleValue).orElse(0.0));
         fullAssessmentDTO.setThreshold(ofNullable(apiResponse.getFullThreshold()).map(BigDecimal::doubleValue).orElse(0.0));
         mapSectionSummaries(fullAssessmentDTO.getSectionSummaries(), apiResponse.getAssessmentSectionSummary());
+        log.info("meansAssessmentResponseToApplicationDto.fullAssessmentDTO--"+ fullAssessmentDTO);
+
     }
 
     private void mapInitialAssessmentDTO(InitialAssessmentDTO initialAssessmentDTO, ApiMeansAssessmentResponse apiResponse) {

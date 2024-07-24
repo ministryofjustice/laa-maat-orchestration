@@ -80,10 +80,10 @@ public class MeansAssessmentOrchestrationService {
         FinancialAssessmentDTO financialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO();
         InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
         FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
-        log.info("applicationDtoToAssessments.initialAssessmentDTO.status-->" + initialAssessmentDTO.getAssessmnentStatusDTO().getStatus());
+        log.info("printStatus.initialAssessmentDTO.status-->" + initialAssessmentDTO.getAssessmnentStatusDTO().getStatus());
         if (Boolean.TRUE.equals(financialAssessmentDTO.getFullAvailable())) {
-            log.info("applicationDtoToAssessments.fullAssessmentDTO.status-->" + fullAssessmentDTO.getAssessmnentStatusDTO().getStatus());
-            log.info("applicationDtoToAssessments.fullAssessmentDTO.Result-->" + AssessmentResult.getFrom(fullAssessmentDTO.getResult()));
+            log.info("printStatus.fullAssessmentDTO.status-->" + fullAssessmentDTO.getAssessmnentStatusDTO().getStatus());
+            log.info("printStatus.fullAssessmentDTO.Result-->" + AssessmentResult.getFrom(fullAssessmentDTO.getResult()));
         }
     }
 
