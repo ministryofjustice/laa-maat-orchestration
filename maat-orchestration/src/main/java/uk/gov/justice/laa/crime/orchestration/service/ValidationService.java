@@ -11,6 +11,8 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.RepStatusDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.Action;
+import uk.gov.justice.laa.crime.orchestration.enums.RestrictedField;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 import uk.gov.justice.laa.crime.util.DateUtil;
@@ -38,6 +40,8 @@ public class ValidationService {
             "User does not have a role capable of performing this action";
     public static final String USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE =
             "User does not have a valid New Work Reason Code";
+    private static final List<Action> createActions = List.of(Action.CREATE_CROWN_HARDSHIP, Action.CREATE_MAGS_HARDSHIP);
+    private static final List<Action> updateActions = List.of(Action.UPDATE_CROWN_HARDSHIP, Action.UPDATE_MAGS_HARDSHIP);
     private final MaatCourtDataService maatCourtDataService;
     private final MaatCourtDataApiService maatCourtDataApiService;
 
@@ -102,6 +106,15 @@ public class ValidationService {
         return true;
     }
 
+    public boolean isUserAuthorisedToEditField(UserSummaryDTO userSummaryDTO, RestrictedField restrictedField) {
+        if (userSummaryDTO == null || userSummaryDTO.getRoleDataItem() == null) {
+            return false;
+        }
+
+        return userSummaryDTO.getRoleDataItem().stream().anyMatch(i -> i.getDataItem().equals(restrictedField.getField())
+            && "Y".equals(i.getEnabled())
+            && ("Y".equals(i.getInsertAllowed()) || "Y".equals(i.getUpdateAllowed())));
+    }
 
 }
 

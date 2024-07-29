@@ -19,6 +19,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.PassportAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RoleDataItemDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
@@ -1210,6 +1211,16 @@ public class TestModelDataBuilder {
                 .roleActions(roleActions)
                 .newWorkReasons(List.of(newWorkReason.getCode()))
                 .reservationsDTO(getReservationsDTO())
+                .build();
+    }
+
+    public static UserSummaryDTO getUserSummaryDTO(List<RoleDataItemDTO> roleDataItems) {
+        return UserSummaryDTO.builder()
+                .username(Constants.USERNAME)
+                .roleActions(TEST_ROLE_ACTIONS)
+                .newWorkReasons(TEST_NEW_WORK_REASONS)
+                .reservationsDTO(getReservationsDTO())
+                .roleDataItem(roleDataItems)
                 .build();
     }
 

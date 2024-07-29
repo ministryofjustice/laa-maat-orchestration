@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
 import java.util.Optional;
+import java.util.List;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,7 +9,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.RepOrderStatus;
@@ -16,9 +16,11 @@ import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RoleDataItemDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.Action;
+import uk.gov.justice.laa.crime.orchestration.enums.RestrictedField;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 
 import java.util.stream.Stream;
@@ -37,6 +39,21 @@ class ValidationServiceTest {
     private ValidationService validationService;
     @Mock
     private MaatCourtDataService maatCourtDataService;
+
+    private static Stream<Arguments> restrictedFieldsNotEditableByUser() {
+        return Stream.of(
+            Arguments.of(RestrictedField.APPEAL_CC_OUTCOME),
+            Arguments.of(RestrictedField.APPEAL_RECEIVED_DATE)
+        );
+    }
+
+    private static Stream<Arguments> restrictedFieldsEditableByUser() {
+        return Stream.of(
+            Arguments.of(RestrictedField.APPEAL_RECEIVED_DATE),
+            Arguments.of(RestrictedField.APPEAL_SENTENCE_ORDER_DATE),
+            Arguments.of(RestrictedField.APPEAL_CC_WITHDRAWAL_DATE)
+        );
+    }
 
     private static Stream<Arguments> validateApplicationTimestamp() {
         return Stream.of(
@@ -350,5 +367,61 @@ class ValidationServiceTest {
         Boolean isUserActionValid =
                 validationService.isUserActionValid(userActionDTO);
         assertTrue(isUserActionValid);
+    }
+
+    @Test
+    void givenUserHasNoPermissions_whenIsUserAuthorisedToEditFieldIsInvoked_thenReturnsFalse() {
+        UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
+
+        boolean result = validationService.isUserAuthorisedToEditField(userSummaryDTO, RestrictedField.APPEAL_CC_OUTCOME);
+
+        assertFalse(result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("restrictedFieldsNotEditableByUser")
+    void givenUserHasNoRoleWhichHasPermissionToEdit_whenIsUserAuthorisedToEditFieldIsInvoked_thenReturnsFalse(final RestrictedField restrictedField) {
+        List<RoleDataItemDTO> roleDataItems = List.of(
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_CC_OUTCOME.getField(), "N", null, null)
+        );
+
+        UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO(roleDataItems);
+
+        boolean result = validationService.isUserAuthorisedToEditField(userSummaryDTO, restrictedField);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void givenUserHasPermissionButPermissionIsDisabled_whenIsUserAuthorisedToEditFieldIsInvoked_thenReturnsFalse() {
+        List<RoleDataItemDTO> roleDataItems = List.of(
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_CC_OUTCOME.getField(), "N", null, null),
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_RECEIVED_DATE.getField(), "N", "Y", "N"),
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_RECEIVED_DATE.getField(), "N", "N", "Y")
+        );
+
+        UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO(roleDataItems);
+        RestrictedField restrictedField = RestrictedField.APPEAL_RECEIVED_DATE;
+
+        boolean result = validationService.isUserAuthorisedToEditField(userSummaryDTO, restrictedField);
+
+        assertFalse(result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("restrictedFieldsEditableByUser")
+    void givenUserHasPermission_whenIsUserAuthorisedToEditField_thenReturnsTrue(final RestrictedField restrictedField) {
+        List<RoleDataItemDTO> roleDataItems = List.of(
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_CC_OUTCOME.getField(), "N", null, null),
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_RECEIVED_DATE.getField(), "Y", "Y", "N"),
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_SENTENCE_ORDER_DATE.getField(), "Y", "N", "Y"),
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_CC_WITHDRAWAL_DATE.getField(), "Y", "Y", "Y")
+        );
+
+        UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO(roleDataItems);
+
+        boolean result = validationService.isUserAuthorisedToEditField(userSummaryDTO, restrictedField);
+
+        assertTrue(result);
     }
 }
