@@ -120,7 +120,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
 
     private void validate(WorkflowRequest request, Action action, RepOrderDTO repOrderDTO) {
         validationService.validate(request, repOrderDTO);
-        validationService.isUserActionValid(hardshipMapper.getUserValidationDTO(request, action));
+        validationService.isUserActionValid(hardshipMapper.getUserActionDTO(request, action));
     }
 
     private ApplicationDTO processMagCourtHardshipRules(WorkflowRequest request) {

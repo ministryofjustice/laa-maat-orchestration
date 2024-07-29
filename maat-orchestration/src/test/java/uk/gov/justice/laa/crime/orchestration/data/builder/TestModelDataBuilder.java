@@ -21,7 +21,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.Action;
 
 
@@ -1138,24 +1138,24 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    public static UserValidationDTO getUserValidationDTO() {
-        return UserValidationDTO.builder()
+    public static UserActionDTO getUserActionDTO() {
+        return UserActionDTO.builder()
                 .username(Constants.USERNAME)
                 .action(TEST_ACTION)
                 .newWorkReason(TEST_NEW_WORK_REASON)
                 .sessionId(USER_SESSION).build();
     }
 
-    public static UserValidationDTO getUserValidationDTOWithReservation() {
-        return UserValidationDTO.builder()
+    public static UserActionDTO getUserActionDTOWithReservation() {
+        return UserActionDTO.builder()
                 .username(Constants.USERNAME)
                 .action(TEST_ACTION)
                 .newWorkReason(TEST_NEW_WORK_REASON)
                 .sessionId(TEST_USER_SESSION).build();
     }
 
-    public static UserValidationDTO getUserValidationDTOInvalidValidRequest() {
-        return UserValidationDTO.builder()
+    public static UserActionDTO getUserActionDTOInvalidValidRequest() {
+        return UserActionDTO.builder()
                 .username(Constants.USERNAME)
                 .action(null)
                 .newWorkReason(null)

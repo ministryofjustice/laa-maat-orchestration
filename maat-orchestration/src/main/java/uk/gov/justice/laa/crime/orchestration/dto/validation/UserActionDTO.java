@@ -11,7 +11,7 @@ import uk.gov.justice.laa.crime.orchestration.enums.Action;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserValidationDTO {
+public class UserActionDTO {
     private String username;
     private Action action;
     private NewWorkReason newWorkReason;

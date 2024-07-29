@@ -10,7 +10,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.RepStatusDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 import uk.gov.justice.laa.crime.util.DateUtil;
@@ -72,7 +72,7 @@ public class ValidationService {
         }
     }
 
-    public Boolean isUserActionValid(UserValidationDTO request) {
+    public Boolean isUserActionValid(UserActionDTO request) {
         List<String> crimeValidationExceptionList = new ArrayList<>();
 
         if (request.getAction() == null && request.getNewWorkReason() == null && request.getSessionId() == null) {
