@@ -51,7 +51,7 @@ public class ContributionService {
                 if (Boolean.TRUE.equals(calculateContributionResponse.getProcessActivity())) {
                     // invoke MATRIX stored procedure
                     application = maatCourtDataService.invokeStoredProcedure(
-                            application, request.getUserDTO(), StoredProcedure.PROCESS_ACTIVITY
+                            application, request.getUserDTO(), StoredProcedure.XX_PROCESS_ACTIVITY
                     );
                 }
                 log.info("completed ProcessActivity --->");
