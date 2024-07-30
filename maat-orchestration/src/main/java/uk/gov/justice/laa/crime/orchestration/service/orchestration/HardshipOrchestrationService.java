@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import io.sentry.Sentry;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,8 @@ import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.Action;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
@@ -120,7 +123,10 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
 
     private void validate(WorkflowRequest request, Action action, RepOrderDTO repOrderDTO) {
         validationService.validate(request, repOrderDTO);
-        validationService.isUserActionValid(hardshipMapper.getUserActionDTO(request, action));
+
+        UserActionDTO userActionDTO = hardshipMapper.getUserActionDTO(request, action);
+        UserSummaryDTO userSummaryDTO = Optional.ofNullable(userActionDTO.getUsername()).map(maatCourtDataService::getUserSummary).orElse(null);
+        validationService.isUserActionValid(userActionDTO, userSummaryDTO);
     }
 
     private ApplicationDTO processMagCourtHardshipRules(WorkflowRequest request) {

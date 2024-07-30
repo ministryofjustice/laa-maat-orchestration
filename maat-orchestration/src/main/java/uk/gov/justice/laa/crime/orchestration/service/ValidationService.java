@@ -11,10 +11,8 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.RepStatusDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
-import uk.gov.justice.laa.crime.orchestration.enums.Action;
 import uk.gov.justice.laa.crime.orchestration.enums.RestrictedField;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
-import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 import uk.gov.justice.laa.crime.util.DateUtil;
 
 import java.time.LocalDateTime;
@@ -40,10 +38,6 @@ public class ValidationService {
             "User does not have a role capable of performing this action";
     public static final String USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE =
             "User does not have a valid New Work Reason Code";
-    private static final List<Action> createActions = List.of(Action.CREATE_CROWN_HARDSHIP, Action.CREATE_MAGS_HARDSHIP);
-    private static final List<Action> updateActions = List.of(Action.UPDATE_CROWN_HARDSHIP, Action.UPDATE_MAGS_HARDSHIP);
-    private final MaatCourtDataService maatCourtDataService;
-    private final MaatCourtDataApiService maatCourtDataApiService;
 
     public void validate(WorkflowRequest request, RepOrderDTO repOrderDTO) {
         validateApplicationTimestamp(request, repOrderDTO);
@@ -76,13 +70,12 @@ public class ValidationService {
         }
     }
 
-    public Boolean isUserActionValid(UserActionDTO request) {
+    public Boolean isUserActionValid(UserActionDTO request, UserSummaryDTO userSummaryDTO) {
         List<String> crimeValidationExceptionList = new ArrayList<>();
 
         if (request.getAction() == null && request.getNewWorkReason() == null && request.getSessionId() == null) {
             throw new IllegalArgumentException(ACTION_NEW_WORK_REASON_AND_SESSION_DOES_NOT_EXIST);
         }
-        UserSummaryDTO userSummaryDTO = maatCourtDataService.getUserSummary(request.getUsername());
 
         if (request.getAction() != null && (userSummaryDTO.getRoleActions() == null
                 || !userSummaryDTO.getRoleActions().contains(request.getAction().getCode()))) {

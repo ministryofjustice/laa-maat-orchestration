@@ -14,6 +14,7 @@ import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
@@ -93,7 +94,11 @@ class HardshipOrchestrationServiceTest {
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), eq(courtType)))
                 .thenReturn(getAssessmentSummaryDTO());
 
-        doReturn(Boolean.TRUE).when(validationService).isUserActionValid(any());
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+                .thenReturn(UserActionDTO.builder().username("mock-u").build());
+
+        when(validationService.isUserActionValid(any(), any()))
+                .thenReturn(Boolean.TRUE);
 
         return workflowRequest;
     }
@@ -242,6 +247,9 @@ class HardshipOrchestrationServiceTest {
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), eq(CourtType.MAGISTRATE)))
                 .thenReturn(getAssessmentSummaryDTO());
 
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
+
         doThrow(new APIClientException()).when(assessmentSummaryService)
                 .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
 
@@ -262,6 +270,8 @@ class HardshipOrchestrationServiceTest {
 
         when(hardshipService.find(performHardshipResponse.getHardshipReviewId()))
                 .thenThrow(new APIClientException());
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(MaatOrchestrationException.class);
@@ -284,6 +294,9 @@ class HardshipOrchestrationServiceTest {
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), eq(CourtType.MAGISTRATE)))
                 .thenThrow(new APIClientException());
 
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
+
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(MaatOrchestrationException.class);
         Mockito.verify(hardshipService, times(1)).rollback(any());
@@ -291,7 +304,6 @@ class HardshipOrchestrationServiceTest {
 
     @Test
     void givenMagsCourtAndNoVariation_whenUpdateIsInvoked_thenApplicationDTOIsUpdatedWithNewHardship() {
-
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
 
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
@@ -303,6 +315,9 @@ class HardshipOrchestrationServiceTest {
         AssessmentSummaryDTO assessmentSummaryDTO = getAssessmentSummaryDTO();
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), any()))
                 .thenReturn(assessmentSummaryDTO);
+
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
         ApplicationDTO applicationDTO = orchestrationService.update(workflowRequest);
 
@@ -331,6 +346,8 @@ class HardshipOrchestrationServiceTest {
         AssessmentSummaryDTO assessmentSummaryDTO = getAssessmentSummaryDTO();
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), any()))
                 .thenReturn(assessmentSummaryDTO);
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
         ApplicationDTO expected = orchestrationService.update(workflowRequest);
 
@@ -363,6 +380,8 @@ class HardshipOrchestrationServiceTest {
         AssessmentSummaryDTO assessmentSummaryDTO = getAssessmentSummaryDTO();
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), any()))
                 .thenReturn(assessmentSummaryDTO);
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
         ApplicationDTO expected = orchestrationService.update(workflowRequest);
 
@@ -387,6 +406,8 @@ class HardshipOrchestrationServiceTest {
                 .getHardship()
                 .getCrownCourtHardship()
                 .getAsessmentStatus().setStatus(AssessmentStatusDTO.INCOMPLETE);
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
         ApplicationDTO actual = orchestrationService.update(workflowRequest);
 
@@ -406,6 +427,8 @@ class HardshipOrchestrationServiceTest {
                 .getHardship()
                 .getCrownCourtHardship()
                 .setAsessmentStatus(null);
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
         ApplicationDTO actual = orchestrationService.update(workflowRequest);
 
@@ -425,6 +448,8 @@ class HardshipOrchestrationServiceTest {
                 .getHardship()
                 .getMagCourtHardship()
                 .getAsessmentStatus().setStatus(AssessmentStatusDTO.INCOMPLETE);
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
         ApplicationDTO actual = orchestrationService.update(workflowRequest);
 
@@ -444,6 +469,8 @@ class HardshipOrchestrationServiceTest {
                 .getHardship()
                 .getMagCourtHardship()
                 .setAsessmentStatus(null);
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
         ApplicationDTO actual = orchestrationService.update(workflowRequest);
 
@@ -470,6 +497,10 @@ class HardshipOrchestrationServiceTest {
                 any(StoredProcedure.class)
         ))
                 .thenThrow(new APIClientException());
+
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
+
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(MaatOrchestrationException.class);
         Mockito.verify(hardshipService, times(1)).rollback(any());
@@ -487,6 +518,9 @@ class HardshipOrchestrationServiceTest {
                 .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
         when(contributionService.calculate(workflowRequest))
                 .thenThrow(new APIClientException());
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
+
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(MaatOrchestrationException.class);
         Mockito.verify(hardshipService, times(1)).rollback(any());
@@ -497,6 +531,9 @@ class HardshipOrchestrationServiceTest {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
         when(hardshipService.create(any(WorkflowRequest.class)))
                 .thenThrow(new APIClientException());
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
+
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(APIClientException.class);
 
@@ -507,6 +544,9 @@ class HardshipOrchestrationServiceTest {
     void givenExceptionThrownInUpdateHardshipService_whenUpdateIsInvoked_thenRollbackIsNotInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
         doThrow(new APIClientException()).when(hardshipService).update(any(WorkflowRequest.class));
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
+
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(APIClientException.class);
 
@@ -516,7 +556,10 @@ class HardshipOrchestrationServiceTest {
     @Test
     void givenExceptionThrownInValidationService_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
-        doThrow(new CrimeValidationException(List.of())).when(validationService).isUserActionValid(any());
+        doThrow(new CrimeValidationException(List.of())).when(validationService).isUserActionValid(any(), any());
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
+
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(CrimeValidationException.class);
 
@@ -526,7 +569,10 @@ class HardshipOrchestrationServiceTest {
     @Test
     void givenExceptionThrownInValidationService_whenUpdateIsInvoked_thenRollbackIsNotInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
-        doThrow(new CrimeValidationException(List.of())).when(validationService).isUserActionValid(any());
+        doThrow(new CrimeValidationException(List.of())).when(validationService).isUserActionValid(any(), any());
+        when(hardshipMapper.getUserActionDTO(any(), any()))
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
+
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(CrimeValidationException.class);
 
