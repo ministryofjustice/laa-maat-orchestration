@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
+import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,11 +47,17 @@ public class ValidationService {
     }
 
     private void validateApplicationTimestamp(WorkflowRequest request, RepOrderDTO repOrderDTO) {
+        ZonedDateTime applicationTimestamp = request.getApplicationDTO().getTimestamp();
+
+        if (applicationTimestamp == null) {
+            return;
+        }
+
         LocalDateTime repOrderCreatedDate = DateUtil.convertDateToDateTime(repOrderDTO.getDateCreated());
         LocalDateTime repOrderUpdatedDate = repOrderDTO.getDateModified();
         LocalDateTime repOrderTimestamp = (null != repOrderUpdatedDate) ? repOrderUpdatedDate : repOrderCreatedDate;
-        ZonedDateTime applicationTimestamp = request.getApplicationDTO().getTimestamp();
-        if (applicationTimestamp != null && !applicationTimestamp.toLocalDateTime().isEqual(repOrderTimestamp)) {
+
+        if (!applicationTimestamp.toLocalDateTime().truncatedTo(ChronoUnit.SECONDS).isEqual(repOrderTimestamp.truncatedTo(ChronoUnit.SECONDS))) {
             throw new ValidationException(CANNOT_MODIFY_APPLICATION_ERROR);
         }
     }
