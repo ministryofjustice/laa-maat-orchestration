@@ -122,6 +122,18 @@ class HardshipIntegrationTest {
     }
 
     @Test
+    void givenMismatchingApplicationAndRepoOrderDates_whenCreateIsInvoked_thenRollbackIsNotInvoked() throws Exception {
+        stubForOAuth();
+        stubForGetUserSummary(objectMapper.writeValueAsString(TestModelDataBuilder.getUserSummaryDTO(UPDATE_ROLE_ACTIONS, NewWorkReason.NEW)));
+        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTOWithModifiedDateOf("2023-06-27T10:15:30")));
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
+            .andExpect(status().is4xxClientError());
+        verify(exactly(0), getRequestedFor(urlPathMatching("/api/internal/v1/users/summary/.*")));
+        verify(exactly(0), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
+    }
+
+    @Test
     void givenAValidContent_whenCreateIsInvoked_thenShouldCreateSuccess() throws Exception {
 
         stubForCreateHardship(CourtType.CROWN_COURT);
@@ -179,6 +191,18 @@ class HardshipIntegrationTest {
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
                 .andExpect(status().is4xxClientError());
         verify(exactly(1), getRequestedFor(urlPathMatching("/api/internal/v1/users/summary/.*")));
+        verify(exactly(0), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
+    }
+
+    @Test
+    void givenMismatchingApplicationAndRepoOrderDates_whenUpdateIsInvoked_thenRollbackIsNotInvoked() throws Exception {
+        stubForOAuth();
+        stubForGetUserSummary(objectMapper.writeValueAsString(TestModelDataBuilder.getUserSummaryDTO(UPDATE_ROLE_ACTIONS, NewWorkReason.NEW)));
+        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTOWithModifiedDateOf("2023-06-27T10:15:30")));
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
+            .andExpect(status().is4xxClientError());
+        verify(exactly(0), getRequestedFor(urlPathMatching("/api/internal/v1/users/summary/.*")));
         verify(exactly(0), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
     }
 

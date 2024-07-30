@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
+import java.util.Optional;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,12 +42,12 @@ class ValidationServiceTest {
         return Stream.of(
                 Arguments.of(
                         TestModelDataBuilder
-                                .buildWorkFlowRequestForApplicationTimestampValidation(),
+                                .buildWorkflowRequestForApplicationTimestampValidation(Optional.empty()),
                         TestModelDataBuilder
                                 .buildRepOrderDTOWithModifiedDate()),
                 Arguments.of(
                         TestModelDataBuilder
-                                .buildWorkFlowRequestForApplicationTimestampValidation(),
+                                .buildWorkflowRequestForApplicationTimestampValidation(Optional.empty()),
                         TestModelDataBuilder
                                 .buildRepOrderDTOWithCreatedDateAndNoModifiedDate())
         );
@@ -82,9 +83,38 @@ class ValidationServiceTest {
         );
     }
 
+    @Test
+    void validateApplicationTimestamp_whenApplicationTimestampIsNull_thenNoExceptionIsThrow() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTOWithModifiedDate();
+
+        assertDoesNotThrow(() -> validationService.validate(workflowRequest, repOrderDTO));
+    }
+
+    @Test
+    void validateApplicationTimestamp_whenApplicationAndRepOrderTimestampsAreEqual_thenNoExceptionIsThrown() {
+        String timestamp = "2024-07-26T10:41:02.515";
+
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestForApplicationTimestampValidation(Optional.of(timestamp));
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTOWithModifiedDateOf(timestamp);
+
+        assertDoesNotThrow(() -> validationService.validate(workflowRequest, repOrderDTO));
+    }
+
+    @Test
+    void validateApplicationTimestamp_whenApplicationAndRepOrderTimestampsAreEqualExceptMilliseconds_thenNoExceptionIsThrown() {
+        String applicationTimestamp = "2024-07-26T10:41:02.515";
+        String repOrderTimestamp = "2024-07-26T10:41:02.314";
+
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestForApplicationTimestampValidation(Optional.of(applicationTimestamp));
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTOWithModifiedDateOf(repOrderTimestamp);
+
+        assertDoesNotThrow(() -> validationService.validate(workflowRequest, repOrderDTO));
+    }
+
     @ParameterizedTest
     @MethodSource("validateApplicationTimestamp")
-    void validateApplicationTimestamp(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
+    void validateApplicationTimestamp_whenApplicationHasBeenModifiedByAnotherUser_thenExceptionIsThrown(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
         ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.
                 validate(workflowRequest, repOrderDTO));
         assertThat(validationException.getMessage()).isEqualTo(CANNOT_MODIFY_APPLICATION_ERROR);
