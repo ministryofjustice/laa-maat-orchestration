@@ -30,36 +30,45 @@ public class ContributionService {
     private final MaatCourtDataService maatCourtDataService;
 
     public ApplicationDTO calculate(WorkflowRequest request) {
+        log.info("start ContributionService.calculate --->");
         ApplicationDTO application = request.getApplicationDTO();
         if (isRecalculationRequired(application)) {
+            log.info("---isRecalculationRequired() --->");
             ApiMaatCalculateContributionRequest calculateContributionRequest =
                     contributionMapper.workflowRequestToMaatCalculateContributionRequest(request);
+            log.info("..Before Calling ContributionService.calculate()..");
             ApiMaatCalculateContributionResponse calculateContributionResponse =
                     contributionApiService.calculate(calculateContributionRequest);
-            if (calculateContributionResponse != null) {
+            log.info("calculateContributionResponse --->" +calculateContributionResponse);
+            if (calculateContributionResponse != null && null != calculateContributionResponse.getContributionId()) {
                 if (calculateContributionResponse.getContributionId() != null) {
                     application.getCrownCourtOverviewDTO().setContribution(
                             contributionMapper.maatCalculateContributionResponseToContributionsDto(
                                     calculateContributionResponse)
                     );
                 }
+                log.info("ProcessActivity --->" + calculateContributionResponse.getProcessActivity());
                 if (Boolean.TRUE.equals(calculateContributionResponse.getProcessActivity())) {
                     // invoke MATRIX stored procedure
                     application = maatCourtDataService.invokeStoredProcedure(
-                            application, request.getUserDTO(), StoredProcedure.PROCESS_ACTIVITY
+                            application, request.getUserDTO(), StoredProcedure.XX_PROCESS_ACTIVITY
                     );
                 }
+                log.info("completed ProcessActivity --->");
                 List<ApiContributionSummary> contributionSummaries =
                         contributionApiService.getContributionSummary(application.getRepId());
                 application.getCrownCourtOverviewDTO().setContributionSummary(
                         contributionMapper.contributionSummaryToDto(contributionSummaries)
                 );
+                log.info("calling GET_APPLICATION_CORRESPONDENCE --->");
                 // correspondence_pkg.get_application_correspondence
                 application = maatCourtDataService.invokeStoredProcedure(
                         application, request.getUserDTO(), StoredProcedure.GET_APPLICATION_CORRESPONDENCE
                 );
+                log.info("Completed GET_APPLICATION_CORRESPONDENCE --->");
             }
         }
+        log.info("End ContributionService.calculate --->");
         return application;
     }
 

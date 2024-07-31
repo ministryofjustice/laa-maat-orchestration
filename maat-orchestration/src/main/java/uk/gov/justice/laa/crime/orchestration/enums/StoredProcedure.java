@@ -13,6 +13,7 @@ public enum StoredProcedure {
     ASSESSMENT_POST_PROCESSING_PART_1_C3(Package.ASSESSMENTS, "post_assessment_processing_part_1_c3"),
     PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE(Package.CROWN_COURT, "xx_process_activity_and_get_correspondence"),
     PROCESS_ACTIVITY(Package.MATRIX_ACTIVITY, "process_activity"),
+    XX_PROCESS_ACTIVITY(Package.MATRIX_ACTIVITY, "xx_process_activity"),
     DETERMINE_MAGS_REP_DECISION(Package.ASSESSMENTS, "determine_mags_rep_decision"),
     PRE_UPDATE_CC_APPLICATION(Package.APPLICATION, "pre_update_cc_application"),
     GET_APPLICATION_CORRESPONDENCE(Package.CORRESPONDENCE, "get_application_correspondence"),
