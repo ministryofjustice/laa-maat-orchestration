@@ -151,7 +151,7 @@ class MeansAssessmentIntegrationTest {
         assertStubForUpdateCrownCourtProceedings(1);
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1);
-        assertStubForInvokeStoredProcedure(5);
+        assertStubForInvokeStoredProcedure(4);
     }
 
     @Test
@@ -216,7 +216,7 @@ class MeansAssessmentIntegrationTest {
         assertStubForUpdateCrownCourtProceedings(1);
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1);
-        assertStubForInvokeStoredProcedure(5);
+        assertStubForInvokeStoredProcedure(4);
     }
 
     @Test
