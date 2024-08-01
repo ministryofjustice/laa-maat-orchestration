@@ -289,17 +289,17 @@ class HardshipIntegrationTest {
         assertStubForGetContributionsSummary(1);
         if (CourtType.CROWN_COURT.equals(courtType)) {
             assertStubForHandleEformSerivce(1);
-            assertStubForInvokeStoredProcedure(4);
+            assertStubForInvokeStoredProcedure(3);
         } else {
             assertStubForCheckContributionsRule(1);
-            assertStubForInvokeStoredProcedure(3);
+            assertStubForInvokeStoredProcedure(2);
         }
     }
 
 
     private static void verifyStubForUpdateHardship(CourtType courtType) {
         verify(exactly(1), putRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
-        assertStubForInvokeStoredProcedure(3);
+        assertStubForInvokeStoredProcedure(2);
         assertStubForCheckContributionsRule(1);
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1);
