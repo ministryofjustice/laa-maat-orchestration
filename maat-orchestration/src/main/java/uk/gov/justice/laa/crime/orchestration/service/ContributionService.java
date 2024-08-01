@@ -46,17 +46,13 @@ public class ContributionService {
                 if (Boolean.TRUE.equals(calculateContributionResponse.getProcessActivity())) {
                     // invoke MATRIX stored procedure
                     application = maatCourtDataService.invokeStoredProcedure(
-                            application, request.getUserDTO(), StoredProcedure.PROCESS_ACTIVITY
+                            application, request.getUserDTO(), StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE
                     );
                 }
                 List<ApiContributionSummary> contributionSummaries =
                         contributionApiService.getContributionSummary(application.getRepId());
                 application.getCrownCourtOverviewDTO().setContributionSummary(
                         contributionMapper.contributionSummaryToDto(contributionSummaries)
-                );
-                // correspondence_pkg.get_application_correspondence
-                application = maatCourtDataService.invokeStoredProcedure(
-                        application, request.getUserDTO(), StoredProcedure.GET_APPLICATION_CORRESPONDENCE
                 );
             }
         }
