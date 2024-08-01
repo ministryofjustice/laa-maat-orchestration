@@ -30,19 +30,24 @@ public class ContributionService {
     private final MaatCourtDataService maatCourtDataService;
 
     public ApplicationDTO calculate(WorkflowRequest request) {
+        log.info("start ContributionService.calculate --->");
         ApplicationDTO application = request.getApplicationDTO();
         if (isRecalculationRequired(application)) {
+            log.info("---isRecalculationRequired() --->");
             ApiMaatCalculateContributionRequest calculateContributionRequest =
                     contributionMapper.workflowRequestToMaatCalculateContributionRequest(request);
+            log.info("..Before Calling ContributionService.calculate()..");
             ApiMaatCalculateContributionResponse calculateContributionResponse =
                     contributionApiService.calculate(calculateContributionRequest);
-            if (calculateContributionResponse != null) {
+            log.info("calculateContributionResponse --->" +calculateContributionResponse);
+            if (calculateContributionResponse != null && null != calculateContributionResponse.getContributionId()) {
                 if (calculateContributionResponse.getContributionId() != null) {
                     application.getCrownCourtOverviewDTO().setContribution(
                             contributionMapper.maatCalculateContributionResponseToContributionsDto(
                                     calculateContributionResponse)
                     );
                 }
+                log.info("ProcessActivity --->" + calculateContributionResponse.getProcessActivity());
                 if (Boolean.TRUE.equals(calculateContributionResponse.getProcessActivity())) {
                     // invoke MATRIX stored procedure
                     application = maatCourtDataService.invokeStoredProcedure(
@@ -56,6 +61,7 @@ public class ContributionService {
                 );
             }
         }
+        log.info("End ContributionService.calculate --->");
         return application;
     }
 

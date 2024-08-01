@@ -446,14 +446,20 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    public static WorkflowRequest buildWorkFlowRequestForApplicationTimestampValidation() {
+    public static WorkflowRequest buildWorkflowRequestForApplicationTimestampValidation(Optional<String> timestamp) {
+        ZonedDateTime timestampToUse = timestamp.isPresent() ? toZonedDateTime(LocalDateTime.parse(timestamp.get())) : APPLICATION_TIMESTAMP;
+
         return WorkflowRequest
                 .builder()
                 .applicationDTO(
                         ApplicationDTO
                                 .builder()
                                 .repId(123L)
-                                .timestamp(APPLICATION_TIMESTAMP)
+                                .timestamp(timestampToUse)
+                                .statusDTO(RepStatusDTO
+                                    .builder()
+                                    .updateAllowed(true)
+                                    .build())
                                 .build()).build();
     }
 
@@ -1080,6 +1086,12 @@ public class TestModelDataBuilder {
 
     public static RepOrderDTO buildRepOrderDTOWithModifiedDate() {
         return RepOrderDTO.builder().dateModified(REP_ORDER_MODIFIED_TIMESTAMP).build();
+    }
+
+    public static RepOrderDTO buildRepOrderDTOWithModifiedDateOf(String dateModifiedTimestamp) {
+        LocalDateTime dateModified = LocalDateTime.parse(dateModifiedTimestamp);
+
+        return RepOrderDTO.builder().dateModified(dateModified).rorsStatus(RepOrderStatus.CURR.getCode()).build();
     }
 
     public static RepOrderDTO buildRepOrderDTOWithCreatedDateAndNoModifiedDate() {
