@@ -85,7 +85,7 @@ services:
       request-transfer-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/request-transfer
       calculate-contribution-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/calculate-contribution
       check-contribution-rule-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/check-contribution-rule
-      contribution-summaries-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/summaries
+      contribution-summaries-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/{repId}/summary
 
   crown-court-api:
     base-url: ${CCP_API_BASE_URL}
