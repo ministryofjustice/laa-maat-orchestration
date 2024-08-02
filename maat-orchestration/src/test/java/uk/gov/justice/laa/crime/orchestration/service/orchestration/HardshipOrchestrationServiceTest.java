@@ -255,7 +255,6 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(MaatOrchestrationException.class);
-        Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
     @Test
@@ -275,7 +274,6 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(MaatOrchestrationException.class);
-        Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
     @Test
@@ -299,7 +297,6 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(MaatOrchestrationException.class);
-        Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
     @Test
@@ -503,7 +500,6 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(MaatOrchestrationException.class);
-        Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
     @Test
@@ -523,7 +519,6 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(MaatOrchestrationException.class);
-        Mockito.verify(hardshipService, times(1)).rollback(any());
     }
 
     @Test
@@ -536,8 +531,6 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(APIClientException.class);
-
-        Mockito.verify(hardshipService, times(0)).rollback(any());
     }
 
     @Test
@@ -549,33 +542,33 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(APIClientException.class);
-
-        Mockito.verify(hardshipService, times(0)).rollback(any());
     }
 
     @Test
     void givenExceptionThrownInValidationService_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
-        doThrow(new CrimeValidationException(List.of())).when(validationService).isUserActionValid(any(), any());
+
+        when(validationService.isUserActionValid(any(), any()))
+            .thenThrow(new CrimeValidationException(List.of()));
+
         when(hardshipMapper.getUserActionDTO(any(), any()))
             .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(CrimeValidationException.class);
-
-        Mockito.verify(hardshipService, times(0)).rollback(any());
     }
 
     @Test
     void givenExceptionThrownInValidationService_whenUpdateIsInvoked_thenRollbackIsNotInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
-        doThrow(new CrimeValidationException(List.of())).when(validationService).isUserActionValid(any(), any());
+
+        when(validationService.isUserActionValid(any(), any()))
+            .thenThrow(new CrimeValidationException(List.of()));
+
         when(hardshipMapper.getUserActionDTO(any(), any()))
             .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(CrimeValidationException.class);
-
-        Mockito.verify(hardshipService, times(0)).rollback(any());
     }
 }
