@@ -12,7 +12,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.enums.CourtType;
-import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class HardshipReviewMapperTest {
@@ -206,11 +206,11 @@ class HardshipReviewMapperTest {
     }
 
     @Test
-    void givenWorkflowRequestAndAction_whenGetUserValidationDTOIsInvoked_thenMappingIsCorrect() {
+    void givenWorkflowRequestAndAction_whengetUserActionDTOIsInvoked_thenMappingIsCorrect() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
-        UserValidationDTO actual =
-                hardshipMapper.getUserValidationDTO(workflowRequest, TestModelDataBuilder.TEST_ACTION);
-        UserValidationDTO expected = TestModelDataBuilder.getUserValidationDTO();
+        UserActionDTO actual =
+                hardshipMapper.getUserActionDTO(workflowRequest, TestModelDataBuilder.TEST_ACTION);
+        UserActionDTO expected = TestModelDataBuilder.getUserActionDTO();
 
         softly.assertThat(actual)
                 .usingRecursiveComparison()

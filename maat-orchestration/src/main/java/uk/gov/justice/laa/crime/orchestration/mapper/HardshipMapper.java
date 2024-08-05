@@ -8,7 +8,7 @@ import uk.gov.justice.laa.crime.common.model.orchestration.hardship.*;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.Action;
 
 import uk.gov.justice.laa.crime.util.NumberUtils;
@@ -300,10 +300,10 @@ public class HardshipMapper {
                 .build();
     }
 
-    public UserValidationDTO getUserValidationDTO(WorkflowRequest request, Action action) {
+    public UserActionDTO getUserActionDTO(WorkflowRequest request, Action action) {
         UserDTO userDTO = request.getUserDTO();
         HardshipReviewDTO hardshipReviewDTO = getHardshipReviewDTO(request.getApplicationDTO(), request.getCourtType());
-        return UserValidationDTO.builder()
+        return UserActionDTO.builder()
                 .username(userDTO.getUserName())
                 .sessionId(userDTO.getUserSession())
                 .newWorkReason(NewWorkReason.getFrom(hardshipReviewDTO.getNewWorkReason().getCode()))
