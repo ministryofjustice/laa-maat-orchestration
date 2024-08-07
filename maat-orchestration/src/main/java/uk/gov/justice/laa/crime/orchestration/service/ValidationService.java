@@ -39,37 +39,6 @@ public class ValidationService {
     public static final String USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE =
             "User does not have a valid New Work Reason Code";
 
-    public void validate(WorkflowRequest request, RepOrderDTO repOrderDTO) {
-        validateApplicationTimestamp(request, repOrderDTO);
-        validateApplicationStatus(request, repOrderDTO);
-    }
-
-    private void validateApplicationTimestamp(WorkflowRequest request, RepOrderDTO repOrderDTO) {
-        ZonedDateTime applicationTimestamp = request.getApplicationDTO().getTimestamp();
-
-        if (applicationTimestamp == null) {
-            return;
-        }
-
-        LocalDateTime repOrderCreatedDate = DateUtil.convertDateToDateTime(repOrderDTO.getDateCreated());
-        LocalDateTime repOrderUpdatedDate = repOrderDTO.getDateModified();
-        LocalDateTime repOrderTimestamp = (null != repOrderUpdatedDate) ? repOrderUpdatedDate : repOrderCreatedDate;
-
-        if (!applicationTimestamp.toLocalDateTime().truncatedTo(ChronoUnit.SECONDS).isEqual(repOrderTimestamp.truncatedTo(ChronoUnit.SECONDS))) {
-            throw new ValidationException(CANNOT_MODIFY_APPLICATION_ERROR);
-        }
-    }
-
-    private void validateApplicationStatus(WorkflowRequest request, RepOrderDTO repOrderDTO) {
-        RepStatusDTO statusDTO = request.getApplicationDTO().getStatusDTO();
-        boolean isUpdateAllowedOnApplication = statusDTO.getUpdateAllowed();
-        String rorsStatus = repOrderDTO.getRorsStatus();
-        boolean isUpdateAllowedOnRepOrder = (null == rorsStatus) || RepOrderStatus.getFrom(rorsStatus).isUpdateAllowed();
-        if (!isUpdateAllowedOnRepOrder && !isUpdateAllowedOnApplication) {
-            throw new ValidationException(String.format(CANNOT_UPDATE_APPLICATION_STATUS, statusDTO.getDescription()));
-        }
-    }
-
     public Boolean isUserActionValid(UserActionDTO request, UserSummaryDTO userSummaryDTO) {
         List<String> crimeValidationExceptionList = new ArrayList<>();
 
@@ -78,17 +47,17 @@ public class ValidationService {
         }
 
         if (request.getAction() != null && (userSummaryDTO.getRoleActions() == null
-                || !userSummaryDTO.getRoleActions().contains(request.getAction().getCode()))) {
+            || !userSummaryDTO.getRoleActions().contains(request.getAction().getCode()))) {
             crimeValidationExceptionList.add(USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION);
         }
 
         if (request.getNewWorkReason() != null && (userSummaryDTO.getNewWorkReasons() == null
-                || !userSummaryDTO.getNewWorkReasons().contains(request.getNewWorkReason().getCode()))) {
+            || !userSummaryDTO.getNewWorkReasons().contains(request.getNewWorkReason().getCode()))) {
             crimeValidationExceptionList.add(USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE);
         }
 
         if (request.getSessionId() != null && userSummaryDTO.getReservationsDTO() != null
-                && !request.getSessionId().equalsIgnoreCase(userSummaryDTO.getReservationsDTO().getUserSession())) {
+            && !request.getSessionId().equalsIgnoreCase(userSummaryDTO.getReservationsDTO().getUserSession())) {
             crimeValidationExceptionList.add(USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED);
         }
 
@@ -107,6 +76,37 @@ public class ValidationService {
         return userSummaryDTO.getRoleDataItem().stream().anyMatch(i -> i.getDataItem().equals(restrictedField.getField())
             && "Y".equals(i.getEnabled())
             && ("Y".equals(i.getInsertAllowed()) || "Y".equals(i.getUpdateAllowed())));
+    }
+
+    public void validate(WorkflowRequest request, RepOrderDTO repOrderDTO) {
+        validateApplicationTimestamp(request, repOrderDTO);
+        validateApplicationStatus(request, repOrderDTO);
+    }
+
+    private void validateApplicationStatus(WorkflowRequest request, RepOrderDTO repOrderDTO) {
+        RepStatusDTO statusDTO = request.getApplicationDTO().getStatusDTO();
+        boolean isUpdateAllowedOnApplication = statusDTO.getUpdateAllowed();
+        String rorsStatus = repOrderDTO.getRorsStatus();
+        boolean isUpdateAllowedOnRepOrder = (null == rorsStatus) || RepOrderStatus.getFrom(rorsStatus).isUpdateAllowed();
+        if (!isUpdateAllowedOnRepOrder && !isUpdateAllowedOnApplication) {
+            throw new ValidationException(String.format(CANNOT_UPDATE_APPLICATION_STATUS, statusDTO.getDescription()));
+        }
+    }
+    
+    private void validateApplicationTimestamp(WorkflowRequest request, RepOrderDTO repOrderDTO) {
+        ZonedDateTime applicationTimestamp = request.getApplicationDTO().getTimestamp();
+
+        if (applicationTimestamp == null) {
+            return;
+        }
+
+        LocalDateTime repOrderCreatedDate = DateUtil.convertDateToDateTime(repOrderDTO.getDateCreated());
+        LocalDateTime repOrderUpdatedDate = repOrderDTO.getDateModified();
+        LocalDateTime repOrderTimestamp = (null != repOrderUpdatedDate) ? repOrderUpdatedDate : repOrderCreatedDate;
+
+        if (!applicationTimestamp.toLocalDateTime().truncatedTo(ChronoUnit.SECONDS).isEqual(repOrderTimestamp.truncatedTo(ChronoUnit.SECONDS))) {
+            throw new ValidationException(CANNOT_MODIFY_APPLICATION_ERROR);
+        }
     }
 
 }
