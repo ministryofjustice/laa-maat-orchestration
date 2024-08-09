@@ -393,7 +393,7 @@ class ValidationServiceTest {
 
     @ParameterizedTest
     @MethodSource("restrictedFieldsEditableByUser")
-    void givenUserHasPermission_whenIsUserAuthorisedToEditField_thenReturnsTrue(final RestrictedField restrictedField) {
+    void givenUserHasPermission_whenIsUserAuthorisedToEditFieldIsInvoked_thenReturnsTrue(final RestrictedField restrictedField) {
         List<RoleDataItemDTO> roleDataItems = List.of(
             new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_CC_OUTCOME.getField(), "N", null, null),
             new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_RECEIVED_DATE.getField(), "Y", "Y", "N"),
