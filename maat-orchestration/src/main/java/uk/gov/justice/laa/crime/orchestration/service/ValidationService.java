@@ -39,6 +39,14 @@ public class ValidationService {
     public static final String USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE =
             "User does not have a valid New Work Reason Code";
 
+    public void checkUpliftFieldPermissions(final UserSummaryDTO userSummaryDTO) {
+        boolean userCanEditUpliftApplied = this.isUserAuthorisedToEditField(userSummaryDTO, RestrictedField.UPLIFT_APPLIED);
+
+        if (!userCanEditUpliftApplied || !this.isUserAuthorisedToEditField(userSummaryDTO, RestrictedField.UPLIFT_REMOVED)) {
+            throw new ValidationException(USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION);
+        }
+    }
+
     public Boolean isUserActionValid(UserActionDTO request, UserSummaryDTO userSummaryDTO) {
         List<String> crimeValidationExceptionList = new ArrayList<>();
 
@@ -92,7 +100,7 @@ public class ValidationService {
             throw new ValidationException(String.format(CANNOT_UPDATE_APPLICATION_STATUS, statusDTO.getDescription()));
         }
     }
-    
+
     private void validateApplicationTimestamp(WorkflowRequest request, RepOrderDTO repOrderDTO) {
         ZonedDateTime applicationTimestamp = request.getApplicationDTO().getTimestamp();
 
@@ -110,7 +118,3 @@ public class ValidationService {
     }
 
 }
-
-
-
-
