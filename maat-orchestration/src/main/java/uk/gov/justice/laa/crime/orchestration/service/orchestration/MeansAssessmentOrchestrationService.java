@@ -4,6 +4,7 @@ import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.commons.exception.MAATServerException;
 import uk.gov.justice.laa.crime.enums.orchestration.AssessmentResult;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -44,6 +45,9 @@ public class MeansAssessmentOrchestrationService {
             log.debug("Created Means assessment for applicationId = " + repId);
         } catch (ValidationException | CrimeValidationException exception) {
             throw exception;
+        } catch (MAATServerException exception) {
+            meansAssessmentService.rollback(request);
+            throw new ValidationException(exception.getMessage());
         } catch (Exception ex) {
             log.warn("Create Means assessment failed with the exception: {}", ex);
             meansAssessmentService.rollback(request);
@@ -66,6 +70,9 @@ public class MeansAssessmentOrchestrationService {
             log.debug("Updated Means assessment for applicationId = " + repId);
         } catch (ValidationException | CrimeValidationException exception) {
             throw exception;
+        } catch (MAATServerException exception) {
+            meansAssessmentService.rollback(request);
+            throw new ValidationException(exception.getMessage());
         } catch (Exception ex) {
             log.warn("Update Means assessment failed with the exception: {}", ex);
             meansAssessmentService.rollback(request);
