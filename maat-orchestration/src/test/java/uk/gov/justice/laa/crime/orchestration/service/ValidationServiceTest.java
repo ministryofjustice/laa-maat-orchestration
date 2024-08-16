@@ -393,7 +393,7 @@ class ValidationServiceTest {
 
     @ParameterizedTest
     @MethodSource("restrictedFieldsEditableByUser")
-    void givenUserHasPermission_whenIsUserAuthorisedToEditField_thenReturnsTrue(final RestrictedField restrictedField) {
+    void givenUserHasPermission_whenIsUserAuthorisedToEditFieldIsInvoked_thenReturnsTrue(final RestrictedField restrictedField) {
         List<RoleDataItemDTO> roleDataItems = List.of(
             new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_CC_OUTCOME.getField(), "N", null, null),
             new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_RECEIVED_DATE.getField(), "Y", "Y", "N"),
@@ -406,5 +406,36 @@ class ValidationServiceTest {
         boolean result = validationService.isUserAuthorisedToEditField(userSummaryDTO, restrictedField);
 
         assertTrue(result);
+    }
+
+    @Test
+    void givenUserHasNoUpliftPermissions_whenCheckUpliftFieldPermissionsInInvoked_thenExceptionIsThrown() {
+        UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
+
+        ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.checkUpliftFieldPermissions(userSummaryDTO));
+        assertThat(validationException.getMessage()).isEqualTo(USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION);
+    }
+
+    @Test
+    void givenUserHasPartialPermissions_whenCheckUpliftFieldPermissionsInInvoked_thenExceptionIsThrown() {
+        List<RoleDataItemDTO> roleDataItems = List.of(
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.UPLIFT_APPLIED.getField(), "Y", "Y", "Y"),
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.UPLIFT_REMOVED.getField(), "N", "Y", "Y")
+        );
+        UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO(roleDataItems);
+
+        ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.checkUpliftFieldPermissions(userSummaryDTO));
+        assertThat(validationException.getMessage()).isEqualTo(USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION);
+    }
+
+    @Test
+    void givenUserHasUpliftPermissions_whenCheckUpliftFieldPermissionsIsInvoked_thenNoExceptionIsThrown() {
+        List<RoleDataItemDTO> roleDataItems = List.of(
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.UPLIFT_APPLIED.getField(), "Y", "Y", "Y"),
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.UPLIFT_REMOVED.getField(), "Y", "Y", "Y")
+        );
+        UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO(roleDataItems);
+
+        assertDoesNotThrow(() -> validationService.checkUpliftFieldPermissions(userSummaryDTO));
     }
 }
