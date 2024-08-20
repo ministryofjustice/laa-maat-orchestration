@@ -39,7 +39,7 @@ public class MeansAssessmentController {
     public ResponseEntity<FinancialAssessmentDTO> find(
             @PathVariable int financialAssessmentId,
             @PathVariable int applicantId) {
-        log.info("Received request to find crime means assessment");
+        log.info("Received request to find crime means assessment - {}", financialAssessmentId);
         return ResponseEntity.ok(assessmentOrchestrationService.find(financialAssessmentId, applicantId));
     }
 

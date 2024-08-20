@@ -38,6 +38,19 @@
                 <maskPattern>telephone=([\w\s]+)</maskPattern>
                 <maskPattern>defendantId=([\w+-]+)</maskPattern>
                 <maskPattern>debtRefNumber=(\w+)</maskPattern>
+                <maskPattern>statusReason=([^,]+)</maskPattern>
+                <maskPattern>notes=([^,]+)</maskPattern>
+                <maskPattern>otherBenefitNote=([^,]+)</maskPattern>
+                <maskPattern>otherIncomeNote=([^,]+)</maskPattern>
+                <maskPattern>assessmentNotes=([^,]+)</maskPattern>
+                <maskPattern>otherHousingNote=([^,]+)</maskPattern>
+                <maskPattern>decisionNotes=([^,]+)</maskPattern>
+                <maskPattern>hrReasonNote=([^,]+)</maskPattern>
+                <maskPattern>incomeEvidenceNotes=([^,]+)</maskPattern>
+                <maskPattern>otherDescription=([^,]+)</maskPattern>
+                <maskPattern>otherText=([^,]+)</maskPattern>
+                <maskPattern>capitalNote=([^,]+)</maskPattern>
+                <maskPattern>iojResultNote=([^,]+)</maskPattern>
                 <pattern>%d{HH:mm:ss.SSS} traceId: %X{traceId:-} spanId: %X{spanId:-} [%thread] %-5level %logger{36} - %msg%n</pattern>
             </layout>
         </encoder>

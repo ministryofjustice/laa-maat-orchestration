@@ -46,4 +46,4 @@ spec:
                 port:
                   number: {{ $svcPort }}
     {{- end }}
-  {{- end }}
+{{- end }}

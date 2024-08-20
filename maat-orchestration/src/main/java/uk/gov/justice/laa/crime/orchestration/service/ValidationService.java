@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
+import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -9,9 +10,9 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.RepStatusDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.RestrictedField;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
-import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 import uk.gov.justice.laa.crime.util.DateUtil;
 
 import java.time.LocalDateTime;
@@ -37,22 +38,57 @@ public class ValidationService {
             "User does not have a role capable of performing this action";
     public static final String USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE =
             "User does not have a valid New Work Reason Code";
-    private final MaatCourtDataService maatCourtDataService;
-    private final MaatCourtDataApiService maatCourtDataApiService;
+
+    public void checkUpliftFieldPermissions(final UserSummaryDTO userSummaryDTO) {
+        boolean userCanEditUpliftApplied = this.isUserAuthorisedToEditField(userSummaryDTO, RestrictedField.UPLIFT_APPLIED);
+
+        if (!userCanEditUpliftApplied || !this.isUserAuthorisedToEditField(userSummaryDTO, RestrictedField.UPLIFT_REMOVED)) {
+            throw new ValidationException(USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION);
+        }
+    }
+
+    public Boolean isUserActionValid(UserActionDTO request, UserSummaryDTO userSummaryDTO) {
+        List<String> crimeValidationExceptionList = new ArrayList<>();
+
+        if (request.getAction() == null && request.getNewWorkReason() == null && request.getSessionId() == null) {
+            throw new IllegalArgumentException(ACTION_NEW_WORK_REASON_AND_SESSION_DOES_NOT_EXIST);
+        }
+
+        if (request.getAction() != null && (userSummaryDTO.getRoleActions() == null
+            || !userSummaryDTO.getRoleActions().contains(request.getAction().getCode()))) {
+            crimeValidationExceptionList.add(USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION);
+        }
+
+        if (request.getNewWorkReason() != null && (userSummaryDTO.getNewWorkReasons() == null
+            || !userSummaryDTO.getNewWorkReasons().contains(request.getNewWorkReason().getCode()))) {
+            crimeValidationExceptionList.add(USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE);
+        }
+
+        if (request.getSessionId() != null && userSummaryDTO.getReservationsDTO() != null
+            && !request.getSessionId().equalsIgnoreCase(userSummaryDTO.getReservationsDTO().getUserSession())) {
+            crimeValidationExceptionList.add(USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED);
+        }
+
+        if (!crimeValidationExceptionList.isEmpty()) {
+            throw new CrimeValidationException(crimeValidationExceptionList);
+        }
+
+        return true;
+    }
+
+    public boolean isUserAuthorisedToEditField(UserSummaryDTO userSummaryDTO, RestrictedField restrictedField) {
+        if (userSummaryDTO == null || userSummaryDTO.getRoleDataItem() == null) {
+            return false;
+        }
+
+        return userSummaryDTO.getRoleDataItem().stream().anyMatch(i -> i.getDataItem().equals(restrictedField.getField())
+            && "Y".equals(i.getEnabled())
+            && ("Y".equals(i.getInsertAllowed()) || "Y".equals(i.getUpdateAllowed())));
+    }
 
     public void validate(WorkflowRequest request, RepOrderDTO repOrderDTO) {
         validateApplicationTimestamp(request, repOrderDTO);
         validateApplicationStatus(request, repOrderDTO);
-    }
-
-    private void validateApplicationTimestamp(WorkflowRequest request, RepOrderDTO repOrderDTO) {
-        LocalDateTime repOrderCreatedDate = DateUtil.convertDateToDateTime(repOrderDTO.getDateCreated());
-        LocalDateTime repOrderUpdatedDate = repOrderDTO.getDateModified();
-        LocalDateTime repOrderTimestamp = (null != repOrderUpdatedDate) ? repOrderUpdatedDate : repOrderCreatedDate;
-        ZonedDateTime applicationTimestamp = request.getApplicationDTO().getTimestamp();
-        if (applicationTimestamp != null && !applicationTimestamp.toLocalDateTime().isEqual(repOrderTimestamp)) {
-            throw new ValidationException(CANNOT_MODIFY_APPLICATION_ERROR);
-        }
     }
 
     private void validateApplicationStatus(WorkflowRequest request, RepOrderDTO repOrderDTO) {
@@ -65,39 +101,20 @@ public class ValidationService {
         }
     }
 
-    public Boolean isUserActionValid(UserValidationDTO request) {
-        List<String> crimeValidationExceptionList = new ArrayList<>();
+    private void validateApplicationTimestamp(WorkflowRequest request, RepOrderDTO repOrderDTO) {
+        ZonedDateTime applicationTimestamp = request.getApplicationDTO().getTimestamp();
 
-        if (request.getAction() == null && request.getNewWorkReason() == null && request.getSessionId() == null) {
-            throw new IllegalArgumentException(ACTION_NEW_WORK_REASON_AND_SESSION_DOES_NOT_EXIST);
-        }
-        UserSummaryDTO userSummaryDTO = maatCourtDataService.getUserSummary(request.getUsername());
-
-        if (request.getAction() != null && (userSummaryDTO.getRoleActions() == null
-                || !userSummaryDTO.getRoleActions().contains(request.getAction().getCode()))) {
-            crimeValidationExceptionList.add(USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION);
+        if (applicationTimestamp == null) {
+            return;
         }
 
-        if (request.getNewWorkReason() != null && (userSummaryDTO.getNewWorkReasons() == null
-                || !userSummaryDTO.getNewWorkReasons().contains(request.getNewWorkReason().getCode()))) {
-            crimeValidationExceptionList.add(USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE);
-        }
+        LocalDateTime repOrderCreatedDate = DateUtil.convertDateToDateTime(repOrderDTO.getDateCreated());
+        LocalDateTime repOrderUpdatedDate = repOrderDTO.getDateModified();
+        LocalDateTime repOrderTimestamp = (null != repOrderUpdatedDate) ? repOrderUpdatedDate : repOrderCreatedDate;
 
-        if (request.getSessionId() != null && userSummaryDTO.getReservationsDTO() != null
-                && !request.getSessionId().equalsIgnoreCase(userSummaryDTO.getReservationsDTO().getUserSession())) {
-            crimeValidationExceptionList.add(USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED);
+        if (!applicationTimestamp.toLocalDateTime().truncatedTo(ChronoUnit.SECONDS).isEqual(repOrderTimestamp.truncatedTo(ChronoUnit.SECONDS))) {
+            throw new ValidationException(CANNOT_MODIFY_APPLICATION_ERROR);
         }
-
-        if (!crimeValidationExceptionList.isEmpty()) {
-            throw new CrimeValidationException(crimeValidationExceptionList);
-        }
-
-        return true;
     }
 
-
 }
-
-
-
-

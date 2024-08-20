@@ -19,9 +19,10 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.PassportAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RoleDataItemDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.validation.UserValidationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.Action;
 
 
@@ -446,14 +447,20 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    public static WorkflowRequest buildWorkFlowRequestForApplicationTimestampValidation() {
+    public static WorkflowRequest buildWorkflowRequestForApplicationTimestampValidation(Optional<String> timestamp) {
+        ZonedDateTime timestampToUse = timestamp.isPresent() ? toZonedDateTime(LocalDateTime.parse(timestamp.get())) : APPLICATION_TIMESTAMP;
+
         return WorkflowRequest
                 .builder()
                 .applicationDTO(
                         ApplicationDTO
                                 .builder()
                                 .repId(123L)
-                                .timestamp(APPLICATION_TIMESTAMP)
+                                .timestamp(timestampToUse)
+                                .statusDTO(RepStatusDTO
+                                    .builder()
+                                    .updateAllowed(true)
+                                    .build())
                                 .build()).build();
     }
 
@@ -1082,6 +1089,12 @@ public class TestModelDataBuilder {
         return RepOrderDTO.builder().dateModified(REP_ORDER_MODIFIED_TIMESTAMP).build();
     }
 
+    public static RepOrderDTO buildRepOrderDTOWithModifiedDateOf(String dateModifiedTimestamp) {
+        LocalDateTime dateModified = LocalDateTime.parse(dateModifiedTimestamp);
+
+        return RepOrderDTO.builder().dateModified(dateModified).rorsStatus(RepOrderStatus.CURR.getCode()).build();
+    }
+
     public static RepOrderDTO buildRepOrderDTOWithCreatedDateAndNoModifiedDate() {
         return RepOrderDTO.builder().dateCreated(REP_ORDER_CREATED_TIMESTAMP).dateModified(null).build();
     }
@@ -1126,24 +1139,24 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    public static UserValidationDTO getUserValidationDTO() {
-        return UserValidationDTO.builder()
+    public static UserActionDTO getUserActionDTO() {
+        return UserActionDTO.builder()
                 .username(Constants.USERNAME)
                 .action(TEST_ACTION)
                 .newWorkReason(TEST_NEW_WORK_REASON)
                 .sessionId(USER_SESSION).build();
     }
 
-    public static UserValidationDTO getUserValidationDTOWithReservation() {
-        return UserValidationDTO.builder()
+    public static UserActionDTO getUserActionDTOWithReservation() {
+        return UserActionDTO.builder()
                 .username(Constants.USERNAME)
                 .action(TEST_ACTION)
                 .newWorkReason(TEST_NEW_WORK_REASON)
                 .sessionId(TEST_USER_SESSION).build();
     }
 
-    public static UserValidationDTO getUserValidationDTOInvalidValidRequest() {
-        return UserValidationDTO.builder()
+    public static UserActionDTO getUserActionDTOInvalidValidRequest() {
+        return UserActionDTO.builder()
                 .username(Constants.USERNAME)
                 .action(null)
                 .newWorkReason(null)
@@ -1198,6 +1211,16 @@ public class TestModelDataBuilder {
                 .roleActions(roleActions)
                 .newWorkReasons(List.of(newWorkReason.getCode()))
                 .reservationsDTO(getReservationsDTO())
+                .build();
+    }
+
+    public static UserSummaryDTO getUserSummaryDTO(List<RoleDataItemDTO> roleDataItems) {
+        return UserSummaryDTO.builder()
+                .username(Constants.USERNAME)
+                .roleActions(TEST_ROLE_ACTIONS)
+                .newWorkReasons(TEST_NEW_WORK_REASONS)
+                .reservationsDTO(getReservationsDTO())
+                .roleDataItem(roleDataItems)
                 .build();
     }
 
