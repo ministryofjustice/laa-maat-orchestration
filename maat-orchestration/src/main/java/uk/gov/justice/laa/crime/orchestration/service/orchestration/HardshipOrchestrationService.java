@@ -159,8 +159,9 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
 
         proceedingsService.updateApplication(request);
 
+        // TODO: Uncomment this call to application tracking before activating hardship orchestration
         // Call application.handle_eform_result stored procedure OR Equivalent ATS service endpoint
-        catDataService.handleEformResult(applicationTrackingMapper.build(request, repOrderDTO));
+        // catDataService.handleEformResult(applicationTrackingMapper.build(request, repOrderDTO));
 
 
         // Call crown_court.xx_process_activity_and_get_correspondence stored procedure

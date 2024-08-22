@@ -288,7 +288,8 @@ class HardshipIntegrationTest {
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1);
         if (CourtType.CROWN_COURT.equals(courtType)) {
-            assertStubForHandleEformSerivce(1);
+            // TODO: Uncomment this assertion for application tracking before activating hardship orchestration
+            // assertStubForHandleEformSerivce(1);
             assertStubForInvokeStoredProcedure(3);
         } else {
             assertStubForCheckContributionsRule(1);
@@ -304,7 +305,8 @@ class HardshipIntegrationTest {
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1);
         if (CourtType.CROWN_COURT.equals(courtType)) {
-            assertStubForHandleEformSerivce(1);
+            // TODO: Uncomment this assertion for application tracking before activating hardship orchestration
+            // assertStubForHandleEformSerivce(1);
         }
     }
 
