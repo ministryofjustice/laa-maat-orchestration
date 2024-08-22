@@ -19,7 +19,7 @@ def versions = [
 		pitest                  : "1.16.1",
 		springdocVersion        : "2.5.0",
 		commonsModSchemas       : "1.5.0",
-		crimeCommonsClasses     : "3.29.0-SNAPSHOT",
+		crimeCommonsClasses     : "3.28.2",
 		commonsRestClient       : "3.16.0",
 		okhttpVersion           : "4.12.0",
 		wmStubRunnerVersion    	: "4.1.3"
@@ -32,9 +32,6 @@ configurations {
 }
 
 repositories {
-	maven {
-		url "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-	}
 	mavenCentral()
 }
 
