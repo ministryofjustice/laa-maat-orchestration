@@ -47,6 +47,7 @@ class HardshipReviewMapperTest {
                 .isEqualTo(CourtType.CROWN_COURT);
         softly.assertThat(actualHardship.getTotalAnnualDisposableIncome().doubleValue())
                 .isEqualTo(workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getTotalAnnualDisposableIncome());
+        softly.assertThat(actualHardship.getSolicitorCosts()).isNull();
     }
 
     @Test
