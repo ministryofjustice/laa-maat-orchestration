@@ -48,11 +48,6 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         validate(request, action, getRepOrderDTO(request));
         ApplicationDTO application = request.getApplicationDTO();
 
-        if (courtType == CourtType.MAGISTRATE) {
-            log.info("Before create hardship via hardship service for: {}",
-                    request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getMagCourtHardship().getSolictorsCosts());
-        }
-
         ApiPerformHardshipResponse performHardshipResponse = hardshipService.create(request);
         try {
             // Need to refresh from DB as HardshipDetail ids may have changed
