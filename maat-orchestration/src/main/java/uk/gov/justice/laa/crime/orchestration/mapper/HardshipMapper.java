@@ -106,7 +106,7 @@ public class HardshipMapper {
     }
 
     private SolicitorCosts hrSolicitorCostsDtoToSolicitorCosts(HRSolicitorsCostsDTO solicitorsCosts) {
-        if (solicitorsCosts.getSolicitorEstimatedTotalCost() != null) {
+        if (solicitorsCosts.getSolicitorRate() != null && solicitorsCosts.getSolicitorHours() != null) {
             return new SolicitorCosts()
                     .withVat(solicitorsCosts.getSolicitorVat())
                     .withRate(solicitorsCosts.getSolicitorRate())
