@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.laa.crime.common.model.orchestration.application_tracking.ApiCrimeApplicationTrackingRequest;
 import uk.gov.justice.laa.crime.common.model.orchestration.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.enums.CourtType;
@@ -168,6 +169,8 @@ class HardshipOrchestrationServiceTest {
                 any(StoredProcedure.class)
         ))
                 .thenReturn(applicationDTO);
+
+        when(applicationTrackingMapper.build(any(), any())).thenReturn(new ApiCrimeApplicationTrackingRequest().withUsn(12345));
 
         ApplicationDTO expected = orchestrationService.create(workflowRequest);
 
@@ -379,7 +382,7 @@ class HardshipOrchestrationServiceTest {
                 .thenReturn(assessmentSummaryDTO);
         when(hardshipMapper.getUserActionDTO(any(), any()))
             .thenReturn(UserActionDTO.builder().username("mock-u").build());
-
+        when(applicationTrackingMapper.build(any(), any())).thenReturn(new ApiCrimeApplicationTrackingRequest().withUsn(12345));
         ApplicationDTO expected = orchestrationService.update(workflowRequest);
 
         assertThat(expected.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship())

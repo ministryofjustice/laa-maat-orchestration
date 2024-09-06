@@ -5,6 +5,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.common.model.orchestration.application_tracking.ApiCrimeApplicationTrackingRequest;
 import uk.gov.justice.laa.crime.common.model.orchestration.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
@@ -158,12 +159,11 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         ));
 
         proceedingsService.updateApplication(request);
-
-        // TODO: Uncomment this call to application tracking before activating hardship orchestration
         // Call application.handle_eform_result stored procedure OR Equivalent ATS service endpoint
-        // catDataService.handleEformResult(applicationTrackingMapper.build(request, repOrderDTO));
-
-
+        ApiCrimeApplicationTrackingRequest apiCrimeApplicationTrackingRequest = applicationTrackingMapper.build(request, repOrderDTO);
+        if (null != apiCrimeApplicationTrackingRequest.getUsn()) {
+            catDataService.handleEformResult(apiCrimeApplicationTrackingRequest);
+        }
         // Call crown_court.xx_process_activity_and_get_correspondence stored procedure
         request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
                 request.getApplicationDTO(), request.getUserDTO(),
