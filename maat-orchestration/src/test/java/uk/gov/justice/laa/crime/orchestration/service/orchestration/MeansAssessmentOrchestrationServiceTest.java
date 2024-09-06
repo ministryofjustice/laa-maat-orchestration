@@ -32,6 +32,9 @@ class MeansAssessmentOrchestrationServiceTest {
     private MeansAssessmentService meansAssessmentService;
 
     @Mock
+    private FeatureDecisionService featureDecisionService;
+
+    @Mock
     private ProceedingsService proceedingsService;
 
     @Mock
@@ -64,6 +67,7 @@ class MeansAssessmentOrchestrationServiceTest {
                 any(StoredProcedure.class)
         ))
                 .thenReturn(applicationDTO);
+        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
 
         ApplicationDTO actual = orchestrationService.create(workflowRequest);
 
@@ -87,9 +91,12 @@ class MeansAssessmentOrchestrationServiceTest {
 
         WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         workflowRequest.setC3Enabled(false);
+
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
                 any(StoredProcedure.class)
         )).thenReturn(workflowRequest.getApplicationDTO());
+
+        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(false);
 
         orchestrationService.create(workflowRequest);
         verify(meansAssessmentService).create(workflowRequest);
@@ -120,6 +127,7 @@ class MeansAssessmentOrchestrationServiceTest {
                 any(StoredProcedure.class)
         ))
                 .thenReturn(applicationDTO);
+        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
 
         ApplicationDTO actual = orchestrationService.update(workflowRequest);
 
@@ -145,10 +153,12 @@ class MeansAssessmentOrchestrationServiceTest {
 
         WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         workflowRequest.setC3Enabled(false);
+
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
                 any(StoredProcedure.class)
         ))
-                .thenReturn(workflowRequest.getApplicationDTO());
+            .thenReturn(workflowRequest.getApplicationDTO());
+        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(false);
 
         orchestrationService.update(workflowRequest);
         verify(meansAssessmentService).update(workflowRequest);

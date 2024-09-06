@@ -18,6 +18,10 @@ import java.math.BigDecimal;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FeatureToggleDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.CurrentFeatureToggles;
+import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggleAction;
 
 import static uk.gov.justice.laa.crime.orchestration.data.Constants.FINANCIAL_ASSESSMENT_ID;
 import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
@@ -124,7 +128,6 @@ public class MeansAssessmentDataBuilder {
         return WorkflowRequest.builder()
                 .userDTO(getUserDTO())
                 .applicationDTO(getApplicationDTO())
-                .isC3Enabled(true)
                 .build();
     }
 
@@ -343,6 +346,17 @@ public class MeansAssessmentDataBuilder {
                 .description(ReviewType.ER.getDescription())
                 .code(ReviewType.ER.getCode())
                 .build();
+    }
+
+    public static UserSummaryDTO getUserSummaryDTO() {
+        return UserSummaryDTO.builder()
+            .featureToggle(List.of(
+                FeatureToggleDTO.builder()
+                    .featureName(CurrentFeatureToggles.CALCULATE_CONTRIBUTION.getName())
+                    .action(FeatureToggleAction.CREATE.getName())
+                    .build()
+            ))
+            .build();
     }
 
     private static List<ChildWeightingDTO> getChildWeightings() {
