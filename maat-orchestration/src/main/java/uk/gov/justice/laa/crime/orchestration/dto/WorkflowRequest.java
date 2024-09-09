@@ -18,6 +18,5 @@ public class WorkflowRequest {
     private UserDTO userDTO;
     @NotNull
     private ApplicationDTO applicationDTO;
-    private boolean isC3Enabled;
     private CourtType courtType;
 }

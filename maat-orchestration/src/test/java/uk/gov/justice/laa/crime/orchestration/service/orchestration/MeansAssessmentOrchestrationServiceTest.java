@@ -90,7 +90,6 @@ class MeansAssessmentOrchestrationServiceTest {
     void givenARequestWithC3NotEnabled_whenCreateIsInvoked_thenCalculationContributionIsNotCalled() {
 
         WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
-        workflowRequest.setC3Enabled(false);
 
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
                 any(StoredProcedure.class)
@@ -152,7 +151,6 @@ class MeansAssessmentOrchestrationServiceTest {
     void givenARequestWithC3NotEnabled_whenUpdateIsInvoked_thenCalculationContributionIsNotCalled() {
 
         WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
-        workflowRequest.setC3Enabled(false);
 
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
                 any(StoredProcedure.class)
