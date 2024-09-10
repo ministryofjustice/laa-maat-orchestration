@@ -28,6 +28,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith({MockitoExtension.class})
 class MeansAssessmentOrchestrationServiceTest {
 
+    private static final String MOCK_ALERT = "Mock alert";
     @Mock
     private MeansAssessmentService meansAssessmentService;
 
@@ -201,4 +202,36 @@ class MeansAssessmentOrchestrationServiceTest {
                 .isInstanceOf(ValidationException.class);
         Mockito.verify(meansAssessmentService, times(0)).rollback(any());
     }
-}
+
+    @Test
+    void givenValidationFailureAtPostAssessmentProcessing_whenUpdateIsInvoked_thenRollbackIsInvoked() {
+
+        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
+        workflowRequest.setC3Enabled(false);
+        workflowRequest.getApplicationDTO().setAlertMessage(MOCK_ALERT);
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                any(StoredProcedure.class)
+        )).thenReturn(workflowRequest.getApplicationDTO());
+
+        assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
+                .isInstanceOf(ValidationException.class).hasMessage(MOCK_ALERT);
+        verify(proceedingsService, times(0)).updateApplication(workflowRequest);
+        verify(meansAssessmentService, times(1)).rollback(any());
+    }
+
+    @Test
+    void givenValidationFailureAtPostAssessmentProcessing_whenCreateIsInvoked_thenRollbackIsInvoked() {
+
+        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().setAlertMessage(MOCK_ALERT);
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                any(StoredProcedure.class)
+        )).thenReturn(workflowRequest.getApplicationDTO());
+        when(contributionService.calculate(workflowRequest))
+                .thenReturn(workflowRequest.getApplicationDTO());
+
+        assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
+                .isInstanceOf(ValidationException.class).hasMessage(MOCK_ALERT);
+        verify(proceedingsService, times(0)).updateApplication(workflowRequest);
+        verify(meansAssessmentService, times(1)).rollback(any());
+    }}
