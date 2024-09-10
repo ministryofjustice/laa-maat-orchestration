@@ -24,7 +24,7 @@ public class MeansAssessmentOrchestrationService {
     private final MeansAssessmentService meansAssessmentService;
     private final MaatCourtDataService maatCourtDataService;
     private final AssessmentSummaryService assessmentSummaryService;
-
+    private final FeatureDecisionService featureDecisionService;
 
     public FinancialAssessmentDTO find(int assessmentId, int applicantId) {
         return meansAssessmentService.find(assessmentId, applicantId);
@@ -95,9 +95,7 @@ public class MeansAssessmentOrchestrationService {
     }
 
     private ApplicationDTO processCrownCourtProceedings(WorkflowRequest request) {
-        if (request.isC3Enabled()) {
-
-
+        if (featureDecisionService.isC3Enabled(request)) {
             log.info("Before calling ASSESSMENT_POST_PROCESSING_PART_1_C3");
             printStatus(request.getApplicationDTO(), "Before calling ASSESSMENT_POST_PROCESSING_PART_1_C3.printStatus()");
             // call post_processing_part_1_c3 and map the application
