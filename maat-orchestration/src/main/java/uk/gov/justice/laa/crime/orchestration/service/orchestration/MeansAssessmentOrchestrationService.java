@@ -19,12 +19,11 @@ import uk.gov.justice.laa.crime.orchestration.service.*;
 @RequiredArgsConstructor
 public class MeansAssessmentOrchestrationService {
 
-    private final ContributionService contributionService;
     private final ProceedingsService proceedingsService;
     private final MeansAssessmentService meansAssessmentService;
     private final MaatCourtDataService maatCourtDataService;
     private final AssessmentSummaryService assessmentSummaryService;
-    private final FeatureDecisionService featureDecisionService;
+    private final MeansContributionServiceFactory contributionServiceFactory;
 
     public FinancialAssessmentDTO find(int assessmentId, int applicantId) {
         return meansAssessmentService.find(assessmentId, applicantId);
@@ -95,31 +94,10 @@ public class MeansAssessmentOrchestrationService {
     }
 
     private ApplicationDTO processCrownCourtProceedings(WorkflowRequest request) {
-        if (featureDecisionService.isC3Enabled(request)) {
-            log.info("Before calling ASSESSMENT_POST_PROCESSING_PART_1_C3");
-            printStatus(request.getApplicationDTO(), "Before calling ASSESSMENT_POST_PROCESSING_PART_1_C3.printStatus()");
-            // call post_processing_part_1_c3 and map the application
-            request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                    request.getApplicationDTO(),
-                    request.getUserDTO(),
-                    StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3)
-            );
-            printStatus(request.getApplicationDTO(), "after calling ASSESSMENT_POST_PROCESSING_PART_1_C3");
-            // call pre_update_cc_application with the calculated contribution and map the application
-            request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                    contributionService.calculate(request),
-                    request.getUserDTO(),
-                    StoredProcedure.PRE_UPDATE_CC_APPLICATION)
-            );
-            log.info("MeansAssessmentOrchestrationService.PRE_UPDATE_CC_APPLICATION = " + request);
-        } else {
-            // call post_processing_part1 and map the application
-            request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                    request.getApplicationDTO(),
-                    request.getUserDTO(),
-                    StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1)
-            );
-        }
+
+        MeansContributionService service = contributionServiceFactory.getService(request);
+        service.processContributions(request);
+
         proceedingsService.updateApplication(request);
 
         log.info("MeansAssessmentOrchestrationService.updateApplication = " + request);
