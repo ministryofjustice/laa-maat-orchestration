@@ -19,6 +19,7 @@ import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
 import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
 import uk.gov.justice.laa.crime.orchestration.service.MeansAssessmentService;
 import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
+import static uk.gov.justice.laa.crime.orchestration.common.Constants.*;
 
 @Slf4j
 @Service
@@ -30,7 +31,6 @@ public class MeansAssessmentOrchestrationService {
     private final MeansAssessmentService meansAssessmentService;
     private final MaatCourtDataService maatCourtDataService;
     private final AssessmentSummaryService assessmentSummaryService;
-
 
     public FinancialAssessmentDTO find(int assessmentId, int applicantId) {
         return meansAssessmentService.find(assessmentId, applicantId);
@@ -108,7 +108,8 @@ public class MeansAssessmentOrchestrationService {
 
         // Check for any validation alerts resulted as part of the pre_update_checks and raise exception
         String alertMessage = request.getApplicationDTO().getAlertMessage();
-        if (StringUtils.isNotBlank(alertMessage)) {
+        if (StringUtils.isNotBlank(alertMessage) &&
+                (alertMessage.contains(WRN_MSG_REASSESSMENT) || alertMessage.contains(WRN_MSG_INCOMPLETE_ASSESSMENT))) {
             throw new MAATServerException(alertMessage);
         }
 

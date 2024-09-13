@@ -24,6 +24,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_INCOMPLETE_ASSESSMENT;
+import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_REASSESSMENT;
 
 @ExtendWith({MockitoExtension.class})
 class MeansAssessmentOrchestrationServiceTest {
@@ -205,23 +207,37 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Test
     void givenValidationFailureAtPostAssessmentProcessing_whenUpdateIsInvoked_thenRollbackIsInvoked() {
-
         WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         workflowRequest.setC3Enabled(false);
-        workflowRequest.getApplicationDTO().setAlertMessage(MOCK_ALERT);
+        workflowRequest.getApplicationDTO().setAlertMessage(WRN_MSG_REASSESSMENT);
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
                 any(StoredProcedure.class)
         )).thenReturn(workflowRequest.getApplicationDTO());
 
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
-                .isInstanceOf(ValidationException.class).hasMessage(MOCK_ALERT);
+                .isInstanceOf(ValidationException.class).hasMessage(WRN_MSG_REASSESSMENT);
         verify(proceedingsService, times(0)).updateApplication(workflowRequest);
         verify(meansAssessmentService, times(1)).rollback(any());
     }
 
     @Test
     void givenValidationFailureAtPostAssessmentProcessing_whenCreateIsInvoked_thenRollbackIsInvoked() {
+        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().setAlertMessage(WRN_MSG_INCOMPLETE_ASSESSMENT);
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                any(StoredProcedure.class)
+        )).thenReturn(workflowRequest.getApplicationDTO());
+        when(contributionService.calculate(workflowRequest))
+                .thenReturn(workflowRequest.getApplicationDTO());
 
+        assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
+                .isInstanceOf(ValidationException.class).hasMessage(WRN_MSG_INCOMPLETE_ASSESSMENT);
+        verify(proceedingsService, times(0)).updateApplication(workflowRequest);
+        verify(meansAssessmentService, times(1)).rollback(any());
+    }
+
+    @Test
+    void givenSuccessfulPostAssessmentProcessing_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
         WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         workflowRequest.getApplicationDTO().setAlertMessage(MOCK_ALERT);
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
@@ -230,8 +246,8 @@ class MeansAssessmentOrchestrationServiceTest {
         when(contributionService.calculate(workflowRequest))
                 .thenReturn(workflowRequest.getApplicationDTO());
 
-        assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
-                .isInstanceOf(ValidationException.class).hasMessage(MOCK_ALERT);
-        verify(proceedingsService, times(0)).updateApplication(workflowRequest);
-        verify(meansAssessmentService, times(1)).rollback(any());
-    }}
+        orchestrationService.create(workflowRequest);
+        verify(proceedingsService, times(1)).updateApplication(workflowRequest);
+        verify(meansAssessmentService, times(0)).rollback(any());
+    }
+}
