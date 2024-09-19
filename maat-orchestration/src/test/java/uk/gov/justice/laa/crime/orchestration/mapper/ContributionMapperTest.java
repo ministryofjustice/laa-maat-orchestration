@@ -5,10 +5,10 @@ import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import uk.gov.justice.laa.crime.common.model.orchestration.contribution.ApiMaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.common.model.orchestration.contribution.ApiMaatCalculateContributionResponse;
-import uk.gov.justice.laa.crime.common.model.orchestration.contribution.ApiMaatCheckContributionRuleRequest;
-import uk.gov.justice.laa.crime.common.model.orchestration.contribution.common.ApiContributionSummary;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -48,7 +48,7 @@ class ContributionMapperTest {
                 .isEqualTo(workflowRequest.getUserDTO().getUserName());
         softly.assertThat(apiMaatCalculateContributionRequest.getRepId())
                 .isEqualTo(NumberUtils.toInteger(applicationDTO.getRepId()));
-        softly.assertThat(apiMaatCalculateContributionRequest.getApplId())
+        softly.assertThat(apiMaatCalculateContributionRequest.getApplicantId())
                 .isEqualTo(NumberUtils.toInteger(applicationDTO.getApplicantDTO().getId()));
         softly.assertThat(apiMaatCalculateContributionRequest.getMagCourtOutcome())
                 .isEqualTo(MagCourtOutcome.getFrom(applicationDTO.getMagsOutcomeDTO().getOutcome()));
@@ -102,7 +102,7 @@ class ContributionMapperTest {
                 .isEqualTo(workflowRequest.getUserDTO().getUserName());
         softly.assertThat(apiMaatCalculateContributionRequest.getRepId())
                 .isEqualTo(NumberUtils.toInteger(applicationDTO.getRepId()));
-        softly.assertThat(apiMaatCalculateContributionRequest.getApplId())
+        softly.assertThat(apiMaatCalculateContributionRequest.getApplicantId())
                 .isEqualTo(NumberUtils.toInteger(applicationDTO.getApplicantDTO().getId()));
         softly.assertThat(apiMaatCalculateContributionRequest.getMagCourtOutcome())
                 .isEqualTo(MagCourtOutcome.getFrom(applicationDTO.getMagsOutcomeDTO().getOutcome()));

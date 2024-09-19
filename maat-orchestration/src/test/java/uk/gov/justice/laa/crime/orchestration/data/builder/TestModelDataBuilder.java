@@ -2,12 +2,12 @@ package uk.gov.justice.laa.crime.orchestration.data.builder;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtOutcome;
+import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiRepOrderCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiUserSession;
-import uk.gov.justice.laa.crime.common.model.orchestration.contribution.ApiMaatCalculateContributionResponse;
-import uk.gov.justice.laa.crime.common.model.orchestration.contribution.common.ApiContributionSummary;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.common.model.orchestration.court_data_api.hardship.ApiHardshipDetail;
 import uk.gov.justice.laa.crime.common.model.orchestration.court_data_api.hardship.ApiHardshipProgress;
 import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.*;
@@ -252,7 +252,7 @@ public class TestModelDataBuilder {
         return new ApiCrownCourtOutcome()
                 .withDateSet(SENTENCE_ORDER_DATETIME)
                 .withDescription(crownCourtOutcome.getDescription())
-                .withOutComeType(crownCourtOutcome.getType())
+                .withOutcomeType(crownCourtOutcome.getType())
                 .withOutcome(crownCourtOutcome);
     }
 

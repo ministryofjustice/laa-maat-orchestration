@@ -4,16 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.common.model.orchestration.contribution.ApiMaatCalculateContributionRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.enums.*;
-import uk.gov.justice.laa.crime.enums.orchestration.AssessmentResult;
+import uk.gov.justice.laa.crime.enums.contribution.AssessmentType;
+import uk.gov.justice.laa.crime.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiAssessment;
-import uk.gov.justice.laa.crime.common.model.orchestration.contribution.ApiMaatCalculateContributionResponse;
-import uk.gov.justice.laa.crime.common.model.orchestration.contribution.ApiMaatCheckContributionRuleRequest;
-import uk.gov.justice.laa.crime.common.model.orchestration.contribution.LastOutcome;
-import uk.gov.justice.laa.crime.common.model.orchestration.contribution.common.ApiContributionSummary;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
+import uk.gov.justice.laa.crime.common.model.contribution.LastOutcome;
+import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
@@ -21,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
 import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
@@ -34,7 +34,7 @@ public class ContributionMapper extends CrownCourtMapper {
             WorkflowRequest workflowRequest) {
 
         log.info("ContributionMapper.workflowRequestToMaatCalculateContributionRequest()");
-        ApiMaatCalculateContributionRequest request = null;
+        ApiMaatCalculateContributionRequest request;
 
 
         UserDTO user = workflowRequest.getUserDTO();
@@ -54,7 +54,7 @@ public class ContributionMapper extends CrownCourtMapper {
         request = new ApiMaatCalculateContributionRequest()
                 .withUserCreated(user.getUserName())
                 .withRepId(NumberUtils.toInteger(application.getRepId()))
-                .withApplId(NumberUtils.toInteger(application.getApplicantDTO().getId()))
+                .withApplicantId(NumberUtils.toInteger(application.getApplicantDTO().getId()))
                 .withMagCourtOutcome(MagCourtOutcome.getFrom(application.getMagsOutcomeDTO().getOutcome()))
                 .withCommittalDate(toLocalDateTime(application.getCommittalDate()))
                 .withCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()))
