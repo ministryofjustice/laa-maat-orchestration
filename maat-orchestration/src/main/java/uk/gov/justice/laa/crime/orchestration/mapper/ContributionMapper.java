@@ -48,6 +48,7 @@ public class ContributionMapper extends CrownCourtMapper {
 
         log.info("workflowRequestToMaatCalculateContributionRequest()");
         Collection<OutcomeDTO> outcomeDTOs = crownCourtOverviewDTO.getCrownCourtSummaryDTO().getOutcomeDTOs();
+        log.info("OutcomeDTOs are {}", outcomeDTOs);
         String appealType = crownCourtOverviewDTO.getAppealDTO().getAppealTypeDTO().getCode();
         LocalDateTime effectiveDate = toLocalDateTime(contributionsDTO.getEffectiveDate() != null ? contributionsDTO.getEffectiveDate().getValue() : null);
 
