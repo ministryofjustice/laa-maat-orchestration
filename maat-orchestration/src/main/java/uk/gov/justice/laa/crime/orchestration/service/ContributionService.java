@@ -31,7 +31,6 @@ public class ContributionService {
 
     public ApplicationDTO calculate(WorkflowRequest request) {
         log.info("start ContributionService.calculate --->");
-        log.info("WorkflowRequest is {}", request);
         ApplicationDTO application = request.getApplicationDTO();
         if (isRecalculationRequired(application)) {
             log.info("---isRecalculationRequired() --->");
