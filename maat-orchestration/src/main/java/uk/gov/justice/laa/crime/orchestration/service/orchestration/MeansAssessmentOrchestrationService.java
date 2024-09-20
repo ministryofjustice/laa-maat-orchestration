@@ -85,7 +85,6 @@ public class MeansAssessmentOrchestrationService {
     }
 
     private ApplicationDTO processCrownCourtProceedings(WorkflowRequest request) {
-        log.info("WorkflowRequest is {}", request);
         if (featureDecisionService.isC3Enabled(request)) {
             // call post_processing_part_1_c3 and map the application
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(

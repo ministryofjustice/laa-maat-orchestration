@@ -37,7 +37,6 @@ public class ContributionService {
             ApiMaatCalculateContributionRequest calculateContributionRequest =
                     contributionMapper.workflowRequestToMaatCalculateContributionRequest(request);
             log.info("..Before Calling ContributionService.calculate()..");
-            log.info("ApiMaatCalculateContributionRequest is {}", calculateContributionRequest);
             ApiMaatCalculateContributionResponse calculateContributionResponse =
                     contributionApiService.calculate(calculateContributionRequest);
             log.info("calculateContributionResponse --->" +calculateContributionResponse);

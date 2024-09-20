@@ -13,7 +13,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.LastOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
@@ -47,8 +46,6 @@ public class ContributionMapper extends CrownCourtMapper {
         HardshipOverviewDTO hardshipOverviewDTO = financialAssessmentDTO.getHardship();
 
         log.info("workflowRequestToMaatCalculateContributionRequest()");
-        Collection<OutcomeDTO> outcomeDTOs = crownCourtOverviewDTO.getCrownCourtSummaryDTO().getOutcomeDTOs();
-        log.info("OutcomeDTOs are {}", outcomeDTOs);
         String appealType = crownCourtOverviewDTO.getAppealDTO().getAppealTypeDTO().getCode();
         LocalDateTime effectiveDate = toLocalDateTime(contributionsDTO.getEffectiveDate() != null ? contributionsDTO.getEffectiveDate().getValue() : null);
 
@@ -70,7 +67,6 @@ public class ContributionMapper extends CrownCourtMapper {
                         MagCourtOutcome.getFrom(
                                 application.getMagsOutcomeDTO().getOutcome()) : null)
                 .withAppealType(appealType != null ? AppealType.getFrom(appealType) : null)
-                .withLastOutcome(getLastCrownCourtOutcome(outcomeDTOs))
                 .withCrownCourtOutcome(
                         crownCourtSummaryDtoToCrownCourtOutcomes(crownCourtOverviewDTO.getCrownCourtSummaryDTO())
                 )
@@ -92,16 +88,6 @@ public class ContributionMapper extends CrownCourtMapper {
                     hardshipOverviewDTO.getMagCourtHardship().getDisposableIncomeAfterHardship());
         }
         return request;
-    }
-
-    private LastOutcome getLastCrownCourtOutcome(final Collection<OutcomeDTO> crownCourtOutcomeList) {
-        return crownCourtOutcomeList.stream()
-                .reduce((first, second) -> second)
-                .filter(outcome ->  outcome.getOutComeType() != null && outcome.getOutComeType().equals(CrownCourtOutcomeType.APPEAL.getType()))
-                .map(appealOutcome -> new LastOutcome()
-                        .withDateSet(toLocalDateTime(appealOutcome.getDateSet()))
-                        .withOutcome(CrownCourtAppealOutcome.getFrom(appealOutcome.getOutcome())))
-                .orElse(null);
     }
 
     private List<ApiAssessment> applicationDtoToAssessments(final ApplicationDTO application) {
