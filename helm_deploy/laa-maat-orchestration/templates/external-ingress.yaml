@@ -17,10 +17,7 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- if .Values.ingress.external_whitelist_source_range }}
-    nginx.ingress.kubernetes.io/whitelist-source-range: {{ $.Values.ingress.external_whitelist_source_range }}
-    external-dns.alpha.kubernetes.io/set-identifier: {{ $fullName }}-external-{{ $.Values.ingress.environmentName}}-green
-  {{- end }}
+  {{- include "laa-maat-orchestration.externalIngress" . | nindent 2 }}
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   {{- if .Values.ingress.tls }}
