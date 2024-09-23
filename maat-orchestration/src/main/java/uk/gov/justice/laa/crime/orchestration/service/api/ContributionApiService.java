@@ -24,9 +24,11 @@ public class ContributionApiService {
     @Qualifier("cccApiClient")
     private final RestAPIClient contributionApiClient;
     private final ServicesConfiguration configuration;
-    private static final String RESPONSE_STRING = "Response from Contribution Service: %s";
+    private static final String RESPONSE_STRING = "Response from Contribution Service: {}";
+    private static final String REQUEST_STRING = "Request to Contribution Service: {}";
 
     public ApiMaatCalculateContributionResponse calculate(ApiMaatCalculateContributionRequest request) {
+        log.info(REQUEST_STRING, request);
         ApiMaatCalculateContributionResponse response = contributionApiClient.post(
                 request,
                 new ParameterizedTypeReference<>() {
@@ -35,11 +37,12 @@ public class ContributionApiService {
                 Collections.emptyMap()
         );
 
-        log.info(String.format(RESPONSE_STRING, response));
+        log.info(RESPONSE_STRING, response);
         return response;
     }
 
     public Boolean isContributionRule(ApiMaatCheckContributionRuleRequest request) {
+        log.info(REQUEST_STRING, request);
         Boolean response = contributionApiClient.post(
                 request,
                 new ParameterizedTypeReference<>() {
@@ -48,7 +51,7 @@ public class ContributionApiService {
                 Collections.emptyMap()
         );
 
-        log.info(String.format(RESPONSE_STRING, response));
+        log.info(RESPONSE_STRING, response);
         return response;
     }
 
@@ -61,7 +64,7 @@ public class ContributionApiService {
                 repId
         );
 
-        log.info(String.format(RESPONSE_STRING, response));
+        log.info(RESPONSE_STRING, response);
         return response;
     }
 }

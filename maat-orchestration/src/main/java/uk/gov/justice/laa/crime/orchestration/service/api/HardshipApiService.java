@@ -22,9 +22,11 @@ public class HardshipApiService {
     @Qualifier("hardshipApiClient")
     private final RestAPIClient hardshipApiClient;
     private final ServicesConfiguration configuration;
-    private static final String RESPONSE_STRING = "Response from Hardship Service: %s";
+    private static final String RESPONSE_STRING = "Response from Hardship Service: {}";
+    private static final String REQUEST_STRING = "Request to Hardship Service: {}";
 
     public ApiFindHardshipResponse find(Integer hardshipReviewId) {
+        log.info(REQUEST_STRING, hardshipReviewId);
         ApiFindHardshipResponse response = hardshipApiClient.get(
                 new ParameterizedTypeReference<>() {
                 },
@@ -32,11 +34,12 @@ public class HardshipApiService {
                 hardshipReviewId
         );
 
-        log.info(String.format(RESPONSE_STRING, response));
+        log.info(RESPONSE_STRING, response);
         return response;
     }
 
     public ApiPerformHardshipResponse create(ApiPerformHardshipRequest request) {
+        log.info(REQUEST_STRING, request);
         ApiPerformHardshipResponse response = hardshipApiClient.post(
                 request,
                 new ParameterizedTypeReference<>() {
@@ -45,11 +48,12 @@ public class HardshipApiService {
                 Collections.emptyMap()
         );
 
-        log.info(String.format(RESPONSE_STRING, response));
+        log.info(RESPONSE_STRING, response);
         return response;
     }
 
     public ApiPerformHardshipResponse update(ApiPerformHardshipRequest request) {
+        log.info(REQUEST_STRING, request);
         ApiPerformHardshipResponse response = hardshipApiClient.put(
                 request,
                 new ParameterizedTypeReference<>() {
@@ -58,11 +62,12 @@ public class HardshipApiService {
                 Collections.emptyMap()
         );
 
-        log.info(String.format(RESPONSE_STRING, response));
+        log.info(RESPONSE_STRING, response);
         return response;
     }
 
     public void rollback(Long hardshipReviewId) {
+        log.info(REQUEST_STRING, hardshipReviewId);
         hardshipApiClient.patch(
                 "",
                 new ParameterizedTypeReference<>() {

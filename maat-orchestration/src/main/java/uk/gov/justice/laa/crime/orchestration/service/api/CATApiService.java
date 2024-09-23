@@ -16,12 +16,13 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class CATApiService {
 
-    private static final String RESPONSE_STRING = "Response from MAAT Court Data Service: {}";
+    private static final String REQUEST_STRING = "Request to Application Tracking Service: {}";
     @Qualifier("catApiClient")
     private final RestAPIClient catApiClient;
     private final ServicesConfiguration configuration;
 
     public void handleEformResult(ApiCrimeApplicationTrackingRequest request) {
+        log.info(REQUEST_STRING, request);
         catApiClient.post(
                 request,
                 new ParameterizedTypeReference<>() {

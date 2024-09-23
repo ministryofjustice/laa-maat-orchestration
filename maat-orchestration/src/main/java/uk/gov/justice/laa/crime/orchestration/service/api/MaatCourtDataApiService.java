@@ -23,11 +23,13 @@ import java.util.Map;
 public class MaatCourtDataApiService {
 
     private static final String RESPONSE_STRING = "Response from MAAT Court Data Service: {}";
+    private static final String REQUEST_STRING = "Request to MAAT Court Data Service: {}";
     @Qualifier("maatApiClient")
     private final RestAPIClient maatApiClient;
     private final ServicesConfiguration configuration;
 
     public ApplicationDTO executeStoredProcedure(StoredProcedureRequest request) {
+        log.info(REQUEST_STRING, request);
         ApplicationDTO response = maatApiClient.post(
                 request,
                 new ParameterizedTypeReference<>() {
@@ -40,6 +42,7 @@ public class MaatCourtDataApiService {
     }
 
     public RepOrderDTO getRepOrderByRepId(Integer repId) {
+        log.info(REQUEST_STRING, repId);
         RepOrderDTO response = maatApiClient.get(
                 new ParameterizedTypeReference<>() {
                 },
@@ -51,6 +54,7 @@ public class MaatCourtDataApiService {
     }
 
     public UserSummaryDTO getUserSummary(String username) {
+        log.info(REQUEST_STRING, username);
         UserSummaryDTO userSummaryDTO = maatApiClient.get(
                 new ParameterizedTypeReference<>() {
                 },
@@ -63,6 +67,7 @@ public class MaatCourtDataApiService {
     }
 
     public RepOrderDTO updateSendToCCLF(SendToCCLFDTO sendToCCLFDTO) {
+        log.info(REQUEST_STRING, sendToCCLFDTO);
         RepOrderDTO response = maatApiClient.put(sendToCCLFDTO,
                 new ParameterizedTypeReference<>() {
                 },
@@ -74,6 +79,7 @@ public class MaatCourtDataApiService {
     }
 
     public FinancialAssessmentDTO getFinancialAssessment(int financialAssessmentId) {
+        log.info(REQUEST_STRING, financialAssessmentId);
         FinancialAssessmentDTO financialAssessmentDTO = maatApiClient.get(
                 new ParameterizedTypeReference<>() {
                 },
