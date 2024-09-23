@@ -22,9 +22,11 @@ public class ProceedingsApiService {
     @Qualifier("ccpApiClient")
     private final RestAPIClient crownCourtApiClient;
     private final ServicesConfiguration configuration;
-    private static final String RESPONSE_STRING = "Response from Crown Court API Service: %s";
+    private static final String RESPONSE_STRING = "Response from Proceedings Service: {}";
+    private static final String REQUEST_STRING = "Request to Proceedings Service: {}";
 
     public ApiUpdateApplicationResponse updateApplication(ApiUpdateApplicationRequest request) {
+        log.info(REQUEST_STRING, request);
         ApiUpdateApplicationResponse response = crownCourtApiClient.put(
                 request,
                 new ParameterizedTypeReference<>() {
@@ -33,11 +35,12 @@ public class ProceedingsApiService {
                 Collections.emptyMap()
         );
 
-        log.info(String.format(RESPONSE_STRING, response));
+        log.info(RESPONSE_STRING, response);
         return response;
     }
 
     public ApiUpdateCrownCourtResponse updateCrownCourt(ApiUpdateApplicationRequest request) {
+        log.info(REQUEST_STRING, request);
         ApiUpdateCrownCourtResponse response = crownCourtApiClient.put(
                 request,
                 new ParameterizedTypeReference<>() {
@@ -46,7 +49,7 @@ public class ProceedingsApiService {
                 Collections.emptyMap()
         );
 
-        log.info(String.format(RESPONSE_STRING, response));
+        log.info(RESPONSE_STRING, response);
         return response;
     }
 }
