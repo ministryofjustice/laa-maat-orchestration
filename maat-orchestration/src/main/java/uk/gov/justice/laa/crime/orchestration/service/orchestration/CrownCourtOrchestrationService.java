@@ -29,17 +29,23 @@ public class CrownCourtOrchestrationService {
                 application, request.getUserDTO(), StoredProcedure.PRE_UPDATE_CHECKS
         );
 
+        log.info("before calling updateCrownCourt()");
         proceedingsService.updateCrownCourt(request);
+        log.info("after calling updateCrownCourt()");
 
         if (hasNewOutcome(application)) {
+            log.info("hasNewOutcome--TRUE");
+            log.info("before calling xx_process_activity_and_get_correspondence()");
             application = maatCourtDataService.invokeStoredProcedure(
                     application, request.getUserDTO(), StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE
             );
+            log.info("after calling xx_process_activity_and_get_correspondence()");
         }
-
+        log.info("before calling UPDATE_CC_APPLICANT_AND_APPLICATION()");
         application = maatCourtDataService.invokeStoredProcedure(
                 application, request.getUserDTO(), StoredProcedure.UPDATE_CC_APPLICANT_AND_APPLICATION
         );
+        log.info("after calling UPDATE_CC_APPLICANT_AND_APPLICATION()");
 
         application.setTransactionId(null);
 
