@@ -19,15 +19,20 @@ public class CrownCourtOrchestrationService {
     private final MaatCourtDataService maatCourtDataService;
 
     public ApplicationDTO update(WorkflowRequest request) {
+
+        log.info("calling update()");
         ApplicationDTO application = request.getApplicationDTO();
 
+        log.info("before calling UPDATE_DBMS_TRANSACTION_ID");
         application = maatCourtDataService.invokeStoredProcedure(
                 application, request.getUserDTO(), StoredProcedure.UPDATE_DBMS_TRANSACTION_ID
         );
 
+        log.info("before calling PRE_UPDATE_CHECKS");
         application = maatCourtDataService.invokeStoredProcedure(
                 application, request.getUserDTO(), StoredProcedure.PRE_UPDATE_CHECKS
         );
+        log.info("after calling PRE_UPDATE_CHECKS");
 
         log.info("before calling updateCrownCourt()");
         proceedingsService.updateCrownCourt(request);
