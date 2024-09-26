@@ -60,3 +60,25 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create ingress configuration
+*/}}
+{{- define "laa-maat-orchestration.ingress" -}}
+{{- $internalAllowlistSourceRange := (lookup "v1" "Secret" .Release.Namespace "ingress-internal-allowlist-source-range").data.INTERNAL_ALLOWLIST_SOURCE_RANGE | b64dec }}
+{{- if $internalAllowlistSourceRange }}
+  nginx.ingress.kubernetes.io/whitelist-source-range: {{ $internalAllowlistSourceRange }}
+  external-dns.alpha.kubernetes.io/set-identifier: {{ include "laa-maat-orchestration.fullname" . }}-{{ $.Values.ingress.environmentName}}-green
+{{- end }}
+{{- end }}
+
+{{/*
+Create external ingress configuration
+*/}}
+{{- define "laa-maat-orchestration.externalIngress" -}}
+{{- $externalAllowlistSourceRange := (lookup "v1" "Secret" .Release.Namespace "ingress-external-allowlist-source-range").data.EXTERNAL_ALLOWLIST_SOURCE_RANGE | b64dec }}
+{{- if $externalAllowlistSourceRange }}
+  nginx.ingress.kubernetes.io/whitelist-source-range: {{ $externalAllowlistSourceRange }}
+  external-dns.alpha.kubernetes.io/set-identifier: {{ include "laa-maat-orchestration.fullname" . }}-external-{{ $.Values.ingress.environmentName}}-green
+{{- end }}
+{{- end }}
