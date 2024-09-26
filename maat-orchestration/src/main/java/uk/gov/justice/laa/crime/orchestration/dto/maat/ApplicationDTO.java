@@ -72,4 +72,5 @@ public class ApplicationDTO extends GenericDTO {
     private BreathingSpaceDTO breathingSpaceDTO;
     private CommonPlatformDataDTO commonPlatformData;
     private ArrayList<DigitisedMeansAssessmentDTO> meansAssessments; // MW - 30/03/2017 - To support FIP changes
+    private EmploymentStatusDTO employmentStatusDTO;
 }
