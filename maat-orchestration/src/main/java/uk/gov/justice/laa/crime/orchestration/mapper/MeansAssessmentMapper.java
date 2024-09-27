@@ -4,13 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtOverview;
-import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtSummary;
-import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.*;
+import uk.gov.justice.laa.crime.common.model.meansassessment.*;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
@@ -107,7 +104,7 @@ public class MeansAssessmentMapper {
                 )
                 .withRepId(NumberUtils.toInteger(application.getRepId()))
                 .withUserSession(userMapper.userDtoToUserSession(request.getUserDTO()))
-                .withFinancialAssessmentId(BigDecimal.valueOf(financialAssessmentDTO.getId()))
+                .withFinancialAssessmentId(financialAssessmentDTO.getId().intValue())
                 .withFullAssessmentDate(toLocalDateTime(fullAssessmentDTO.getAssessmentDate()))
                 .withOtherHousingNote(fullAssessmentDTO.getOtherHousingNote())
                 .withInitTotalAggregatedIncome(BigDecimal.valueOf(initialAssessmentDTO.getTotalAggregatedIncome()))
@@ -414,11 +411,8 @@ public class MeansAssessmentMapper {
 
 
         if (Boolean.TRUE.equals(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable())) {
-            log.info("meansAssessmentResponseToApplicationDto.mapFullAssessmentDTO");
             mapFullAssessmentDTO(financialAssessmentDTO.getFull(), apiResponse);
-            log.info("meansAssessmentResponseToApplicationDto.mapFullAssessmentDTO");
         } else {
-            log.info("meansAssessmentResponseToApplicationDto.mapInitialAssessmentDTO");
             mapInitialAssessmentDTO(financialAssessmentDTO.getInitial(), apiResponse);
             financialAssessmentDTO.setFullAvailable(apiResponse.getFullAssessmentAvailable());
         }
@@ -432,7 +426,6 @@ public class MeansAssessmentMapper {
         fullAssessmentDTO.setTotalAnnualDisposableIncome(ofNullable(apiResponse.getTotalAnnualDisposableIncome()).map(BigDecimal::doubleValue).orElse(0.0));
         fullAssessmentDTO.setThreshold(ofNullable(apiResponse.getFullThreshold()).map(BigDecimal::doubleValue).orElse(0.0));
         mapSectionSummaries(fullAssessmentDTO.getSectionSummaries(), apiResponse.getAssessmentSectionSummary());
-        log.info("meansAssessmentResponseToApplicationDto.fullAssessmentDTO--"+ fullAssessmentDTO);
 
     }
 
