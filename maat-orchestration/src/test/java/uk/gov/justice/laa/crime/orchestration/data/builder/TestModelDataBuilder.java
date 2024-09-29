@@ -227,6 +227,7 @@ public class TestModelDataBuilder {
                 .withCrownCourtSummary(getApiCrownCourtSummary())
                 .withIojAppeal(getApiIOJSummary())
                 .withFinancialAssessment(getApiFinancialAssessment())
+                .withCapitalEvidence(List.of(getApiCapitalEvidence()))
                 .withPassportAssessment(getApiPassportAssessment());
     }
 
@@ -289,6 +290,11 @@ public class TestModelDataBuilder {
         return new ApiPassportAssessment()
                 .withResult(RESULT_FAIL)
                 .withStatus(CurrentStatus.COMPLETE);
+    }
+
+    public static ApiCapitalEvidence getApiCapitalEvidence() {
+        return new ApiCapitalEvidence().withEvidenceType(INCOME_EVIDENCE)
+                .withDateReceived(LocalDateTime.of(2023, 11, 18, 0, 0, 0));
     }
 
 
@@ -512,6 +518,7 @@ public class TestModelDataBuilder {
                 .iojResult(RESULT_PASS)
                 .assessmentSummary(Collections.emptyList())
                 .timestamp(APPLICATION_TIMESTAMP)
+                .capitalEquityDTO(getCapitalEquityDTO())
                 .build();
     }
 
@@ -674,6 +681,18 @@ public class TestModelDataBuilder {
         return RepOrderDecisionDTO.builder()
                 .code(DecisionReason.GRANTED.getCode())
                 .description(new SysGenString(DecisionReason.GRANTED.getDescription()))
+                .build();
+    }
+
+    public static CapitalEquityDTO getCapitalEquityDTO() {
+        return CapitalEquityDTO.builder()
+                .capitalOther(List.of(getCapitalOtherDTO()))
+                .build();
+    }
+
+    public static CapitalOtherDTO getCapitalOtherDTO() {
+        return CapitalOtherDTO.builder()
+                .capitalEvidence(List.of(getEvidenceDTO()))
                 .build();
     }
 
