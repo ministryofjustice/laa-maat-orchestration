@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiUpdateApplicationRequest;
-import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiUpdateApplicationResponse;
-import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiUpdateCrownCourtResponse;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 
@@ -39,9 +39,9 @@ public class ProceedingsApiService {
         return response;
     }
 
-    public ApiUpdateCrownCourtResponse updateCrownCourt(ApiUpdateApplicationRequest request) {
+    public ApiUpdateCrownCourtOutcomeResponse updateCrownCourt(ApiUpdateApplicationRequest request) {
         log.info(REQUEST_STRING, request);
-        ApiUpdateCrownCourtResponse response = crownCourtApiClient.put(
+        ApiUpdateCrownCourtOutcomeResponse response = crownCourtApiClient.put(
                 request,
                 new ParameterizedTypeReference<>() {
                 },

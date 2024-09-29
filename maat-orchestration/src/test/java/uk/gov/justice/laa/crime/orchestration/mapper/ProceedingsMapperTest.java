@@ -8,11 +8,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtSummary;
-import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiUserSession;
-import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiUpdateApplicationRequest;
-import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiUpdateApplicationResponse;
-import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiUpdateCrownCourtResponse;
+import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiUserSession;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -44,10 +44,10 @@ class ProceedingsMapperTest {
 
     @Test
     void whenWorkflowRequestToUpdateApplicationRequestIsInvoked() {
-        ApiUserSession userSession = TestModelDataBuilder.getApiUserSession();
+        ApiUserSession userSession = TestModelDataBuilder.getProceedingApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
 
-        when(userMapper.userDtoToUserSession(any(UserDTO.class)))
+        when(userMapper.userDtoToProceedingUserSession(any(UserDTO.class)))
                 .thenReturn(userSession);
 
         ApiUpdateApplicationRequest expectedApplicationRequest = TestModelDataBuilder.getUpdateApplicationRequest();
@@ -63,10 +63,10 @@ class ProceedingsMapperTest {
 
     @Test
     void whenWorkflowRequestToUpdateApplicationRequestIsInvokedWithNullFields() {
-        ApiUserSession userSession = TestModelDataBuilder.getApiUserSession();
+        ApiUserSession userSession = TestModelDataBuilder.getProceedingApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
 
-        when(userMapper.userDtoToUserSession(any(UserDTO.class)))
+        when(userMapper.userDtoToProceedingUserSession(any(UserDTO.class)))
                 .thenReturn(userSession);
 
         ApiUpdateApplicationRequest expectedApplicationRequest = TestModelDataBuilder.getUpdateApplicationRequest();
@@ -113,7 +113,7 @@ class ProceedingsMapperTest {
 
     @Test
     void updateCrownCourtResponseToApplicationDtoIsInvoked() {
-        ApiUpdateCrownCourtResponse updateCrownCourtResponse = TestModelDataBuilder.getApiUpdateCrownCourtResponse();
+        ApiUpdateCrownCourtOutcomeResponse updateCrownCourtResponse = TestModelDataBuilder.getApiUpdateCrownCourtResponse();
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT);
 
         updateCrownCourtResponse.getCrownCourtSummary().setRepOrderCrownCourtOutcome(

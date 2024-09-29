@@ -5,9 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiUpdateApplicationRequest;
-import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiUpdateApplicationResponse;
-import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiUpdateCrownCourtResponse;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
@@ -52,12 +52,12 @@ class ProceedingsServiceTest {
                 .thenReturn(new ApiUpdateApplicationRequest());
 
         when(proceedingsApiService.updateCrownCourt(any(ApiUpdateApplicationRequest.class)))
-                .thenReturn(new ApiUpdateCrownCourtResponse());
+                .thenReturn(new ApiUpdateCrownCourtOutcomeResponse());
 
         proceedingsService.updateCrownCourt(WorkflowRequest.builder().applicationDTO(new ApplicationDTO()).build());
 
         verify(proceedingsMapper)
-                .updateCrownCourtResponseToApplicationDto(any(ApiUpdateCrownCourtResponse.class),
+                .updateCrownCourtResponseToApplicationDto(any(ApiUpdateCrownCourtOutcomeResponse.class),
                                                           any(ApplicationDTO.class)
                 );
     }

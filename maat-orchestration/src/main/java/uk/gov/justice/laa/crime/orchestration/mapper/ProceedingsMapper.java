@@ -2,8 +2,10 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtSummary;
-import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.*;
+import uk.gov.justice.laa.crime.common.model.proceeding.common.*;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
@@ -36,7 +38,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
                 .withCommittalDate(DateUtil.toLocalDateTime(application.getCommittalDate()))
                 .withDateReceived(DateUtil.toLocalDateTime(application.getDateReceived()))
                 .withIojAppeal(
-                        new ApiIOJAppeal()
+                        new ApiIOJSummary()
                                 .withDecisionResult(
                                         application.getAssessmentDTO().getIojAppeal().getAppealDecisionResult()
                                 )
@@ -51,7 +53,6 @@ public class ProceedingsMapper extends CrownCourtMapper {
         ApiCrownCourtSummary ccpCrownCourtSummary =
                 crownCourtSummaryDtoToApiCrownCourtSummary(crownCourtSummary);
 
-        mapEvidenceDetailsToRequest(updateApplicationRequest, application);
 
         UserDTO userDTO = workflowRequest.getUserDTO();
         return updateApplicationRequest
@@ -59,7 +60,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
                 .withApplicantHistoryId(NumberUtils.toInteger(application.getApplicantDTO().getApplicantHistoryId()))
                 .withCrownRepId(NumberUtils.toInteger(crownCourtSummary.getCcRepId()))
                 .withIsImprisoned(crownCourtSummary.getInPrisoned())
-                .withUserSession(userMapper.userDtoToUserSession(userDTO));
+                .withUserSession(userMapper.userDtoToProceedingUserSession(userDTO));
     }
 
     private ApiCrownCourtSummary crownCourtSummaryDtoToApiCrownCourtSummary(CrownCourtSummaryDTO crownCourtSummary) {
@@ -158,7 +159,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         return application;
     }
 
-    public ApplicationDTO updateCrownCourtResponseToApplicationDto(ApiUpdateCrownCourtResponse response,
+    public ApplicationDTO updateCrownCourtResponseToApplicationDto(ApiUpdateCrownCourtOutcomeResponse response,
                                                                    ApplicationDTO application) {
 
         application.setTimestamp(toZonedDateTime(response.getModifiedDateTime()));
@@ -167,41 +168,4 @@ public class ProceedingsMapper extends CrownCourtMapper {
         );
         return application;
     }
-
-    private void mapEvidenceDetailsToRequest(ApiUpdateApplicationRequest request, ApplicationDTO application) {
-
-        FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
-        CapitalEquityDTO capitalEquityDTO = application.getCapitalEquityDTO();
-
-        if (null != application && null != application.getEmploymentStatusDTO()) {
-            request.setEmstCode(application.getEmploymentStatusDTO().getCode());
-        }
-
-        if (null != financialAssessmentDTO && null != financialAssessmentDTO.getIncomeEvidence()) {
-            IncomeEvidenceSummaryDTO incomeEvidenceSummaryDTO = financialAssessmentDTO.getIncomeEvidence();
-            request.setIncomeEvidenceReceivedDate(DateUtil.toLocalDateTime(incomeEvidenceSummaryDTO.getEvidenceReceivedDate()));
-        }
-
-       if (null != capitalEquityDTO && null != capitalEquityDTO.getCapitalEvidenceSummary()) {
-            request.setCapitalEvidenceReceivedDate(
-                    DateUtil.toLocalDateTime(capitalEquityDTO.getCapitalEvidenceSummary().getEvidenceReceivedDate()));
-        }
-
-       if (null != application.getCapitalEquityDTO() && null !=application.getCapitalEquityDTO().getCapitalOther()) {
-
-           List<ApiCapitalEvidence> apiCapitalEvidenceList = application.getCapitalEquityDTO().getCapitalOther().stream()
-                   .map(CapitalOtherDTO::getCapitalEvidence)
-                   .flatMap(Collection::stream)
-                   .map(x -> {
-                       ApiCapitalEvidence apiCapitalEvidence = new ApiCapitalEvidence();
-                       apiCapitalEvidence.setEvidenceType(x.getEvidenceTypeDTO().getEvidence());
-                       apiCapitalEvidence.setDateReceived(DateUtil.toLocalDateTime(x.getDateReceived()));
-                       return apiCapitalEvidence;
-                   })
-                   .collect(Collectors.toList());
-
-           request.setCapitalEvidence(apiCapitalEvidenceList);
-       }
-    }
-
 }

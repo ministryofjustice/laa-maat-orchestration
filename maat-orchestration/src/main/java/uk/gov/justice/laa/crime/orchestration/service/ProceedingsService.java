@@ -3,9 +3,9 @@ package uk.gov.justice.laa.crime.orchestration.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiUpdateApplicationRequest;
-import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiUpdateApplicationResponse;
-import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiUpdateCrownCourtResponse;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
 
@@ -32,7 +32,7 @@ public class ProceedingsService {
     public void updateCrownCourt(WorkflowRequest request) {
         ApiUpdateApplicationRequest apiUpdateApplicationRequest =
                 proceedingsMapper.workflowRequestToUpdateApplicationRequest(request);
-        ApiUpdateCrownCourtResponse updateCrownCourtResponse =
+        ApiUpdateCrownCourtOutcomeResponse updateCrownCourtResponse =
                 proceedingsApiService.updateCrownCourt(apiUpdateApplicationRequest);
         proceedingsMapper.updateCrownCourtResponseToApplicationDto(
                 updateCrownCourtResponse, request.getApplicationDTO()

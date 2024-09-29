@@ -3,15 +3,16 @@ package uk.gov.justice.laa.crime.orchestration.data.builder;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
-import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtSummary;
-import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiRepOrderCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiUserSession;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.common.model.orchestration.court_data_api.hardship.ApiHardshipDetail;
 import uk.gov.justice.laa.crime.common.model.orchestration.court_data_api.hardship.ApiHardshipProgress;
-import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.*;
+import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiIOJAppeal;
 import uk.gov.justice.laa.crime.common.model.orchestration.hardship.*;
+import uk.gov.justice.laa.crime.common.model.proceeding.common.*;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -209,12 +210,12 @@ public class TestModelDataBuilder {
                 );
     }
 
-    public static ApiUpdateApplicationRequest getUpdateApplicationRequest() {
-        return new ApiUpdateApplicationRequest()
+    public static uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest getUpdateApplicationRequest() {
+        return new uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest()
                 .withApplicantHistoryId(APPLICANT_HISTORY_ID)
                 .withCrownRepId(REP_ID)
                 .withIsImprisoned(Boolean.TRUE)
-                .withUserSession(getApiUserSession())
+                .withUserSession(getProceedingApiUserSession())
                 .withRepId(REP_ID)
                 .withCaseType(CaseType.EITHER_WAY)
                 .withMagCourtOutcome(MagCourtOutcome.SENT_FOR_TRIAL)
@@ -222,9 +223,9 @@ public class TestModelDataBuilder {
                 .withDecisionDate(DECISION_DATETIME)
                 .withCommittalDate(COMMITAL_DATETIME)
                 .withDateReceived(DATETIME_RECEIVED)
-                .withIncomeEvidenceReceivedDate(LocalDateTime.of(2023, 2, 18, 0, 0, 0))
+                //.withIncomeEvidenceReceivedDate(LocalDateTime.of(2023, 2, 18, 0, 0, 0))
                 .withCrownCourtSummary(getApiCrownCourtSummary())
-                .withIojAppeal(getApiIOJAppeal())
+                .withIojAppeal(getApiIOJSummary())
                 .withFinancialAssessment(getApiFinancialAssessment())
                 .withPassportAssessment(getApiPassportAssessment());
     }
@@ -263,6 +264,12 @@ public class TestModelDataBuilder {
                 .withDecisionResult(RESULT_PASS);
     }
 
+    public static ApiIOJSummary getApiIOJSummary() {
+        return new ApiIOJSummary()
+                .withIojResult(RESULT_PASS)
+                .withDecisionResult(RESULT_PASS);
+    }
+
     public static ApiFinancialAssessment getApiFinancialAssessment() {
         return new ApiFinancialAssessment()
                 .withInitResult(RESULT_FAIL)
@@ -291,6 +298,12 @@ public class TestModelDataBuilder {
                 .withSessionId(USER_SESSION);
     }
 
+    public static uk.gov.justice.laa.crime.common.model.proceeding.common.ApiUserSession getProceedingApiUserSession() {
+        return new uk.gov.justice.laa.crime.common.model.proceeding.common.ApiUserSession()
+                .withUserName(Constants.USERNAME)
+                .withSessionId(USER_SESSION);
+    }
+
     public static ApiUpdateApplicationResponse getApiUpdateApplicationResponse() {
         return new ApiUpdateApplicationResponse()
                 .withCrownRepOrderDate(CC_REP_ORDER_DATETIME)
@@ -299,8 +312,8 @@ public class TestModelDataBuilder {
                 .withCrownRepOrderType(CC_REP_TYPE_THROUGH_ORDER.toString());
     }
 
-    public static ApiUpdateCrownCourtResponse getApiUpdateCrownCourtResponse() {
-        return new ApiUpdateCrownCourtResponse()
+    public static ApiUpdateCrownCourtOutcomeResponse getApiUpdateCrownCourtResponse() {
+        return new ApiUpdateCrownCourtOutcomeResponse()
                 .withModifiedDateTime(DATE_MODIFIED_DATETIME)
                 .withCrownCourtSummary(getApiCrownCourtSummary());
     }
