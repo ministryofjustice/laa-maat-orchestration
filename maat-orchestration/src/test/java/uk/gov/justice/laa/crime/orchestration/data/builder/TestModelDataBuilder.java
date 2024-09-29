@@ -223,7 +223,7 @@ public class TestModelDataBuilder {
                 .withDecisionDate(DECISION_DATETIME)
                 .withCommittalDate(COMMITAL_DATETIME)
                 .withDateReceived(DATETIME_RECEIVED)
-                //.withIncomeEvidenceReceivedDate(LocalDateTime.of(2023, 2, 18, 0, 0, 0))
+                .withIncomeEvidenceReceivedDate(LocalDateTime.of(2023, 2, 18, 0, 0, 0))
                 .withCrownCourtSummary(getApiCrownCourtSummary())
                 .withIojAppeal(getApiIOJSummary())
                 .withFinancialAssessment(getApiFinancialAssessment())

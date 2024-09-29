@@ -53,6 +53,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         ApiCrownCourtSummary ccpCrownCourtSummary =
                 crownCourtSummaryDtoToApiCrownCourtSummary(crownCourtSummary);
 
+        mapEvidenceDetailsToRequest(updateApplicationRequest, application);
 
         UserDTO userDTO = workflowRequest.getUserDTO();
         return updateApplicationRequest
@@ -167,5 +168,41 @@ public class ProceedingsMapper extends CrownCourtMapper {
                 apiCrownCourtSummaryToCrownCourtSummaryDto(response.getCrownCourtSummary())
         );
         return application;
+    }
+
+    private void mapEvidenceDetailsToRequest(ApiUpdateApplicationRequest request, ApplicationDTO application) {
+
+        FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
+        CapitalEquityDTO capitalEquityDTO = application.getCapitalEquityDTO();
+
+        if (null != application && null != application.getEmploymentStatusDTO()) {
+            request.setEmstCode(application.getEmploymentStatusDTO().getCode());
+        }
+
+        if (null != financialAssessmentDTO && null != financialAssessmentDTO.getIncomeEvidence()) {
+            IncomeEvidenceSummaryDTO incomeEvidenceSummaryDTO = financialAssessmentDTO.getIncomeEvidence();
+            request.setIncomeEvidenceReceivedDate(DateUtil.toLocalDateTime(incomeEvidenceSummaryDTO.getEvidenceReceivedDate()));
+        }
+
+        if (null != capitalEquityDTO && null != capitalEquityDTO.getCapitalEvidenceSummary()) {
+            request.setCapitalEvidenceReceivedDate(
+                    DateUtil.toLocalDateTime(capitalEquityDTO.getCapitalEvidenceSummary().getEvidenceReceivedDate()));
+        }
+
+        if (null != application.getCapitalEquityDTO() && null != application.getCapitalEquityDTO().getCapitalOther()) {
+
+            List<ApiCapitalEvidence> apiCapitalEvidenceList = application.getCapitalEquityDTO().getCapitalOther().stream()
+                    .map(CapitalOtherDTO::getCapitalEvidence)
+                    .flatMap(Collection::stream)
+                    .map(x -> {
+                        ApiCapitalEvidence apiCapitalEvidence = new ApiCapitalEvidence();
+                        apiCapitalEvidence.setEvidenceType(x.getEvidenceTypeDTO().getEvidence());
+                        apiCapitalEvidence.setDateReceived(DateUtil.toLocalDateTime(x.getDateReceived()));
+                        return apiCapitalEvidence;
+                    })
+                    .collect(Collectors.toList());
+
+            request.setCapitalEvidence(apiCapitalEvidenceList);
+        }
     }
 }
