@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
 
 @Component
@@ -99,11 +100,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
                 .ccRepId(apiCrownCourtSummary.getRepId().longValue())
                 .ccRepType(new SysGenString(apiCrownCourtSummary.getRepType()))
                 .ccRepOrderDate(DateUtil.toDate(apiCrownCourtSummary.getRepOrderDate()))
-                .sentenceOrderDate(DateUtil.toDate(apiCrownCourtSummary.getSentenceOrderDate()))
-                .ccWithDrawalDate(DateUtil.toDate(apiCrownCourtSummary.getWithdrawalDate()))
                 .repOrderDecision(new SysGenString(apiCrownCourtSummary.getRepOrderDecision()))
-                .inPrisoned(apiCrownCourtSummary.getIsImprisoned())
-                .benchWarrantyIssued(apiCrownCourtSummary.getIsWarrantIssued())
                 .evidenceProvisionFee(
                         EvidenceFeeDTO.builder()
                                 .feeLevel(apiCrownCourtSummary.getEvidenceFeeLevel().getFeeLevel())

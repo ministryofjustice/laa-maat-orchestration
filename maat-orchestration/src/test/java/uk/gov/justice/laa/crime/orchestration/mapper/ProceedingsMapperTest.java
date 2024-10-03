@@ -139,20 +139,8 @@ class ProceedingsMapperTest {
         softly.assertThat(crownCourtSummaryDTO.getCcRepOrderDate())
                 .isEqualTo(DateUtil.toDate(apiCrownCourtSummary.getRepOrderDate()));
 
-        softly.assertThat(crownCourtSummaryDTO.getSentenceOrderDate())
-                .isEqualTo(DateUtil.toDate(apiCrownCourtSummary.getSentenceOrderDate()));
-
-        softly.assertThat(crownCourtSummaryDTO.getCcWithDrawalDate())
-                .isEqualTo(DateUtil.toDate(apiCrownCourtSummary.getWithdrawalDate()));
-
         softly.assertThat(crownCourtSummaryDTO.getRepOrderDecision().getValue())
                 .isEqualTo(apiCrownCourtSummary.getRepOrderDecision());
-
-        softly.assertThat(crownCourtSummaryDTO.getInPrisoned())
-                .isEqualTo(apiCrownCourtSummary.getIsImprisoned());
-
-        softly.assertThat(crownCourtSummaryDTO.getBenchWarrantyIssued())
-                .isEqualTo(apiCrownCourtSummary.getIsWarrantIssued());
 
         softly.assertThat(crownCourtSummaryDTO.getEvidenceProvisionFee().getFeeLevel())
                 .isEqualTo(apiCrownCourtSummary.getEvidenceFeeLevel().getFeeLevel());
