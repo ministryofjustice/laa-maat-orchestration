@@ -2,6 +2,7 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.*;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
@@ -13,6 +14,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.util.DateUtil;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,6 +54,10 @@ public class ProceedingsMapper extends CrownCourtMapper {
 
         ApiCrownCourtSummary ccpCrownCourtSummary =
                 crownCourtSummaryDtoToApiCrownCourtSummary(crownCourtSummary);
+
+        if (null != crownCourtSummary.getOutcomeDTOs()) {
+            ccpCrownCourtSummary.setCrownCourtOutcome(mapToApiCrownCourtOutcomes(crownCourtSummary));
+        }
 
         mapEvidenceDetailsToRequest(updateApplicationRequest, application);
 
@@ -204,5 +210,21 @@ public class ProceedingsMapper extends CrownCourtMapper {
 
             request.setCapitalEvidence(apiCapitalEvidenceList);
         }
+    }
+
+    private static List<ApiCrownCourtOutcome> mapToApiCrownCourtOutcomes(CrownCourtSummaryDTO crownCourtSummary) {
+        Collection<OutcomeDTO> outcomeDTOS = crownCourtSummary.getOutcomeDTOs();
+        return outcomeDTOS.stream()
+                .filter(outcomeDTO -> null == outcomeDTO.getDateSet())
+                .map(ProceedingsMapper::getApiCrownCourtOutcome)
+                .collect(Collectors.toList());
+    }
+
+    private static ApiCrownCourtOutcome getApiCrownCourtOutcome(OutcomeDTO outcomeDTO) {
+        return new ApiCrownCourtOutcome()
+                .withOutcome(CrownCourtOutcome.getFrom(outcomeDTO.getOutcome()))
+                .withOutcomeType(outcomeDTO.getOutComeType())
+                .withDateSet(DateUtil.toLocalDateTime(outcomeDTO.getDateSet()))
+                .withDescription(outcomeDTO.getDescription());
     }
 }
