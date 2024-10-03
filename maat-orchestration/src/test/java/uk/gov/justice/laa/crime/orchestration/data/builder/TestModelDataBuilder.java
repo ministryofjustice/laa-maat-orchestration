@@ -241,8 +241,7 @@ public class TestModelDataBuilder {
                 .withRepOrderDecision(REP_ORDER_DECISION_GRANTED.getValue())
                 .withIsImprisoned(Boolean.TRUE)
                 .withIsWarrantIssued(Boolean.TRUE)
-                .withEvidenceFeeLevel(EvidenceFeeLevel.LEVEL1)
-                .withCrownCourtOutcome(List.of(getApiCrownCourtOutcome(CrownCourtOutcome.CONVICTED)));
+                .withEvidenceFeeLevel(EvidenceFeeLevel.LEVEL1);
     }
 
     public static ApiRepOrderCrownCourtOutcome getApiRepOrderCrownCourtOutcome() {
