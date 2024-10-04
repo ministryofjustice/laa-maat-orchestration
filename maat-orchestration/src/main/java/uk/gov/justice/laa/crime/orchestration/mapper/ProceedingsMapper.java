@@ -112,6 +112,34 @@ public class ProceedingsMapper extends CrownCourtMapper {
                 .build();
     }
 
+    private void mapCrownCourtSummaryToApplication(ApiUpdateCrownCourtOutcomeResponse response, ApplicationDTO applicationDTO) {
+
+        CrownCourtSummaryDTO crownCourtSummary = applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO();
+        crownCourtSummary.setCcRepOrderDate(DateUtil.toDate(response.getCrownCourtSummary().getRepOrderDate()) );
+        crownCourtSummary.setRepOrderDecision(new SysGenString(response.getCrownCourtSummary().getRepOrderDecision()));
+        crownCourtSummary.setCcRepType(new SysGenString(response.getCrownCourtSummary().getRepType()));
+
+        EvidenceFeeLevel evidenceFeeLevel = response.getCrownCourtSummary().getEvidenceFeeLevel();
+
+        if (null != evidenceFeeLevel) {
+            crownCourtSummary.getEvidenceProvisionFee().setFeeLevel(evidenceFeeLevel.getFeeLevel());
+            crownCourtSummary.getEvidenceProvisionFee()
+                    .setDescription(new SysGenString(evidenceFeeLevel.getDescription()));
+        }
+
+        List<OutcomeDTO> outcomeDTOList = response.getCrownCourtSummary().getRepOrderCrownCourtOutcome()
+                .stream()
+                .map(x -> {
+                    OutcomeDTO outcomeDTO = new OutcomeDTO();
+                    outcomeDTO.setOutcome(x.getOutcome().getCode());
+                    outcomeDTO.setDescription(x.getOutcome().getDescription());
+                    outcomeDTO.setDateSet(DateUtil.toDate(x.getOutcomeDate()));
+                    return outcomeDTO;
+                }).collect(Collectors.toList());
+
+        crownCourtSummary.setOutcomeDTOs(outcomeDTOList);
+    }
+
     private ApiPassportAssessment applicationDtoToPassportAssessment(ApplicationDTO application) {
         PassportedDTO passported = application.getPassportedDTO();
 
@@ -167,9 +195,10 @@ public class ProceedingsMapper extends CrownCourtMapper {
                                                                    ApplicationDTO application) {
 
         application.setTimestamp(toZonedDateTime(response.getModifiedDateTime()));
-        application.getCrownCourtOverviewDTO().setCrownCourtSummaryDTO(
+        /*application.getCrownCourtOverviewDTO().setCrownCourtSummaryDTO(
                 apiCrownCourtSummaryToCrownCourtSummaryDto(response.getCrownCourtSummary())
-        );
+        );*/
+        mapCrownCourtSummaryToApplication(response, application);
         return application;
     }
 
