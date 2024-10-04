@@ -25,7 +25,6 @@ public class MockServicesConfiguration {
         ServicesConfiguration.ContributionApi.Endpoints contributionEndpoints =
                 new ServicesConfiguration.ContributionApi.Endpoints(
                         "contribution/calculate-contribution",
-                        "/contribution/request-transfer",
                         "/contribution/check-contribution-rule",
                         "/contribution/summaries"
                 );
