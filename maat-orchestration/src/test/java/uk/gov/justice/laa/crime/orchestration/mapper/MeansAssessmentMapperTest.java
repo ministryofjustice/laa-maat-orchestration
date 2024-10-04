@@ -136,7 +136,7 @@ class MeansAssessmentMapperTest {
         InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
         FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
         softly.assertThat(apiUpdateMeansAssessmentRequest.getFinancialAssessmentId())
-                .isEqualTo(BigDecimal.valueOf(financialAssessmentDTO.getId()));
+                .isEqualTo(financialAssessmentDTO.getId().intValue());
         softly.assertThat(apiUpdateMeansAssessmentRequest.getFullAssessmentDate())
                 .isEqualTo(toLocalDateTime(fullAssessmentDTO.getAssessmentDate()));
         softly.assertThat(apiUpdateMeansAssessmentRequest.getOtherHousingNote())

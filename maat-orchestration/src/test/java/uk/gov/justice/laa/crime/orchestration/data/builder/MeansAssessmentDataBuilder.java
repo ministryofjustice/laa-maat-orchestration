@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.common.model.common.ApiUserSession;
 import uk.gov.justice.laa.crime.common.model.meansassessment.*;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
@@ -10,7 +11,6 @@ import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiUpdate
 
 import java.math.BigDecimal;
 import java.time.*;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FeatureToggleDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
