@@ -520,7 +520,14 @@ public class TestModelDataBuilder {
                 .partnerContraryInterestDTO(getContraryInterestDTO())
                 .iojResult(RESULT_PASS)
                 .assessmentSummary(Collections.emptyList())
+                .applicantLinks(getApplicantLinks())
                 .build();
+    }
+
+    private static Collection<ApplicantLinkDTO> getApplicantLinks() {
+        return List.of(ApplicantLinkDTO.builder()
+                .partnerDTO(getApplicantDTO())
+                .build());
     }
 
     public static ChildWeightingDTO getChildWeightingDTO() {
