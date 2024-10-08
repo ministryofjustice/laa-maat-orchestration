@@ -882,9 +882,19 @@ public class TestModelDataBuilder {
                 .incomeEvidenceNotes("Income Evidence Notes")
                 .applicantIncomeEvidenceList(List.of(getEvidenceDTO()))
                 .partnerIncomeEvidenceList(List.of(getEvidenceDTO()))
+                .extraEvidenceList(List.of(getExtraEvidenceDTO()))
                 .evidenceReceivedDate(toDate(LocalDateTime.of(2023, 2, 18, 0, 0, 0)))
                 .evidenceDueDate(toDate(LocalDateTime.of(2023, 3, 18, 0, 0, 0)))
                 .upliftsAvailable(true)
+                .build();
+    }
+
+    private static ExtraEvidenceDTO getExtraEvidenceDTO() {
+        return ExtraEvidenceDTO.builder()
+                .adhoc("A")
+                .evidenceTypeDTO(getEvidenceTypeDTO())
+                .id(EVIDENCE_ID.longValue())
+                .dateReceived(toDate(LocalDateTime.of(2023, 11, 11, 0, 0, 0)))
                 .build();
     }
 
