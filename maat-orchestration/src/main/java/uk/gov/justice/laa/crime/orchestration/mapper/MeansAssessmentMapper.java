@@ -3,6 +3,7 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.meansassessment.*;
 import uk.gov.justice.laa.crime.enums.*;
@@ -104,7 +105,7 @@ public class MeansAssessmentMapper {
                 .withIncomeEvidence(mapIncomeEvidence(application))
                 .withRepId(NumberUtils.toInteger(application.getRepId()))
                 .withUserSession(userMapper.userDtoToUserSession(request.getUserDTO()))
-                .withFinancialAssessmentId(financialAssessmentDTO.getId().intValue())
+                .withFinancialAssessmentId(NumberUtils.toInteger(financialAssessmentDTO.getId()))
                 .withFullAssessmentDate(toLocalDateTime(fullAssessmentDTO.getAssessmentDate()))
                 .withOtherHousingNote(fullAssessmentDTO.getOtherHousingNote())
                 .withInitTotalAggregatedIncome(BigDecimal.valueOf(initialAssessmentDTO.getTotalAggregatedIncome()))
@@ -113,26 +114,15 @@ public class MeansAssessmentMapper {
 
     private List<ApiIncomeEvidence> mapIncomeEvidence(ApplicationDTO applicationDTO) {
 
-        Optional<Integer> partnerId = applicationDTO.getApplicantLinks()
-                .stream()
-                .filter(link -> link.getUnlinked() == null)
-                .map(link -> link.getPartnerDTO().getId().intValue())
-                .findFirst();
-
         IncomeEvidenceSummaryDTO incomeEvidenceSummary =
                 applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence();
+        int applicantId = NumberUtils.toInteger(applicationDTO.getApplicantDTO().getId());
+        List<ApiIncomeEvidence> incomeEvidence = new ArrayList<>(incomeEvidenceSummary.getApplicantIncomeEvidenceList()
+                .stream()
+                .map(evidenceItem -> mapToApiIncomeEvidence(evidenceItem, applicantId))
+                .toList());
 
-        List<ApiIncomeEvidence> incomeEvidence = new ArrayList<>();
-
-        incomeEvidence.addAll(
-                incomeEvidenceSummary.getApplicantIncomeEvidenceList()
-                        .stream()
-                        .map(evidenceItem -> mapToApiIncomeEvidence(evidenceItem,
-                                                                    applicationDTO.getApplicantDTO().getId().intValue()
-                        ))
-                        .toList()
-        );
-
+        Optional<Integer> partnerId = getPartnerId(applicationDTO);
         partnerId.ifPresent(id -> incomeEvidence.addAll(
                 incomeEvidenceSummary.getPartnerIncomeEvidenceList()
                         .stream()
@@ -152,10 +142,22 @@ public class MeansAssessmentMapper {
         return incomeEvidence;
     }
 
+    @NotNull
+    private static Optional<Integer> getPartnerId(ApplicationDTO applicationDTO) {
+        if (applicationDTO.getApplicantLinks() != null) {
+            return applicationDTO.getApplicantLinks()
+                    .stream()
+                    .filter(link -> link.getUnlinked() == null)
+                    .map(link -> NumberUtils.toInteger(link.getPartnerDTO().getId()))
+                    .findFirst();
+        }
+        return Optional.empty();
+    }
+
     private ApiIncomeEvidence mapToApiIncomeEvidence(EvidenceDTO evidenceItem, int applicantId) {
         IncomeEvidenceType evidenceType = IncomeEvidenceType.getFrom(evidenceItem.getEvidenceTypeDTO().getEvidence());
         return new ApiIncomeEvidence()
-                .withId(evidenceItem.getId().intValue())
+                .withId(NumberUtils.toInteger(evidenceItem.getId()))
                 .withDateReceived(DateUtil.toLocalDateTime(evidenceItem.getDateReceived()))
                 .withApiEvidenceType(new ApiEvidenceType(evidenceType.getName(), evidenceType.getDescription()))
                 .withApplicantId(applicantId)
@@ -164,11 +166,11 @@ public class MeansAssessmentMapper {
 
     private ApiIncomeEvidence mapToExtraApiIncomeEvidence(ExtraEvidenceDTO evidenceItem, ApplicationDTO applicationDTO, Integer partnerId) {
         IncomeEvidenceType evidenceType = IncomeEvidenceType.getFrom(evidenceItem.getEvidenceTypeDTO().getEvidence());
-        int applicantId = evidenceItem.getAdhoc().equals("A") ?
-                applicationDTO.getApplicantDTO().getId().intValue() : partnerId;
+        Integer applicantId = evidenceItem.getAdhoc().equals("A") ?
+                NumberUtils.toInteger(applicationDTO.getApplicantDTO().getId()) : partnerId;
 
         return new ApiIncomeEvidence()
-                .withId(evidenceItem.getId().intValue())
+                .withId(NumberUtils.toInteger(evidenceItem.getId()))
                 .withDateReceived(DateUtil.toLocalDateTime(evidenceItem.getDateReceived()))
                 .withApiEvidenceType(new ApiEvidenceType(evidenceType.getName(), evidenceType.getDescription()))
                 .withApplicantId(applicantId)

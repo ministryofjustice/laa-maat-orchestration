@@ -76,8 +76,6 @@ class ContributionMapperTest {
                 .isEqualTo(AppealType.getFrom(appealTypeDTO.getCode()));
         softly.assertThat(apiMaatCalculateContributionRequest.getCrownCourtOutcome().size())
                 .isGreaterThan(0);
-        softly.assertThat(apiMaatCalculateContributionRequest.getLastOutcome().getOutcome())
-                        .isEqualTo(CrownCourtAppealOutcome.SUCCESSFUL);
         softly.assertAll();
 
     }
@@ -130,7 +128,6 @@ class ContributionMapperTest {
                 .isEqualTo(AppealType.getFrom(appealTypeDTO.getCode()));
         softly.assertThat(apiMaatCalculateContributionRequest.getCrownCourtOutcome().size())
                 .isGreaterThan(0);
-        softly.assertThat(apiMaatCalculateContributionRequest.getLastOutcome()).isNull();
         softly.assertAll();
 
     }

@@ -4,17 +4,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.enums.*;
-import uk.gov.justice.laa.crime.enums.contribution.AssessmentType;
-import uk.gov.justice.laa.crime.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiAssessment;
+import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.LastOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
+import uk.gov.justice.laa.crime.enums.AppealType;
+import uk.gov.justice.laa.crime.enums.AssessmentResult;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
+import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.enums.contribution.AssessmentType;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
@@ -25,6 +28,7 @@ import java.util.List;
 
 import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
 import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -69,7 +73,6 @@ public class ContributionMapper extends CrownCourtMapper {
                         MagCourtOutcome.getFrom(
                                 application.getMagsOutcomeDTO().getOutcome()) : null)
                 .withAppealType(appealType != null ? AppealType.getFrom(appealType) : null)
-                .withLastOutcome(getLastCrownCourtOutcome(outcomeDTOs))
                 .withCrownCourtOutcome(
                         crownCourtSummaryDtoToCrownCourtOutcomes(crownCourtOverviewDTO.getCrownCourtSummaryDTO())
                 )
@@ -93,16 +96,6 @@ public class ContributionMapper extends CrownCourtMapper {
         return request;
     }
 
-    private LastOutcome getLastCrownCourtOutcome(final Collection<OutcomeDTO> crownCourtOutcomeList) {
-        return crownCourtOutcomeList.stream()
-                .reduce((first, second) -> second)
-                .filter(outcome ->  outcome.getOutComeType() != null && outcome.getOutComeType().equals(CrownCourtOutcomeType.APPEAL.getType()))
-                .map(appealOutcome -> new LastOutcome()
-                        .withDateSet(toLocalDateTime(appealOutcome.getDateSet()))
-                        .withOutcome(CrownCourtAppealOutcome.getFrom(appealOutcome.getOutcome())))
-                .orElse(null);
-    }
-
     private List<ApiAssessment> applicationDtoToAssessments(final ApplicationDTO application) {
         List<ApiAssessment> assessmentList = new ArrayList<>();
         FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
@@ -119,9 +112,9 @@ public class ContributionMapper extends CrownCourtMapper {
 
         FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
         log.info("applicationDtoToAssessments.fullAssessmentDTO-->" + fullAssessmentDTO);
-        if (null != fullAssessmentDTO && null !=fullAssessmentDTO.getAssessmnentStatusDTO()
+        if (null != fullAssessmentDTO && null != fullAssessmentDTO.getAssessmnentStatusDTO()
                 && StringUtils.isNotBlank(fullAssessmentDTO.getAssessmnentStatusDTO().getStatus())
-                && StringUtils.isNotBlank(fullAssessmentDTO.getResult()) ) {
+                && StringUtils.isNotBlank(fullAssessmentDTO.getResult())) {
             log.info("applicationDtoToAssessments.fullAssessmentDTO.status-->" + fullAssessmentDTO.getAssessmnentStatusDTO().getStatus());
             assessmentList.add(
                     new ApiAssessment()
