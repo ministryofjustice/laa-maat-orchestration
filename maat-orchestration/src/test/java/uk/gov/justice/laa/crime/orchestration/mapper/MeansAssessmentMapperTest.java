@@ -5,7 +5,7 @@ import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.*;
+import uk.gov.justice.laa.crime.common.model.meansassessment.*;
 import uk.gov.justice.laa.crime.enums.AssessmentType;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
@@ -136,7 +136,7 @@ class MeansAssessmentMapperTest {
         InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
         FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
         softly.assertThat(apiUpdateMeansAssessmentRequest.getFinancialAssessmentId())
-                .isEqualTo(BigDecimal.valueOf(financialAssessmentDTO.getId()));
+                .isEqualTo(financialAssessmentDTO.getId().intValue());
         softly.assertThat(apiUpdateMeansAssessmentRequest.getFullAssessmentDate())
                 .isEqualTo(toLocalDateTime(fullAssessmentDTO.getAssessmentDate()));
         softly.assertThat(apiUpdateMeansAssessmentRequest.getOtherHousingNote())
