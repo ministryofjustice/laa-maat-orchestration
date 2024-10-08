@@ -77,9 +77,6 @@ public class ServicesConfiguration {
             private String calculateContributionUrl;
 
             @NotNull
-            private String requestTransferUrl;
-
-            @NotNull
             private String checkContributionRuleUrl;
 
             @NotNull
