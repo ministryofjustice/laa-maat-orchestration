@@ -8,18 +8,14 @@ import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplica
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.*;
-import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-
 import uk.gov.justice.laa.crime.util.DateUtil;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
-import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.Optional.ofNullable;
 import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
 
 @Component
@@ -133,7 +129,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
                     outcomeDTO.setDescription(x.getOutcome().getDescription());
                     outcomeDTO.setDateSet(DateUtil.toDate(x.getOutcomeDate()));
                     return outcomeDTO;
-                }).collect(Collectors.toList());
+                }).toList();
 
         crownCourtSummary.setOutcomeDTOs(outcomeDTOList);
     }
@@ -202,7 +198,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
         CapitalEquityDTO capitalEquityDTO = application.getCapitalEquityDTO();
 
-        if (null != application && null != application.getEmploymentStatusDTO()) {
+        if (null != application.getEmploymentStatusDTO()) {
             request.setEmstCode(application.getEmploymentStatusDTO().getCode());
         }
 
@@ -238,7 +234,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         return outcomeDTOS.stream()
                 .filter(outcomeDTO -> null == outcomeDTO.getDateSet())
                 .map(ProceedingsMapper::getApiCrownCourtOutcome)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private static ApiCrownCourtOutcome getApiCrownCourtOutcome(OutcomeDTO outcomeDTO) {
