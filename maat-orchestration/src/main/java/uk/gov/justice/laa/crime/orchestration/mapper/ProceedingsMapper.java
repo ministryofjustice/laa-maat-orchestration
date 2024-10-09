@@ -29,9 +29,8 @@ public class ProceedingsMapper extends CrownCourtMapper {
     private final UserMapper userMapper;
 
     public ApiUpdateApplicationRequest workflowRequestToUpdateApplicationRequest(
-            WorkflowRequest workflowRequest) {
+            ApplicationDTO application, UserDTO userDTO) {
 
-        ApplicationDTO application = workflowRequest.getApplicationDTO();
         ApiUpdateApplicationRequest updateApplicationRequest = new ApiUpdateApplicationRequest()
                 .withRepId(NumberUtils.toInteger(application.getRepId()))
                 .withCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()))
@@ -62,7 +61,6 @@ public class ProceedingsMapper extends CrownCourtMapper {
 
         mapEvidenceDetailsToRequest(updateApplicationRequest, application);
 
-        UserDTO userDTO = workflowRequest.getUserDTO();
         return updateApplicationRequest
                 .withCrownCourtSummary(ccpCrownCourtSummary)
                 .withApplicantHistoryId(NumberUtils.toInteger(application.getApplicantDTO().getApplicantHistoryId()))
@@ -195,9 +193,6 @@ public class ProceedingsMapper extends CrownCourtMapper {
                                                                    ApplicationDTO application) {
 
         application.setTimestamp(toZonedDateTime(response.getModifiedDateTime()));
-        /*application.getCrownCourtOverviewDTO().setCrownCourtSummaryDTO(
-                apiCrownCourtSummaryToCrownCourtSummaryDto(response.getCrownCourtSummary())
-        );*/
         mapCrownCourtSummaryToApplication(response, application);
         return application;
     }

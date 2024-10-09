@@ -7,6 +7,8 @@ import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplica
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
 
 import uk.gov.justice.laa.crime.orchestration.service.api.ProceedingsApiService;
@@ -21,7 +23,7 @@ public class ProceedingsService {
 
     public void updateApplication(WorkflowRequest request) {
         ApiUpdateApplicationRequest apiUpdateApplicationRequest =
-                proceedingsMapper.workflowRequestToUpdateApplicationRequest(request);
+                proceedingsMapper.workflowRequestToUpdateApplicationRequest(request.getApplicationDTO(), request.getUserDTO());
         ApiUpdateApplicationResponse updateApplicationResponse =
                 proceedingsApiService.updateApplication(apiUpdateApplicationRequest);
         proceedingsMapper.updateApplicationResponseToApplicationDto(
@@ -29,14 +31,14 @@ public class ProceedingsService {
         );
     }
 
-    public void updateCrownCourt(WorkflowRequest request) {
+    public ApplicationDTO updateCrownCourt(ApplicationDTO application, UserDTO userDTO) {
         ApiUpdateApplicationRequest apiUpdateApplicationRequest =
-                proceedingsMapper.workflowRequestToUpdateApplicationRequest(request);
+                proceedingsMapper.workflowRequestToUpdateApplicationRequest(application, userDTO);
         ApiUpdateCrownCourtOutcomeResponse updateCrownCourtResponse =
                 proceedingsApiService.updateCrownCourt(apiUpdateApplicationRequest);
         log.info("response--" + updateCrownCourtResponse);
-        proceedingsMapper.updateCrownCourtResponseToApplicationDto(
-                updateCrownCourtResponse, request.getApplicationDTO()
+        return proceedingsMapper.updateCrownCourtResponseToApplicationDto(
+                updateCrownCourtResponse, application
         );
     }
 }

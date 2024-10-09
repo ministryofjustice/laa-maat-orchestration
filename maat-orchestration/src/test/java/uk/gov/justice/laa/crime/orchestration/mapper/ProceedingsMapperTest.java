@@ -52,7 +52,7 @@ class ProceedingsMapperTest {
 
         ApiUpdateApplicationRequest expectedApplicationRequest = TestModelDataBuilder.getUpdateApplicationRequest();
         ApiUpdateApplicationRequest actualApplicationRequest =
-                proceedingsMapper.workflowRequestToUpdateApplicationRequest(workflowRequest);
+                proceedingsMapper.workflowRequestToUpdateApplicationRequest(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
 
         softly.assertThat(actualApplicationRequest)
                 .usingRecursiveComparison()
@@ -80,7 +80,7 @@ class ProceedingsMapperTest {
         expectedApplicationRequest.getCrownCourtSummary().setCrownCourtOutcome(emptyList());
 
         ApiUpdateApplicationRequest actualApplicationRequest =
-                proceedingsMapper.workflowRequestToUpdateApplicationRequest(workflowRequest);
+                proceedingsMapper.workflowRequestToUpdateApplicationRequest(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
 
         softly.assertThat(actualApplicationRequest)
                 .usingRecursiveComparison()
