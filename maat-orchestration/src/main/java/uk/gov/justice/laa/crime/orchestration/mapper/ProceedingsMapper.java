@@ -89,23 +89,6 @@ public class ProceedingsMapper extends CrownCourtMapper {
         return ccpCrownCourtSummary;
     }
 
-    private CrownCourtSummaryDTO apiCrownCourtSummaryToCrownCourtSummaryDto(ApiCrownCourtSummary apiCrownCourtSummary) {
-        return CrownCourtSummaryDTO.builder()
-                .ccRepId(apiCrownCourtSummary.getRepId().longValue())
-                .ccRepType(new SysGenString(apiCrownCourtSummary.getRepType()))
-                .ccRepOrderDate(DateUtil.toDate(apiCrownCourtSummary.getRepOrderDate()))
-                .repOrderDecision(new SysGenString(apiCrownCourtSummary.getRepOrderDecision()))
-                .evidenceProvisionFee(
-                        EvidenceFeeDTO.builder()
-                                .feeLevel(apiCrownCourtSummary.getEvidenceFeeLevel().getFeeLevel())
-                                .description(new SysGenString(
-                                        apiCrownCourtSummary.getEvidenceFeeLevel().getDescription()))
-                                .build())
-                .outcomeDTOs(
-                        apiRepOrderCrownCourtOutcomesToOutcomeDtos(apiCrownCourtSummary.getRepOrderCrownCourtOutcome()))
-                .build();
-    }
-
     private void mapCrownCourtSummaryToApplication(ApiUpdateCrownCourtOutcomeResponse response, ApplicationDTO applicationDTO) {
 
         CrownCourtSummaryDTO crownCourtSummary = applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO();
@@ -222,8 +205,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
                         apiCapitalEvidence.setEvidenceType(x.getEvidenceTypeDTO().getEvidence());
                         apiCapitalEvidence.setDateReceived(DateUtil.toLocalDateTime(x.getDateReceived()));
                         return apiCapitalEvidence;
-                    })
-                    .collect(Collectors.toList());
+                    }).toList();
 
             request.setCapitalEvidence(apiCapitalEvidenceList);
         }
