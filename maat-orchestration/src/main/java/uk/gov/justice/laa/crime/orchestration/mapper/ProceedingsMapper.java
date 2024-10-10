@@ -14,7 +14,6 @@ import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
 
@@ -180,9 +179,10 @@ public class ProceedingsMapper extends CrownCourtMapper {
 
         FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
         CapitalEquityDTO capitalEquityDTO = application.getCapitalEquityDTO();
+        ApplicantDTO applicantDTO = application.getApplicantDTO();
 
-        if (null != application.getEmploymentStatusDTO()) {
-            request.setEmstCode(application.getEmploymentStatusDTO().getCode());
+        if (null!= applicantDTO && null != applicantDTO.getEmploymentStatusDTO()) {
+            request.setEmstCode(applicantDTO.getEmploymentStatusDTO().getCode());
         }
 
         if (null != financialAssessmentDTO && null != financialAssessmentDTO.getIncomeEvidence()) {

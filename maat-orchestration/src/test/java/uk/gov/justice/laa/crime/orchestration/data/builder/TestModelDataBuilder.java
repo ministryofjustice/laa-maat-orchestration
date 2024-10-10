@@ -228,7 +228,8 @@ public class TestModelDataBuilder {
                 .withIojAppeal(getApiIOJSummary())
                 .withFinancialAssessment(getApiFinancialAssessment())
                 .withCapitalEvidence(List.of(getApiCapitalEvidence()))
-                .withPassportAssessment(getApiPassportAssessment());
+                .withPassportAssessment(getApiPassportAssessment())
+                .withEmstCode("EMPLOY");
     }
 
     public static ApiCrownCourtSummary getApiCrownCourtSummary() {
