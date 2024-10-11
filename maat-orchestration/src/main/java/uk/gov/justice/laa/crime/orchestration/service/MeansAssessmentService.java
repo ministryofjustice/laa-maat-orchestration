@@ -3,7 +3,7 @@ package uk.gov.justice.laa.crime.orchestration.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.*;
+import uk.gov.justice.laa.crime.common.model.meansassessment.*;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;

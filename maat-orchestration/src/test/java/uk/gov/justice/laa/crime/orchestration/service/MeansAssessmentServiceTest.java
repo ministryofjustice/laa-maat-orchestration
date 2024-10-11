@@ -5,9 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.ApiCreateMeansAssessmentRequest;
-import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.ApiGetMeansAssessmentResponse;
-import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.ApiUpdateMeansAssessmentRequest;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiCreateMeansAssessmentRequest;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiGetMeansAssessmentResponse;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiUpdateMeansAssessmentRequest;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -37,7 +37,8 @@ class MeansAssessmentServiceTest {
         when(meansAssessmentApiService.find(Constants.FINANCIAL_ASSESSMENT_ID))
                 .thenReturn(MeansAssessmentDataBuilder.getApiGetMeansAssessmentResponse());
         meansAssessmentService.find(Constants.FINANCIAL_ASSESSMENT_ID, Constants.APPLICANT_ID);
-        verify(meansAssessmentMapper).getMeansAssessmentResponseToFinancialAssessmentDto(any(ApiGetMeansAssessmentResponse.class), anyInt());
+        verify(meansAssessmentMapper).getMeansAssessmentResponseToFinancialAssessmentDto(any(
+                ApiGetMeansAssessmentResponse.class), anyInt());
     }
 
     @Test
