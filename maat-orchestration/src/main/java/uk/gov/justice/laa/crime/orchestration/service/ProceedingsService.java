@@ -36,7 +36,6 @@ public class ProceedingsService {
                 proceedingsMapper.workflowRequestToUpdateApplicationRequest(application, userDTO);
         ApiUpdateCrownCourtOutcomeResponse updateCrownCourtResponse =
                 proceedingsApiService.updateCrownCourt(apiUpdateApplicationRequest);
-        log.info("response--" + updateCrownCourtResponse);
         return proceedingsMapper.updateCrownCourtResponseToApplicationDto(
                 updateCrownCourtResponse, application
         );
