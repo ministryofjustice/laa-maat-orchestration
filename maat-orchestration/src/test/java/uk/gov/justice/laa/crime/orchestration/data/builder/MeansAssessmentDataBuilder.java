@@ -1,22 +1,16 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.ApiAssessmentDetail;
-import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.ApiAssessmentSectionSummary;
-import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.ApiMeansAssessmentResponse;
+import uk.gov.justice.laa.crime.common.model.common.ApiUserSession;
+import uk.gov.justice.laa.crime.common.model.meansassessment.*;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtOverview;
-import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtSummary;
-import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiUserSession;
 import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiUpdateApplicationResponse;
-import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.*;
 
 import java.math.BigDecimal;
 import java.time.*;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FeatureToggleDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
@@ -43,10 +37,10 @@ public class MeansAssessmentDataBuilder {
     private static final SysGenString REP_ORDER_DECISION_GRANTED = new SysGenString("Granted");
     private static final SysGenString CC_REP_TYPE_THROUGH_ORDER = new SysGenString("Through Order");
     private static final LocalDateTime CC_REP_ORDER_DATETIME = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
-    private static final LocalDateTime SENTENCE_ORDER_DATETIME = CC_REP_ORDER_DATETIME.plus(1, ChronoUnit.DAYS);
+    private static final LocalDateTime SENTENCE_ORDER_DATETIME = CC_REP_ORDER_DATETIME.plusDays(1);
     private static final LocalDateTime DATETIME_RECEIVED = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
-    private static final LocalDateTime COMMITTAL_DATETIME = DATETIME_RECEIVED.plus(1, ChronoUnit.DAYS);
-    private static final LocalDateTime DECISION_DATETIME = COMMITTAL_DATETIME.plus(1, ChronoUnit.DAYS);
+    private static final LocalDateTime COMMITTAL_DATETIME = DATETIME_RECEIVED.plusDays(1);
+    private static final LocalDateTime DECISION_DATETIME = COMMITTAL_DATETIME.plusDays(1);
     public static final LocalDateTime INITIAL_ASSESSMENT_DATE = DATETIME_RECEIVED.plusDays(2);
     public static final LocalDateTime FULL_ASSESSMENT_DATE = INITIAL_ASSESSMENT_DATE;
     private static final Date ASSESSMENT_DATE = toDate(INITIAL_ASSESSMENT_DATE);

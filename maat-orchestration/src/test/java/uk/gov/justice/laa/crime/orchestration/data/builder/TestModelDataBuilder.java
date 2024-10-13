@@ -3,16 +3,27 @@ package uk.gov.justice.laa.crime.orchestration.data.builder;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
-import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiUserSession;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.common.model.orchestration.court_data_api.hardship.ApiHardshipDetail;
 import uk.gov.justice.laa.crime.common.model.orchestration.court_data_api.hardship.ApiHardshipProgress;
 import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiIOJAppeal;
-import uk.gov.justice.laa.crime.common.model.orchestration.hardship.*;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.*;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
+import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiHardshipOverview;
+import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiPassportAssessment;
+import uk.gov.justice.laa.crime.common.model.orchestration.hardship.ApiFindHardshipResponse;
+import uk.gov.justice.laa.crime.common.model.orchestration.hardship.ApiPerformHardshipRequest;
+import uk.gov.justice.laa.crime.common.model.orchestration.hardship.ApiPerformHardshipResponse;
+import uk.gov.justice.laa.crime.common.model.orchestration.hardship.DeniedIncome;
+import uk.gov.justice.laa.crime.common.model.orchestration.hardship.ExtraExpenditure;
+import uk.gov.justice.laa.crime.common.model.orchestration.hardship.HardshipMetadata;
+import uk.gov.justice.laa.crime.common.model.orchestration.hardship.HardshipProgress;
+import uk.gov.justice.laa.crime.common.model.orchestration.hardship.HardshipReview;
+import uk.gov.justice.laa.crime.common.model.orchestration.hardship.SolicitorCosts;
+import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCapitalEvidence;
+import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiUserSession;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -22,19 +33,34 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderCCOutcomeDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RoleDataItemDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.Action;
-
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.*;
-import java.util.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.*;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.CRITERIA_DETAIL_ID;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.SECTION;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.TOTAL_AGGREGATED_INCOME;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.getReviewTypeDTO;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.getSectionSummaryDTO;
 import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
 import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
 
@@ -271,8 +297,8 @@ public class TestModelDataBuilder {
                 .withDecisionResult(RESULT_PASS);
     }
 
-    public static ApiFinancialAssessment getApiFinancialAssessment() {
-        return new ApiFinancialAssessment()
+    public static uk.gov.justice.laa.crime.common.model.proceeding.common.ApiFinancialAssessment getApiFinancialAssessment() {
+        return new uk.gov.justice.laa.crime.common.model.proceeding.common.ApiFinancialAssessment()
                 .withInitResult(RESULT_FAIL)
                 .withInitStatus(CurrentStatus.COMPLETE)
                 .withFullResult(RESULT_PASS)
@@ -280,14 +306,14 @@ public class TestModelDataBuilder {
                 .withHardshipOverview(getApiHardshipOverview());
     }
 
-    public static ApiHardshipOverview getApiHardshipOverview() {
-        return new ApiHardshipOverview()
+    public static uk.gov.justice.laa.crime.common.model.proceeding.common.ApiHardshipOverview getApiHardshipOverview() {
+        return new uk.gov.justice.laa.crime.common.model.proceeding.common.ApiHardshipOverview()
                 .withReviewResult(ReviewResult.PASS)
                 .withAssessmentStatus(CurrentStatus.COMPLETE);
     }
 
-    public static ApiPassportAssessment getApiPassportAssessment() {
-        return new ApiPassportAssessment()
+    public static uk.gov.justice.laa.crime.common.model.proceeding.common.ApiPassportAssessment getApiPassportAssessment() {
+        return new uk.gov.justice.laa.crime.common.model.proceeding.common.ApiPassportAssessment()
                 .withResult(RESULT_FAIL)
                 .withStatus(CurrentStatus.COMPLETE);
     }
@@ -298,8 +324,8 @@ public class TestModelDataBuilder {
     }
 
 
-    public static ApiUserSession getApiUserSession() {
-        return new ApiUserSession()
+    public static uk.gov.justice.laa.crime.common.model.common.ApiUserSession getApiUserSession() {
+        return new uk.gov.justice.laa.crime.common.model.common.ApiUserSession()
                 .withUserName(Constants.USERNAME)
                 .withSessionId(USER_SESSION);
     }
@@ -477,9 +503,9 @@ public class TestModelDataBuilder {
                                 .repId(123L)
                                 .timestamp(timestampToUse)
                                 .statusDTO(RepStatusDTO
-                                    .builder()
-                                    .updateAllowed(true)
-                                    .build())
+                                        .builder()
+                                        .updateAllowed(true)
+                                        .build())
                                 .build()).build();
     }
 
@@ -541,7 +567,21 @@ public class TestModelDataBuilder {
                 .partnerContraryInterestDTO(getContraryInterestDTO())
                 .iojResult(RESULT_PASS)
                 .assessmentSummary(Collections.emptyList())
+                .applicantLinks(getApplicantLinks())
                 .build();
+    }
+
+    private static Collection<ApplicantLinkDTO> getApplicantLinks() {
+        ApplicantDTO applicantDTO = getApplicantDTO();
+        ApplicantDTO partner = getApplicantDTO();
+        partner.setId(1234L);
+        return List.of(ApplicantLinkDTO.builder()
+                        .partnerDTO(applicantDTO)
+                        .unlinked(DATE_COMPLETED)
+                        .build(),
+                ApplicantLinkDTO.builder()
+                        .partnerDTO(partner)
+                        .build());
     }
 
     public static ChildWeightingDTO getChildWeightingDTO() {
@@ -908,9 +948,19 @@ public class TestModelDataBuilder {
                 .incomeEvidenceNotes("Income Evidence Notes")
                 .applicantIncomeEvidenceList(List.of(getEvidenceDTO()))
                 .partnerIncomeEvidenceList(List.of(getEvidenceDTO()))
+                .extraEvidenceList(List.of(getExtraEvidenceDTO()))
                 .evidenceReceivedDate(toDate(LocalDateTime.of(2023, 2, 18, 0, 0, 0)))
                 .evidenceDueDate(toDate(LocalDateTime.of(2023, 3, 18, 0, 0, 0)))
                 .upliftsAvailable(true)
+                .build();
+    }
+
+    private static ExtraEvidenceDTO getExtraEvidenceDTO() {
+        return ExtraEvidenceDTO.builder()
+                .adhoc("A")
+                .evidenceTypeDTO(getEvidenceTypeDTO())
+                .id(EVIDENCE_ID.longValue())
+                .dateReceived(toDate(LocalDateTime.of(2023, 11, 11, 0, 0, 0)))
                 .build();
     }
 

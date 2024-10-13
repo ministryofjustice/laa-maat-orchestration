@@ -3,21 +3,18 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtOverview;
-import uk.gov.justice.laa.crime.common.model.orchestration.common.ApiCrownCourtSummary;
-import uk.gov.justice.laa.crime.common.model.orchestration.means_assessment.*;
+import uk.gov.justice.laa.crime.common.model.meansassessment.*;
 import uk.gov.justice.laa.crime.enums.*;
+import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-
+import uk.gov.justice.laa.crime.util.DateUtil;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.justice.laa.crime.util.DateUtil.*;
@@ -105,13 +102,81 @@ public class MeansAssessmentMapper {
                                         : initialAssessmentDTO.getSectionSummaries()
                         )
                 )
+                .withIncomeEvidence(mapIncomeEvidence(application))
                 .withRepId(NumberUtils.toInteger(application.getRepId()))
                 .withUserSession(userMapper.userDtoToUserSession(request.getUserDTO()))
-                .withFinancialAssessmentId(BigDecimal.valueOf(financialAssessmentDTO.getId()))
+                .withFinancialAssessmentId(NumberUtils.toInteger(financialAssessmentDTO.getId()))
                 .withFullAssessmentDate(toLocalDateTime(fullAssessmentDTO.getAssessmentDate()))
                 .withOtherHousingNote(fullAssessmentDTO.getOtherHousingNote())
                 .withInitTotalAggregatedIncome(BigDecimal.valueOf(initialAssessmentDTO.getTotalAggregatedIncome()))
                 .withFullAssessmentNotes(fullAssessmentDTO.getAssessmentNotes());
+    }
+
+    private List<ApiIncomeEvidence> mapIncomeEvidence(ApplicationDTO applicationDTO) {
+
+        IncomeEvidenceSummaryDTO incomeEvidenceSummary =
+                applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence();
+        int applicantId = NumberUtils.toInteger(applicationDTO.getApplicantDTO().getId());
+        List<ApiIncomeEvidence> incomeEvidence = new ArrayList<>(incomeEvidenceSummary.getApplicantIncomeEvidenceList()
+                .stream()
+                .map(evidenceItem -> mapToApiIncomeEvidence(evidenceItem, applicantId))
+                .toList());
+
+        Optional<Integer> partnerId = getPartnerId(applicationDTO);
+        partnerId.ifPresent(id -> incomeEvidence.addAll(
+                incomeEvidenceSummary.getPartnerIncomeEvidenceList()
+                        .stream()
+                        .map(evidenceItem -> mapToApiIncomeEvidence(evidenceItem, id))
+                        .toList()
+        ));
+
+        incomeEvidence.addAll(
+                incomeEvidenceSummary.getExtraEvidenceList()
+                        .stream()
+                        .map(evidenceItem -> mapToExtraApiIncomeEvidence(evidenceItem, applicationDTO,
+                                                                         partnerId.orElse(null)
+                        ))
+                        .toList()
+        );
+
+        return incomeEvidence;
+    }
+
+    @NotNull
+    private static Optional<Integer> getPartnerId(ApplicationDTO applicationDTO) {
+        if (applicationDTO.getApplicantLinks() != null) {
+            return applicationDTO.getApplicantLinks()
+                    .stream()
+                    .filter(link -> link.getUnlinked() == null)
+                    .map(link -> NumberUtils.toInteger(link.getPartnerDTO().getId()))
+                    .findFirst();
+        }
+        return Optional.empty();
+    }
+
+    private ApiIncomeEvidence mapToApiIncomeEvidence(EvidenceDTO evidenceItem, int applicantId) {
+        IncomeEvidenceType evidenceType = IncomeEvidenceType.getFrom(evidenceItem.getEvidenceTypeDTO().getEvidence());
+        return new ApiIncomeEvidence()
+                .withId(NumberUtils.toInteger(evidenceItem.getId()))
+                .withDateReceived(DateUtil.toLocalDateTime(evidenceItem.getDateReceived()))
+                .withApiEvidenceType(new ApiEvidenceType(evidenceType.getName(), evidenceType.getDescription()))
+                .withApplicantId(applicantId)
+                .withOtherText(evidenceItem.getOtherDescription());
+    }
+
+    private ApiIncomeEvidence mapToExtraApiIncomeEvidence(ExtraEvidenceDTO evidenceItem, ApplicationDTO applicationDTO, Integer partnerId) {
+        IncomeEvidenceType evidenceType = IncomeEvidenceType.getFrom(evidenceItem.getEvidenceTypeDTO().getEvidence());
+        Integer applicantId = evidenceItem.getAdhoc().equals("A") ?
+                NumberUtils.toInteger(applicationDTO.getApplicantDTO().getId()) : partnerId;
+
+        return new ApiIncomeEvidence()
+                .withId(NumberUtils.toInteger(evidenceItem.getId()))
+                .withDateReceived(DateUtil.toLocalDateTime(evidenceItem.getDateReceived()))
+                .withApiEvidenceType(new ApiEvidenceType(evidenceType.getName(), evidenceType.getDescription()))
+                .withApplicantId(applicantId)
+                .withMandatory("Y")
+                .withAdhoc(evidenceItem.getAdhoc())
+                .withOtherText(evidenceItem.getOtherText());
     }
 
     private List<ApiAssessmentChildWeighting> childWeightingsBuilder(Collection<ChildWeightingDTO> childWeightings) {
@@ -119,8 +184,9 @@ public class MeansAssessmentMapper {
         if (childWeightings != null) {
             for (ChildWeightingDTO childWeightingDTO : childWeightings) {
                 childWeightingList.add(new ApiAssessmentChildWeighting()
-                        .withChildWeightingId(NumberUtils.toInteger(childWeightingDTO.getWeightingId()))
-                        .withNoOfChildren(childWeightingDTO.getNoOfChildren())
+                                               .withChildWeightingId(
+                                                       NumberUtils.toInteger(childWeightingDTO.getWeightingId()))
+                                               .withNoOfChildren(childWeightingDTO.getNoOfChildren())
                 );
             }
         }
@@ -150,8 +216,7 @@ public class MeansAssessmentMapper {
                     .withIncomeEvidenceNotes(evidenceSummaryDTO.getIncomeEvidenceNotes())
                     .withUpliftAppliedDate(toLocalDateTime(evidenceSummaryDTO.getUpliftAppliedDate()))
                     .withEvidenceDueDate(toLocalDateTime(evidenceSummaryDTO.getEvidenceDueDate()))
-                    .withUpliftRemovedDate(toLocalDateTime(evidenceSummaryDTO.getUpliftRemovedDate()))
-                    ;
+                    .withUpliftRemovedDate(toLocalDateTime(evidenceSummaryDTO.getUpliftRemovedDate()));
         } else {
             return null;
         }
@@ -159,19 +224,24 @@ public class MeansAssessmentMapper {
 
     private boolean isPartnerContraryInterest(ApplicationDTO application) {
         return application.getPartnerContraryInterestDTO() != null &&
-                !StringUtils.equals(ContraryInterestDTO.NO_CONTRARY_INTEREST, application.getPartnerContraryInterestDTO().getCode());
+                !StringUtils.equals(ContraryInterestDTO.NO_CONTRARY_INTEREST,
+                                    application.getPartnerContraryInterestDTO().getCode()
+                );
     }
 
-    private List<ApiAssessmentSectionSummary> sectionSummariesBuilder(Collection<AssessmentSectionSummaryDTO> sectionSummaries) {
+    private List<ApiAssessmentSectionSummary> sectionSummariesBuilder(
+            Collection<AssessmentSectionSummaryDTO> sectionSummaries) {
         List<ApiAssessmentSectionSummary> apiAssessmentSectionSummaries = new ArrayList<>();
         if (sectionSummaries != null) {
             for (AssessmentSectionSummaryDTO sectionSummaryDTO : sectionSummaries) {
                 apiAssessmentSectionSummaries.add(
                         new ApiAssessmentSectionSummary()
                                 .withAnnualTotal(BigDecimal.valueOf(sectionSummaryDTO.getAnnualTotal()))
-                                .withAssessmentDetails(assessmentDetailsBuilder(sectionSummaryDTO.getAssessmentDetail()))
+                                .withAssessmentDetails(
+                                        assessmentDetailsBuilder(sectionSummaryDTO.getAssessmentDetail()))
                                 .withSection(sectionSummaryDTO.getSection())
-                                .withApplicantAnnualTotal(BigDecimal.valueOf(sectionSummaryDTO.getApplicantAnnualTotal()))
+                                .withApplicantAnnualTotal(
+                                        BigDecimal.valueOf(sectionSummaryDTO.getApplicantAnnualTotal()))
                                 .withPartnerAnnualTotal(BigDecimal.valueOf(sectionSummaryDTO.getPartnerAnnualTotal()))
                 );
             }
@@ -187,17 +257,20 @@ public class MeansAssessmentMapper {
                         new ApiAssessmentDetail()
                                 .withId(NumberUtils.toInteger(assessmentDetailDTO.getId()))
                                 .withApplicantAmount(BigDecimal.valueOf(assessmentDetailDTO.getApplicantAmount()))
-                                .withApplicantFrequency(Frequency.getFrom(assessmentDetailDTO.getApplicantFrequency().getCode()))
+                                .withApplicantFrequency(
+                                        Frequency.getFrom(assessmentDetailDTO.getApplicantFrequency().getCode()))
                                 .withCriteriaDetailId(NumberUtils.toInteger(assessmentDetailDTO.getCriteriaDetailsId()))
                                 .withPartnerAmount(BigDecimal.valueOf(assessmentDetailDTO.getPartnerAmount()))
-                                .withPartnerFrequency(Frequency.getFrom(assessmentDetailDTO.getPartnerFrequency().getCode()))
+                                .withPartnerFrequency(
+                                        Frequency.getFrom(assessmentDetailDTO.getPartnerFrequency().getCode()))
                 );
             }
         }
         return apiAssessmentDetails;
     }
 
-    public FinancialAssessmentDTO getMeansAssessmentResponseToFinancialAssessmentDto(ApiGetMeansAssessmentResponse apiResponse, int applicantId) {
+    public FinancialAssessmentDTO getMeansAssessmentResponseToFinancialAssessmentDto(
+            ApiGetMeansAssessmentResponse apiResponse, int applicantId) {
         return FinancialAssessmentDTO.builder()
                 .id(ofNullable(apiResponse.getId()).map(Integer::longValue).orElse(0L))
                 .criteriaId(ofNullable(apiResponse.getCriteriaId()).map(Integer::longValue).orElse(0L))
@@ -210,7 +283,8 @@ public class MeansAssessmentMapper {
 
     }
 
-    private IncomeEvidenceSummaryDTO incomeEvidenceSummaryToDto(ApiIncomeEvidenceSummary incomeEvidenceSummary, int applicantId) {
+    private IncomeEvidenceSummaryDTO incomeEvidenceSummaryToDto(ApiIncomeEvidenceSummary incomeEvidenceSummary,
+                                                                int applicantId) {
         IncomeEvidenceSummaryDTO incomeEvidenceSummaryDTO = IncomeEvidenceSummaryDTO.builder()
                 .evidenceDueDate(toDate(incomeEvidenceSummary.getEvidenceDueDate()))
                 .evidenceReceivedDate(toDate(incomeEvidenceSummary.getEvidenceReceivedDate()))
@@ -279,11 +353,14 @@ public class MeansAssessmentMapper {
     private InitialAssessmentDTO initialAssessmentToDTO(ApiInitialMeansAssessment apiInitialMeansAssessment) {
         return InitialAssessmentDTO.builder()
                 .id(ofNullable(apiInitialMeansAssessment.getId()).map(Integer::longValue).orElse(0L))
-                .adjustedIncomeValue(ofNullable(apiInitialMeansAssessment.getAdjustedIncomeValue()).map(BigDecimal::doubleValue).orElse(0.0))
+                .adjustedIncomeValue(
+                        ofNullable(apiInitialMeansAssessment.getAdjustedIncomeValue()).map(BigDecimal::doubleValue)
+                                .orElse(0.0))
                 .assessmentDate(toDate(apiInitialMeansAssessment.getAssessmentDate()))
                 .assessmnentStatusDTO(mapAssessmentStatus(apiInitialMeansAssessment.getAssessmentStatus()))
                 .childWeightings(mapChildWeightings(apiInitialMeansAssessment.getChildWeighting()))
-                .lowerThreshold(ofNullable(apiInitialMeansAssessment.getLowerThreshold()).map(BigDecimal::doubleValue).orElse(0.0))
+                .lowerThreshold(ofNullable(apiInitialMeansAssessment.getLowerThreshold()).map(BigDecimal::doubleValue)
+                                        .orElse(0.0))
                 .newWorkReason(mapNewWorkReason(apiInitialMeansAssessment.getNewWorkReason()))
                 .notes(apiInitialMeansAssessment.getNotes())
                 .otherBenefitNote(apiInitialMeansAssessment.getOtherBenefitNote())
@@ -292,8 +369,11 @@ public class MeansAssessmentMapper {
                 .result(apiInitialMeansAssessment.getResult())
                 .resultReason(apiInitialMeansAssessment.getResultReason())
                 .sectionSummaries(getSectionSummaries(apiInitialMeansAssessment.getAssessmentSectionSummary()))
-                .totalAggregatedIncome(ofNullable(apiInitialMeansAssessment.getTotalAggregatedIncome()).map(BigDecimal::doubleValue).orElse(0.0))
-                .upperThreshold(ofNullable(apiInitialMeansAssessment.getUpperThreshold()).map(BigDecimal::doubleValue).orElse(0.0))
+                .totalAggregatedIncome(
+                        ofNullable(apiInitialMeansAssessment.getTotalAggregatedIncome()).map(BigDecimal::doubleValue)
+                                .orElse(0.0))
+                .upperThreshold(ofNullable(apiInitialMeansAssessment.getUpperThreshold()).map(BigDecimal::doubleValue)
+                                        .orElse(0.0))
                 .build();
     }
 
@@ -323,8 +403,11 @@ public class MeansAssessmentMapper {
         for (ApiAssessmentChildWeighting apiAssessmentChildWeighting : childWeightings) {
             ChildWeightingDTO childWeightingDTO = new ChildWeightingDTO();
             childWeightingDTO.setId(ofNullable(apiAssessmentChildWeighting.getId()).map(Integer::longValue).orElse(0L));
-            childWeightingDTO.setWeightingId(ofNullable(apiAssessmentChildWeighting.getChildWeightingId()).map(Integer::longValue).orElse(0L));
-            childWeightingDTO.setWeightingFactor(ofNullable(apiAssessmentChildWeighting.getWeightingFactor()).map(BigDecimal::doubleValue).orElse(0.0));
+            childWeightingDTO.setWeightingId(
+                    ofNullable(apiAssessmentChildWeighting.getChildWeightingId()).map(Integer::longValue).orElse(0L));
+            childWeightingDTO.setWeightingFactor(
+                    ofNullable(apiAssessmentChildWeighting.getWeightingFactor()).map(BigDecimal::doubleValue)
+                            .orElse(0.0));
             childWeightingDTO.setNoOfChildren(apiAssessmentChildWeighting.getNoOfChildren());
             childWeightingDTO.setLowerAgeRange(apiAssessmentChildWeighting.getLowerAgeRange());
             childWeightingDTO.setUpperAgeRange(apiAssessmentChildWeighting.getUpperAgeRange());
@@ -335,7 +418,9 @@ public class MeansAssessmentMapper {
 
     private FullAssessmentDTO fullAssessmentToDto(ApiFullMeansAssessment apiFullMeansAssessment) {
         return FullAssessmentDTO.builder()
-                .adjustedLivingAllowance(ofNullable(apiFullMeansAssessment.getAdjustedLivingAllowance()).map(BigDecimal::doubleValue).orElse(0.0))
+                .adjustedLivingAllowance(
+                        ofNullable(apiFullMeansAssessment.getAdjustedLivingAllowance()).map(BigDecimal::doubleValue)
+                                .orElse(0.0))
                 .assessmentDate(toDate(apiFullMeansAssessment.getAssessmentDate()))
                 .assessmentNotes(apiFullMeansAssessment.getAssessmentNotes())
                 .assessmnentStatusDTO(mapAssessmentStatus(apiFullMeansAssessment.getAssessmentStatus()))
@@ -345,8 +430,12 @@ public class MeansAssessmentMapper {
                 .resultReason(ofNullable(apiFullMeansAssessment.getResultReason()).map(String::toString).orElse(""))
                 .sectionSummaries(getSectionSummaries(apiFullMeansAssessment.getAssessmentSectionSummary()))
                 .threshold(ofNullable(apiFullMeansAssessment.getThreshold()).map(BigDecimal::doubleValue).orElse(0.0))
-                .totalAggregatedExpense(ofNullable(apiFullMeansAssessment.getTotalAggregatedExpense()).map(BigDecimal::doubleValue).orElse(0.0))
-                .totalAnnualDisposableIncome(ofNullable(apiFullMeansAssessment.getTotalAnnualDisposableIncome()).map(BigDecimal::doubleValue).orElse(0.0))
+                .totalAggregatedExpense(
+                        ofNullable(apiFullMeansAssessment.getTotalAggregatedExpense()).map(BigDecimal::doubleValue)
+                                .orElse(0.0))
+                .totalAnnualDisposableIncome(
+                        ofNullable(apiFullMeansAssessment.getTotalAnnualDisposableIncome()).map(BigDecimal::doubleValue)
+                                .orElse(0.0))
                 .build();
     }
 
@@ -360,15 +449,22 @@ public class MeansAssessmentMapper {
         return AssessmentStatusDTO.builder().build();
     }
 
-    private static List<AssessmentSectionSummaryDTO> getSectionSummaries(List<ApiAssessmentSectionSummary> assessmentSectionSummary) {
+    private static List<AssessmentSectionSummaryDTO> getSectionSummaries(
+            List<ApiAssessmentSectionSummary> assessmentSectionSummary) {
         List<AssessmentSectionSummaryDTO> sectionSummaryDTOS = new ArrayList<>();
         for (ApiAssessmentSectionSummary apiAssessmentSectionSummary : assessmentSectionSummary) {
             AssessmentSectionSummaryDTO assessmentSectionSummaryDTO = new AssessmentSectionSummaryDTO();
-            assessmentSectionSummaryDTO.setAssessmentDetail(getSectionDetail(apiAssessmentSectionSummary.getAssessmentDetails()));
+            assessmentSectionSummaryDTO.setAssessmentDetail(
+                    getSectionDetail(apiAssessmentSectionSummary.getAssessmentDetails()));
             assessmentSectionSummaryDTO.setSection(apiAssessmentSectionSummary.getSection());
-            assessmentSectionSummaryDTO.setAnnualTotal(ofNullable(apiAssessmentSectionSummary.getAnnualTotal()).map(BigDecimal::doubleValue).orElse(0.0));
-            assessmentSectionSummaryDTO.setApplicantAnnualTotal(ofNullable(apiAssessmentSectionSummary.getApplicantAnnualTotal()).map(BigDecimal::doubleValue).orElse(0.0));
-            assessmentSectionSummaryDTO.setPartnerAnnualTotal(ofNullable(apiAssessmentSectionSummary.getPartnerAnnualTotal()).map(BigDecimal::doubleValue).orElse(0.0));
+            assessmentSectionSummaryDTO.setAnnualTotal(
+                    ofNullable(apiAssessmentSectionSummary.getAnnualTotal()).map(BigDecimal::doubleValue).orElse(0.0));
+            assessmentSectionSummaryDTO.setApplicantAnnualTotal(
+                    ofNullable(apiAssessmentSectionSummary.getApplicantAnnualTotal()).map(BigDecimal::doubleValue)
+                            .orElse(0.0));
+            assessmentSectionSummaryDTO.setPartnerAnnualTotal(
+                    ofNullable(apiAssessmentSectionSummary.getPartnerAnnualTotal()).map(BigDecimal::doubleValue)
+                            .orElse(0.0));
             sectionSummaryDTOS.add(assessmentSectionSummaryDTO);
         }
         return sectionSummaryDTOS;
@@ -380,9 +476,12 @@ public class MeansAssessmentMapper {
             AssessmentDetailDTO assessmentDetailDTO = new AssessmentDetailDTO();
             assessmentDetailDTO.setDetailCode(apiAssessmentDetail.getAssessmentDetailCode());
             assessmentDetailDTO.setDescription(apiAssessmentDetail.getAssessmentDescription());
-            assessmentDetailDTO.setPartnerAmount(ofNullable(apiAssessmentDetail.getPartnerAmount()).map(BigDecimal::doubleValue).orElse(0.0));
-            assessmentDetailDTO.setApplicantAmount(ofNullable(apiAssessmentDetail.getApplicantAmount()).map(BigDecimal::doubleValue).orElse(0.0));
-            assessmentDetailDTO.setCriteriaDetailsId(ofNullable(apiAssessmentDetail.getCriteriaDetailId()).map(Integer::longValue).orElse(0L));
+            assessmentDetailDTO.setPartnerAmount(
+                    ofNullable(apiAssessmentDetail.getPartnerAmount()).map(BigDecimal::doubleValue).orElse(0.0));
+            assessmentDetailDTO.setApplicantAmount(
+                    ofNullable(apiAssessmentDetail.getApplicantAmount()).map(BigDecimal::doubleValue).orElse(0.0));
+            assessmentDetailDTO.setCriteriaDetailsId(
+                    ofNullable(apiAssessmentDetail.getCriteriaDetailId()).map(Integer::longValue).orElse(0L));
             assessmentDetailDTO.setId(ofNullable(apiAssessmentDetail.getId()).map(Integer::longValue).orElse(0L));
             assessmentDetailDTO.setTimestamp(toZonedDateTime(apiAssessmentDetail.getDateModified()));
             assessmentDetailDTO.setApplicantFrequency(getFrequency(apiAssessmentDetail.getApplicantFrequency()));
@@ -402,8 +501,10 @@ public class MeansAssessmentMapper {
         return frequenciesDTO;
     }
 
-    public void meansAssessmentResponseToApplicationDto(final ApiMeansAssessmentResponse apiResponse, ApplicationDTO applicationDTO) {
-        applicationDTO.setRepId(ofNullable(apiResponse.getRepId()).map(Integer::longValue).orElse(applicationDTO.getRepId()));
+    public void meansAssessmentResponseToApplicationDto(final ApiMeansAssessmentResponse apiResponse,
+                                                        ApplicationDTO applicationDTO) {
+        applicationDTO.setRepId(
+                ofNullable(apiResponse.getRepId()).map(Integer::longValue).orElse(applicationDTO.getRepId()));
         applicationDTO.setPassportedDTO(PassportedDTO.builder().build());
         if (apiResponse.getApplicationTimestamp() != null) {
             applicationDTO.setTimestamp(toZonedDateTime(apiResponse.getApplicationTimestamp()));
@@ -414,11 +515,8 @@ public class MeansAssessmentMapper {
 
 
         if (Boolean.TRUE.equals(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable())) {
-            log.info("meansAssessmentResponseToApplicationDto.mapFullAssessmentDTO");
             mapFullAssessmentDTO(financialAssessmentDTO.getFull(), apiResponse);
-            log.info("meansAssessmentResponseToApplicationDto.mapFullAssessmentDTO");
         } else {
-            log.info("meansAssessmentResponseToApplicationDto.mapInitialAssessmentDTO");
             mapInitialAssessmentDTO(financialAssessmentDTO.getInitial(), apiResponse);
             financialAssessmentDTO.setFullAvailable(apiResponse.getFullAssessmentAvailable());
         }
@@ -426,23 +524,33 @@ public class MeansAssessmentMapper {
 
     private void mapFullAssessmentDTO(FullAssessmentDTO fullAssessmentDTO, ApiMeansAssessmentResponse apiResponse) {
         fullAssessmentDTO.setResult(ofNullable(apiResponse.getFullResult()).map(String::toString).orElse(""));
-        fullAssessmentDTO.setAdjustedLivingAllowance(ofNullable(apiResponse.getAdjustedLivingAllowance()).map(BigDecimal::doubleValue).orElse(0.0));
-        fullAssessmentDTO.setResultReason(ofNullable(apiResponse.getFullResultReason()).map(String::toString).orElse(""));
-        fullAssessmentDTO.setTotalAggregatedExpense(ofNullable(apiResponse.getTotalAggregatedExpense()).map(BigDecimal::doubleValue).orElse(0.0));
-        fullAssessmentDTO.setTotalAnnualDisposableIncome(ofNullable(apiResponse.getTotalAnnualDisposableIncome()).map(BigDecimal::doubleValue).orElse(0.0));
-        fullAssessmentDTO.setThreshold(ofNullable(apiResponse.getFullThreshold()).map(BigDecimal::doubleValue).orElse(0.0));
+        fullAssessmentDTO.setAdjustedLivingAllowance(
+                ofNullable(apiResponse.getAdjustedLivingAllowance()).map(BigDecimal::doubleValue).orElse(0.0));
+        fullAssessmentDTO.setResultReason(
+                ofNullable(apiResponse.getFullResultReason()).map(String::toString).orElse(""));
+        fullAssessmentDTO.setTotalAggregatedExpense(
+                ofNullable(apiResponse.getTotalAggregatedExpense()).map(BigDecimal::doubleValue).orElse(0.0));
+        fullAssessmentDTO.setTotalAnnualDisposableIncome(
+                ofNullable(apiResponse.getTotalAnnualDisposableIncome()).map(BigDecimal::doubleValue).orElse(0.0));
+        fullAssessmentDTO.setThreshold(
+                ofNullable(apiResponse.getFullThreshold()).map(BigDecimal::doubleValue).orElse(0.0));
         mapSectionSummaries(fullAssessmentDTO.getSectionSummaries(), apiResponse.getAssessmentSectionSummary());
-        log.info("meansAssessmentResponseToApplicationDto.fullAssessmentDTO--"+ fullAssessmentDTO);
 
     }
 
-    private void mapInitialAssessmentDTO(InitialAssessmentDTO initialAssessmentDTO, ApiMeansAssessmentResponse apiResponse) {
-        initialAssessmentDTO.setLowerThreshold(ofNullable(apiResponse.getLowerThreshold()).map(BigDecimal::doubleValue).orElse(0.0));
-        initialAssessmentDTO.setUpperThreshold(ofNullable(apiResponse.getUpperThreshold()).map(BigDecimal::doubleValue).orElse(0.0));
-        initialAssessmentDTO.setTotalAggregatedIncome(ofNullable(apiResponse.getTotalAggregatedIncome()).map(BigDecimal::doubleValue).orElse(0.0));
-        initialAssessmentDTO.setAdjustedIncomeValue(ofNullable(apiResponse.getAdjustedIncomeValue()).map(BigDecimal::doubleValue).orElse(0.0));
+    private void mapInitialAssessmentDTO(InitialAssessmentDTO initialAssessmentDTO,
+                                         ApiMeansAssessmentResponse apiResponse) {
+        initialAssessmentDTO.setLowerThreshold(
+                ofNullable(apiResponse.getLowerThreshold()).map(BigDecimal::doubleValue).orElse(0.0));
+        initialAssessmentDTO.setUpperThreshold(
+                ofNullable(apiResponse.getUpperThreshold()).map(BigDecimal::doubleValue).orElse(0.0));
+        initialAssessmentDTO.setTotalAggregatedIncome(
+                ofNullable(apiResponse.getTotalAggregatedIncome()).map(BigDecimal::doubleValue).orElse(0.0));
+        initialAssessmentDTO.setAdjustedIncomeValue(
+                ofNullable(apiResponse.getAdjustedIncomeValue()).map(BigDecimal::doubleValue).orElse(0.0));
         initialAssessmentDTO.setResult(ofNullable(apiResponse.getInitResult()).map(String::toString).orElse(""));
-        initialAssessmentDTO.setResultReason(ofNullable(apiResponse.getInitResultReason()).map(String::toString).orElse(""));
+        initialAssessmentDTO.setResultReason(
+                ofNullable(apiResponse.getInitResultReason()).map(String::toString).orElse(""));
         initialAssessmentDTO.setCriteriaId(ofNullable(apiResponse.getCriteriaId()).map(Integer::longValue).orElse(0L));
         initialAssessmentDTO.setId(ofNullable(apiResponse.getAssessmentId()).map(Integer::longValue).orElse(0L));
         mapReviewType(initialAssessmentDTO.getReviewType(), apiResponse.getReviewType());
@@ -450,11 +558,14 @@ public class MeansAssessmentMapper {
         updateChildWeightingsId(initialAssessmentDTO.getChildWeightings(), apiResponse.getChildWeightings());
     }
 
-    private void updateChildWeightingsId(Collection<ChildWeightingDTO> childWeightingDTOCollection, List<ApiAssessmentChildWeighting> apiAssessmentChildWeightingList) {
+    private void updateChildWeightingsId(Collection<ChildWeightingDTO> childWeightingDTOCollection,
+                                         List<ApiAssessmentChildWeighting> apiAssessmentChildWeightingList) {
         for (ApiAssessmentChildWeighting responseChildWeighting : apiAssessmentChildWeightingList) {
             for (ChildWeightingDTO childWeightingDTO : childWeightingDTOCollection) {
-                if (responseChildWeighting.getChildWeightingId().equals(childWeightingDTO.getWeightingId().intValue())) {
-                    childWeightingDTO.setId(ofNullable(responseChildWeighting.getId()).map(Integer::longValue).orElse(0L));
+                if (responseChildWeighting.getChildWeightingId()
+                        .equals(childWeightingDTO.getWeightingId().intValue())) {
+                    childWeightingDTO.setId(
+                            ofNullable(responseChildWeighting.getId()).map(Integer::longValue).orElse(0L));
                 }
             }
         }
@@ -467,40 +578,55 @@ public class MeansAssessmentMapper {
         }
     }
 
-    private void mapSectionSummaries(Collection<AssessmentSectionSummaryDTO> sectionSummaries, List<ApiAssessmentSectionSummary> assessmentSectionSummaries) {
+    private void mapSectionSummaries(Collection<AssessmentSectionSummaryDTO> sectionSummaries,
+                                     List<ApiAssessmentSectionSummary> assessmentSectionSummaries) {
         if (assessmentSectionSummaries != null) {
             for (ApiAssessmentSectionSummary assessmentSectionSummary : assessmentSectionSummaries) {
                 for (AssessmentSectionSummaryDTO assessmentSectionSummaryDTO : sectionSummaries) {
                     if (assessmentSectionSummary.getSection().equals(assessmentSectionSummaryDTO.getSection())) {
-                        assessmentSectionSummaryDTO.setAnnualTotal(ofNullable(assessmentSectionSummary.getAnnualTotal()).map(BigDecimal::doubleValue).orElse(0.0));
-                        assessmentSectionSummaryDTO.setApplicantAnnualTotal(ofNullable(assessmentSectionSummary.getApplicantAnnualTotal()).map(BigDecimal::doubleValue).orElse(0.0));
-                        assessmentSectionSummaryDTO.setPartnerAnnualTotal(ofNullable(assessmentSectionSummary.getPartnerAnnualTotal()).map(BigDecimal::doubleValue).orElse(0.0));
-                        mapAssessmentDetail(assessmentSectionSummaryDTO.getAssessmentDetail(), assessmentSectionSummary.getAssessmentDetails());
+                        assessmentSectionSummaryDTO.setAnnualTotal(
+                                ofNullable(assessmentSectionSummary.getAnnualTotal()).map(BigDecimal::doubleValue)
+                                        .orElse(0.0));
+                        assessmentSectionSummaryDTO.setApplicantAnnualTotal(
+                                ofNullable(assessmentSectionSummary.getApplicantAnnualTotal()).map(
+                                        BigDecimal::doubleValue).orElse(0.0));
+                        assessmentSectionSummaryDTO.setPartnerAnnualTotal(
+                                ofNullable(assessmentSectionSummary.getPartnerAnnualTotal()).map(
+                                        BigDecimal::doubleValue).orElse(0.0));
+                        mapAssessmentDetail(assessmentSectionSummaryDTO.getAssessmentDetail(),
+                                            assessmentSectionSummary.getAssessmentDetails()
+                        );
                     }
                 }
             }
         }
     }
 
-    private void mapAssessmentDetail(Collection<AssessmentDetailDTO> assessmentDetail, List<ApiAssessmentDetail> assessmentDetailList) {
+    private void mapAssessmentDetail(Collection<AssessmentDetailDTO> assessmentDetail,
+                                     List<ApiAssessmentDetail> assessmentDetailList) {
         if (assessmentDetailList != null) {
             for (ApiAssessmentDetail apiAssessmentDetail : assessmentDetailList) {
                 for (AssessmentDetailDTO assessmentDetailDTO : assessmentDetail) {
-                    if (apiAssessmentDetail.getCriteriaDetailId().equals(assessmentDetailDTO.getCriteriaDetailsId().intValue())) {
-                        assessmentDetailDTO.setId(ofNullable(apiAssessmentDetail.getId()).map(Integer::longValue).orElse(0L));
+                    if (apiAssessmentDetail.getCriteriaDetailId()
+                            .equals(assessmentDetailDTO.getCriteriaDetailsId().intValue())) {
+                        assessmentDetailDTO.setId(
+                                ofNullable(apiAssessmentDetail.getId()).map(Integer::longValue).orElse(0L));
                     }
                 }
             }
         }
     }
 
-    public void apiRollbackMeansAssessmentResponseToApplicationDto(ApiRollbackMeansAssessmentResponse response, ApplicationDTO applicationDTO) {
+    public void apiRollbackMeansAssessmentResponseToApplicationDto(ApiRollbackMeansAssessmentResponse response,
+                                                                   ApplicationDTO applicationDTO) {
         if (AssessmentType.INIT.getType().equals(response.getAssessmentType())) {
-            InitialAssessmentDTO initialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
+            InitialAssessmentDTO initialAssessmentDTO =
+                    applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
             initialAssessmentDTO.setResult(response.getInitResult());
             initialAssessmentDTO.setAssessmnentStatusDTO(mapAssessmentStatus(response.getFassInitStatus()));
         } else if (AssessmentType.FULL.getType().equals(response.getAssessmentType())) {
-            FullAssessmentDTO fullAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFull();
+            FullAssessmentDTO fullAssessmentDTO =
+                    applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFull();
             fullAssessmentDTO.setResult(response.getFullResult());
             fullAssessmentDTO.setAssessmnentStatusDTO(mapAssessmentStatus(response.getFassFullStatus()));
         }
