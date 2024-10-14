@@ -37,6 +37,10 @@ jobs:
           commits=${{ github.event.pull_request.commits }}
           
           echo "Total commits: {$commits.totalCount}"
+          
+          for commit in "${commits.nodes[@]}"; do
+            echo "Commit msg: {{ $commit.message }}"
+          done
 
           exit 0
 
