@@ -29,7 +29,7 @@ jobs:
           echo $DESCRIPTION
 
           if [[ $DESCRIPTION == *"https://dsdmoj.atlassian.net/browse/LCAM-XXX"* ]]; then
-            echo "Please update the Jira link to point to the correct work item."
+            echo "Please update the Jira link to point to the corresponding work item(s)."
             exit 1
           fi
 
