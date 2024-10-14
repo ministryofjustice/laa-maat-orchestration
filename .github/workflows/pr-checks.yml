@@ -11,9 +11,9 @@ jobs:
       - name: PR description check
         env:
           TITLE: {{ github.event.pull_request.title }}
-          DESCRIPTION: {{ github.event.pull_request.description }}
+#          DESCRIPTION: {{ github.event.pull_request.description }}
         run: |
           echo $TITLE
-          echo $DESCRIPTION
+#          echo $DESCRIPTION
           
           exit 0
