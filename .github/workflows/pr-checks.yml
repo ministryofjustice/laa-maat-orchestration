@@ -38,7 +38,7 @@ jobs:
           nodes=${{github.event.pull_request.commits.nodes}}
           
           echo $commits
-          echo "Total commits: {$count}"
+          echo "Total commits: $count"
           
           for node in "${nodes[@]}"
           do
