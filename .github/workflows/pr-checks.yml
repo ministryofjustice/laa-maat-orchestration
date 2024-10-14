@@ -10,10 +10,8 @@ jobs:
     steps:
       - name: PR description check
         env:
-          TITLE: ${{ github.event.pull_request.title }}
           DESCRIPTION: ${{ github.event.pull_request.body }}
         run: |
-          echo $TITLE
           echo $DESCRIPTION
           
           if [[ $DESCRIPTION == *"Describe what you did and why"* ]]; then
