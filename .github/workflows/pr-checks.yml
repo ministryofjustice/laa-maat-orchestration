@@ -5,15 +5,12 @@ on:
     branches: [main]
 
 jobs:
-  pr-checks:
+  run-pr-checks:
     runs-on: ubuntu-latest
     steps:
       - name: PR description check
         env:
           TITLE: {{ github.event.pull_request.title }}
-#          DESCRIPTION: {{ github.event.pull_request.description }}
         run: |
           echo $TITLE
-#          echo $DESCRIPTION
-          
           exit 0
