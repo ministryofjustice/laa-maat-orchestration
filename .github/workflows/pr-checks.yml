@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: PR description check
         env:
-          TITLE: {{ github.event.pull_request.title }}
+          TITLE: ${{ github.event.pull_request.title }}
         run: |
           echo $TITLE
           exit 0
