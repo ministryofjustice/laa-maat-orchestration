@@ -38,8 +38,9 @@ jobs:
           
           echo "Total commits: {$commits.totalCount}"
           
-          for commit in "${commits.nodes[@]}"; do
-            echo "Commit msg: {$commit.message}"
+          for node in "${commits.nodes[@]}"
+          do
+            echo "Commit msg: {node.commit.message}"
           done
 
           exit 0
