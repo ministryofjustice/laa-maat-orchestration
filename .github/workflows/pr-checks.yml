@@ -16,7 +16,7 @@ jobs:
           echo $TITLE
           echo $DESCRIPTION
           
-          if [[ $DESCRIPTION == *"Describe what you did and why"* ]]
+          if [[ $DESCRIPTION == *"Describe what you did and why"* ]]; then
             echo "Please add a meaningful description to your PR."
             exit 1
           fi
