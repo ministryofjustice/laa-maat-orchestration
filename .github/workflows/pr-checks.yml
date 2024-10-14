@@ -36,6 +36,7 @@ jobs:
         run: |
           commits=${{ github.event.pull_request.commits }}
           
+          echo $commits
           echo "Total commits: {$commits.totalCount}"
           
           for node in "${commits.nodes}"
