@@ -35,7 +35,7 @@ jobs:
       - name: Commits check
         run: |
           count=${{ github.event.pull_request.commits }}
-          nodes=${{github.event.pull_request.commits.nodes}}
+          nodes=${{ github.event.pull_request.commits.nodes }}
           
           echo $commits
           echo "Total commits: $count"
