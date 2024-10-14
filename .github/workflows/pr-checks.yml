@@ -15,4 +15,10 @@ jobs:
         run: |
           echo $TITLE
           echo $DESCRIPTION
+          
+          if [[ $DESCRIPTION == *"Describe what you did and why"* ]]
+            echo "Please add a meaningful description to your PR."
+            exit 1
+          fi
+          
           exit 0
