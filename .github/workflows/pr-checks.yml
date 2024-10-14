@@ -34,7 +34,7 @@ jobs:
           exit 0
       - name: Commits check
         run: |
-          count=${{ github.event.pull_request.commits.totalCount }}
+          count=${{ github.event.pull_request.commits }}
           nodes=${{github.event.pull_request.commits.nodes}}
           
           echo $commits
