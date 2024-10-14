@@ -42,7 +42,7 @@ jobs:
           
           for node in "${nodes[@]}"
           do
-            echo "Commit msg: {node.commit.message}"
+            echo "Commit msg: ${node.commit.message}"
           done
 
           exit 0
