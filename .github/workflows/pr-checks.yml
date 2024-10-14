@@ -34,12 +34,12 @@ jobs:
           exit 0
       - name: Commits check
         run: |
-          commits=${{ github.event.pull_request.commits }}
+          count=${{ github.event.pull_request.commits.totalCount }}
           
           echo $commits
-          echo "Total commits: {$commits.totalCount}"
+          echo "Total commits: {$count}"
           
-          for node in "${commits.nodes}"
+          for node in "${github.event.pull_request.commits.nodes[@]}"
           do
             echo "Commit msg: {node.commit.message}"
           done
