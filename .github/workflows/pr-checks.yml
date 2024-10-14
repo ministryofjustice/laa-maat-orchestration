@@ -22,3 +22,15 @@ jobs:
           fi
           
           exit 0
+      - name: Jira link check
+        env:
+          DESCRIPTION: ${{ github.event.pull_request.body }}
+        run: |
+          echo $DESCRIPTION
+
+          if [[ $DESCRIPTION == *"https://dsdmoj.atlassian.net/browse/LCAM-XXX"* ]]; then
+            echo "Please update the Jira link to point to the correct work item."
+            exit 1
+          fi
+
+          exit 0
