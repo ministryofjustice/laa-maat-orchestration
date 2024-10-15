@@ -12,37 +12,12 @@ jobs:
         run: |
           echo "SHA: ${{ github.event.ref }}"
           
-          commits=${{ github.event.commits }}
-          messages=${{ github.event.commits.*.message }}
-          # message=${{ github.event.commits[0].message }}
+          messages="${{ join(github.event.commits.*.message, ',') }}"
+          echo $messages
           
-          msgs=${{ join(github.event.commits.*.message, ',') }}
-          echo $msgs
+          if [[ ${{ contains(messages, 'forgot') }} }} ]]; then
+            echo "Please fix-up your PR to make commits more meaningful."
+            exit 1
+          fi
           
-          (output=$'\n'; echo "${messages[*]}")
-          
-          echo $output
-          
-          echo ${messages[*]}
-          
-          echo "${commits[0]}"
-          
-          for key in "${!messages[@]}"
-          do
-            echo "Key: $key"
-            echo "Value: ${messages[$key]}"
-          done
-          
-          echo "Total commits: ${#commits[@]}"
-          
-          actual_commits=${commits[0]}
-          
-          echo ${actual_commits[*]}
-          
-          for key in "${!actual_commits[@]}"
-          do
-            echo "Key: $key"
-            echo "Value: ${actual_commits[$key]}"
-          done
-
           exit 0
