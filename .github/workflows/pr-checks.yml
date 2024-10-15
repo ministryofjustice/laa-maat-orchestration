@@ -32,20 +32,6 @@ jobs:
           fi
 
           exit 0
-      - name: Commits check
-        run: |
-          count=${{ github.event.pull_request.commits }}
-          nodes=${{ github.event.pull_request.commits.nodes }}
-          
-          echo $commits
-          echo "Total commits: $count"
-          
-          for node in "${nodes[@]}"
-          do
-            echo "Commit msg: ${node.commit.message}"
-          done
-
-          exit 0
 
   run-tests:
     runs-on: ubuntu-latest
