@@ -18,6 +18,10 @@ jobs:
           
           echo $messages
           
+          (output=$'\n'; echo "${commits[*].message}")
+          
+          echo $output
+          
           echo ${messages[*]}
           
           echo "${commits[0]}"
