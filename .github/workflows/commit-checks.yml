@@ -9,15 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Commit message check
-        env:
-          SHA: ${{ github.event.push.ref }}
-          GC: ${{ toJson(github.event) }}
         run: |
-          echo "$GC"
+          echo "SHA: ${{ github.event.ref }}"
           
-          echo "SHA: $SHA"
-          
-          commits=${{ github.event.push.commits }}
+          commits=${{ github.event.commits }}
           
           for commit in "${commits[@]}"
           do
