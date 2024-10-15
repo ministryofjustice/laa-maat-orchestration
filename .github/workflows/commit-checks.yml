@@ -20,7 +20,8 @@ jobs:
           
           for key in "${!actual_commits[@]}"
           do
-            echo ${{actual_commits[$key]}}
+            echo $key
+            #echo ${actual_commits[$key]}
             # echo "${commit[message]}"
             # echo "Commit msg: ${commit.message}"
           done
