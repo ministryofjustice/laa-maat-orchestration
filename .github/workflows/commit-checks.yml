@@ -12,7 +12,7 @@ jobs:
         run: |
           echo "SHA: ${{ github.event.ref }}"
           
-          commits=${{ github.event.commits }}
+          commits=${github.event.commits}
           
           echo "Total commits: ${#commits[@]}"
           
@@ -20,7 +20,7 @@ jobs:
           
           for key in "${!actual_commits[@]}"
           do
-            echo "$key: ${actual_commits[$key]}"
+            echo ${{actual_commits[$key]}}
             # echo "${commit[message]}"
             # echo "Commit msg: ${commit.message}"
           done
