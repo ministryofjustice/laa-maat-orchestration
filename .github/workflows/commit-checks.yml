@@ -9,10 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Commit message check
+        env:
+          SHA: ${{ github.event.push.ref }}
         run: |
-          sha=${{ github.event.push.ref }}
-          
-          echo "SHA: $sha"
+          echo "SHA: $SHA"
           
           commits=${{ github.event.push.commits }}
           
