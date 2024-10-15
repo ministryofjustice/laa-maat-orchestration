@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Commit message check
         run: |
+          echo "SHA: ${{ github.event.push.base_ref }}"
+          
           commits=${{ github.event.push.commits }}
           
           echo "Total commits: ${#commits[@]}"
