@@ -10,15 +10,17 @@ jobs:
     steps:
       - name: Commit message check
         run: |
-          echo "SHA: ${{ github.event.push.base_ref }}"
+          sha=${{ github.event.push.base_ref }}
+          
+          echo "SHA: $sha"
           
           commits=${{ github.event.push.commits }}
           
-          echo "Total commits: ${#commits[@]}"
+#          echo "Total commits: ${#commits[@]}"
 
-          for commit in "${commits[@]}"
+          for commit in "${commits[@]}";
           do
-            echo "Commit msg: ${commit.message}"
+            echo "Commit msg: $commit"
           done
 
           exit 0
