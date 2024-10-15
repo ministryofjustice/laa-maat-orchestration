@@ -16,7 +16,7 @@ jobs:
           messages=${{ github.event.commits.*.message }}
           # message=${{ github.event.commits[0].message }}
           
-          echo $messages
+          echo "${{join(github.event.commits.*.message, ',')}}"
           
           (output=$'\n'; echo "${messages[*]}")
           
