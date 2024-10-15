@@ -9,8 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Commit message check
-        env:
-          CMTS: ${{ github.event.commits }}
         run: |
           echo "SHA: ${{ github.event.ref }}"
           
