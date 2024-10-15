@@ -20,7 +20,7 @@ jobs:
 
           for commit in "${commits[@]}";
           do
-            echo "Commit msg: $commit"
+            echo "Commit msg $commit"
           done
 
           exit 0
