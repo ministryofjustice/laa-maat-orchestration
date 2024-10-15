@@ -18,7 +18,7 @@ jobs:
           
           echo $messages
           
-          (output=$'\n'; echo "${commits[*].message}")
+          (output=$'\n'; echo "${commits[*]}")
           
           echo $output
           
