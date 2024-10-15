@@ -19,10 +19,10 @@ jobs:
           
           echo "${commits[0]}"
           
-          for key in "${!commits[@]}"
+          for key in "${!messages[@]}"
           do
             echo "Key: $key"
-            echo "Value: ${commits[$key]}"
+            echo "Value: ${messages[$key]}"
           done
           
           echo "Total commits: ${#commits[@]}"
