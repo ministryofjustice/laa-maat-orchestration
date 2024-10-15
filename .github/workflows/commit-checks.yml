@@ -16,10 +16,10 @@ jobs:
           
           echo "Total commits: ${#commits[@]}"
           
-          for commit in "${commits[@]}"
+          for key in "${!commits[@]}"
           do
-            echo "$commit"
-            echo "${{commit[message]}}"
+            echo "$key: ${commits[$key]}"
+            # echo "${commit[message]}"
             # echo "Commit msg: ${commit.message}"
           done
 
