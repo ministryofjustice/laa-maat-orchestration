@@ -14,9 +14,9 @@ jobs:
           
           commits=${{ github.event.commits }}
           
-          echo "Total commits: ${#commits[@]}"
+          echo "Total commits: ${#commits[][@]}"
           
-          for key in "${!commits[@]}"
+          for key in "${!commits[][@]}"
           do
             echo "$key: ${commits[$key]}"
             # echo "${commit[message]}"
