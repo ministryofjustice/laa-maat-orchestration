@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Commit message check
         run: |
-          sha=${{ github.event.push.base_ref }}
+          sha=${{ github.event.push.ref }}
           
           echo "SHA: $sha"
           
