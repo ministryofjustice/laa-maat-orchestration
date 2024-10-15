@@ -16,8 +16,16 @@ jobs:
           
           echo "${commits[*]}"
           
+          for key in "${!commits[@]}"
+          do
+            echo "Key: $key"
+            echo "Value: ${commits[$key]}"
+          done
+          
           echo "Total commits: ${#commits[@]}"
           
           actual_commits=${commits[0]}
+          
+          echo "${actual_commits[*]}"
 
           exit 0
