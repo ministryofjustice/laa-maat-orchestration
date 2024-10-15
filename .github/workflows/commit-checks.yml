@@ -12,7 +12,9 @@ jobs:
         run: |
           echo "SHA: ${{ github.event.ref }}"
           
-          commits=${github.event.commits}
+          commits=${{ github.event.commits }}
+          
+          echo "${toJson(commits)}"
           
           echo "Total commits: ${#commits[@]}"
           
