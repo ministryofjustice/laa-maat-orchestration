@@ -16,6 +16,8 @@ jobs:
           
           echo ${commits[*]}
           
+          echo "${commits[0][message]}"
+          
           for key in "${!commits[@]}"
           do
             echo "Key: $key"
