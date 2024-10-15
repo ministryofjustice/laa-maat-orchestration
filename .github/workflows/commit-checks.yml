@@ -17,7 +17,7 @@ jobs:
           echo $messages
           
           needs_rebase=${{ contains(github.event.commits.*.message, 'forgot') }}
-          echo $needs_rebase
+          echo "Needs rebase: ${needs_rebase}"
           
           if [[ $messages == *"forgot"* ]]; then
             echo "Please fix-up your PR to make commits more meaningful."
