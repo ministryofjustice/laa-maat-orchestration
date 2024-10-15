@@ -18,7 +18,7 @@ jobs:
           
           for commit in "${commits[@]}"
           do
-            echo "${{ commit['message'] }}"
+            echo "$commit"
             # echo "Commit msg: ${commit.message}"
           done
 
