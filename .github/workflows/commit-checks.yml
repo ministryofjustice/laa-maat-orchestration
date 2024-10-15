@@ -18,7 +18,8 @@ jobs:
           
           for commit in "${commits[@]}"
           do
-            echo "Commit msg: ${commit.message}"
+            echo "${{ toJson(commit) }}" 
+            # echo "Commit msg: ${commit.message}"
           done
 
           exit 0
