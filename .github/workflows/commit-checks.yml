@@ -16,8 +16,6 @@ jobs:
           
           commits=${{ github.event.push.commits }}
           
-#          echo "Total commits: ${#commits[@]}"
-
           for commit in "${commits[@]}"
           do
             echo "Commit msg $commit"
