@@ -16,7 +16,7 @@ jobs:
           
           commits=${{ github.event.commits }}
           
-          echo '${{ toJSON(CMTS) }}'
+          echo "${commits[*]}"
           
           echo "Total commits: ${#commits[@]}"
           
