@@ -13,7 +13,10 @@ jobs:
           echo "SHA: ${{ github.event.ref }}"
           
           commits=${{ github.event.commits }}
-          messages=${{ github.event.push.commits.*.message }}
+          messages=${{ github.event.commits.*.message }}
+          # message=${{ github.event.commits[0].message }}
+          
+          echo $messages
           
           echo ${messages[*]}
           
