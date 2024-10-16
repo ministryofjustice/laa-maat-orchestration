@@ -11,7 +11,7 @@ jobs:
       - name: Commit message check
         run: |
           echo "SHA: ${{ github.event.ref }}"
-          echo "Created: ${{ github.event.timestamp }}"
+          echo "Modified: ${{ github.event.head_commit.timestamp }}"
           
           messages="${{ join(github.event.push.commits.*.message, ',') }}"
           echo $messages
