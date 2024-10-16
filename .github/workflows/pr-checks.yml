@@ -20,6 +20,18 @@ jobs:
           fi
           
           exit 0
+      - name: PR commit count check
+        env:
+          COMMIT_COUNT: ${{ github.event.pull_request.commits }}
+        run: |
+          echo $COMMIT_COUNT
+
+          if [[ $COMMIT_COUNT > 20 ]]; then
+            echo "Please fix-up your commits to make them more individually meaningful."
+            exit 1
+          fi
+
+          exit 0
       - name: Jira link check
         env:
           DESCRIPTION: ${{ github.event.pull_request.body }}
