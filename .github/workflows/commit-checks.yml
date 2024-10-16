@@ -13,11 +13,13 @@ jobs:
           echo "SHA: ${{ github.event.ref }}"
           echo "Modified: ${{ github.event.head_commit.timestamp }}"
           
-          messages="${{ join(github.event.push.commits.*.message, ',') }}"
+          messages="${{ join(github.event.commits.*.message, ',') }}"
           echo $messages
           
-          needs_rebase=${{ contains(github.event.push.commits.*.message, 'forgot') }}
-          echo "Needs rebase: ${needs_rebase}"
+          needs_rebase=${{ contains(github.event.commits.*.message, 'forgot') }}
+          if [ $needs_rebase -eq 1] ; then
+            echo "Needs rebase: ${needs_rebase}"
+          fi
           
           if [[ $messages == *"forgot"* ]]; then
             echo "Please fix-up your PR to make commits more meaningful."
