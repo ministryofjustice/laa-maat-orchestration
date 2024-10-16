@@ -10,8 +10,8 @@ jobs:
     steps:
       - name: Commit message check
         run: |
-          echo "SHA: ${{ github.event.push.ref }}"
-          echo "Created: ${{ github.event.push.timestamp }}"
+          echo "SHA: ${{ github.event.ref }}"
+          echo "Created: ${{ github.event.timestamp }}"
           
           messages="${{ join(github.event.push.commits.*.message, ',') }}"
           echo $messages
