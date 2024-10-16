@@ -38,6 +38,9 @@ class CrownCourtOrchestrationServiceTest {
         when(maatCourtDataService.invokeStoredProcedure(
                 any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)
         )).thenReturn(applicationDTO);
+
+        when(proceedingsService.updateCrownCourt(any(ApplicationDTO.class), any(UserDTO.class)))
+                .thenReturn(applicationDTO);
     }
 
     void checkStoredProcedureInvocations(WorkflowRequest request) {

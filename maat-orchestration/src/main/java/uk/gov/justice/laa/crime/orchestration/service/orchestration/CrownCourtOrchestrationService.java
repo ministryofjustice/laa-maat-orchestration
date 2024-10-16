@@ -19,6 +19,7 @@ public class CrownCourtOrchestrationService {
     private final MaatCourtDataService maatCourtDataService;
 
     public ApplicationDTO update(WorkflowRequest request) {
+
         ApplicationDTO application = request.getApplicationDTO();
 
         application = maatCourtDataService.invokeStoredProcedure(
@@ -29,18 +30,17 @@ public class CrownCourtOrchestrationService {
                 application, request.getUserDTO(), StoredProcedure.PRE_UPDATE_CHECKS
         );
 
-        proceedingsService.updateCrownCourt(request);
+        application = proceedingsService.updateCrownCourt(application, request.getUserDTO());
 
         if (hasNewOutcome(application)) {
-            application = maatCourtDataService.invokeStoredProcedure(
+          application = maatCourtDataService.invokeStoredProcedure(
                     application, request.getUserDTO(), StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE
             );
         }
 
-        application = maatCourtDataService.invokeStoredProcedure(
+       application = maatCourtDataService.invokeStoredProcedure(
                 application, request.getUserDTO(), StoredProcedure.UPDATE_CC_APPLICANT_AND_APPLICATION
         );
-
         application.setTransactionId(null);
 
         return application;
