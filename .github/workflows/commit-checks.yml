@@ -10,13 +10,13 @@ jobs:
     steps:
       - name: Commit message check
         run: |
-          echo "SHA: ${{ github.event.ref }}"
-          echo "Created: ${{ github.event.timestamp }}"
+          echo "SHA: ${{ github.event.push.ref }}"
+          echo "Created: ${{ github.event.push.timestamp }}"
           
-          messages="${{ join(github.event.commits.*.message, ',') }}"
+          messages="${{ join(github.event.push.commits.*.message, ',') }}"
           echo $messages
           
-          needs_rebase=${{ contains(github.event.commits.*.message, 'forgot') }}
+          needs_rebase=${{ contains(github.event.push.commits.*.message, 'forgot') }}
           echo "Needs rebase: ${needs_rebase}"
           
           if [[ $messages == *"forgot"* ]]; then
