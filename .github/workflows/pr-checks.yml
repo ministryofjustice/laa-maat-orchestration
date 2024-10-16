@@ -24,10 +24,10 @@ jobs:
         env:
           COMMIT_COUNT: ${{ github.event.pull_request.commits }}
         run: |
-          echo $COMMIT_COUNT
+          commit_limit=20
 
-          if (( $COMMIT_COUNT > 20 )); then
-            echo "Please fix-up your commits to make them more individually meaningful."
+          if (( $COMMIT_COUNT > $commit_limit )); then
+            echo "You have exceeded the recommended limit of $commit_limit commits in this PR. Please fix-up your commits to make them more individually meaningful."
             exit 1
           fi
 
