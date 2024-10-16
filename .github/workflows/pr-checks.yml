@@ -26,7 +26,7 @@ jobs:
         run: |
           echo $COMMIT_COUNT
 
-          if [[ $COMMIT_COUNT > 20 ]]; then
+          if (( $COMMIT_COUNT > 20 )); then
             echo "Please fix-up your commits to make them more individually meaningful."
             exit 1
           fi
