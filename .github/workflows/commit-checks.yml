@@ -8,11 +8,11 @@ jobs:
   run-commit-checks:
     runs-on: ubuntu-latest
     steps:
-      - name: Commit message check
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: main
+      - name: Commit message check
         run: |
           # Caveat that this only checks the commits in the current push
           # Do not have access to anything else via the GitHub event
