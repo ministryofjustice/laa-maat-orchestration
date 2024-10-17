@@ -17,6 +17,8 @@ jobs:
           fetch-depth: $PR_FETCH_DEPTH
 
       - name: Commit message check
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           # Caveat that this only checks the commits in the current push
           # Do not have access to anything else via the GitHub event
