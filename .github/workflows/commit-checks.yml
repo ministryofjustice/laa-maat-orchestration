@@ -20,25 +20,10 @@ jobs:
           echo "SHA: ${{ github.event.ref }}"
           echo "Modified: ${{ github.event.head_commit.timestamp }}"
           
-          messages="${{ join(github.event.commits.*.message, ',') }}"
-          echo $messages
-          
-          needs_rebase=${{ contains(github.event.commits.*.message, 'forgot') }}
-          if [ $needs_rebase -eq 1 ] ; then
-            echo "Needs rebase: ${needs_rebase}"
-          fi
-          
           output=$(git log main^..HEAD --pretty=oneline | grep -i "forgot")
+          echo "Output: $output"
           
           if [[ ! -n "$output" ]]; then
-            echo 'Found commits with the keyword "forgot"'
-            echo "Please fix-up your PR to make commits more meaningful."
-            exit 1
-          fi
-          
-          shopt -s nocasematch
-          
-          if [[ $messages == *"forgot"* ]]; then
             echo 'Found commits with the keyword "forgot"'
             echo "Please fix-up your PR to make commits more meaningful."
             exit 1
