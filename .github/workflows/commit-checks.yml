@@ -8,9 +8,14 @@ jobs:
   run-commit-checks:
     runs-on: ubuntu-latest
     steps:
+      - name: Get PR fetch depth
+        run: echo "PR_FETCH_DEPTH=$(( ${{ github.event.pull_request.commits }} + 1 ))" >> "${GITHUB_ENV}"
+
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: $PR_FETCH_DEPTH
+
       - name: Commit message check
         run: |
           # Caveat that this only checks the commits in the current push
