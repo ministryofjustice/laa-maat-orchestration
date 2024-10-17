@@ -24,6 +24,9 @@ jobs:
           echo "SHA: ${{ github.event.ref }}"
           echo "Modified: ${{ github.event.head_commit.timestamp }}"
           
+          commits=$(gh pr view commits)
+          echo $commits
+          
           output=$(git log main^..HEAD --pretty=oneline | grep -i "forgot")
           echo "Output: $output"
           
