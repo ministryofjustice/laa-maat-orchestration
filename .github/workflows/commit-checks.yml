@@ -10,6 +10,9 @@ jobs:
     steps:
       - name: Commit message check
         run: |
+          # Caveat that this only checks the commits in the current push
+          # Do not have access to anything else via the GitHub event
+          # Perhaps instead we should do a git log and a grep to search all commits.
           echo "SHA: ${{ github.event.ref }}"
           echo "Modified: ${{ github.event.head_commit.timestamp }}"
           
@@ -19,6 +22,14 @@ jobs:
           needs_rebase=${{ contains(github.event.commits.*.message, 'forgot') }}
           if [ $needs_rebase -eq 1 ] ; then
             echo "Needs rebase: ${needs_rebase}"
+          fi
+          
+          output=$(git log main^..HEAD --pretty=oneline | grep -i "forgot")
+          
+          if [[ ! -n "$output" ]]; then
+            echo 'Found commits with the keyword "forgot"'
+            echo "Please fix-up your PR to make commits more meaningful."
+            exit 1
           fi
           
           shopt -s nocasematch
