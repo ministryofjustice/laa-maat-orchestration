@@ -7,18 +7,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.justice.laa.crime.common.model.meansassessment.*;
 import uk.gov.justice.laa.crime.enums.AssessmentType;
+import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
-import uk.gov.justice.laa.crime.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.util.DateUtil;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getApplicationDTOForMeansAssessmentMapper;
@@ -68,7 +71,8 @@ class MeansAssessmentMapperTest {
 
     }
 
-    private void assertApiMeansAssessmentRequestAttributes(WorkflowRequest workflowRequest, ApiMeansAssessmentRequest apiMeansAssessmentRequest) {
+    private void assertApiMeansAssessmentRequestAttributes(WorkflowRequest workflowRequest,
+                                                           ApiMeansAssessmentRequest apiMeansAssessmentRequest) {
         ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
         AssessmentDTO assessmentDTO = applicationDTO.getAssessmentDTO();
         FinancialAssessmentDTO financialAssessmentDTO = assessmentDTO.getFinancialAssessmentDTO();
@@ -99,7 +103,8 @@ class MeansAssessmentMapperTest {
                 .isEqualTo(childWeightingDTO.getNoOfChildren());
         softly.assertThat(apiMeansAssessmentRequest.getCrownCourtOverview().getAvailable())
                 .isEqualTo(crownCourtOverviewDTO.getAvailable());
-        softly.assertThat(apiMeansAssessmentRequest.getCrownCourtOverview().getCrownCourtSummary().getRepOrderDecision())
+        softly.assertThat(
+                        apiMeansAssessmentRequest.getCrownCourtOverview().getCrownCourtSummary().getRepOrderDecision())
                 .isEqualTo(crownCourtSummaryDTO.getRepOrderDecision().getValue());
         softly.assertThat(apiMeansAssessmentRequest.getSectionSummaries().size())
                 .isEqualTo(1);
@@ -129,12 +134,15 @@ class MeansAssessmentMapperTest {
                 isEqualTo(initialAssessmentDTO.getOtherIncomeNote());
     }
 
-    private void assertApiUpdateMeansAssessmentRequestAttributes(WorkflowRequest workflowRequest, ApiUpdateMeansAssessmentRequest apiUpdateMeansAssessmentRequest) {
+    private void assertApiUpdateMeansAssessmentRequestAttributes(WorkflowRequest workflowRequest,
+                                                                 ApiUpdateMeansAssessmentRequest apiUpdateMeansAssessmentRequest) {
+
         ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
         AssessmentDTO assessmentDTO = applicationDTO.getAssessmentDTO();
         FinancialAssessmentDTO financialAssessmentDTO = assessmentDTO.getFinancialAssessmentDTO();
         InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
         FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
+
         softly.assertThat(apiUpdateMeansAssessmentRequest.getFinancialAssessmentId())
                 .isEqualTo(financialAssessmentDTO.getId().intValue());
         softly.assertThat(apiUpdateMeansAssessmentRequest.getFullAssessmentDate())
@@ -145,9 +153,89 @@ class MeansAssessmentMapperTest {
                 .isEqualTo(BigDecimal.valueOf(initialAssessmentDTO.getTotalAggregatedIncome()));
         softly.assertThat(apiUpdateMeansAssessmentRequest.getFullAssessmentNotes())
                 .isEqualTo(fullAssessmentDTO.getAssessmentNotes());
+
+        assertIncomeEvidenceAttributes(workflowRequest, apiUpdateMeansAssessmentRequest);
     }
 
-    private void assertApiCreateMeansAssessmentRequestAttributes(WorkflowRequest workflowRequest, ApiCreateMeansAssessmentRequest apiCreateMeansAssessmentRequest) {
+    private void assertIncomeEvidenceAttributes(WorkflowRequest workflowRequest,
+                                                ApiUpdateMeansAssessmentRequest apiUpdateMeansAssessmentRequest) {
+        ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
+        AssessmentDTO assessmentDTO = applicationDTO.getAssessmentDTO();
+        IncomeEvidenceSummaryDTO incomeEvidenceSummary = assessmentDTO.getFinancialAssessmentDTO().getIncomeEvidence();
+
+        Collection<ExtraEvidenceDTO> extraEvidenceList = incomeEvidenceSummary.getExtraEvidenceList();
+        Collection<EvidenceDTO> partnerIncomeEvidenceList = incomeEvidenceSummary.getPartnerIncomeEvidenceList();
+        Collection<EvidenceDTO> applicantIncomeEvidenceList = incomeEvidenceSummary.getApplicantIncomeEvidenceList();
+
+        List<ApiIncomeEvidence> incomeEvidence = apiUpdateMeansAssessmentRequest.getIncomeEvidence();
+
+        // Assert the total size of the income evidence list
+        softly.assertThat(incomeEvidence)
+                .hasSize(applicantIncomeEvidenceList.size() + partnerIncomeEvidenceList.size() + extraEvidenceList.size());
+
+        // Helper method to assert income evidence
+        BiConsumer<EvidenceDTO, ApiIncomeEvidence> assertCommonFields = (evidenceDTO, apiIncomeEvidence) -> {
+            softly.assertThat(apiIncomeEvidence.getApiEvidenceType().getCode())
+                    .isEqualTo(evidenceDTO.getEvidenceTypeDTO().getEvidence());
+
+            softly.assertThat(apiIncomeEvidence.getApiEvidenceType().getDescription())
+                    .isEqualTo(evidenceDTO.getEvidenceTypeDTO().getDescription());
+
+            softly.assertThat(apiIncomeEvidence.getDateReceived())
+                    .isEqualTo(DateUtil.toLocalDateTime(evidenceDTO.getDateReceived()));
+
+            softly.assertThat(apiIncomeEvidence.getOtherText()).isNull();
+        };
+
+        // Method to find the corresponding ApiIncomeEvidence
+        Function<EvidenceDTO, ApiIncomeEvidence> findApiIncomeEvidence = evidenceDTO ->
+                incomeEvidence.stream()
+                        .filter(item -> item.getId().equals(evidenceDTO.getId().intValue()))
+                        .findFirst()
+                        .orElse(null);
+
+        applicantIncomeEvidenceList.forEach(evidenceDTO -> {
+            ApiIncomeEvidence apiIncomeEvidence = incomeEvidence
+                    .stream()
+                    .filter(item -> item.getId().equals(evidenceDTO.getId().intValue()))
+                    .findFirst().orElse(null);
+
+            softly.assertThat(apiIncomeEvidence.getApplicantId())
+                    .isEqualTo(applicationDTO.getApplicantDTO().getId().intValue());
+
+            assertCommonFields.accept(evidenceDTO, apiIncomeEvidence);
+        });
+
+        partnerIncomeEvidenceList.forEach(evidenceDTO -> {
+            ApiIncomeEvidence apiIncomeEvidence = incomeEvidence
+                    .stream()
+                    .filter(item -> item.getId().equals(evidenceDTO.getId().intValue()))
+                    .findFirst().orElse(null);
+
+            softly.assertThat(apiIncomeEvidence.getApplicantId())
+                    .isEqualTo(NumberUtils.toInteger(TestModelDataBuilder.PARTNER_ID));
+
+            assertCommonFields.accept(evidenceDTO, apiIncomeEvidence);
+        });
+
+        // Additional assertions for extra evidence list
+        extraEvidenceList.forEach(extraEvidenceDTO -> {
+            ApiIncomeEvidence apiIncomeEvidence = findApiIncomeEvidence.apply(extraEvidenceDTO);
+            assertCommonFields.accept(extraEvidenceDTO, apiIncomeEvidence);
+
+            softly.assertThat(apiIncomeEvidence.getMandatory())
+                    .isEqualTo("Y");
+
+            softly.assertThat(apiIncomeEvidence.getAdhoc())
+                    .isEqualTo(extraEvidenceDTO.getAdhoc());
+
+            softly.assertThat(apiIncomeEvidence.getOtherText())
+                    .isEqualTo(extraEvidenceDTO.getOtherText());
+        });
+    }
+
+    private void assertApiCreateMeansAssessmentRequestAttributes(WorkflowRequest workflowRequest,
+                                                                 ApiCreateMeansAssessmentRequest apiCreateMeansAssessmentRequest) {
         ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
         AssessmentDTO assessmentDTO = applicationDTO.getAssessmentDTO();
         FinancialAssessmentDTO financialAssessmentDTO = assessmentDTO.getFinancialAssessmentDTO();
@@ -162,23 +250,28 @@ class MeansAssessmentMapperTest {
     void givenValidMeansAssessmentResponse_whenMeansAssessmentMapperIsInvoked_thenPassportDTOIsClearedOut() {
         ApplicationDTO applicationDTO = getApplicationDTOForMeansAssessmentMapper(true);
         applicationDTO.setPassportedDTO(getPassportedDTO());
-        ApiMeansAssessmentResponse apiMeansAssessmentResponse = MeansAssessmentDataBuilder.getApiMeansAssessmentResponse();
+        ApiMeansAssessmentResponse apiMeansAssessmentResponse =
+                MeansAssessmentDataBuilder.getApiMeansAssessmentResponse();
         meansAssessmentMapper.meansAssessmentResponseToApplicationDto(
                 apiMeansAssessmentResponse,
-                applicationDTO);
+                applicationDTO
+        );
         assertThat(applicationDTO.getPassportedDTO())
                 .isEqualTo(PassportedDTO.builder().build());
     }
-        @Test
+
+    @Test
     void givenValidMeansAssessmentResponse_whenMeansAssessmentMapperIsInvokedForFullAssessment_thenMappingIsCorrect() {
         ApplicationDTO applicationDTO = getApplicationDTOForMeansAssessmentMapper(true);
         FinancialAssessmentDTO financialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO();
         FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
-        ApiMeansAssessmentResponse apiMeansAssessmentResponse = MeansAssessmentDataBuilder.getApiMeansAssessmentResponse();
+        ApiMeansAssessmentResponse apiMeansAssessmentResponse =
+                MeansAssessmentDataBuilder.getApiMeansAssessmentResponse();
 
         meansAssessmentMapper.meansAssessmentResponseToApplicationDto(
                 apiMeansAssessmentResponse,
-                applicationDTO);
+                applicationDTO
+        );
 
         softly.assertThat(applicationDTO.getRepId())
                 .isEqualTo(apiMeansAssessmentResponse.getRepId().intValue());
@@ -206,22 +299,26 @@ class MeansAssessmentMapperTest {
 
     @Test
     void givenValidMeansAssessmentResponse_whenMeansAssessmentMapperIsInvokedForInitialAssessment_thenMappingIsCorrect() {
-        ApiMeansAssessmentResponse apiMeansAssessmentResponse = MeansAssessmentDataBuilder.getApiMeansAssessmentResponse();
+        ApiMeansAssessmentResponse apiMeansAssessmentResponse =
+                MeansAssessmentDataBuilder.getApiMeansAssessmentResponse();
         ApplicationDTO applicationDTO = getApplicationDTOForMeansAssessmentMapper(false);
         FinancialAssessmentDTO financialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO();
         InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
         Collection<AssessmentSectionSummaryDTO> sectionSummaries = initialAssessmentDTO.getSectionSummaries();
         AssessmentSectionSummaryDTO assessmentSectionSummaryDTO = sectionSummaries.iterator().next();
-        List<ApiAssessmentSectionSummary> assessmentSectionSummaries = apiMeansAssessmentResponse.getAssessmentSectionSummary();
+        List<ApiAssessmentSectionSummary> assessmentSectionSummaries =
+                apiMeansAssessmentResponse.getAssessmentSectionSummary();
         ApiAssessmentSectionSummary assessmentSectionSummary = assessmentSectionSummaries.get(0);
         AssessmentDetailDTO assessmentDetail = assessmentSectionSummaryDTO.getAssessmentDetail().iterator().next();
         ApiAssessmentDetail apiAssessmentDetail = assessmentSectionSummary.getAssessmentDetails().get(0);
         ChildWeightingDTO childWeightingDTO = initialAssessmentDTO.getChildWeightings().iterator().next();
-        ApiAssessmentChildWeighting apiAssessmentChildWeighting = apiMeansAssessmentResponse.getChildWeightings().get(0);
+        ApiAssessmentChildWeighting apiAssessmentChildWeighting =
+                apiMeansAssessmentResponse.getChildWeightings().get(0);
 
         meansAssessmentMapper.meansAssessmentResponseToApplicationDto(
                 apiMeansAssessmentResponse,
-                applicationDTO);
+                applicationDTO
+        );
 
         softly.assertThat(applicationDTO.getRepId())
                 .isEqualTo(apiMeansAssessmentResponse.getRepId().intValue());
@@ -252,7 +349,7 @@ class MeansAssessmentMapperTest {
         softly.assertThat(initialAssessmentDTO.getReviewType().getCode())
                 .isEqualTo(apiMeansAssessmentResponse.getReviewType().getCode());
         softly.assertThat(sectionSummaries.size())
-                .isEqualTo(assessmentSectionSummaries.size() );
+                .isEqualTo(assessmentSectionSummaries.size());
         softly.assertThat(assessmentSectionSummaryDTO.getAnnualTotal())
                 .isEqualTo(assessmentSectionSummary.getAnnualTotal().doubleValue());
         softly.assertThat(assessmentSectionSummaryDTO.getApplicantAnnualTotal())
@@ -270,7 +367,8 @@ class MeansAssessmentMapperTest {
         ApiRollbackMeansAssessmentResponse apiRollbackMeansAssessmentResponse =
                 MeansAssessmentDataBuilder.getApiRollbackMeansAssessmentResponse(AssessmentType.INIT.getType());
         ApplicationDTO applicationDTO = getApplicationDTOForMeansAssessmentMapper(false);
-        InitialAssessmentDTO initialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
+        InitialAssessmentDTO initialAssessmentDTO =
+                applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
         meansAssessmentMapper.apiRollbackMeansAssessmentResponseToApplicationDto(
                 apiRollbackMeansAssessmentResponse, applicationDTO);
 
@@ -297,4 +395,5 @@ class MeansAssessmentMapperTest {
                 .isEqualTo(apiRollbackMeansAssessmentResponse.getFassFullStatus().getStatus());
         softly.assertThat(fullAssessmentDTO.getAssessmnentStatusDTO().getDescription())
                 .isEqualTo(apiRollbackMeansAssessmentResponse.getFassFullStatus().getDescription());
-    }}
+    }
+}

@@ -44,7 +44,9 @@ public class TestModelDataBuilder {
     public static final Integer REP_ID = 200;
     public static final Action TEST_ACTION = Action.CREATE_ASSESSMENT;
     public static final String RT_CODE_ER = "ER";
-    private static final Integer EVIDENCE_ID = 9552473;
+    private static final Integer APPLICANT_EVIDENCE_ID = 9552473;
+    private static final Integer PARTNER_EVIDENCE_ID = 9552474;
+    private static final Integer EXTRA_EVIDENCE_ID = 9552475;
     private static final String INCOME_EVIDENCE_DESCRIPTION = "Tax Return";
     private static final String INCOME_EVIDENCE = "TAX RETURN";
     private static final String EVIDENCE_FEE_LEVEL_1 = "LEVEL1";
@@ -111,6 +113,8 @@ public class TestModelDataBuilder {
     public static final String TEST_USER_SESSION = "sessionId_e5712593c198";
     private static final Integer TEST_RECORD_ID = 100;
     private static final LocalDateTime RESERVATION_DATE = LocalDateTime.of(2022, 12, 14, 0, 0, 0);
+    public static final LocalDateTime EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 11, 0, 0, 0);
+    public static final long PARTNER_ID = 1234L;
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
         return new ApiFindHardshipResponse()
@@ -549,7 +553,7 @@ public class TestModelDataBuilder {
     private static Collection<ApplicantLinkDTO> getApplicantLinks() {
         ApplicantDTO applicantDTO = getApplicantDTO();
         ApplicantDTO partner = getApplicantDTO();
-        partner.setId(1234L);
+        partner.setId(PARTNER_ID);
         return List.of(ApplicantLinkDTO.builder()
                         .partnerDTO(applicantDTO)
                         .unlinked(DATE_COMPLETED)
@@ -921,9 +925,9 @@ public class TestModelDataBuilder {
                 .upliftAppliedDate(toDate(LocalDateTime.of(2023, 11, 18, 0, 0, 0)))
                 .upliftRemovedDate(toDate(LocalDateTime.of(2023, 11, 18, 0, 0, 0)))
                 .incomeEvidenceNotes("Income Evidence Notes")
-                .applicantIncomeEvidenceList(List.of(getEvidenceDTO()))
-                .partnerIncomeEvidenceList(List.of(getEvidenceDTO()))
                 .extraEvidenceList(List.of(getExtraEvidenceDTO()))
+                .applicantIncomeEvidenceList(List.of(getEvidenceDTO(APPLICANT_EVIDENCE_ID)))
+                .partnerIncomeEvidenceList(List.of(getEvidenceDTO(PARTNER_EVIDENCE_ID)))
                 .evidenceReceivedDate(toDate(LocalDateTime.of(2023, 2, 18, 0, 0, 0)))
                 .evidenceDueDate(toDate(LocalDateTime.of(2023, 3, 18, 0, 0, 0)))
                 .upliftsAvailable(true)
@@ -932,19 +936,24 @@ public class TestModelDataBuilder {
 
     private static ExtraEvidenceDTO getExtraEvidenceDTO() {
         return ExtraEvidenceDTO.builder()
-                .adhoc("A")
+                .id(TestModelDataBuilder.EXTRA_EVIDENCE_ID.longValue())
                 .evidenceTypeDTO(getEvidenceTypeDTO())
-                .id(EVIDENCE_ID.longValue())
-                .dateReceived(toDate(LocalDateTime.of(2023, 11, 11, 0, 0, 0)))
+                .dateReceived(toDate(EVIDENCE_RECEIVED_DATE))
+                .otherDescription("OTHER DESCRIPTION")
+                .mandatory(true)
+                .adhoc("A")
                 .build();
     }
 
     private static EvidenceDTO getEvidenceDTO() {
+        return getEvidenceDTO(APPLICANT_EVIDENCE_ID);
+    }
+
+    private static EvidenceDTO getEvidenceDTO(Integer id) {
         return EvidenceDTO.builder()
-                .id(EVIDENCE_ID.longValue())
+                .id(id.longValue())
                 .evidenceTypeDTO(getEvidenceTypeDTO())
-                .dateReceived(toDate(LocalDateTime.of(2023, 11, 18, 0, 0, 0)))
-                .otherDescription("OTHER DESCRIPTION")
+                .dateReceived(toDate(EVIDENCE_RECEIVED_DATE))
                 .selected(true)
                 .build();
     }
