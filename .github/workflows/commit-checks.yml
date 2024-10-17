@@ -30,9 +30,9 @@ jobs:
           # not ideal as only gets the first 100 commits (in case there are more)
           echo "Keywords: $KEYWORDS"
           commits=$(gh pr view --json commits --jq '.commits[].messageHeadline | select(test(env.KEYWORDS; "i"))')
-          echo $commits
+          echo "Commit messages: $commits"
           
-          if [[ ! -n "$commits" ]]; then
+          if [[! -n "$commits"]]; then
             echo 'Found commits with the keyword "forgot"'
             echo "Please fix-up your PR to make commits more meaningful."
             exit 1
