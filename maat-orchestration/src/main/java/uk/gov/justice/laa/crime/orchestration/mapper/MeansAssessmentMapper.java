@@ -160,8 +160,7 @@ public class MeansAssessmentMapper {
                 .withId(NumberUtils.toInteger(evidenceItem.getId()))
                 .withDateReceived(DateUtil.toLocalDateTime(evidenceItem.getDateReceived()))
                 .withApiEvidenceType(new ApiEvidenceType(evidenceType.getName(), evidenceType.getDescription()))
-                .withApplicantId(applicantId)
-                .withOtherText(evidenceItem.getOtherDescription());
+                .withApplicantId(applicantId);
     }
 
     private ApiIncomeEvidence mapToExtraApiIncomeEvidence(ExtraEvidenceDTO evidenceItem, ApplicationDTO applicationDTO, Integer partnerId) {
