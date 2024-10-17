@@ -46,6 +46,7 @@ jobs:
           exit 0
       - name: Commit message check
         env:
+          GH_TOKEN: ${{ github.token }}
           KEYWORDS: forgot|tidy|schema
         run: |
           # Caveat that this only checks the commits in the current push
