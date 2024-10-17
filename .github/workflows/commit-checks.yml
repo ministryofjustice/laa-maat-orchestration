@@ -19,7 +19,7 @@ jobs:
       - name: Commit message check
         env:
           GH_TOKEN: ${{ github.token }}
-          KEYWORDS: forgot|tidy|schema
+          KEYWORDS: forgot|tidy
         run: |
           # Caveat that this only checks the commits in the current push
           # Do not have access to anything else via the GitHub event
@@ -27,14 +27,13 @@ jobs:
           echo "SHA: ${{ github.event.ref }}"
           echo "Modified: ${{ github.event.head_commit.timestamp }}"
           
-          # not ideal as only gets the first 100 commits (in case there are more)
+          # Only gets the first 100 commits without pagination, probably reasonable for most PRs.
           echo "Keywords: $KEYWORDS"
           commits=$(gh pr view --json commits --jq '.commits[].messageHeadline | select(test(env.KEYWORDS; "i"))')
           echo "Commit messages: $commits"
           
           if [ ! -z "${commits}" ]; then
-            echo 'Found commits with the keyword "forgot"'
-            echo "Please fix-up your PR to make commits more meaningful."
+            echo "Please fix-up your commit history to remove temporary commits."
             exit 1
           fi
           
