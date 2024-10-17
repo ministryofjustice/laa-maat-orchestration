@@ -45,37 +45,6 @@ jobs:
 
           exit 0
 
-      - name: Get PR fetch depth
-        run: echo "PR_FETCH_DEPTH=$(( ${{ github.event.pull_request.commits }} + 1 ))" >> "${GITHUB_ENV}"
-
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: $PR_FETCH_DEPTH
-
-      - name: Commit message check
-        env:
-          GH_TOKEN: ${{ github.token }}
-          KEYWORDS: forgot|tidy|schema
-        run: |
-          # Caveat that this only checks the commits in the current push
-          # Do not have access to anything else via the GitHub event
-          # Perhaps instead we should do a git log and a grep to search all commits.
-          echo "SHA: ${{ github.event.ref }}"
-          echo "Modified: ${{ github.event.head_commit.timestamp }}"
-          
-          # not ideal as only gets the first 100 commits (in case there are more)
-          commits=$(gh pr view --json commits --jq '.commits[].messageHeadline | select(test(env.KEYWORDS; "i"))')
-          echo $commits
-          
-          if [[ ! -n "$commits" ]]; then
-            echo 'Found commits with the keyword "forgot"'
-            echo "Please fix-up your PR to make commits more meaningful."
-            exit 1
-          fi
-          
-          exit 0
-
   run-tests:
     runs-on: ubuntu-latest
     steps:
