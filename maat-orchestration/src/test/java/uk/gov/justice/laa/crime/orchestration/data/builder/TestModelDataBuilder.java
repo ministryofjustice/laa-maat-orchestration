@@ -299,7 +299,7 @@ public class TestModelDataBuilder {
 
     public static ApiCapitalEvidence getApiCapitalEvidence() {
         return new ApiCapitalEvidence().withEvidenceType(INCOME_EVIDENCE)
-                .withDateReceived(LocalDateTime.of(2023, 11, 18, 0, 0, 0));
+                .withDateReceived(EVIDENCE_RECEIVED_DATE);
     }
 
 
