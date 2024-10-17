@@ -44,6 +44,15 @@ jobs:
           fi
 
           exit 0
+
+      - name: Get PR fetch depth
+        run: echo "PR_FETCH_DEPTH=$(( ${{ github.event.pull_request.commits }} + 1 ))" >> "${GITHUB_ENV}"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: $PR_FETCH_DEPTH
+
       - name: Commit message check
         env:
           GH_TOKEN: ${{ github.token }}
