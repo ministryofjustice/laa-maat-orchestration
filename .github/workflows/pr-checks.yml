@@ -55,7 +55,7 @@ jobs:
           echo "Modified: ${{ github.event.head_commit.timestamp }}"
           
           # not ideal as only gets the first 100 commits (in case there are more)
-          commits=$(gh pr view --json commits --jq '.commits[].messageHeadline | select(test(env.KEYWORDS; "i")))
+          commits=$(gh pr view --json commits --jq '.commits[].messageHeadline | select(test(env.KEYWORDS; "i"))'
           echo $commits
           
           if [[ ! -n "$commits" ]]; then
