@@ -24,6 +24,7 @@ jobs:
           shopt -s nocasematch
           
           if [[ $messages == *"forgot"* ]]; then
+            echo 'Found commits with the keyword "forgot"'
             echo "Please fix-up your PR to make commits more meaningful."
             exit 1
           fi
