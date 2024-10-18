@@ -1,0 +1,65 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  run-pr-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: PR description check
+        env:
+          DESCRIPTION: ${{ github.event.pull_request.body }}
+        run: |
+          echo $DESCRIPTION
+          
+          if [[ $DESCRIPTION == *"Describe what you did and why"* ]]; then
+            echo "Please add a meaningful description to your PR."
+            exit 1
+          fi
+          
+          exit 0
+      - name: PR commit count check
+        env:
+          COMMIT_COUNT: ${{ github.event.pull_request.commits }}
+        run: |
+          commit_limit=200
+
+          if (( $COMMIT_COUNT > $commit_limit )); then
+            echo "You have exceeded the recommended limit of $commit_limit commits in this PR. Please fix-up your commits to make them more individually meaningful."
+            exit 1
+          fi
+
+          exit 0
+      - name: Jira link check
+        env:
+          DESCRIPTION: ${{ github.event.pull_request.body }}
+        run: |
+          echo $DESCRIPTION
+
+          if [[ $DESCRIPTION == *"https://dsdmoj.atlassian.net/browse/LCAM-XXX"* ]]; then
+            echo "Please update the Jira link to point to the corresponding work item(s)."
+            exit 1
+          fi
+
+          exit 0
+
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set-up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set-up Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Run Tests
+        run: ./gradlew test
+        working-directory: ./maat-orchestration
