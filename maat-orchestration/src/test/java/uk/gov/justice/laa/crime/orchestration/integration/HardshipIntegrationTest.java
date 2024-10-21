@@ -290,7 +290,7 @@ class HardshipIntegrationTest {
         if (CourtType.CROWN_COURT.equals(courtType)) {
             // TODO: Uncomment this assertion for application tracking before activating hardship orchestration
             // assertStubForHandleEformSerivce(1);
-            assertStubForInvokeStoredProcedure(3);
+            assertStubForInvokeStoredProcedure(4);
         } else {
             assertStubForCheckContributionsRule(1);
             assertStubForInvokeStoredProcedure(2);
