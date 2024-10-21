@@ -151,6 +151,11 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
      * application.update_cc_application(p_application_object => p_application_object);
      */
     private ApplicationDTO checkActionsAndUpdateApplication(WorkflowRequest request, RepOrderDTO repOrderDTO) {
+
+        request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                request.getApplicationDTO(), request.getUserDTO(), StoredProcedure.UPDATE_DBMS_TRANSACTION_ID
+        ));
+
         request.setApplicationDTO(contributionService.calculate(request));
 
         // call application.pre_update_cc_application stored procedure
@@ -169,6 +174,8 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                 request.getApplicationDTO(), request.getUserDTO(),
                 StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE
         ));
+
+        request.getApplicationDTO().setTransactionId(null);
 
         return request.getApplicationDTO();
     }

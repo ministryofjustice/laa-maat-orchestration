@@ -491,8 +491,6 @@ class HardshipOrchestrationServiceTest {
 
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship()
                 .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
-        when(contributionService.calculate(workflowRequest))
-                .thenReturn(applicationDTO);
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
                 any(StoredProcedure.class)
         ))
