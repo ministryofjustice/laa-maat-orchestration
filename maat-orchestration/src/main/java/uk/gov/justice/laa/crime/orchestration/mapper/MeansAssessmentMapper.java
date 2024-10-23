@@ -518,6 +518,13 @@ public class MeansAssessmentMapper {
         } else {
             mapInitialAssessmentDTO(financialAssessmentDTO.getInitial(), apiResponse);
             financialAssessmentDTO.setFullAvailable(apiResponse.getFullAssessmentAvailable());
+
+            // Temp fix, wipe the income evidence before progressing until we can populate from means assessment response
+            IncomeEvidenceSummaryDTO incomeEvidence =
+                    applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence();
+            incomeEvidence.getExtraEvidenceList().clear();
+            incomeEvidence.getApplicantIncomeEvidenceList().clear();
+            incomeEvidence.getPartnerIncomeEvidenceList().clear();
         }
     }
 

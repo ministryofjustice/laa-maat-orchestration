@@ -315,6 +315,10 @@ class MeansAssessmentMapperTest {
         ApiAssessmentChildWeighting apiAssessmentChildWeighting =
                 apiMeansAssessmentResponse.getChildWeightings().get(0);
 
+        IncomeEvidenceSummaryDTO incomeEvidence =
+                applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence();
+        incomeEvidence.getApplicantIncomeEvidenceList().add(new EvidenceDTO());
+
         meansAssessmentMapper.meansAssessmentResponseToApplicationDto(
                 apiMeansAssessmentResponse,
                 applicationDTO
@@ -360,6 +364,11 @@ class MeansAssessmentMapperTest {
                 .isEqualTo(apiAssessmentDetail.getId().longValue());
         softly.assertThat(childWeightingDTO.getId())
                 .isEqualTo(apiAssessmentChildWeighting.getId().intValue());
+
+        // Check that income evidence records are cleared - this will be populated during post-processing
+        softly.assertThat(incomeEvidence.getExtraEvidenceList()).isEmpty();
+        softly.assertThat(incomeEvidence.getPartnerIncomeEvidenceList()).isEmpty();
+        softly.assertThat(incomeEvidence.getApplicantIncomeEvidenceList()).isEmpty();
     }
 
     @Test

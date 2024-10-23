@@ -1112,6 +1112,7 @@ public class TestModelDataBuilder {
         AssessmentDTO assessmentDTO = new AssessmentDTO();
         FinancialAssessmentDTO financialAssessmentDTO = getFinancialAssessmentDTOForMeansAssessmentMapper(isFullAssessmentAvailable);
         assessmentDTO.setFinancialAssessmentDTO(financialAssessmentDTO);
+        assessmentDTO.getFinancialAssessmentDTO().setIncomeEvidence(new IncomeEvidenceSummaryDTO());
         applicationDTO.setAssessmentDTO(assessmentDTO);
         return applicationDTO;
     }
