@@ -26,7 +26,7 @@ public class ProceedingsApiService {
     private static final String REQUEST_STRING = "Request to Proceedings Service: {}";
 
     public ApiUpdateApplicationResponse updateApplication(ApiUpdateApplicationRequest request) {
-        log.info(REQUEST_STRING, request);
+        log.debug(REQUEST_STRING, request);
         ApiUpdateApplicationResponse response = crownCourtApiClient.put(
                 request,
                 new ParameterizedTypeReference<>() {
@@ -35,12 +35,12 @@ public class ProceedingsApiService {
                 Collections.emptyMap()
         );
 
-        log.info(RESPONSE_STRING, response);
+        log.debug(RESPONSE_STRING, response);
         return response;
     }
 
     public ApiUpdateCrownCourtOutcomeResponse updateCrownCourt(ApiUpdateApplicationRequest request) {
-        log.info(REQUEST_STRING, request);
+        log.debug(REQUEST_STRING, request);
         ApiUpdateCrownCourtOutcomeResponse response = crownCourtApiClient.put(
                 request,
                 new ParameterizedTypeReference<>() {
@@ -49,7 +49,7 @@ public class ProceedingsApiService {
                 Collections.emptyMap()
         );
 
-        log.info(RESPONSE_STRING, response);
+        log.debug(RESPONSE_STRING, response);
         return response;
     }
 }

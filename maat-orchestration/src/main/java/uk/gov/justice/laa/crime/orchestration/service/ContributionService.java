@@ -7,13 +7,17 @@ import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContri
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.InitAssessmentResult;
-import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
+import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CaseDetailDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.ContributionMapper;
-
 import uk.gov.justice.laa.crime.orchestration.service.api.ContributionApiService;
 
 import java.util.List;
@@ -30,16 +34,16 @@ public class ContributionService {
     private final MaatCourtDataService maatCourtDataService;
 
     public ApplicationDTO calculate(WorkflowRequest request) {
-        log.info("start ContributionService.calculate --->");
+
         ApplicationDTO application = request.getApplicationDTO();
         if (isRecalculationRequired(application)) {
-            log.info("---isRecalculationRequired() --->");
+
             ApiMaatCalculateContributionRequest calculateContributionRequest =
                     contributionMapper.workflowRequestToMaatCalculateContributionRequest(request);
-            log.info("..Before Calling ContributionService.calculate()..");
+
             ApiMaatCalculateContributionResponse calculateContributionResponse =
                     contributionApiService.calculate(calculateContributionRequest);
-            log.info("calculateContributionResponse --->" +calculateContributionResponse);
+
             if (calculateContributionResponse != null && null != calculateContributionResponse.getContributionId()) {
                 if (calculateContributionResponse.getContributionId() != null) {
                     application.getCrownCourtOverviewDTO().setContribution(
@@ -47,7 +51,7 @@ public class ContributionService {
                                     calculateContributionResponse)
                     );
                 }
-                log.info("ProcessActivity --->" + calculateContributionResponse.getProcessActivity());
+
                 if (Boolean.TRUE.equals(calculateContributionResponse.getProcessActivity())) {
                     // invoke MATRIX stored procedure
                     application = maatCourtDataService.invokeStoredProcedure(
@@ -61,7 +65,7 @@ public class ContributionService {
                 );
             }
         }
-        log.info("End ContributionService.calculate --->");
+
         return application;
     }
 

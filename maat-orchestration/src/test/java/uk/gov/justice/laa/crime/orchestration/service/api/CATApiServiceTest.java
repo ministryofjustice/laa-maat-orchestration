@@ -6,12 +6,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.common.model.orchestration.application_tracking.ApiCrimeApplicationTrackingRequest;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.MockServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith({MockitoExtension.class})
@@ -29,8 +31,8 @@ class CATApiServiceTest {
 
     @Test
     void givenValidRequest_whenHandleEformResultIsInvoked_thenApplicationTrackingServiceIsCalled() {
-        catApiService.handleEformResult(new ApiCrimeApplicationTrackingRequest());
-        verify(catApiClient).post(any(ApiCrimeApplicationTrackingRequest.class), any(), anyString(), anyMap());
+        catApiService.handleEformResult(new ApplicationTrackingOutputResult());
+        verify(catApiClient).post(any(ApplicationTrackingOutputResult.class), any(), anyString(), anyMap());
     }
 
 }

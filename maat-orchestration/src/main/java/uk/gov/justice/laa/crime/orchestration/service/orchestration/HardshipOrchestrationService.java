@@ -5,8 +5,8 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.common.model.orchestration.application_tracking.ApiCrimeApplicationTrackingRequest;
-import uk.gov.justice.laa.crime.common.model.orchestration.hardship.ApiPerformHardshipResponse;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
+import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -14,8 +14,8 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.enums.Action;
-import uk.gov.justice.laa.crime.orchestration.enums.StoredProcedure;
+import uk.gov.justice.laa.crime.enums.orchestration.Action;
+import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
@@ -84,8 +84,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
 
     private RepOrderDTO getRepOrderDTO(WorkflowRequest request) {
         int repId = request.getApplicationDTO().getRepId().intValue();
-        RepOrderDTO repOrderDTO = maatCourtDataService.findRepOrder(repId);
-        return repOrderDTO;
+        return maatCourtDataService.findRepOrder(repId);
     }
 
     public ApplicationDTO update(WorkflowRequest request) {
@@ -165,9 +164,9 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
 
         proceedingsService.updateApplication(request);
         // Call application.handle_eform_result stored procedure OR Equivalent ATS service endpoint
-        ApiCrimeApplicationTrackingRequest apiCrimeApplicationTrackingRequest = applicationTrackingMapper.build(request, repOrderDTO);
-        if (null != apiCrimeApplicationTrackingRequest.getUsn()) {
-            catDataService.handleEformResult(apiCrimeApplicationTrackingRequest);
+        ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(request, repOrderDTO);
+        if (null != applicationTrackingOutputResult.getUsn()) {
+            catDataService.handleEformResult(applicationTrackingOutputResult);
         }
         // Call crown_court.xx_process_activity_and_get_correspondence stored procedure
         request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(

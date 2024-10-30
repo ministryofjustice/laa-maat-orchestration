@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.justice.laa.crime.commons.exception.APIClientException;
+import uk.gov.justice.laa.crime.commons.tracing.TraceIdHandler;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
@@ -44,6 +45,9 @@ class MeansAssessmentControllerTest {
 
     @MockBean
     private MeansAssessmentOrchestrationService orchestrationService;
+
+    @MockBean
+    private TraceIdHandler traceIdHandler;
 
     @Test
     void givenValidRequest_whenFindIsInvoked_thenOkResponseIsReturned() throws Exception {

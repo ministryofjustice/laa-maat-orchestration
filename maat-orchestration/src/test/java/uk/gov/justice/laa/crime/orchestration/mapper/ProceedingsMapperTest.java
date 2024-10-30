@@ -9,7 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
-import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiUserSession;
+import uk.gov.justice.laa.crime.common.model.common.ApiUserSession;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
@@ -44,10 +44,10 @@ class ProceedingsMapperTest {
 
     @Test
     void whenWorkflowRequestToUpdateApplicationRequestIsInvoked() {
-        ApiUserSession userSession = TestModelDataBuilder.getProceedingApiUserSession();
+        ApiUserSession userSession = TestModelDataBuilder.getApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
 
-        when(userMapper.userDtoToProceedingUserSession(any(UserDTO.class)))
+        when(userMapper.userDtoToUserSession(any(UserDTO.class)))
                 .thenReturn(userSession);
 
         ApiUpdateApplicationRequest expectedApplicationRequest = TestModelDataBuilder.getUpdateApplicationRequest();
@@ -57,16 +57,14 @@ class ProceedingsMapperTest {
         softly.assertThat(actualApplicationRequest)
                 .usingRecursiveComparison()
                 .isEqualTo(expectedApplicationRequest);
-
-
     }
 
     @Test
     void whenWorkflowRequestToUpdateApplicationRequestIsInvokedWithNullFields() {
-        ApiUserSession userSession = TestModelDataBuilder.getProceedingApiUserSession();
+        ApiUserSession userSession = TestModelDataBuilder.getApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
 
-        when(userMapper.userDtoToProceedingUserSession(any(UserDTO.class)))
+        when(userMapper.userDtoToUserSession(any(UserDTO.class)))
                 .thenReturn(userSession);
 
         ApiUpdateApplicationRequest expectedApplicationRequest = TestModelDataBuilder.getUpdateApplicationRequest();
