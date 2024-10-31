@@ -2,13 +2,9 @@ package uk.gov.justice.laa.crime.orchestration.data.builder;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.common.model.orchestration.court_data_api.hardship.ApiHardshipDetail;
-import uk.gov.justice.laa.crime.common.model.orchestration.court_data_api.hardship.ApiHardshipProgress;
-import uk.gov.justice.laa.crime.common.model.orchestration.crown_court.ApiIOJAppeal;
-import uk.gov.justice.laa.crime.common.model.orchestration.hardship.*;
+import uk.gov.justice.laa.crime.common.model.hardship.*;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCapitalEvidence;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiIOJSummary;
@@ -16,6 +12,7 @@ import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiRepOrderCrownC
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.*;
+import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
@@ -26,16 +23,31 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RoleDataItemDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.enums.Action;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.*;
-import java.util.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.*;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.CRITERIA_DETAIL_ID;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.SECTION;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.TOTAL_AGGREGATED_INCOME;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.getReviewTypeDTO;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.getSectionSummaryDTO;
 import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
 import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
 
@@ -220,7 +232,7 @@ public class TestModelDataBuilder {
                 .withApplicantHistoryId(APPLICANT_HISTORY_ID)
                 .withCrownRepId(REP_ID)
                 .withIsImprisoned(Boolean.TRUE)
-                .withUserSession(getProceedingApiUserSession())
+                .withUserSession(getApiUserSession())
                 .withRepId(REP_ID)
                 .withCaseType(CaseType.EITHER_WAY)
                 .withMagCourtOutcome(MagCourtOutcome.SENT_FOR_TRIAL)
@@ -254,20 +266,6 @@ public class TestModelDataBuilder {
         return new ApiRepOrderCrownCourtOutcome()
                 .withOutcome(CrownCourtOutcome.CONVICTED)
                 .withOutcomeDate(SENTENCE_ORDER_DATETIME);
-    }
-
-    public static ApiCrownCourtOutcome getApiCrownCourtOutcome(CrownCourtOutcome crownCourtOutcome) {
-        return new ApiCrownCourtOutcome()
-                .withDateSet(SENTENCE_ORDER_DATETIME)
-                .withDescription(crownCourtOutcome.getDescription())
-                .withOutcomeType(crownCourtOutcome.getType())
-                .withOutcome(crownCourtOutcome);
-    }
-
-    public static ApiIOJAppeal getApiIOJAppeal() {
-        return new ApiIOJAppeal()
-                .withIojResult(RESULT_PASS)
-                .withDecisionResult(RESULT_PASS);
     }
 
     public static ApiIOJSummary getApiIOJSummary() {
@@ -305,12 +303,6 @@ public class TestModelDataBuilder {
 
     public static uk.gov.justice.laa.crime.common.model.common.ApiUserSession getApiUserSession() {
         return new uk.gov.justice.laa.crime.common.model.common.ApiUserSession()
-                .withUserName(Constants.USERNAME)
-                .withSessionId(USER_SESSION);
-    }
-
-    public static uk.gov.justice.laa.crime.common.model.proceeding.common.ApiUserSession getProceedingApiUserSession() {
-        return new uk.gov.justice.laa.crime.common.model.proceeding.common.ApiUserSession()
                 .withUserName(Constants.USERNAME)
                 .withSessionId(USER_SESSION);
     }

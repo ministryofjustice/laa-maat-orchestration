@@ -11,10 +11,4 @@ public class UserMapper {
                 .withUserName(user.getUserName())
                 .withSessionId(user.getUserSession());
     }
-
-    public uk.gov.justice.laa.crime.common.model.proceeding.common.ApiUserSession userDtoToProceedingUserSession(UserDTO user) {
-        return new uk.gov.justice.laa.crime.common.model.proceeding.common.ApiUserSession()
-                .withUserName(user.getUserName())
-                .withSessionId(user.getUserSession());
-    }
 }

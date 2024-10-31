@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.common.model.orchestration.hardship.ApiFindHardshipResponse;
-import uk.gov.justice.laa.crime.common.model.orchestration.hardship.ApiPerformHardshipRequest;
-import uk.gov.justice.laa.crime.common.model.orchestration.hardship.ApiPerformHardshipResponse;
+import uk.gov.justice.laa.crime.common.model.hardship.ApiFindHardshipResponse;
+import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipRequest;
+import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 
@@ -34,12 +34,12 @@ public class HardshipApiService {
                 hardshipReviewId
         );
 
-        log.info(RESPONSE_STRING, response);
+        log.debug(RESPONSE_STRING, response);
         return response;
     }
 
     public ApiPerformHardshipResponse create(ApiPerformHardshipRequest request) {
-        log.info(REQUEST_STRING, request);
+        log.debug(REQUEST_STRING, request);
         ApiPerformHardshipResponse response = hardshipApiClient.post(
                 request,
                 new ParameterizedTypeReference<>() {
@@ -48,12 +48,12 @@ public class HardshipApiService {
                 Collections.emptyMap()
         );
 
-        log.info(RESPONSE_STRING, response);
+        log.debug(RESPONSE_STRING, response);
         return response;
     }
 
     public ApiPerformHardshipResponse update(ApiPerformHardshipRequest request) {
-        log.info(REQUEST_STRING, request);
+        log.debug(REQUEST_STRING, request);
         ApiPerformHardshipResponse response = hardshipApiClient.put(
                 request,
                 new ParameterizedTypeReference<>() {
@@ -62,7 +62,7 @@ public class HardshipApiService {
                 Collections.emptyMap()
         );
 
-        log.info(RESPONSE_STRING, response);
+        log.debug(RESPONSE_STRING, response);
         return response;
     }
 

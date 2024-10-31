@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.common.model.orchestration.application_tracking.ApiCrimeApplicationTrackingRequest;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.orchestration.service.api.CATApiService;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -22,8 +22,8 @@ class CATDataServiceTest {
 
     @Test
     void givenAValidInput_whenHandleEformResultIsInvoked_thenCATServiceIsCalled() {
-        catDataService.handleEformResult(new ApiCrimeApplicationTrackingRequest());
-        verify(catApiService).handleEformResult(any(ApiCrimeApplicationTrackingRequest.class));
+        catDataService.handleEformResult(new ApplicationTrackingOutputResult());
+        verify(catApiService).handleEformResult(any(ApplicationTrackingOutputResult.class));
     }
 
 }

@@ -29,7 +29,7 @@ public class MaatCourtDataApiService {
     private final ServicesConfiguration configuration;
 
     public ApplicationDTO executeStoredProcedure(StoredProcedureRequest request) {
-        log.info(REQUEST_STRING, request);
+        log.debug(REQUEST_STRING, request);
         ApplicationDTO response = maatApiClient.post(
                 request,
                 new ParameterizedTypeReference<>() {
@@ -37,7 +37,7 @@ public class MaatCourtDataApiService {
                 configuration.getMaatApi().getEndpoints().getCallStoredProcUrl(),
                 Collections.emptyMap()
         );
-        log.info(RESPONSE_STRING, response);
+        log.debug(RESPONSE_STRING, response);
         return response;
     }
 
@@ -49,7 +49,7 @@ public class MaatCourtDataApiService {
                 configuration.getMaatApi().getEndpoints().getRepOrderUrl(),
                 repId
         );
-        log.info(RESPONSE_STRING, response);
+        log.debug(RESPONSE_STRING, response);
         return response;
     }
 
@@ -62,19 +62,19 @@ public class MaatCourtDataApiService {
                 username
         );
 
-        log.info(RESPONSE_STRING, userSummaryDTO);
+        log.debug(RESPONSE_STRING, userSummaryDTO);
         return userSummaryDTO;
     }
 
     public RepOrderDTO updateSendToCCLF(SendToCCLFDTO sendToCCLFDTO) {
-        log.info(REQUEST_STRING, sendToCCLFDTO);
+        log.debug(REQUEST_STRING, sendToCCLFDTO);
         RepOrderDTO response = maatApiClient.put(sendToCCLFDTO,
                 new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getEndpoints().getUpdateSendToCCLFUrl(),
                 Map.of()
         );
-        log.info(RESPONSE_STRING, response);
+        log.debug(RESPONSE_STRING, response);
         return response;
     }
 
@@ -86,7 +86,7 @@ public class MaatCourtDataApiService {
                 configuration.getMaatApi().getEndpoints().getGetAssessmentUrl(),
                 financialAssessmentId
         );
-        log.info(RESPONSE_STRING, financialAssessmentDTO);
+        log.debug(RESPONSE_STRING, financialAssessmentDTO);
         return financialAssessmentDTO;
     }
 

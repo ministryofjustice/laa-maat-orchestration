@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.common.model.orchestration.application_tracking.ApiCrimeApplicationTrackingRequest;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 
@@ -21,8 +21,8 @@ public class CATApiService {
     private final RestAPIClient catApiClient;
     private final ServicesConfiguration configuration;
 
-    public void handleEformResult(ApiCrimeApplicationTrackingRequest request) {
-        log.info(REQUEST_STRING, request);
+    public void handleEformResult(ApplicationTrackingOutputResult request) {
+        log.debug(REQUEST_STRING, request);
         catApiClient.post(
                 request,
                 new ParameterizedTypeReference<>() {

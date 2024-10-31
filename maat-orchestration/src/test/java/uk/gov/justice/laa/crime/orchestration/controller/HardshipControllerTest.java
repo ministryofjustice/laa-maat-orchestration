@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.justice.laa.crime.commons.exception.APIClientException;
+import uk.gov.justice.laa.crime.commons.tracing.TraceIdHandler;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
@@ -41,6 +42,9 @@ class HardshipControllerTest {
 
     @MockBean
     private HardshipOrchestrationService orchestrationService;
+
+    @MockBean
+    private TraceIdHandler traceIdHandler;
 
     private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/hardship";
 
