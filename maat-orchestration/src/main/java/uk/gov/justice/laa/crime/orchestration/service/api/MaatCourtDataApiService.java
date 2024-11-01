@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
@@ -91,9 +92,9 @@ public class MaatCourtDataApiService {
         return financialAssessmentDTO;
     }
 
-    public FinancialAssessmentDTO updateFinancialAssessment(MaatApiUpdateAssessment maatApiUpdateAssessment) {
+    public MaatApiAssessmentResponse updateFinancialAssessment(MaatApiUpdateAssessment maatApiUpdateAssessment) {
         log.info(REQUEST_STRING, maatApiUpdateAssessment);
-        FinancialAssessmentDTO financialAssessmentDTO = maatApiClient.put(
+        MaatApiAssessmentResponse financialAssessmentDTO = maatApiClient.put(
                 maatApiUpdateAssessment,
                 new ParameterizedTypeReference<>() {},
                 configuration.getMaatApi().getEndpoints().getFinancialAssessmentUrl(),
