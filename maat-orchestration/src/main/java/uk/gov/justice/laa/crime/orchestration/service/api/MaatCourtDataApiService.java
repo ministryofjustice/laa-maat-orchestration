@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
@@ -83,16 +84,23 @@ public class MaatCourtDataApiService {
         FinancialAssessmentDTO financialAssessmentDTO = maatApiClient.get(
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getMaatApi().getEndpoints().getGetAssessmentUrl(),
+                configuration.getMaatApi().getEndpoints().getFinancialAssessmentUrl(),
                 financialAssessmentId
         );
         log.debug(RESPONSE_STRING, financialAssessmentDTO);
         return financialAssessmentDTO;
     }
 
-    // TODO: Complete the update financial assessment via maat api method
-    public ??? updateFinancialAssessment() {
-
+    public FinancialAssessmentDTO updateFinancialAssessment(MaatApiUpdateAssessment maatApiUpdateAssessment) {
+        log.info(REQUEST_STRING, maatApiUpdateAssessment);
+        FinancialAssessmentDTO financialAssessmentDTO = maatApiClient.put(
+                maatApiUpdateAssessment,
+                new ParameterizedTypeReference<>() {},
+                configuration.getMaatApi().getEndpoints().getFinancialAssessmentUrl(),
+                Map.of()
+        );
+        log.debug(RESPONSE_STRING, financialAssessmentDTO);
+        return financialAssessmentDTO;
     }
 
 }

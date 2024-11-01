@@ -163,7 +163,7 @@ public class ServicesConfiguration {
             @NotNull
             private String updateSendToCCLFUrl;
             @NotNull
-            private String getAssessmentUrl;
+            private String financialAssessmentUrl;
         }
 
         @Data

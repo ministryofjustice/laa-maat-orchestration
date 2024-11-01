@@ -23,15 +23,15 @@ public class EvidenceApiService {
     private final RestAPIClient evidenceApiClient;
     private final ServicesConfiguration configuration;
 
-    public ApiCreateIncomeEvidenceResponse createEvidence(ApiCreateIncomeEvidenceRequest request) {
-        log.info(REQUEST_STRING, request);
-        ApiCreateIncomeEvidenceResponse response = evidenceApiClient.post(
-                request,
+    public ApiCreateIncomeEvidenceResponse createEvidence(ApiCreateIncomeEvidenceRequest apiCreateIncomeEvidenceRequest) {
+        log.info(REQUEST_STRING, apiCreateIncomeEvidenceRequest);
+        ApiCreateIncomeEvidenceResponse apiCreateIncomeEvidenceResponse = evidenceApiClient.post(
+                apiCreateIncomeEvidenceRequest,
                 new ParameterizedTypeReference<>() {},
                 configuration.getEvidenceApi().getEndpoints().getIncomeEvidenceUrl(),
                 Map.of()
         );
-        log.debug(RESPONSE_STRING, response);
-        return response;
+        log.debug(RESPONSE_STRING, apiCreateIncomeEvidenceResponse);
+        return apiCreateIncomeEvidenceResponse;
     }
 }

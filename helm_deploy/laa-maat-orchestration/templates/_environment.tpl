@@ -120,11 +120,11 @@ env:
   - name: EVIDENCE_API_OAUTH_CLIENT_ID
     valueFrom:
         secretKeyRef:
-            name: evidence-oauth-client-id
+            name: evidence-api-oauth-client-id
             key: EVIDENCE_API_OAUTH_CLIENT_ID
   - name: EVIDENCE_API_OAUTH_CLIENT_SECRET
     valueFrom:
         secretKeyRef:
-            name: evidence-oauth-client-secret
+            name: evidence-api-oauth-client-secret
             key: EVIDENCE_API_OAUTH_CLIENT_SECRET
 {{- end -}}
