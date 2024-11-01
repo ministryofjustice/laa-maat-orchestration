@@ -90,4 +90,9 @@ public class MaatCourtDataApiService {
         return financialAssessmentDTO;
     }
 
+    // TODO: Complete the update financial assessment via maat api method
+    public ??? updateFinancialAssessment() {
+
+    }
+
 }

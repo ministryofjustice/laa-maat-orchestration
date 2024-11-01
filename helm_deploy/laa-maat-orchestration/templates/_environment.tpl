@@ -117,4 +117,14 @@ env:
         secretKeyRef:
             name: cat-api-oauth-client-secret
             key: CAT_API_OAUTH_CLIENT_SECRET
+  - name: EVIDENCE_API_OAUTH_CLIENT_ID
+    valueFrom:
+        secretKeyRef:
+            name: evidence-oauth-client-id
+            key: EVIDENCE_API_OAUTH_CLIENT_ID
+  - name: EVIDENCE_API_OAUTH_CLIENT_SECRET
+    valueFrom:
+        secretKeyRef:
+            name: evidence-oauth-client-secret
+            key: EVIDENCE_API_OAUTH_CLIENT_SECRET
 {{- end -}}

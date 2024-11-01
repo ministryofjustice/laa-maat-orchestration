@@ -30,6 +30,9 @@ public class ServicesConfiguration {
     @NotNull
     private CATApi catApi;
 
+    @NotNull
+    private EvidenceApi evidenceApi;
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -191,6 +194,27 @@ public class ServicesConfiguration {
             @NotNull
             private String handleEformUrl;
 
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class EvidenceApi {
+
+        @NotNull
+        private String baseUrl;
+
+        @NotNull
+        private Endpoints endpoints;
+
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Endpoints {
+
+            @NotNull
+            private String incomeEvidenceUrl;
         }
     }
 }
