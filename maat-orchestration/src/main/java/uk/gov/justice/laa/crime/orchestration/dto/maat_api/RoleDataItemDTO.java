@@ -17,4 +17,5 @@ public class RoleDataItemDTO implements Serializable {
     private String enabled;
     private String insertAllowed;
     private String updateAllowed;
+    private String upsertAllowed;
 }

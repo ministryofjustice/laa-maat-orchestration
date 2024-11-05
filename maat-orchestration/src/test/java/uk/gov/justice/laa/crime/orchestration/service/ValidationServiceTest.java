@@ -372,7 +372,7 @@ class ValidationServiceTest {
     @MethodSource("restrictedFieldsNotEditableByUser")
     void givenUserHasNoRoleWhichHasPermissionToEdit_whenIsUserAuthorisedToEditFieldIsInvoked_thenReturnsFalse(final RestrictedField restrictedField) {
         List<RoleDataItemDTO> roleDataItems = List.of(
-            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_CC_OUTCOME.getField(), "N", null, null)
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_CC_OUTCOME.getField(), "N", null, null, null)
         );
 
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO(roleDataItems);
@@ -385,9 +385,9 @@ class ValidationServiceTest {
     @Test
     void givenUserHasPermissionButPermissionIsDisabled_whenIsUserAuthorisedToEditFieldIsInvoked_thenReturnsFalse() {
         List<RoleDataItemDTO> roleDataItems = List.of(
-            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_CC_OUTCOME.getField(), "N", null, null),
-            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_RECEIVED_DATE.getField(), "N", "Y", "N"),
-            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_RECEIVED_DATE.getField(), "N", "N", "Y")
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_CC_OUTCOME.getField(), "N", null, null, "N"),
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_RECEIVED_DATE.getField(), "N", "Y", "N", "N" ),
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_RECEIVED_DATE.getField(), "N", "N", "Y", "N")
         );
 
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO(roleDataItems);
@@ -402,10 +402,10 @@ class ValidationServiceTest {
     @MethodSource("restrictedFieldsEditableByUser")
     void givenUserHasPermission_whenIsUserAuthorisedToEditFieldIsInvoked_thenReturnsTrue(final RestrictedField restrictedField) {
         List<RoleDataItemDTO> roleDataItems = List.of(
-            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_CC_OUTCOME.getField(), "N", null, null),
-            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_RECEIVED_DATE.getField(), "Y", "Y", "N"),
-            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_SENTENCE_ORDER_DATE.getField(), "Y", "N", "Y"),
-            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_CC_WITHDRAWAL_DATE.getField(), "Y", "Y", "Y")
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_CC_OUTCOME.getField(), "N", null, null, "Y"),
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_RECEIVED_DATE.getField(), "Y", "Y", "N", "Y"),
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_SENTENCE_ORDER_DATE.getField(), "Y", "N", "Y", "Y"),
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_CC_WITHDRAWAL_DATE.getField(), "Y", "Y", "Y", "Y")
         );
 
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO(roleDataItems);
@@ -426,8 +426,8 @@ class ValidationServiceTest {
     @Test
     void givenUserHasPartialPermissions_whenCheckUpliftFieldPermissionsInInvoked_thenExceptionIsThrown() {
         List<RoleDataItemDTO> roleDataItems = List.of(
-            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.UPLIFT_APPLIED.getField(), "Y", "Y", "Y"),
-            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.UPLIFT_REMOVED.getField(), "N", "Y", "Y")
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.UPLIFT_APPLIED.getField(), "Y", "Y", "Y", "Y"),
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.UPLIFT_REMOVED.getField(), "N", "Y", "Y" ,"Y")
         );
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO(roleDataItems);
 
@@ -438,8 +438,8 @@ class ValidationServiceTest {
     @Test
     void givenUserHasUpliftPermissions_whenCheckUpliftFieldPermissionsIsInvoked_thenNoExceptionIsThrown() {
         List<RoleDataItemDTO> roleDataItems = List.of(
-            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.UPLIFT_APPLIED.getField(), "Y", "Y", "Y"),
-            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.UPLIFT_REMOVED.getField(), "Y", "Y", "Y")
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.UPLIFT_APPLIED.getField(), "Y", "Y", "Y", "Y"),
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.UPLIFT_REMOVED.getField(), "Y", "Y", "Y", "Y")
         );
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO(roleDataItems);
 
