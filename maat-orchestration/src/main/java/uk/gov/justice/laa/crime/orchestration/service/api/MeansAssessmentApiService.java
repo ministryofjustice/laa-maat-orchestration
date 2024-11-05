@@ -31,12 +31,12 @@ public class MeansAssessmentApiService {
                 assessmentId
         );
 
-        log.info(RESPONSE_STRING, response);
+        log.debug(RESPONSE_STRING, response);
         return response;
     }
 
     public ApiMeansAssessmentResponse create(ApiCreateMeansAssessmentRequest request) {
-        log.info(REQUEST_STRING, request);
+        log.debug(REQUEST_STRING, request);
         ApiMeansAssessmentResponse response = cmaApiClient.post(
                 request,
                 new ParameterizedTypeReference<>() {
@@ -45,12 +45,12 @@ public class MeansAssessmentApiService {
                 Collections.emptyMap()
         );
 
-        log.info(RESPONSE_STRING, response);
+        log.debug(RESPONSE_STRING, response);
         return response;
     }
 
     public ApiMeansAssessmentResponse update(ApiUpdateMeansAssessmentRequest request) {
-        log.info(REQUEST_STRING, request);
+        log.debug(REQUEST_STRING, request);
         ApiMeansAssessmentResponse response = cmaApiClient.put(
                 request,
                 new ParameterizedTypeReference<>() {
@@ -59,7 +59,7 @@ public class MeansAssessmentApiService {
                 Collections.emptyMap()
         );
 
-        log.info(RESPONSE_STRING, response);
+        log.debug(RESPONSE_STRING, response);
         return response;
     }
 

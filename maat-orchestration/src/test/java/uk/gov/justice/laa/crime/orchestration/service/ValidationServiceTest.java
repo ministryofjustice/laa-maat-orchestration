@@ -1,7 +1,5 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
-import java.util.Optional;
-import java.util.List;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,24 +10,33 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.RepOrderStatus;
+import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RoleDataItemDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
-import uk.gov.justice.laa.crime.orchestration.enums.Action;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.RestrictedField;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.TEST_USER_SESSION;
-import static uk.gov.justice.laa.crime.orchestration.service.ValidationService.*;
+import static uk.gov.justice.laa.crime.orchestration.service.ValidationService.ACTION_NEW_WORK_REASON_AND_SESSION_DOES_NOT_EXIST;
+import static uk.gov.justice.laa.crime.orchestration.service.ValidationService.CANNOT_MODIFY_APPLICATION_ERROR;
+import static uk.gov.justice.laa.crime.orchestration.service.ValidationService.USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION;
+import static uk.gov.justice.laa.crime.orchestration.service.ValidationService.USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE;
+import static uk.gov.justice.laa.crime.orchestration.service.ValidationService.USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED;
 
 @ExtendWith(MockitoExtension.class)
 class ValidationServiceTest {

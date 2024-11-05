@@ -61,7 +61,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
                 .withApplicantHistoryId(NumberUtils.toInteger(application.getApplicantDTO().getApplicantHistoryId()))
                 .withCrownRepId(NumberUtils.toInteger(crownCourtSummary.getCcRepId()))
                 .withIsImprisoned(crownCourtSummary.getInPrisoned())
-                .withUserSession(userMapper.userDtoToProceedingUserSession(userDTO));
+                .withUserSession(userMapper.userDtoToUserSession(userDTO));
     }
 
     private ApiCrownCourtSummary crownCourtSummaryDtoToApiCrownCourtSummary(CrownCourtSummaryDTO crownCourtSummary) {

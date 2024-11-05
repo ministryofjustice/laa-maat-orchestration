@@ -2,14 +2,19 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.common.model.orchestration.application_tracking.*;
-import uk.gov.justice.laa.crime.enums.CaseType;
-import uk.gov.justice.laa.crime.enums.PassportAssessmentResult;
-import uk.gov.justice.laa.crime.enums.ReviewResult;
-import uk.gov.justice.laa.crime.enums.orchestration.AssessmentType;
-import uk.gov.justice.laa.crime.enums.orchestration.HardshipType;
-import uk.gov.justice.laa.crime.enums.orchestration.MeanAssessmentResult;
-import uk.gov.justice.laa.crime.enums.orchestration.RequestSource;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.CaseType;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
+import uk.gov.justice.laa.crime.common.model.tracking.Hardship;
+import uk.gov.justice.laa.crime.common.model.tracking.Hardship.HardshipResult;
+import uk.gov.justice.laa.crime.common.model.tracking.Hardship.HardshipType;
+import uk.gov.justice.laa.crime.common.model.tracking.Ioj;
+import uk.gov.justice.laa.crime.common.model.tracking.Ioj.IojAppealResult;
+import uk.gov.justice.laa.crime.common.model.tracking.MeansAssessment;
+import uk.gov.justice.laa.crime.common.model.tracking.MeansAssessment.MeansAssessmentResult;
+import uk.gov.justice.laa.crime.common.model.tracking.Passport;
+import uk.gov.justice.laa.crime.common.model.tracking.Passport.PassportResult;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.PassportAssessmentDTO;
@@ -23,9 +28,9 @@ import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
 @Component
 public class ApplicationTrackingMapper {
 
-    public ApiCrimeApplicationTrackingRequest build(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {
+    public ApplicationTrackingOutputResult build(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {
 
-        ApiCrimeApplicationTrackingRequest request = new ApiCrimeApplicationTrackingRequest();
+        ApplicationTrackingOutputResult request = new ApplicationTrackingOutputResult();
         ApplicationDTO application = workflowRequest.getApplicationDTO();
         FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
         PassportedDTO passportedDTO = application.getPassportedDTO();
@@ -37,7 +42,8 @@ public class ApplicationTrackingMapper {
         request.setMaatRef(application.getRepId().intValue());
         request.setActionKeyId(financialAssessmentDTO.getId().intValue());
         request.setCaseId(application.getCaseId());
-        request.setCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()));
+        request.setCaseType(StringUtils.isBlank(application.getCaseDetailsDTO().getCaseType()) ? null :
+                CaseType.fromValue(application.getCaseDetailsDTO().getCaseType()));
         request.setAssessmentId(financialAssessmentDTO.getId().intValue());
         request.setAssessmentType(AssessmentType.CCHARDSHIP);
         request.setDwpResult(passportedDTO.getDwpResult());
@@ -62,7 +68,8 @@ public class ApplicationTrackingMapper {
                 .withIojId(null != iojAppealDTO.getIojId() ? iojAppealDTO.getIojId().intValue() : null)
                 .withIojResult(application.getIojResult())
                 .withIojReason(application.getIojResultNote())
-                .withIojAppealResult(ReviewResult.getFrom(iojAppealDTO.getAppealDecisionResult()))
+                .withIojAppealResult(StringUtils.isBlank(iojAppealDTO.getAppealDecisionResult()) ? null :
+                        IojAppealResult.fromValue(iojAppealDTO.getAppealDecisionResult()))
                 .withIojAssessorName(getCapitalisedFullName(repOrderDTO.getUserCreatedEntity().getFirstName(), repOrderDTO.getUserCreatedEntity().getSurname()))
                 .withAppCreatedDate(toLocalDateTime(application.getDateCreated()));
 
@@ -83,7 +90,8 @@ public class ApplicationTrackingMapper {
 
         return new Passport()
                 .withPassportId(passportedDTO.getPassportedId() != null ? passportedDTO.getPassportedId().intValue() : null)
-                .withPassportResult(PassportAssessmentResult.getFrom(passportedDTO.getResult()))
+                .withPassportResult(StringUtils.isBlank(passportedDTO.getResult()) ? null :
+                        PassportResult.fromValue(passportedDTO.getResult()))
                 .withPassportAssessorName((null != passportAssessmentDTO) ?
                         getCapitalisedFullName(passportAssessmentDTO.getUserCreatedEntity().getFirstName(),
                                 passportAssessmentDTO.getUserCreatedEntity().getSurname()) : null)
@@ -104,13 +112,17 @@ public class ApplicationTrackingMapper {
                 fa.getUserCreatedEntity().getSurname()) : null);
 
         if (financialAssessmentDTO.getFullAvailable() != null && financialAssessmentDTO.getFullAvailable()) {
-            assessment.setMeansAssessmentStatus(financialAssessmentDTO.getFull().getAssessmnentStatusDTO().getStatus());
-            assessment.setMeansAssessmentResult(MeanAssessmentResult.getFrom(financialAssessmentDTO.getFull().getResult()));
-            assessment.setMeansAssessmentCreatedDate(toLocalDateTime(financialAssessmentDTO.getFull().getAssessmentDate()));
+            FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
+            assessment.setMeansAssessmentStatus(fullAssessmentDTO.getAssessmnentStatusDTO().getStatus());
+            assessment.setMeansAssessmentResult(StringUtils.isBlank(fullAssessmentDTO.getResult()) ? null :
+                    MeansAssessmentResult.fromValue(fullAssessmentDTO.getResult()));
+            assessment.setMeansAssessmentCreatedDate(toLocalDateTime(fullAssessmentDTO.getAssessmentDate()));
         } else {
-            assessment.setMeansAssessmentStatus(financialAssessmentDTO.getInitial().getAssessmnentStatusDTO().getStatus());
-            assessment.setMeansAssessmentResult(MeanAssessmentResult.getFrom(financialAssessmentDTO.getInitial().getResult()));
-            assessment.setMeansAssessmentCreatedDate(toLocalDateTime(financialAssessmentDTO.getInitial().getAssessmentDate()));
+            InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
+            assessment.setMeansAssessmentStatus(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus());
+            assessment.setMeansAssessmentResult(StringUtils.isBlank(initialAssessmentDTO.getResult()) ? null :
+                    MeansAssessmentResult.fromValue(initialAssessmentDTO.getResult()));
+            assessment.setMeansAssessmentCreatedDate(toLocalDateTime(initialAssessmentDTO.getAssessmentDate()));
         }
 
         return assessment;
@@ -124,7 +136,8 @@ public class ApplicationTrackingMapper {
 
         return new Hardship()
                 .withHardshipId(hardshipReviewDTO.getId() != null ? hardshipReviewDTO.getId().intValue() : null)
-                .withHardshipResult(ReviewResult.getFrom(hardshipReviewDTO.getReviewResult()))
+                .withHardshipResult(StringUtils.isBlank(hardshipReviewDTO.getReviewResult()) ? null :
+                        HardshipResult.fromValue(hardshipReviewDTO.getReviewResult()))
                 .withHardshipType(HardshipType.CCHARDSHIP);
     }
 

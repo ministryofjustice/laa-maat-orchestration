@@ -5,12 +5,21 @@ import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import uk.gov.justice.laa.crime.common.model.orchestration.application_tracking.*;
-import uk.gov.justice.laa.crime.enums.*;
-import uk.gov.justice.laa.crime.enums.orchestration.AssessmentType;
-import uk.gov.justice.laa.crime.enums.orchestration.HardshipType;
-import uk.gov.justice.laa.crime.enums.orchestration.MeanAssessmentResult;
-import uk.gov.justice.laa.crime.enums.orchestration.RequestSource;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.CaseType;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
+import uk.gov.justice.laa.crime.common.model.tracking.Hardship;
+import uk.gov.justice.laa.crime.common.model.tracking.Hardship.HardshipResult;
+import uk.gov.justice.laa.crime.common.model.tracking.Hardship.HardshipType;
+import uk.gov.justice.laa.crime.common.model.tracking.Ioj;
+import uk.gov.justice.laa.crime.common.model.tracking.Ioj.IojAppealResult;
+import uk.gov.justice.laa.crime.common.model.tracking.MeansAssessment;
+import uk.gov.justice.laa.crime.common.model.tracking.MeansAssessment.MeansAssessmentResult;
+import uk.gov.justice.laa.crime.common.model.tracking.Passport;
+import uk.gov.justice.laa.crime.common.model.tracking.Passport.PassportResult;
+import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.enums.DecisionReason;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -36,7 +45,7 @@ class ApplicationTrackingMapperTest {
 
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestWithCCHardship(CourtType.CROWN_COURT);
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTOWithAssessorName();
-        ApiCrimeApplicationTrackingRequest request = mapper.build(workflowRequest, repOrderDTO);
+        ApplicationTrackingOutputResult request = mapper.build(workflowRequest, repOrderDTO);
 
         softly.assertThat(request.getUsn()).isNull();
         softly.assertThat(request.getMaatRef()).isEqualTo(TestModelDataBuilder.REP_ID.intValue());
@@ -63,7 +72,7 @@ class ApplicationTrackingMapperTest {
         workflowRequest.getApplicationDTO().getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().setRepOrderDecision(null);
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTOWithAssessorName();
 
-        ApiCrimeApplicationTrackingRequest request = mapper.build(workflowRequest, repOrderDTO);
+        ApplicationTrackingOutputResult request = mapper.build(workflowRequest, repOrderDTO);
         softly.assertThat(request.getUsn()).isEqualTo(TestModelDataBuilder.REP_ID.intValue());
         softly.assertThat(request.getMaatRef()).isEqualTo(TestModelDataBuilder.REP_ID.intValue());
         softly.assertThat(request.getActionKeyId()).isEqualTo(Constants.FINANCIAL_ASSESSMENT_ID);
@@ -85,16 +94,16 @@ class ApplicationTrackingMapperTest {
 
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestWithCCHardship(CourtType.CROWN_COURT);
         workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal().setIojId(TestModelDataBuilder.REP_ID.longValue());
-        workflowRequest.getApplicationDTO().setIojResultNote(MeanAssessmentResult.PASS.getCode());
-        workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal().setAppealReason(IOJDecisionReasonDTO.builder().code(MeanAssessmentResult.PASS.getCode()).build());
+        workflowRequest.getApplicationDTO().setIojResultNote(MeansAssessmentResult.PASS.toString());
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal().setAppealReason(IOJDecisionReasonDTO.builder().code(MeansAssessmentResult.PASS.toString()).build());
         workflowRequest.getApplicationDTO().setDateCreated(TestModelDataBuilder.DATE_COMPLETED);
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTOWithAssessorName();
 
         Ioj ioj = mapper.buildIOJ(workflowRequest, repOrderDTO);
         softly.assertThat(ioj.getIojId()).isEqualTo(TestModelDataBuilder.REP_ID);
-        softly.assertThat(ioj.getIojResult()).isEqualTo(MeanAssessmentResult.PASS.getCode());
-        softly.assertThat(ioj.getIojReason()).isEqualTo(MeanAssessmentResult.PASS.getCode());
-        softly.assertThat(ioj.getIojAppealResult()).isEqualTo(ReviewResult.PASS);
+        softly.assertThat(ioj.getIojResult()).isEqualTo(MeansAssessmentResult.PASS.toString());
+        softly.assertThat(ioj.getIojReason()).isEqualTo(MeansAssessmentResult.PASS.toString());
+        softly.assertThat(ioj.getIojAppealResult()).isEqualTo(IojAppealResult.PASS);
         softly.assertThat(ioj.getIojAssessorName()).isEqualTo(ASSESSOR_NAME);
         softly.assertAll();
     }
@@ -108,9 +117,9 @@ class ApplicationTrackingMapperTest {
         Ioj ioj = mapper.buildIOJ(workflowRequest, repOrderDTO);
 
         softly.assertThat(ioj.getIojId()).isNull();
-        softly.assertThat(ioj.getIojResult()).isEqualTo(MeanAssessmentResult.PASS.getCode());
+        softly.assertThat(ioj.getIojResult()).isEqualTo(MeansAssessmentResult.PASS.toString());
         softly.assertThat(ioj.getIojReason()).isNull();
-        softly.assertThat(ioj.getIojAppealResult()).isEqualTo(ReviewResult.PASS);
+        softly.assertThat(ioj.getIojAppealResult()).isEqualTo(IojAppealResult.PASS);
         softly.assertThat(ioj.getIojAssessorName()).isEqualTo(ASSESSOR_NAME);
         softly.assertAll();
 
@@ -124,7 +133,7 @@ class ApplicationTrackingMapperTest {
 
         Passport passport = mapper.buildPassport(workflowRequest, repOrderDTO);
         softly.assertThat(passport.getPassportId()).isEqualTo(TestModelDataBuilder.PASSPORTED_ID);
-        softly.assertThat(passport.getPassportResult()).isEqualTo(PassportAssessmentResult.FAIL);
+        softly.assertThat(passport.getPassportResult()).isEqualTo(PassportResult.FAIL);
         softly.assertThat(passport.getPassportCreatedDate()).isNotNull();
         softly.assertThat(passport.getPassportAssessorName()).isEqualTo(ASSESSOR_NAME);
         softly.assertAll();
@@ -139,7 +148,7 @@ class ApplicationTrackingMapperTest {
 
         Passport passport = mapper.buildPassport(workflowRequest, repOrderDTO);
         softly.assertThat(passport.getPassportId()).isEqualTo(TestModelDataBuilder.PASSPORTED_ID);
-        softly.assertThat(passport.getPassportResult()).isEqualTo(PassportAssessmentResult.FAIL);
+        softly.assertThat(passport.getPassportResult()).isEqualTo(PassportResult.FAIL);
         softly.assertThat(passport.getPassportCreatedDate()).isNotNull();
         softly.assertThat(passport.getPassportAssessorName()).isNull();
         softly.assertAll();
@@ -168,7 +177,7 @@ class ApplicationTrackingMapperTest {
         MeansAssessment meansAssessment = mapper.buildMeansAssessment(workflowRequest, repOrderDTO);
         softly.assertThat(meansAssessment.getMeansAssessmentId()).isEqualTo(Constants.FINANCIAL_ASSESSMENT_ID);
         softly.assertThat(meansAssessment.getMeansAssessmentStatus()).isEqualTo(AssessmentStatusDTO.COMPLETE);
-        softly.assertThat(meansAssessment.getMeansAssessmentResult()).isEqualTo(MeanAssessmentResult.PASS);
+        softly.assertThat(meansAssessment.getMeansAssessmentResult()).isEqualTo(MeansAssessmentResult.PASS);
         softly.assertThat(meansAssessment.getMeansAssessmentCreatedDate()).isNotNull();
         softly.assertThat(meansAssessment.getMeansAssessorName()).isEqualTo(ASSESSOR_NAME);
         softly.assertAll();
@@ -184,7 +193,7 @@ class ApplicationTrackingMapperTest {
         MeansAssessment meansAssessment = mapper.buildMeansAssessment(workflowRequest, repOrderDTO);
         softly.assertThat(meansAssessment.getMeansAssessmentId()).isEqualTo(Constants.FINANCIAL_ASSESSMENT_ID);
         softly.assertThat(meansAssessment.getMeansAssessmentStatus()).isEqualTo(AssessmentStatusDTO.COMPLETE);
-        softly.assertThat(meansAssessment.getMeansAssessmentResult()).isEqualTo(MeanAssessmentResult.FAIL);
+        softly.assertThat(meansAssessment.getMeansAssessmentResult()).isEqualTo(MeansAssessmentResult.FAIL);
         softly.assertThat(meansAssessment.getMeansAssessmentCreatedDate()).isNull();
         softly.assertThat(meansAssessment.getMeansAssessorName()).isEqualTo(ASSESSOR_NAME);
         softly.assertAll();
@@ -201,7 +210,7 @@ class ApplicationTrackingMapperTest {
         MeansAssessment meansAssessment = mapper.buildMeansAssessment(workflowRequest, repOrderDTO);
         softly.assertThat(meansAssessment.getMeansAssessmentId()).isEqualTo(Constants.FINANCIAL_ASSESSMENT_ID);
         softly.assertThat(meansAssessment.getMeansAssessmentStatus()).isEqualTo(AssessmentStatusDTO.COMPLETE);
-        softly.assertThat(meansAssessment.getMeansAssessmentResult()).isEqualTo(MeanAssessmentResult.FAIL);
+        softly.assertThat(meansAssessment.getMeansAssessmentResult()).isEqualTo(MeansAssessmentResult.FAIL);
         softly.assertThat(meansAssessment.getMeansAssessmentCreatedDate()).isNull();
         softly.assertThat(meansAssessment.getMeansAssessorName()).isNull();
         softly.assertAll();
@@ -215,7 +224,7 @@ class ApplicationTrackingMapperTest {
         Hardship hardship = mapper.buildHardship(workflowRequest);
         softly.assertThat(hardship.getHardshipId()).isEqualTo(Constants.HARDSHIP_REVIEW_ID);
         softly.assertThat(hardship.getHardshipType()).isEqualTo(HardshipType.CCHARDSHIP);
-        softly.assertThat(hardship.getHardshipResult()).isEqualTo(ReviewResult.PASS);
+        softly.assertThat(hardship.getHardshipResult()).isEqualTo(HardshipResult.PASS);
         softly.assertAll();
     }
 

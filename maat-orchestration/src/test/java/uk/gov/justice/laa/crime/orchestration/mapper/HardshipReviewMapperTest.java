@@ -5,13 +5,20 @@ import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import uk.gov.justice.laa.crime.common.model.orchestration.hardship.*;
+import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipRequest;
+import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipResponse;
+import uk.gov.justice.laa.crime.common.model.hardship.DeniedIncome;
+import uk.gov.justice.laa.crime.common.model.hardship.ExtraExpenditure;
+import uk.gov.justice.laa.crime.common.model.hardship.HardshipMetadata;
+import uk.gov.justice.laa.crime.common.model.hardship.HardshipProgress;
+import uk.gov.justice.laa.crime.common.model.hardship.HardshipReview;
+import uk.gov.justice.laa.crime.common.model.hardship.SolicitorCosts;
+import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
-import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 
 @ExtendWith(SoftAssertionsExtension.class)
@@ -219,38 +226,3 @@ class HardshipReviewMapperTest {
                 .isEqualTo(expected);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
