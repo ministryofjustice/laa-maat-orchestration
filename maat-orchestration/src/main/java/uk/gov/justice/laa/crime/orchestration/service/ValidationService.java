@@ -83,7 +83,7 @@ public class ValidationService {
 
         return userSummaryDTO.getRoleDataItem().stream().anyMatch(i -> i.getDataItem().equals(restrictedField.getField())
             && "Y".equals(i.getEnabled())
-            && ("Y".equals(i.getUpsertAllowed())));
+            && "Y".equals(i.getUpsertAllowed()));
     }
 
     public void validate(WorkflowRequest request, RepOrderDTO repOrderDTO) {

@@ -365,7 +365,7 @@ class ValidationServiceTest {
     @MethodSource("restrictedFieldsNotEditableByUser")
     void givenUserHasNoRoleWhichHasPermissionToEdit_whenIsUserAuthorisedToEditFieldIsInvoked_thenReturnsFalse(final RestrictedField restrictedField) {
         List<RoleDataItemDTO> roleDataItems = List.of(
-            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_CC_OUTCOME.getField(), "N", null, null, "N")
+            new RoleDataItemDTO("CCMT CASEWORKER", RestrictedField.APPEAL_CC_OUTCOME.getField(), "N", null, null, null)
         );
 
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO(roleDataItems);
