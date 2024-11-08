@@ -1,10 +1,12 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.*;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.*;
@@ -50,11 +52,11 @@ public class ProceedingsMapper extends CrownCourtMapper {
         ApiCrownCourtSummary ccpCrownCourtSummary =
                 crownCourtSummaryDtoToApiCrownCourtSummary(crownCourtSummary);
 
-        if (null != crownCourtSummary.getOutcomeDTOs()) {
+        /*if (null != crownCourtSummary.getOutcomeDTOs()) {
             ccpCrownCourtSummary.setCrownCourtOutcome(mapToApiCrownCourtOutcomes(crownCourtSummary));
         }
 
-        mapEvidenceDetailsToRequest(updateApplicationRequest, application);
+        mapEvidenceDetailsToRequest(updateApplicationRequest, application);*/
 
         return updateApplicationRequest
                 .withCrownCourtSummary(ccpCrownCourtSummary)
@@ -136,7 +138,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         ApiFinancialAssessment assessment = new ApiFinancialAssessment();
         assessment
                 .withInitResult(initialAssessment.getResult())
-                .withInitStatus(CurrentStatus.getFrom(initialAssessment.getAssessmnentStatusDTO().getStatus()));
+                .withInitStatus(getCurrentStatus(initialAssessment.getAssessmnentStatusDTO().getStatus()));
 
         if (financialAssessmentDTO.getFull().getAssessmentDate() != null) {
             assessment
@@ -175,7 +177,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         return application;
     }
 
-    private void mapEvidenceDetailsToRequest(ApiUpdateApplicationRequest request, ApplicationDTO application) {
+    private void mapEvidenceDetailsToRequest(ApiUpdateCrownCourtRequest request, ApplicationDTO application) {
 
         FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
         CapitalEquityDTO capitalEquityDTO = application.getCapitalEquityDTO();
@@ -225,5 +227,51 @@ public class ProceedingsMapper extends CrownCourtMapper {
                 .withOutcomeType(outcomeDTO.getOutComeType())
                 .withDateSet(DateUtil.toLocalDateTime(outcomeDTO.getDateSet()))
                 .withDescription(outcomeDTO.getDescription());
+    }
+
+
+    public ApiUpdateCrownCourtRequest workflowRequestToUpdateCrownCourtRequest(
+            ApplicationDTO application, UserDTO userDTO) {
+
+        ApiUpdateCrownCourtRequest updateCrownCourtRequest = new ApiUpdateCrownCourtRequest()
+                .withRepId(NumberUtils.toInteger(application.getRepId()))
+                .withCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()))
+                .withMagCourtOutcome(MagCourtOutcome.getFrom(application.getMagsOutcomeDTO().getOutcome()))
+                .withDecisionReason(DecisionReason.getFrom(application.getRepOrderDecision().getCode()))
+                .withDecisionDate(DateUtil.toLocalDateTime(application.getDecisionDate()))
+                .withCommittalDate(DateUtil.toLocalDateTime(application.getCommittalDate()))
+                .withDateReceived(DateUtil.toLocalDateTime(application.getDateReceived()))
+                .withIojAppeal(
+                        new ApiIOJSummary()
+                                .withDecisionResult(
+                                        application.getAssessmentDTO().getIojAppeal().getAppealDecisionResult()
+                                )
+                                .withIojResult(application.getIojResult())
+                )
+                .withPassportAssessment(applicationDtoToPassportAssessment(application))
+                .withFinancialAssessment(applicationDtoToFinancialAssessment(application));
+
+        CrownCourtOverviewDTO crownCourtOverview = application.getCrownCourtOverviewDTO();
+        CrownCourtSummaryDTO crownCourtSummary = crownCourtOverview.getCrownCourtSummaryDTO();
+
+        ApiCrownCourtSummary ccpCrownCourtSummary =
+                crownCourtSummaryDtoToApiCrownCourtSummary(crownCourtSummary);
+
+        if (null != crownCourtSummary.getOutcomeDTOs()) {
+            ccpCrownCourtSummary.setCrownCourtOutcome(mapToApiCrownCourtOutcomes(crownCourtSummary));
+        }
+
+        mapEvidenceDetailsToRequest(updateCrownCourtRequest, application);
+
+        return updateCrownCourtRequest
+                .withCrownCourtSummary(ccpCrownCourtSummary)
+                .withApplicantHistoryId(NumberUtils.toInteger(application.getApplicantDTO().getApplicantHistoryId()))
+                .withCrownRepId(NumberUtils.toInteger(crownCourtSummary.getCcRepId()))
+                .withIsImprisoned(crownCourtSummary.getInPrisoned())
+                .withUserSession(userMapper.userDtoToUserSession(userDTO));
+    }
+
+    private static CurrentStatus getCurrentStatus(String status) {
+        return StringUtils.isNotBlank(status) ? CurrentStatus.getFrom(status) : null;
     }
 }
