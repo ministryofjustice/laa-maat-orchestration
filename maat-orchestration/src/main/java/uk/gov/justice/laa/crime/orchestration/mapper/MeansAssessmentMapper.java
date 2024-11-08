@@ -180,7 +180,7 @@ public class MeansAssessmentMapper {
                 .withOtherText(evidenceItem.getOtherText());
     }
 
-    private List<ApiAssessmentChildWeighting> childWeightingsBuilder(Collection<ChildWeightingDTO> childWeightings) {
+    public List<ApiAssessmentChildWeighting> childWeightingsBuilder(Collection<ChildWeightingDTO> childWeightings) {
         List<ApiAssessmentChildWeighting> childWeightingList = new ArrayList<>();
         if (childWeightings != null) {
             for (ChildWeightingDTO childWeightingDTO : childWeightings) {
@@ -250,7 +250,7 @@ public class MeansAssessmentMapper {
         return apiAssessmentSectionSummaries;
     }
 
-    private List<ApiAssessmentDetail> assessmentDetailsBuilder(Collection<AssessmentDetailDTO> assessmentDetails) {
+    public List<ApiAssessmentDetail> assessmentDetailsBuilder(Collection<AssessmentDetailDTO> assessmentDetails) {
         List<ApiAssessmentDetail> apiAssessmentDetails = new ArrayList<>();
         if (assessmentDetails != null) {
             for (AssessmentDetailDTO assessmentDetailDTO : assessmentDetails) {
@@ -525,6 +525,7 @@ public class MeansAssessmentMapper {
         FinancialAssessmentDTO financialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO();
         financialAssessmentDTO.setId(ofNullable(apiResponse.getAssessmentId()).map(Integer::longValue).orElse(0L));
         financialAssessmentDTO.setTimestamp(toZonedDateTime(apiResponse.getUpdated()));
+        // TODO: add date completed to finassDTO and then map it from api response
 
 
         if (Boolean.TRUE.equals(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable())) {

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
+import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.IncomeEvidenceMapper;
@@ -18,17 +19,11 @@ public class IncomeEvidenceService {
     private final EvidenceApiService evidenceApiService;
     private final MaatCourtDataApiService maatCourtDataApiService;
     private final IncomeEvidenceMapper incomeEvidenceMapper;
-    
-    public ??? createEvidence(WorkflowRequest request, RepOrderDTO repOrderDTO) {
+
+    public ??? createEvidence(WorkflowRequest request, RepOrderDTO repOrder) {
         ApiCreateIncomeEvidenceRequest evidenceRequest = incomeEvidenceMapper.workflowRequestToApiCreateIncomeEvidenceRequest(request);
         ApiCreateIncomeEvidenceResponse evidenceResponse = evidenceApiService.createEvidence(evidenceRequest);
-        // TODO: Map MaatApiUpdateAssessment for call to maat api
-        MaatApiAssessmentResponse bla2 = maatCourtDataApiService.updateFinancialAssessment();
-    }
-
-    // TODO: Complete private method to get date received if evidence received in rep order otherwise set to null
-    // Use RepOrderDTO here
-    private ??? getDateReceived() {
-
+        MaatApiUpdateAssessment maatApiRequest = incomeEvidenceMapper.mapToMaatApiUpdateAssessment(request, repOrder, evidenceResponse);
+        MaatApiAssessmentResponse maatApiResponse = maatCourtDataApiService.updateFinancialAssessment(maatApiRequest);
     }
 }
