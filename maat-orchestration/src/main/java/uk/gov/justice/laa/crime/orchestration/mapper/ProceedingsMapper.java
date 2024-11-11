@@ -52,12 +52,6 @@ public class ProceedingsMapper extends CrownCourtMapper {
         ApiCrownCourtSummary ccpCrownCourtSummary =
                 crownCourtSummaryDtoToApiCrownCourtSummary(crownCourtSummary);
 
-        /*if (null != crownCourtSummary.getOutcomeDTOs()) {
-            ccpCrownCourtSummary.setCrownCourtOutcome(mapToApiCrownCourtOutcomes(crownCourtSummary));
-        }
-
-        mapEvidenceDetailsToRequest(updateApplicationRequest, application);*/
-
         return updateApplicationRequest
                 .withCrownCourtSummary(ccpCrownCourtSummary)
                 .withApplicantHistoryId(NumberUtils.toInteger(application.getApplicantDTO().getApplicantHistoryId()))

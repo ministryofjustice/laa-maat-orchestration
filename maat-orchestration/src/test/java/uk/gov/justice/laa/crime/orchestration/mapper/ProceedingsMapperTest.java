@@ -73,6 +73,8 @@ class ProceedingsMapperTest {
                 proceedingsMapper.workflowRequestToUpdateCrownCourtRequest(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
 
         softly.assertThat(actualApplicationRequest.getFinancialAssessment().getInitStatus()).isNull();
+
+        softly.assertAll();
     }
 
     @Test
