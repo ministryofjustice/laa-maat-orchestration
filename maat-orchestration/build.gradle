@@ -18,7 +18,7 @@ java {
 def versions = [
 		pitest                  : "1.16.1",
 		springdocVersion        : "2.5.0",
-		commonsModSchemas       : "1.20.0",
+		commonsModSchemas       : "1.19.0-SNAPSHOT",
 		crimeCommonsClasses     : "3.29.0",
 		commonsRestClient       : "3.18.0",
 		okhttpVersion           : "4.12.0",
@@ -33,6 +33,9 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven {
+		url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+	}
 }
 
 dependencies {

@@ -525,8 +525,7 @@ public class MeansAssessmentMapper {
         FinancialAssessmentDTO financialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO();
         financialAssessmentDTO.setId(ofNullable(apiResponse.getAssessmentId()).map(Integer::longValue).orElse(0L));
         financialAssessmentDTO.setTimestamp(toZonedDateTime(apiResponse.getUpdated()));
-        // TODO: add date completed to finassDTO and then map it from api response
-
+        financialAssessmentDTO.setDateCompleted(apiResponse.getDateCompleted());
 
         if (Boolean.TRUE.equals(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable())) {
             mapFullAssessmentDTO(financialAssessmentDTO.getFull(), apiResponse);

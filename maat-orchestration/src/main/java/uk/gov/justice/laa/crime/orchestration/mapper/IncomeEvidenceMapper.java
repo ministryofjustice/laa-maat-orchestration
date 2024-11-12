@@ -86,8 +86,7 @@ public class IncomeEvidenceMapper {
                 .withInitApplicationEmploymentStatus(application.getApplicantDTO().getEmploymentStatusDTO().getCode())
                 .withAssessmentDetails(meansAssessmentMapper.assessmentDetailsBuilder(assessmentDetails))
                 .withChildWeightings(meansAssessmentMapper.childWeightingsBuilder(initialAssessment.getChildWeightings()))
-                // TODO: Amend CMA to return the date completed and update schemas so it is available here
-                .withDateCompleted();
+                .withDateCompleted(application.getAssessmentDTO().getFinancialAssessmentDTO().getDateCompleted());
 
         if ( assessmentType.equals("FULL")) {
             updateAssessment.setFassFullStatus(fullAssessment.getAssessmnentStatusDTO().getStatus());
