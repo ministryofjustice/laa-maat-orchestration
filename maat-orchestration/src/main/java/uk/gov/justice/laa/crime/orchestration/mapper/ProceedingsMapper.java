@@ -132,7 +132,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         ApiFinancialAssessment assessment = new ApiFinancialAssessment();
         assessment
                 .withInitResult(initialAssessment.getResult())
-                .withInitStatus(getCurrentStatus(initialAssessment.getAssessmnentStatusDTO().getStatus()));
+                .withInitStatus(CurrentStatus.getFrom(initialAssessment.getAssessmnentStatusDTO().getStatus()));
 
         if (financialAssessmentDTO.getFull().getAssessmentDate() != null) {
             assessment
@@ -243,7 +243,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
                                 .withIojResult(application.getIojResult())
                 )
                 .withPassportAssessment(applicationDtoToPassportAssessment(application))
-                .withFinancialAssessment(applicationDtoToFinancialAssessment(application));
+                .withFinancialAssessment(crownCourtApplicationDtoToFinancialAssessment(application));
 
         CrownCourtOverviewDTO crownCourtOverview = application.getCrownCourtOverviewDTO();
         CrownCourtSummaryDTO crownCourtSummary = crownCourtOverview.getCrownCourtSummaryDTO();
@@ -267,5 +267,33 @@ public class ProceedingsMapper extends CrownCourtMapper {
 
     private static CurrentStatus getCurrentStatus(String status) {
         return StringUtils.isNotBlank(status) ? CurrentStatus.getFrom(status) : null;
+    }
+
+    private ApiFinancialAssessment crownCourtApplicationDtoToFinancialAssessment(ApplicationDTO application) {
+
+        FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
+        FullAssessmentDTO fullAssessment = financialAssessmentDTO.getFull();
+        InitialAssessmentDTO initialAssessment = financialAssessmentDTO.getInitial();
+
+        ApiFinancialAssessment assessment = new ApiFinancialAssessment();
+        assessment
+                .withInitResult(initialAssessment.getResult())
+                .withInitStatus(getCurrentStatus(initialAssessment.getAssessmnentStatusDTO().getStatus()));
+
+        if (financialAssessmentDTO.getFull().getAssessmentDate() != null) {
+            assessment
+                    .withFullResult(fullAssessment.getResult())
+                    .withFullStatus(CurrentStatus.getFrom(fullAssessment.getAssessmnentStatusDTO().getStatus()));
+        }
+
+        HardshipReviewDTO crownHardship = financialAssessmentDTO.getHardship().getCrownCourtHardship();
+        if (crownHardship.getId() != null) {
+            assessment.withHardshipOverview(
+                    new ApiHardshipOverview()
+                            .withReviewResult(ReviewResult.getFrom(crownHardship.getReviewResult()))
+                            .withAssessmentStatus(CurrentStatus.getFrom(crownHardship.getAsessmentStatus().getStatus()))
+            );
+        }
+        return assessment;
     }
 }
