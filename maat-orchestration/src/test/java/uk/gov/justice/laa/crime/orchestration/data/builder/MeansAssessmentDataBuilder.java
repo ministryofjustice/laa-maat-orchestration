@@ -730,7 +730,8 @@ public class MeansAssessmentDataBuilder {
                 .withTotalAnnualDisposableIncome(ANNUAL_DISPOSABLE_INCOME)
                 .withTransactionDateTime(APPLICATION_TIMESTAMP)
                 .withUpdated(APPLICATION_TIMESTAMP)
-                .withUpperThreshold(UPPER_THRESHOLD);
+                .withUpperThreshold(UPPER_THRESHOLD)
+                .withDateCompleted(DATE_MODIFIED);
 
     }
 
