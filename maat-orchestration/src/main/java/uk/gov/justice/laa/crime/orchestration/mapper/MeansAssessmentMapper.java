@@ -332,7 +332,7 @@ public class MeansAssessmentMapper {
         return incomeEvidenceSummaryDTO;
     }
 
-    private EvidenceDTO getEvidenceDTO(ApiIncomeEvidence apiIncomeEvidence) {
+    public EvidenceDTO getEvidenceDTO(ApiIncomeEvidence apiIncomeEvidence) {
         EvidenceDTO evidenceDTO = new EvidenceDTO();
         evidenceDTO.setEvidenceTypeDTO(getEvidenceTypeDTO(apiIncomeEvidence.getApiEvidenceType()));
         evidenceDTO.setId(ofNullable(apiIncomeEvidence.getId()).map(Integer::longValue).orElse(0L));

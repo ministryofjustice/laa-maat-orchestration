@@ -6,10 +6,8 @@ import uk.gov.justice.laa.crime.common.model.evidence.*;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.FinancialAssessmentIncomeEvidence;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
-import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.enums.EmploymentStatus;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
-import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
@@ -22,12 +20,11 @@ import uk.gov.justice.laa.crime.util.NumberUtils;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
-
-import static uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper.mapChildWeightings;
 
 @Component
 @RequiredArgsConstructor
@@ -103,23 +100,21 @@ public class IncomeEvidenceMapper {
 
     public void maatApiAssessmentResponseToApplicationDTO(MaatApiAssessmentResponse assessmentResponse,
                                                           ApplicationDTO application) {
-        // TODO: Check these not needing to map values: repId, dateCreated, userCreated, cmuId, updated, userModified, rtCode, initApplicationEmploymentStatus
-        Boolean fullAvailable = assessmentResponse.getAssessmentType().equals("FULL");
-        InitialAssessmentDTO initialAssessment = application.getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
-        FullAssessmentDTO fullAssessment = application.getAssessmentDTO().getFinancialAssessmentDTO().getFull();
-        IncomeEvidenceSummaryDTO incomeEvidenceSummary = application.getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence();
+        IncomeEvidenceSummaryDTO incomeEvidenceSummary =
+                application.getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence();
+        List<EvidenceDTO> applicantEvidence = new ArrayList<>();
+        List<EvidenceDTO> partnerEvidence = new ArrayList<>();
 
-        application.getAssessmentDTO().getFinancialAssessmentDTO().setId(Long.valueOf(assessmentResponse.getId()));
-        application.getAssessmentDTO().getFinancialAssessmentDTO().setFullAvailable(fullAvailable);
-        application.getAssessmentDTO().getFinancialAssessmentDTO().setDateCompleted(assessmentResponse.getDateCompleted());
-        application.getAssessmentDTO().getFinancialAssessmentDTO().setUsn(Long.valueOf(assessmentResponse.getUsn()));
-        mapIncomeEvidenceSummary(incomeEvidenceSummary, assessmentResponse);
-
-        if (fullAvailable) {
-            mapFullAssessment(fullAssessment, assessmentResponse);
-        } else {
-            mapInitialAssessment(initialAssessment, assessmentResponse);
+        for (uk.gov.justice.laa.crime.common.model.meansassessment.ApiIncomeEvidence evidence : assessmentResponse.getIncomeEvidence()) {
+            if (evidence.getApplicantId().equals(NumberUtils.toInteger(application.getApplicantDTO().getId()))) {
+                applicantEvidence.add(meansAssessmentMapper.getEvidenceDTO(evidence));
+            } else {
+                partnerEvidence.add(meansAssessmentMapper.getEvidenceDTO(evidence));
+            }
         }
+
+        incomeEvidenceSummary.setApplicantIncomeEvidenceList(applicantEvidence);
+        incomeEvidenceSummary.setPartnerIncomeEvidenceList(partnerEvidence);
     }
 
     private ApiApplicantDetails getPartnerDetails(Collection<ApplicantLinkDTO> applicantLinks) {
@@ -239,63 +234,4 @@ public class IncomeEvidenceMapper {
                 .findFirst()
                 .orElse(null);
     }
-
-    private void mapIncomeEvidenceSummary(IncomeEvidenceSummaryDTO incomeEvidenceSummary,
-                                          MaatApiAssessmentResponse assessmentResponse) {
-        incomeEvidenceSummary.setEvidenceDueDate(DateUtil.toDate(assessmentResponse.getIncomeEvidenceDueDate()));
-        incomeEvidenceSummary.setUpliftAppliedDate(DateUtil.toDate(assessmentResponse.getIncomeUpliftApplyDate()));
-        incomeEvidenceSummary.setUpliftRemovedDate(DateUtil.toDate(assessmentResponse.getIncomeUpliftRemoveDate()));
-        incomeEvidenceSummary.setIncomeEvidenceNotes(assessmentResponse.getIncomeEvidenceNotes());
-        // TODO: How to map flat list of evidences to three seperate lists in appDTO for appl, partner and extra
-        // incomeEvidences
-    }
-
-    private void mapInitialAssessment(InitialAssessmentDTO initialAssessment,
-                                      MaatApiAssessmentResponse assessmentResponse) {
-        initialAssessment.setCriteriaId(Long.valueOf(assessmentResponse.getInitialAscrId()));
-        initialAssessment.setNewWorkReason(buildNewWorkReason(NewWorkReason.getFrom(assessmentResponse.getNworCode())));
-        initialAssessment.setAssessmnentStatusDTO(buildAssessmentStatus(CurrentStatus.getFrom(assessmentResponse.getFassInitStatus())));
-        initialAssessment.setAssessmentDate(DateUtil.toDate(assessmentResponse.getInitialAssessmentDate()));
-        initialAssessment.setOtherBenefitNote(assessmentResponse.getInitOtherBenefitNote());
-        initialAssessment.setOtherIncomeNote(assessmentResponse.getInitOtherIncomeNote());
-        initialAssessment.setTotalAggregatedIncome(assessmentResponse.getInitTotAggregatedIncome().doubleValue());
-        initialAssessment.setAdjustedIncomeValue(assessmentResponse.getInitAdjustedIncomeValue().doubleValue());
-        initialAssessment.setNotes(assessmentResponse.getInitNotes());
-        initialAssessment.setResult(assessmentResponse.getInitResult());
-        initialAssessment.setResultReason(assessmentResponse.getInitResultReason());
-        initialAssessment.setChildWeightings(mapChildWeightings(assessmentResponse.getChildWeightings()));
-        // TODO: How to organise the assessment details received into the appropriate section summaries assessment DTOs???
-        // "assessmentDetails",
-    }
-
-    private void mapFullAssessment(FullAssessmentDTO fullAssessment, MaatApiAssessmentResponse assessmentResponse) {
-        fullAssessment.setCriteriaId(Long.valueOf(assessmentResponse.getFullAscrId()));
-        fullAssessment.setAssessmnentStatusDTO(buildAssessmentStatus(CurrentStatus.getFrom(assessmentResponse.getFassFullStatus())));
-        fullAssessment.setAssessmentDate(DateUtil.toDate(assessmentResponse.getFullAssessmentDate()));
-        fullAssessment.setResult(assessmentResponse.getFullResult());
-        fullAssessment.setResultReason(assessmentResponse.getFullResultReason());
-        fullAssessment.setAssessmentNotes(assessmentResponse.getFullAssessmentNotes());
-        fullAssessment.setAdjustedLivingAllowance(assessmentResponse.getFullAdjustedLivingAllowance().doubleValue());
-        fullAssessment.setTotalAnnualDisposableIncome(assessmentResponse.getFullTotalAnnualDisposableIncome().doubleValue());
-        fullAssessment.setOtherHousingNote(assessmentResponse.getFullOtherHousingNote());
-        fullAssessment.setTotalAggregatedExpense(assessmentResponse.getFullTotalAggregatedExpenses().doubleValue());
-        // TODO: How to organise the assessment details received into the appropriate section summaries assessment DTOs???
-        // "assessmentDetails",
-    }
-
-    private NewWorkReasonDTO buildNewWorkReason(NewWorkReason newWorkReason) {
-        return NewWorkReasonDTO.builder()
-                .code(newWorkReason.getCode())
-                .description(newWorkReason.getDescription())
-                .type(newWorkReason.getType())
-                .build();
-    }
-
-    private AssessmentStatusDTO buildAssessmentStatus(CurrentStatus assessmentStatus) {
-        return AssessmentStatusDTO.builder()
-                .status(assessmentStatus.getStatus())
-                .description(assessmentStatus.getDescription())
-                .build();
-    }
-
 }
