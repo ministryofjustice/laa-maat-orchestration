@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.evidence.*;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.FinancialAssessmentIncomeEvidence;
+import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.enums.EmploymentStatus;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
@@ -24,6 +27,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper.mapChildWeightings;
+
 @Component
 @RequiredArgsConstructor
 public class IncomeEvidenceMapper {
@@ -34,41 +39,33 @@ public class IncomeEvidenceMapper {
     public ApiCreateIncomeEvidenceRequest workflowRequestToApiCreateIncomeEvidenceRequest(WorkflowRequest workflowRequest) {
         ApplicationDTO application = workflowRequest.getApplicationDTO();
         ApiApplicantDetails partnerDetails = getPartnerDetails(application.getApplicantLinks());
-        Collection<AssessmentSectionSummaryDTO> sectionSummaries = application.getAssessmentDTO()
+        Collection<AssessmentSectionSummaryDTO> initSectionSummaries = application.getAssessmentDTO()
                 .getFinancialAssessmentDTO().getInitial().getSectionSummaries();
 
         return new ApiCreateIncomeEvidenceRequest()
                 .withMagCourtOutcome(MagCourtOutcome.getFrom(application.getMagsOutcomeDTO().getOutcome()))
                 .withApplicantDetails(getApplicantDetails(application.getApplicantDTO()))
                 .withPartnerDetails(partnerDetails)
-                .withApplicantPensionAmount(getPensionAmount(sectionSummaries, false))
-                .withPartnerPensionAmount(partnerDetails == null ? null : getPensionAmount(sectionSummaries, true))
+                .withApplicantPensionAmount(getPensionAmount(initSectionSummaries, false))
+                .withPartnerPensionAmount(partnerDetails == null ? null : getPensionAmount(initSectionSummaries, true))
                 .withMetadata(getMetadata(workflowRequest));
     }
 
-    public MaatApiUpdateAssessment mapToMaatApiUpdateAssessment(WorkflowRequest workflowRequest, RepOrderDTO repOrder, ApiCreateIncomeEvidenceResponse evidenceResponse) {
+    public MaatApiUpdateAssessment mapToMaatApiUpdateAssessment(WorkflowRequest workflowRequest,
+                                                                RepOrderDTO repOrder,
+                                                                ApiCreateIncomeEvidenceResponse evidenceResponse) {
         ApplicationDTO application = workflowRequest.getApplicationDTO();
+        String assessmentType = application.getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable() ? "FULL" : "INIT";
         InitialAssessmentDTO initialAssessment = application.getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
         FullAssessmentDTO fullAssessment = application.getAssessmentDTO().getFinancialAssessmentDTO().getFull();
-        String assessmentType = application.getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable() ? "FULL" : "INIT";
-        Collection<AssessmentDetailDTO> assessmentDetails = assessmentType.equals("FULL")
+        Collection<AssessmentDetailDTO> assessmentDetails  = assessmentType.equals("FULL")
                 ? fullAssessment.getSectionSummaries().stream().flatMap(section -> section.getAssessmentDetail().stream()).toList()
                 : initialAssessment.getSectionSummaries().stream().flatMap(section -> section.getAssessmentDetail().stream()).toList();
-        Integer financialAssessmentId = NumberUtils.toInteger(application.getAssessmentDTO().getFinancialAssessmentDTO().getId());
-        FinancialAssessmentDTO existingFinancialAssessment = repOrder.getFinancialAssessments()
-                .stream()
-                .filter(assessment -> assessment.getId().equals(financialAssessmentId))
-                .findFirst()
-                .orElse(null);
-        List<FinancialAssessmentIncomeEvidence> incomeEvidences = Stream.of(
-                        getIncomeEvidences(evidenceResponse.getApplicantEvidenceItems(), existingFinancialAssessment, workflowRequest.getUserDTO()),
-                        getIncomeEvidences(evidenceResponse.getPartnerEvidenceItems(), existingFinancialAssessment, workflowRequest.getUserDTO()))
-                .flatMap(List::stream).toList();
 
         MaatApiUpdateAssessment updateAssessment = new MaatApiUpdateAssessment()
-                .withFinancialAssessmentId(financialAssessmentId)
+                .withFinancialAssessmentId(NumberUtils.toInteger(application.getAssessmentDTO().getFinancialAssessmentDTO().getId()))
                 .withUserModified(workflowRequest.getUserDTO().getUserName())
-                .withFinAssIncomeEvidences(incomeEvidences)
+                .withFinAssIncomeEvidences(getIncomeEvidences(workflowRequest, repOrder, evidenceResponse))
                 .withLaaTransactionId(UUID.randomUUID().toString())
                 .withRepId(NumberUtils.toInteger(application.getRepId()))
                 .withAssessmentType(assessmentType)
@@ -104,31 +101,25 @@ public class IncomeEvidenceMapper {
         return updateAssessment;
     }
 
-    private List<FinancialAssessmentIncomeEvidence> getIncomeEvidences(ApiIncomeEvidenceItems evidenceItems, FinancialAssessmentDTO existingFinancialAssessment, UserDTO user) {
-        Integer applicantId = evidenceItems.getApplicantDetails().getId();
+    public void maatApiAssessmentResponseToApplicationDTO(MaatApiAssessmentResponse assessmentResponse,
+                                                          ApplicationDTO application) {
+        // TODO: Check these not needing to map values: repId, dateCreated, userCreated, cmuId, updated, userModified, rtCode, initApplicationEmploymentStatus
+        Boolean fullAvailable = assessmentResponse.getAssessmentType().equals("FULL");
+        InitialAssessmentDTO initialAssessment = application.getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
+        FullAssessmentDTO fullAssessment = application.getAssessmentDTO().getFinancialAssessmentDTO().getFull();
+        IncomeEvidenceSummaryDTO incomeEvidenceSummary = application.getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence();
 
-        return evidenceItems.getIncomeEvidenceItems()
-                .stream()
-                .map(evidence -> new FinancialAssessmentIncomeEvidence()
-                        .withId(evidence.getId())
-                        .withDateReceived(getDateReceived(applicantId, evidence, existingFinancialAssessment))
-                        .withActive("Y")
-                        .withIncomeEvidence(evidence.getEvidenceType().getName())
-                        .withMandatory(evidence.getMandatory() ? "Y" : "N")
-                        .withApplicant(applicantId)
-                        .withOtherText(evidence.getDescription())
-                        .withUserCreated(user.getUserName()))
-                .toList();
-    }
+        application.getAssessmentDTO().getFinancialAssessmentDTO().setId(Long.valueOf(assessmentResponse.getId()));
+        application.getAssessmentDTO().getFinancialAssessmentDTO().setFullAvailable(fullAvailable);
+        application.getAssessmentDTO().getFinancialAssessmentDTO().setDateCompleted(assessmentResponse.getDateCompleted());
+        application.getAssessmentDTO().getFinancialAssessmentDTO().setUsn(Long.valueOf(assessmentResponse.getUsn()));
+        mapIncomeEvidenceSummary(incomeEvidenceSummary, assessmentResponse);
 
-    private LocalDateTime getDateReceived(Integer applicantId, ApiIncomeEvidence evidence, FinancialAssessmentDTO existingFinancialAssessment) {
-        return existingFinancialAssessment.getFinAssIncomeEvidences()
-                .stream()
-                .filter(existingEvidence -> existingEvidence.getApplicant().getId().equals(applicantId)
-                        && existingEvidence.getIncomeEvidence().equals(evidence.getEvidenceType().getName()))
-                .map(FinAssIncomeEvidenceDTO::getDateReceived)
-                .findFirst()
-                .orElse(null);
+        if (fullAvailable) {
+            mapFullAssessment(fullAssessment, assessmentResponse);
+        } else {
+            mapInitialAssessment(initialAssessment, assessmentResponse);
+        }
     }
 
     private ApiApplicantDetails getPartnerDetails(Collection<ApplicantLinkDTO> applicantLinks) {
@@ -153,8 +144,8 @@ public class IncomeEvidenceMapper {
                 .withEmploymentStatus(EmploymentStatus.getFrom(applicant.getEmploymentStatusDTO().getCode()));
     }
 
-    private BigDecimal getPensionAmount(Collection<AssessmentSectionSummaryDTO> sectionSummaries, boolean isPartner) {
-        AssessmentDetailDTO pensionDetails = sectionSummaries
+    private BigDecimal getPensionAmount(Collection<AssessmentSectionSummaryDTO> initSectionSummaries, boolean isPartner) {
+        AssessmentDetailDTO pensionDetails = initSectionSummaries
                 .stream()
                 .flatMap(section -> section.getAssessmentDetail().stream())
                 .filter(detail -> detail.getDescription().equals("Income from Private Pension(s)"))
@@ -191,11 +182,120 @@ public class IncomeEvidenceMapper {
     }
 
     private Boolean isEvidencePending(IncomeEvidenceSummaryDTO incomeEvidence) {
-        return !Stream.of(incomeEvidence.getApplicantIncomeEvidenceList(), incomeEvidence.getPartnerIncomeEvidenceList(),
+        return !Stream.of(incomeEvidence.getApplicantIncomeEvidenceList(),
+                        incomeEvidence.getPartnerIncomeEvidenceList(),
                         incomeEvidence.getExtraEvidenceList())
                 .flatMap(Collection::stream)
                 .filter(evidence -> evidence.getDateReceived() == null)
                 .toList()
                 .isEmpty();
     }
+
+    private List<FinancialAssessmentIncomeEvidence> getIncomeEvidences(WorkflowRequest workflowRequest,
+                                                                       RepOrderDTO repOrder,
+                                                                       ApiCreateIncomeEvidenceResponse evidenceResponse) {
+        Integer financialAssessmentId = NumberUtils.toInteger(
+                workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getId());
+        FinancialAssessmentDTO existingFinancialAssessment = repOrder.getFinancialAssessments()
+                .stream()
+                .filter(assessment -> assessment.getId().equals(financialAssessmentId))
+                .findFirst()
+                .orElse(null);
+        UserDTO user = workflowRequest.getUserDTO();
+
+        return Stream.of(getEvidences(evidenceResponse.getApplicantEvidenceItems(), existingFinancialAssessment, user),
+                        getEvidences(evidenceResponse.getPartnerEvidenceItems(), existingFinancialAssessment, user))
+                .flatMap(List::stream)
+                .toList();
+    }
+
+    private List<FinancialAssessmentIncomeEvidence> getEvidences(ApiIncomeEvidenceItems evidenceItems,
+                                                                 FinancialAssessmentDTO existingFinancialAssessment,
+                                                                 UserDTO user) {
+        Integer applicantId = evidenceItems.getApplicantDetails().getId();
+
+        return evidenceItems.getIncomeEvidenceItems()
+                .stream()
+                .map(evidence -> new FinancialAssessmentIncomeEvidence()
+                        .withId(evidence.getId())
+                        .withDateReceived(getDateReceived(applicantId, evidence, existingFinancialAssessment))
+                        .withActive("Y")
+                        .withIncomeEvidence(evidence.getEvidenceType().getName())
+                        .withMandatory(evidence.getMandatory() ? "Y" : "N")
+                        .withApplicant(applicantId)
+                        .withOtherText(evidence.getDescription())
+                        .withUserCreated(user.getUserName()))
+                .toList();
+    }
+
+    private LocalDateTime getDateReceived(Integer applicantId,
+                                          ApiIncomeEvidence evidence,
+                                          FinancialAssessmentDTO existingFinancialAssessment) {
+        return existingFinancialAssessment.getFinAssIncomeEvidences()
+                .stream()
+                .filter(existingEvidence -> existingEvidence.getApplicant().getId().equals(applicantId)
+                        && existingEvidence.getIncomeEvidence().equals(evidence.getEvidenceType().getName()))
+                .map(FinAssIncomeEvidenceDTO::getDateReceived)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void mapIncomeEvidenceSummary(IncomeEvidenceSummaryDTO incomeEvidenceSummary,
+                                          MaatApiAssessmentResponse assessmentResponse) {
+        incomeEvidenceSummary.setEvidenceDueDate(DateUtil.toDate(assessmentResponse.getIncomeEvidenceDueDate()));
+        incomeEvidenceSummary.setUpliftAppliedDate(DateUtil.toDate(assessmentResponse.getIncomeUpliftApplyDate()));
+        incomeEvidenceSummary.setUpliftRemovedDate(DateUtil.toDate(assessmentResponse.getIncomeUpliftRemoveDate()));
+        incomeEvidenceSummary.setIncomeEvidenceNotes(assessmentResponse.getIncomeEvidenceNotes());
+        // TODO: How to map flat list of evidences to three seperate lists in appDTO for appl, partner and extra
+        // incomeEvidences
+    }
+
+    private void mapInitialAssessment(InitialAssessmentDTO initialAssessment,
+                                      MaatApiAssessmentResponse assessmentResponse) {
+        initialAssessment.setCriteriaId(Long.valueOf(assessmentResponse.getInitialAscrId()));
+        initialAssessment.setNewWorkReason(buildNewWorkReason(NewWorkReason.getFrom(assessmentResponse.getNworCode())));
+        initialAssessment.setAssessmnentStatusDTO(buildAssessmentStatus(CurrentStatus.getFrom(assessmentResponse.getFassInitStatus())));
+        initialAssessment.setAssessmentDate(DateUtil.toDate(assessmentResponse.getInitialAssessmentDate()));
+        initialAssessment.setOtherBenefitNote(assessmentResponse.getInitOtherBenefitNote());
+        initialAssessment.setOtherIncomeNote(assessmentResponse.getInitOtherIncomeNote());
+        initialAssessment.setTotalAggregatedIncome(assessmentResponse.getInitTotAggregatedIncome().doubleValue());
+        initialAssessment.setAdjustedIncomeValue(assessmentResponse.getInitAdjustedIncomeValue().doubleValue());
+        initialAssessment.setNotes(assessmentResponse.getInitNotes());
+        initialAssessment.setResult(assessmentResponse.getInitResult());
+        initialAssessment.setResultReason(assessmentResponse.getInitResultReason());
+        initialAssessment.setChildWeightings(mapChildWeightings(assessmentResponse.getChildWeightings()));
+        // TODO: How to organise the assessment details received into the appropriate section summaries assessment DTOs???
+        // "assessmentDetails",
+    }
+
+    private void mapFullAssessment(FullAssessmentDTO fullAssessment, MaatApiAssessmentResponse assessmentResponse) {
+        fullAssessment.setCriteriaId(Long.valueOf(assessmentResponse.getFullAscrId()));
+        fullAssessment.setAssessmnentStatusDTO(buildAssessmentStatus(CurrentStatus.getFrom(assessmentResponse.getFassFullStatus())));
+        fullAssessment.setAssessmentDate(DateUtil.toDate(assessmentResponse.getFullAssessmentDate()));
+        fullAssessment.setResult(assessmentResponse.getFullResult());
+        fullAssessment.setResultReason(assessmentResponse.getFullResultReason());
+        fullAssessment.setAssessmentNotes(assessmentResponse.getFullAssessmentNotes());
+        fullAssessment.setAdjustedLivingAllowance(assessmentResponse.getFullAdjustedLivingAllowance().doubleValue());
+        fullAssessment.setTotalAnnualDisposableIncome(assessmentResponse.getFullTotalAnnualDisposableIncome().doubleValue());
+        fullAssessment.setOtherHousingNote(assessmentResponse.getFullOtherHousingNote());
+        fullAssessment.setTotalAggregatedExpense(assessmentResponse.getFullTotalAggregatedExpenses().doubleValue());
+        // TODO: How to organise the assessment details received into the appropriate section summaries assessment DTOs???
+        // "assessmentDetails",
+    }
+
+    private NewWorkReasonDTO buildNewWorkReason(NewWorkReason newWorkReason) {
+        return NewWorkReasonDTO.builder()
+                .code(newWorkReason.getCode())
+                .description(newWorkReason.getDescription())
+                .type(newWorkReason.getType())
+                .build();
+    }
+
+    private AssessmentStatusDTO buildAssessmentStatus(CurrentStatus assessmentStatus) {
+        return AssessmentStatusDTO.builder()
+                .status(assessmentStatus.getStatus())
+                .description(assessmentStatus.getDescription())
+                .build();
+    }
+
 }

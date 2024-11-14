@@ -411,7 +411,7 @@ public class MeansAssessmentMapper {
         return ReviewTypeDTO.builder().build();
     }
 
-    private static List<ChildWeightingDTO> mapChildWeightings(List<ApiAssessmentChildWeighting> childWeightings) {
+    public static List<ChildWeightingDTO> mapChildWeightings(List<ApiAssessmentChildWeighting> childWeightings) {
         List<ChildWeightingDTO> childWeightingDTOList = new ArrayList<>();
         for (ApiAssessmentChildWeighting apiAssessmentChildWeighting : childWeightings) {
             ChildWeightingDTO childWeightingDTO = new ChildWeightingDTO();
