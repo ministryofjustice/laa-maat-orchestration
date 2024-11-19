@@ -3,6 +3,7 @@ package uk.gov.justice.laa.crime.orchestration.data.builder;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.common.ApiUserSession;
 import uk.gov.justice.laa.crime.common.model.meansassessment.*;
+import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -97,7 +98,7 @@ public class MeansAssessmentDataBuilder {
     public static final BigDecimal ADJUSTED_LIVING_ALLOWANCE = BigDecimal.valueOf(15600.00);
     public static final String RESULT_REASON = "FullAssessmentResult.PASS.getReason()";
     public static final String CRITERIA_DETAIL_CODE = "Mock assessment detail code";
-    public static final String ASSESSMENT_DESCRIPTION = "Mock assessment description";
+    public static final String ASSESSMENT_DESCRIPTION = "Income from Private Pension(s)";
     public static final BigDecimal PARTNER_AMOUNT = BigDecimal.valueOf(2000);
     private static final LocalDateTime DATE_MODIFIED = LocalDateTime.of(2023, 10, 13, 10, 15, 30);
     private static final ZonedDateTime TIME_STAMP =  toZonedDateTime(DATE_MODIFIED);
@@ -414,7 +415,7 @@ public class MeansAssessmentDataBuilder {
                 .build();
     }
 
-    private static EvidenceDTO getApplicantEvidenceDTO() {
+    public static EvidenceDTO getApplicantEvidenceDTO() {
         return EvidenceDTO.builder()
                 .id(APPLICANT_EVIDENCE_ID.longValue())
                 .evidenceTypeDTO(getEvidenceTypeDTO())
@@ -423,7 +424,7 @@ public class MeansAssessmentDataBuilder {
                 .build();
     }
 
-    private static EvidenceDTO getPartnerEvidenceDTO() {
+   public static EvidenceDTO getPartnerEvidenceDTO() {
         return EvidenceDTO.builder()
                 .id(PARTNER_EVIDENCE_ID.longValue())
                 .evidenceTypeDTO(getEvidenceTypeDTO())
@@ -580,32 +581,37 @@ public class MeansAssessmentDataBuilder {
                 .withFirstReminderDate(FIRST_REMINDER_DATE)
                 .withSecondReminderDate(SECOND_REMINDER_DATE)
                 .withUpliftRemovedDate(INCOME_UPLIFT_REMOVE_DATE)
-                .withIncomeEvidence(getIncomeEvidence());
+                .withIncomeEvidence(getIncomeEvidence(true));
     }
 
-    private static List<ApiIncomeEvidence> getIncomeEvidence() {
-        return List.of(
-                new ApiIncomeEvidence()
-                        .withId(APPLICANT_EVIDENCE_ID)
-                        .withApplicantId(Constants.APPLICANT_ID)
-                        .withDateReceived(APPLICANT_EVIDENCE_RECEIVED_DATE)
-                        .withDateModified(DATE_MODIFIED)
-                        .withApiEvidenceType(getApiEvidenceType()),
-                new ApiIncomeEvidence()
-                        .withId(PARTNER_EVIDENCE_ID)
-                        .withApplicantId(PARTNER_ID)
-                        .withDateReceived(PARTNER_EVIDENCE_RECEIVED_DATE)
-                        .withDateModified(DATE_MODIFIED)
-                        .withApiEvidenceType(getApiEvidenceType()),
-                new ApiIncomeEvidence()
-                        .withAdhoc("Y")
-                        .withId(EXTRA_EVIDENCE_ID)
-                        .withApiEvidenceType(getApiEvidenceType())
-                        .withDateReceived(DATETIME_RECEIVED)
-                        .withOtherText(OTHER_DESCRIPTION)
-                        .withMandatory("true")
-                        .withDateModified(DATE_MODIFIED)
-        );
+    public static List<ApiIncomeEvidence> getIncomeEvidence(boolean withExtra) {
+        List<ApiIncomeEvidence> incomeEvidences = new ArrayList<>();
+
+        incomeEvidences.add(new ApiIncomeEvidence()
+                .withId(APPLICANT_EVIDENCE_ID)
+                .withApplicantId(Constants.APPLICANT_ID)
+                .withDateReceived(APPLICANT_EVIDENCE_RECEIVED_DATE)
+                .withDateModified(DATE_MODIFIED)
+                .withApiEvidenceType(getApiEvidenceType()));
+        incomeEvidences.add(new ApiIncomeEvidence()
+                .withId(PARTNER_EVIDENCE_ID)
+                .withApplicantId(PARTNER_ID)
+                .withDateReceived(PARTNER_EVIDENCE_RECEIVED_DATE)
+                .withDateModified(DATE_MODIFIED)
+                .withApiEvidenceType(getApiEvidenceType()));
+
+        if (withExtra) {
+            incomeEvidences.add(new ApiIncomeEvidence()
+                    .withAdhoc("Y")
+                    .withId(EXTRA_EVIDENCE_ID)
+                    .withApiEvidenceType(getApiEvidenceType())
+                    .withDateReceived(DATETIME_RECEIVED)
+                    .withOtherText(OTHER_DESCRIPTION)
+                    .withMandatory("true")
+                    .withDateModified(DATE_MODIFIED));
+        }
+
+        return incomeEvidences;
     }
 
     private static ApiEvidenceType getApiEvidenceType() {

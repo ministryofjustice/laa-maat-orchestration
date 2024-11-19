@@ -5,6 +5,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiApplicantDetails;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiIncomeEvidenceMetadata;
 import uk.gov.justice.laa.crime.common.model.hardship.*;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCapitalEvidence;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
@@ -25,6 +28,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RoleDataItemDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
+import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -63,6 +67,7 @@ public class TestModelDataBuilder {
     private static final Integer EXTRA_EVIDENCE_ID = 9552475;
     private static final String INCOME_EVIDENCE_DESCRIPTION = "Tax Return";
     private static final String INCOME_EVIDENCE = "TAX RETURN";
+    private static final String INCOME_EVIDENCE_NOTES = "Income evidence notes";
     private static final String EVIDENCE_FEE_LEVEL_1 = "LEVEL1";
     public static final Integer PASSPORTED_ID = 777;
     private static final Integer APPLICANT_HISTORY_ID = 666;
@@ -128,6 +133,7 @@ public class TestModelDataBuilder {
     private static final Integer TEST_RECORD_ID = 100;
     private static final LocalDateTime RESERVATION_DATE = LocalDateTime.of(2022, 12, 14, 0, 0, 0);
     public static final LocalDateTime EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 11, 0, 0, 0);
+    public static final long APPLICANT_ID = 1000L;
     public static final long PARTNER_ID = 1234L;
     public static final String EMST_CODE ="EMST_CODE";
     public static final LocalDateTime INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 11, 0, 0, 0);
@@ -605,7 +611,7 @@ public class TestModelDataBuilder {
 
     public static ApplicantDTO getApplicantDTO() {
         return ApplicantDTO.builder()
-                .id(1000L)
+                .id(APPLICANT_ID)
                 .applicantHistoryId(APPLICANT_HISTORY_ID.longValue())
                 .employmentStatusDTO(getEmploymentStatusDTO())
                 .build();
@@ -956,7 +962,7 @@ public class TestModelDataBuilder {
         return IncomeEvidenceSummaryDTO.builder()
                 .upliftAppliedDate(toDate(LocalDateTime.of(2023, 11, 18, 0, 0, 0)))
                 .upliftRemovedDate(toDate(LocalDateTime.of(2023, 11, 18, 0, 0, 0)))
-                .incomeEvidenceNotes("Income Evidence Notes")
+                .incomeEvidenceNotes(INCOME_EVIDENCE_NOTES)
                 .extraEvidenceList(List.of(getExtraEvidenceDTO()))
                 .applicantIncomeEvidenceList(List.of(getEvidenceDTO(APPLICANT_EVIDENCE_ID)))
                 .partnerIncomeEvidenceList(List.of(getEvidenceDTO(PARTNER_EVIDENCE_ID)))
@@ -1342,5 +1348,29 @@ public class TestModelDataBuilder {
                 .result(RESULT_FAIL)
                 .reviewType(RT_CODE_ER)
                 .build();
+    }
+
+    public static ApiCreateIncomeEvidenceRequest getApiCreateEvidenceRequest(boolean isPartner) {
+        return new ApiCreateIncomeEvidenceRequest()
+                .withMagCourtOutcome(MagCourtOutcome.SENT_FOR_TRIAL)
+                .withApplicantDetails(getApplicantDetails(false))
+                .withPartnerDetails(isPartner ? getApplicantDetails(true) : null)
+                .withApplicantPensionAmount(BigDecimal.valueOf(1000.0 * Frequency.MONTHLY.getWeighting()))
+                .withPartnerPensionAmount(isPartner ? BigDecimal.valueOf(2000.0 * Frequency.TWO_WEEKLY.getWeighting()) : null)
+                .withMetadata(getMetadata());
+    }
+
+    public static ApiApplicantDetails getApplicantDetails(boolean isPartner) {
+        return new ApiApplicantDetails()
+                .withId(isPartner ? NumberUtils.toInteger(PARTNER_ID) : NumberUtils.toInteger(APPLICANT_ID))
+                .withEmploymentStatus(EmploymentStatus.EMPLOY);
+    }
+
+    public static ApiIncomeEvidenceMetadata getMetadata() {
+        return new ApiIncomeEvidenceMetadata()
+                .withApplicationReceivedDate(DATETIME_RECEIVED.toLocalDate())
+                .withEvidencePending(false)
+                .withNotes(INCOME_EVIDENCE_NOTES)
+                .withUserSession(getApiUserSession());
     }
 }

@@ -11,6 +11,7 @@ import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAsse
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.IncomeEvidenceMapper;
 import uk.gov.justice.laa.crime.orchestration.service.api.EvidenceApiService;
@@ -37,11 +38,11 @@ class IncomeEvidenceServiceTest {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrder = TestModelDataBuilder.buildRepOrderDTO("CURR");
 
-        when(incomeEvidenceMapper.workflowRequestToApiCreateIncomeEvidenceRequest(workflowRequest))
+        when(incomeEvidenceMapper.workflowRequestToApiCreateIncomeEvidenceRequest(any(WorkflowRequest.class)))
                 .thenReturn(new ApiCreateIncomeEvidenceRequest());
         when(evidenceApiService.createEvidence(any(ApiCreateIncomeEvidenceRequest.class)))
                 .thenReturn(new ApiCreateIncomeEvidenceResponse());
-        when(incomeEvidenceMapper.mapToMaatApiUpdateAssessment(workflowRequest, repOrder, any(ApiCreateIncomeEvidenceResponse.class)))
+        when(incomeEvidenceMapper.mapToMaatApiUpdateAssessment(any(WorkflowRequest.class), any(RepOrderDTO.class), any(ApiCreateIncomeEvidenceResponse.class)))
                 .thenReturn(new MaatApiUpdateAssessment());
         when(maatCourtDataApiService.updateFinancialAssessment(any(MaatApiUpdateAssessment.class)))
                 .thenReturn(new MaatApiAssessmentResponse());
@@ -51,7 +52,7 @@ class IncomeEvidenceServiceTest {
         verify(evidenceApiService).createEvidence(any(ApiCreateIncomeEvidenceRequest.class));
         verify(maatCourtDataApiService).updateFinancialAssessment(any(MaatApiUpdateAssessment.class));
         verify(incomeEvidenceMapper).maatApiAssessmentResponseToApplicationDTO(any(MaatApiAssessmentResponse.class),
-                workflowRequest.getApplicationDTO());
+                any(ApplicationDTO.class));
     }
 }
 
