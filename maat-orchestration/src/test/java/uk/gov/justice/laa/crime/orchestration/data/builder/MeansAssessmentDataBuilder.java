@@ -293,7 +293,7 @@ public class MeansAssessmentDataBuilder {
                 .build();
     }
 
-    private static AssessmentDetailDTO getSectionDetail() {
+    public static AssessmentDetailDTO getSectionDetail() {
         return AssessmentDetailDTO.builder()
                 .id(ASSESSMENT_DETAIL_ID.longValue())
                 .applicantAmount(APPLICANT_VALUE.doubleValue())

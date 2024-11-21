@@ -9,18 +9,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiIncomeEvidence;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
+import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
+import uk.gov.justice.laa.crime.enums.AssessmentType;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,12 +73,42 @@ public class IncomeEvidenceMapperTest {
 
     @Test
     void givenInitialAssessment_whenMapToMaatApiUpdateAssessmentIsInvoked_thenMaatApiUpdateAssessmentIsReturned() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(); // full not available
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        ApiCreateIncomeEvidenceResponse apiCreateIncomeEvidenceResponse = ???;
 
+        when(meansAssessmentMapper.assessmentDetailsBuilder(anyList()))
+                .thenReturn();
+        when(meansAssessmentMapper.childWeightingsBuilder(anyList()))
+                .thenReturn();
+
+        MaatApiUpdateAssessment maatApiUpdateAssessment =
+                incomeEvidenceMapper.mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, apiCreateIncomeEvidenceResponse);
+
+        softly.assertThat(maatApiUpdateAssessment)
+                .usingRecursiveComparison()
+                .ignoringFields("laaTransactionId")
+                .isEqualTo(TestModelDataBuilder.getMaatApiUpdateAssessment(AssessmentType.INIT));
     }
 
     @Test
     void givenFullAssessment_whenMapToMaatApiUpdateAssessmentIsInvoked_thenMaatApiUpdateAssessmentIsReturned() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT); // full
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR"); // TODO this might not be right
+        ApiCreateIncomeEvidenceResponse apiCreateIncomeEvidenceResponse = ???;
 
+        when(meansAssessmentMapper.assessmentDetailsBuilder(anyList()))
+                .thenReturn();
+        when(meansAssessmentMapper.childWeightingsBuilder(anyList()))
+                .thenReturn();
+
+        MaatApiUpdateAssessment maatApiUpdateAssessment =
+                incomeEvidenceMapper.mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, apiCreateIncomeEvidenceResponse);
+
+        softly.assertThat(maatApiUpdateAssessment)
+                .usingRecursiveComparison()
+                .ignoringFields("laaTransactionId")
+                .isEqualTo(TestModelDataBuilder.getMaatApiUpdateAssessment(AssessmentType.FULL));
     }
 
     @Test

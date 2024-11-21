@@ -9,6 +9,8 @@ import uk.gov.justice.laa.crime.common.model.evidence.ApiApplicantDetails;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiIncomeEvidenceMetadata;
 import uk.gov.justice.laa.crime.common.model.hardship.*;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentChildWeighting;
+import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCapitalEvidence;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiIOJSummary;
@@ -28,6 +30,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RoleDataItemDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
+import uk.gov.justice.laa.crime.util.DateUtil;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
@@ -1360,17 +1363,65 @@ public class TestModelDataBuilder {
                 .withMetadata(getMetadata());
     }
 
-    public static ApiApplicantDetails getApplicantDetails(boolean isPartner) {
+    private static ApiApplicantDetails getApplicantDetails(boolean isPartner) {
         return new ApiApplicantDetails()
                 .withId(isPartner ? NumberUtils.toInteger(PARTNER_ID) : NumberUtils.toInteger(APPLICANT_ID))
                 .withEmploymentStatus(EmploymentStatus.EMPLOY);
     }
 
-    public static ApiIncomeEvidenceMetadata getMetadata() {
+    private static ApiIncomeEvidenceMetadata getMetadata() {
         return new ApiIncomeEvidenceMetadata()
                 .withApplicationReceivedDate(DATETIME_RECEIVED.toLocalDate())
                 .withEvidencePending(false)
                 .withNotes(INCOME_EVIDENCE_NOTES)
                 .withUserSession(getApiUserSession());
+    }
+
+    public static MaatApiUpdateAssessment getMaatApiUpdateAssessment(AssessmentType assessmentType) {
+        MaatApiUpdateAssessment maatApiUpdateAssessment = new MaatApiUpdateAssessment()
+                .withFinancialAssessmentId(Constants.FINANCIAL_ASSESSMENT_ID)
+                .withUserModified(Constants.USERNAME)
+                .withFinAssIncomeEvidences() // TODO complete this
+                .withRepId(REP_ID)
+                .withAssessmentType(assessmentType.getType())
+                .withCmuId(CMU_ID)
+                .withFassInitStatus(AssessmentStatusDTO.COMPLETE)
+                .withInitialAssessmentDate(null)
+                .withInitOtherBenefitNote(null)
+                .withInitOtherIncomeNote(null)
+                .withInitTotAggregatedIncome(TOTAL_AGGREGATED_INCOME)
+                .withInitAdjustedIncomeValue(null)
+                .withInitNotes(null)
+                .withInitResult(RESULT_FAIL)
+                .withInitResultReason(null)
+                .withInitialAscrId(null)
+                .withInitApplicationEmploymentStatus("EMPLOY")
+                .withAssessmentDetails() // TODO complete this need to build this
+                .withChildWeightings(getAssessmentChildWeightings())
+                .withDateCompleted(null);
+
+        if (AssessmentType.FULL.equals(assessmentType)) {
+            maatApiUpdateAssessment.setFassFullStatus(AssessmentStatusDTO.COMPLETE);
+            maatApiUpdateAssessment.setFullAssessmentDate(LocalDateTime.ofInstant(ASSESSMENT_DATE.toInstant(), ZoneId.systemDefault()));
+            maatApiUpdateAssessment.setFullResult(RESULT_PASS);
+            maatApiUpdateAssessment.setFullResultReason(null);
+            maatApiUpdateAssessment.setFullAssessmentNotes(ASSESSMENT_NOTES);
+            maatApiUpdateAssessment.setFullAdjustedLivingAllowance(null);
+            maatApiUpdateAssessment.setFullTotalAnnualDisposableIncome(Constants.DISPOSABLE_INCOME);
+            maatApiUpdateAssessment.setFullOtherHousingNote(OTHER_HOUSING_NOTES);
+            maatApiUpdateAssessment.setFullTotalAggregatedExpenses(null);
+            maatApiUpdateAssessment.setFullAscrId(null);
+        }
+
+        return maatApiUpdateAssessment;
+    }
+
+    private static List<ApiAssessmentChildWeighting> getAssessmentChildWeightings() {
+        return List.of(
+                new ApiAssessmentChildWeighting()
+                        .withId(1234)
+                        .withChildWeightingId(37)
+                        .withNoOfChildren(1)
+        );
     }
 }
