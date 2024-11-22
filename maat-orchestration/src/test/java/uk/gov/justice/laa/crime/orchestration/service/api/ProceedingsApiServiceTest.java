@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.MockServicesConfiguration;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
@@ -36,7 +37,7 @@ class ProceedingsApiServiceTest {
 
     @Test
     void givenValidRequest_whenUpdateCrownCourtIsInvoked_thenAPIRequestIsSent() {
-        proceedingsApiService.updateCrownCourt(new ApiUpdateApplicationRequest());
+        proceedingsApiService.updateCrownCourt(new ApiUpdateCrownCourtRequest());
 
         verify(crownCourtApiClient)
                 .put(any(ApiUpdateApplicationRequest.class), any(), anyString(), anyMap());

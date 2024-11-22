@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -32,8 +33,8 @@ public class ProceedingsService {
     }
 
     public ApplicationDTO updateCrownCourt(ApplicationDTO application, UserDTO userDTO) {
-        ApiUpdateApplicationRequest apiUpdateApplicationRequest =
-                proceedingsMapper.workflowRequestToUpdateApplicationRequest(application, userDTO);
+        ApiUpdateCrownCourtRequest apiUpdateApplicationRequest =
+                proceedingsMapper.workflowRequestToUpdateCrownCourtRequest(application, userDTO);
         ApiUpdateCrownCourtOutcomeResponse updateCrownCourtResponse =
                 proceedingsApiService.updateCrownCourt(apiUpdateApplicationRequest);
         return proceedingsMapper.updateCrownCourtResponseToApplicationDto(

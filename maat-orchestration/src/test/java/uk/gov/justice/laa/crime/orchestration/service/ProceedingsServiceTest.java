@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -49,10 +50,10 @@ class ProceedingsServiceTest {
 
     @Test
     void givenWorkflowRequest_whenUpdateCrownCourtIsInvoked_thenApiServiceIsCalledAndApplicationUpdated() {
-        when(proceedingsMapper.workflowRequestToUpdateApplicationRequest(any(ApplicationDTO.class), any()))
-                .thenReturn(new ApiUpdateApplicationRequest());
+        when(proceedingsMapper.workflowRequestToUpdateCrownCourtRequest(any(ApplicationDTO.class), any()))
+                .thenReturn(new ApiUpdateCrownCourtRequest());
 
-        when(proceedingsApiService.updateCrownCourt(any(ApiUpdateApplicationRequest.class)))
+        when(proceedingsApiService.updateCrownCourt(any(ApiUpdateCrownCourtRequest.class)))
                 .thenReturn(new ApiUpdateCrownCourtOutcomeResponse());
 
         proceedingsService.updateCrownCourt(new ApplicationDTO(), new UserDTO());

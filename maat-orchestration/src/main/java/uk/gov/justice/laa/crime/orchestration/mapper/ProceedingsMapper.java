@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.*;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiProcessRepOrderRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
@@ -28,8 +29,16 @@ public class ProceedingsMapper extends CrownCourtMapper {
     public ApiUpdateApplicationRequest workflowRequestToUpdateApplicationRequest(
             ApplicationDTO application, UserDTO userDTO) {
 
-        ApiUpdateApplicationRequest updateApplicationRequest = new ApiUpdateApplicationRequest()
-                .withRepId(NumberUtils.toInteger(application.getRepId()))
+        ApiUpdateApplicationRequest request = new ApiUpdateApplicationRequest();
+        mapToApiProcessRepOrderRequest(application, request, Boolean.TRUE);
+        mapToApiUpdateApplicationRequest(application, userDTO, request);
+
+        return request;
+    }
+
+    private void mapToApiProcessRepOrderRequest(ApplicationDTO application, ApiProcessRepOrderRequest request, Boolean isMeansAssessment) {
+        request
+            .withRepId(NumberUtils.toInteger(application.getRepId()))
                 .withCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()))
                 .withMagCourtOutcome(MagCourtOutcome.getFrom(application.getMagsOutcomeDTO().getOutcome()))
                 .withDecisionReason(DecisionReason.getFrom(application.getRepOrderDecision().getCode()))
@@ -44,7 +53,12 @@ public class ProceedingsMapper extends CrownCourtMapper {
                                 .withIojResult(application.getIojResult())
                 )
                 .withPassportAssessment(applicationDtoToPassportAssessment(application))
-                .withFinancialAssessment(applicationDtoToFinancialAssessment(application));
+                .withFinancialAssessment(applicationDtoToFinancialAssessment(application, isMeansAssessment));
+
+
+    }
+
+    private void mapToApiUpdateApplicationRequest(ApplicationDTO application, UserDTO userDTO, ApiUpdateApplicationRequest request) {
 
         CrownCourtOverviewDTO crownCourtOverview = application.getCrownCourtOverviewDTO();
         CrownCourtSummaryDTO crownCourtSummary = crownCourtOverview.getCrownCourtSummaryDTO();
@@ -52,7 +66,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         ApiCrownCourtSummary ccpCrownCourtSummary =
                 crownCourtSummaryDtoToApiCrownCourtSummary(crownCourtSummary);
 
-        return updateApplicationRequest
+        request
                 .withCrownCourtSummary(ccpCrownCourtSummary)
                 .withApplicantHistoryId(NumberUtils.toInteger(application.getApplicantDTO().getApplicantHistoryId()))
                 .withCrownRepId(NumberUtils.toInteger(crownCourtSummary.getCcRepId()))
@@ -61,6 +75,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
     }
 
     private ApiCrownCourtSummary crownCourtSummaryDtoToApiCrownCourtSummary(CrownCourtSummaryDTO crownCourtSummary) {
+
         ApiCrownCourtSummary ccpCrownCourtSummary = new ApiCrownCourtSummary();
         ccpCrownCourtSummary.setRepOrderDecision(crownCourtSummary.getRepOrderDecision().getValue());
         ccpCrownCourtSummary.setRepOrderDate(DateUtil.toLocalDateTime(crownCourtSummary.getCcRepOrderDate()));
@@ -123,16 +138,19 @@ public class ProceedingsMapper extends CrownCourtMapper {
         return null;
     }
 
-    private ApiFinancialAssessment applicationDtoToFinancialAssessment(ApplicationDTO application) {
+    private ApiFinancialAssessment applicationDtoToFinancialAssessment(ApplicationDTO application, Boolean isMeansAssessment) {
 
         FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
         FullAssessmentDTO fullAssessment = financialAssessmentDTO.getFull();
         InitialAssessmentDTO initialAssessment = financialAssessmentDTO.getInitial();
 
         ApiFinancialAssessment assessment = new ApiFinancialAssessment();
-        assessment
-                .withInitResult(initialAssessment.getResult())
-                .withInitStatus(CurrentStatus.getFrom(initialAssessment.getAssessmnentStatusDTO().getStatus()));
+        assessment.withInitResult(initialAssessment.getResult());
+        if (isMeansAssessment) {
+            assessment.withInitStatus(CurrentStatus.getFrom(initialAssessment.getAssessmnentStatusDTO().getStatus()));
+        } else {
+            assessment.withInitStatus(getCurrentStatus(initialAssessment.getAssessmnentStatusDTO().getStatus()));
+        }
 
         if (financialAssessmentDTO.getFull().getAssessmentDate() != null) {
             assessment
@@ -227,73 +245,24 @@ public class ProceedingsMapper extends CrownCourtMapper {
     public ApiUpdateCrownCourtRequest workflowRequestToUpdateCrownCourtRequest(
             ApplicationDTO application, UserDTO userDTO) {
 
-        ApiUpdateCrownCourtRequest updateCrownCourtRequest = new ApiUpdateCrownCourtRequest()
-                .withRepId(NumberUtils.toInteger(application.getRepId()))
-                .withCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()))
-                .withMagCourtOutcome(MagCourtOutcome.getFrom(application.getMagsOutcomeDTO().getOutcome()))
-                .withDecisionReason(DecisionReason.getFrom(application.getRepOrderDecision().getCode()))
-                .withDecisionDate(DateUtil.toLocalDateTime(application.getDecisionDate()))
-                .withCommittalDate(DateUtil.toLocalDateTime(application.getCommittalDate()))
-                .withDateReceived(DateUtil.toLocalDateTime(application.getDateReceived()))
-                .withIojAppeal(
-                        new ApiIOJSummary()
-                                .withDecisionResult(
-                                        application.getAssessmentDTO().getIojAppeal().getAppealDecisionResult()
-                                )
-                                .withIojResult(application.getIojResult())
-                )
-                .withPassportAssessment(applicationDtoToPassportAssessment(application))
-                .withFinancialAssessment(crownCourtApplicationDtoToFinancialAssessment(application));
+        ApiUpdateCrownCourtRequest request = new ApiUpdateCrownCourtRequest();
+
+        mapToApiProcessRepOrderRequest(application, request, Boolean.FALSE);
+        mapToApiUpdateApplicationRequest(application, userDTO, request);
 
         CrownCourtOverviewDTO crownCourtOverview = application.getCrownCourtOverviewDTO();
         CrownCourtSummaryDTO crownCourtSummary = crownCourtOverview.getCrownCourtSummaryDTO();
 
-        ApiCrownCourtSummary ccpCrownCourtSummary =
-                crownCourtSummaryDtoToApiCrownCourtSummary(crownCourtSummary);
-
         if (null != crownCourtSummary.getOutcomeDTOs()) {
-            ccpCrownCourtSummary.setCrownCourtOutcome(mapToApiCrownCourtOutcomes(crownCourtSummary));
+            request.getCrownCourtSummary().setCrownCourtOutcome(mapToApiCrownCourtOutcomes(crownCourtSummary));
         }
+        mapEvidenceDetailsToRequest(request, application);
 
-        mapEvidenceDetailsToRequest(updateCrownCourtRequest, application);
+        return request;
 
-        return updateCrownCourtRequest
-                .withCrownCourtSummary(ccpCrownCourtSummary)
-                .withApplicantHistoryId(NumberUtils.toInteger(application.getApplicantDTO().getApplicantHistoryId()))
-                .withCrownRepId(NumberUtils.toInteger(crownCourtSummary.getCcRepId()))
-                .withIsImprisoned(crownCourtSummary.getInPrisoned())
-                .withUserSession(userMapper.userDtoToUserSession(userDTO));
     }
 
-    private static CurrentStatus getCurrentStatus(String status) {
+    public static CurrentStatus getCurrentStatus(String status) {
         return StringUtils.isNotBlank(status) ? CurrentStatus.getFrom(status) : null;
-    }
-
-    private ApiFinancialAssessment crownCourtApplicationDtoToFinancialAssessment(ApplicationDTO application) {
-
-        FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
-        FullAssessmentDTO fullAssessment = financialAssessmentDTO.getFull();
-        InitialAssessmentDTO initialAssessment = financialAssessmentDTO.getInitial();
-
-        ApiFinancialAssessment assessment = new ApiFinancialAssessment();
-        assessment
-                .withInitResult(initialAssessment.getResult())
-                .withInitStatus(getCurrentStatus(initialAssessment.getAssessmnentStatusDTO().getStatus()));
-
-        if (financialAssessmentDTO.getFull().getAssessmentDate() != null) {
-            assessment
-                    .withFullResult(fullAssessment.getResult())
-                    .withFullStatus(CurrentStatus.getFrom(fullAssessment.getAssessmnentStatusDTO().getStatus()));
-        }
-
-        HardshipReviewDTO crownHardship = financialAssessmentDTO.getHardship().getCrownCourtHardship();
-        if (crownHardship.getId() != null) {
-            assessment.withHardshipOverview(
-                    new ApiHardshipOverview()
-                            .withReviewResult(ReviewResult.getFrom(crownHardship.getReviewResult()))
-                            .withAssessmentStatus(CurrentStatus.getFrom(crownHardship.getAsessmentStatus().getStatus()))
-            );
-        }
-        return assessment;
     }
 }
