@@ -36,7 +36,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         return request;
     }
 
-    private void mapToApiProcessRepOrderRequest(ApplicationDTO application, ApiProcessRepOrderRequest request, Boolean isMeansAssessment) {
+    private void mapToApiProcessRepOrderRequest(ApplicationDTO application, ApiProcessRepOrderRequest request, boolean isMeansAssessment) {
         request
             .withRepId(NumberUtils.toInteger(application.getRepId()))
                 .withCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()))

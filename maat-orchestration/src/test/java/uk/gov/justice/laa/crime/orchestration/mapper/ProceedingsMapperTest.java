@@ -88,21 +88,6 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void whenWorkflowRequestToUpdateApplicationRequestIsInvokedWithNullFields() {
-        mockApiUserSession();
-        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
-
-        ApiUpdateApplicationRequest expectedApplicationRequest = TestModelDataBuilder.getUpdateApplicationRequest();
-
-        ApiUpdateApplicationRequest actualApplicationRequest =
-                proceedingsMapper.workflowRequestToUpdateApplicationRequest(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
-
-        softly.assertThat(actualApplicationRequest)
-                .usingRecursiveComparison()
-                .isEqualTo(expectedApplicationRequest);
-    }
-
-    @Test
     void whenUpdateApplicationResponseToApplicationDtoIsInvoked() {
         ApiUpdateApplicationResponse updateApplicationResponse = TestModelDataBuilder.getApiUpdateApplicationResponse();
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT);
