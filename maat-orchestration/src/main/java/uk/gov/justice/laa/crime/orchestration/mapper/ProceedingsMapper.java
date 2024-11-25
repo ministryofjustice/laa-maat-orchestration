@@ -138,7 +138,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         return null;
     }
 
-    private ApiFinancialAssessment applicationDtoToFinancialAssessment(ApplicationDTO application, Boolean isMeansAssessment) {
+    private ApiFinancialAssessment applicationDtoToFinancialAssessment(ApplicationDTO application, boolean isMeansAssessment) {
 
         FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
         FullAssessmentDTO fullAssessment = financialAssessmentDTO.getFull();
