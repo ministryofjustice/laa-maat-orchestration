@@ -51,7 +51,7 @@ public class IncomeEvidenceMapper {
                                                                 RepOrderDTO repOrder,
                                                                 ApiCreateIncomeEvidenceResponse evidenceResponse) {
         ApplicationDTO application = workflowRequest.getApplicationDTO();
-        String assessmentType = application.getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable() ? "FULL" : "INIT";
+        String assessmentType = Boolean.TRUE.equals(application.getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable()) ? "FULL" : "INIT";
         InitialAssessmentDTO initialAssessment = application.getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
         FullAssessmentDTO fullAssessment = application.getAssessmentDTO().getFinancialAssessmentDTO().getFull();
         Collection<AssessmentDetailDTO> assessmentDetails  = assessmentType.equals("FULL")
@@ -220,7 +220,7 @@ public class IncomeEvidenceMapper {
                         .withDateReceived(getDateReceived(applicantId, evidence, existingFinancialAssessment))
                         .withActive("Y")
                         .withIncomeEvidence(evidence.getEvidenceType().getName())
-                        .withMandatory(evidence.getMandatory() ? "Y" : "N")
+                        .withMandatory(Boolean.TRUE.equals(evidence.getMandatory()) ? "Y" : "N")
                         .withApplicant(applicantId)
                         .withOtherText(evidence.getDescription())
                         .withUserCreated(user.getUserName()))

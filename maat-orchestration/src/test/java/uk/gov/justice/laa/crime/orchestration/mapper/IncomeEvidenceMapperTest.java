@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SoftAssertionsExtension.class)
-public class IncomeEvidenceMapperTest {
+class IncomeEvidenceMapperTest {
 
     @Mock
     private UserMapper userMapper;
@@ -54,6 +54,7 @@ public class IncomeEvidenceMapperTest {
         softly.assertThat(apiCreateIncomeEvidenceRequest)
                 .usingRecursiveComparison()
                 .isEqualTo(TestModelDataBuilder.getApiCreateEvidenceRequest(false));
+        softly.assertAll();
     }
 
     @Test
@@ -69,6 +70,7 @@ public class IncomeEvidenceMapperTest {
         softly.assertThat(apiCreateIncomeEvidenceRequest)
                 .usingRecursiveComparison()
                 .isEqualTo(TestModelDataBuilder.getApiCreateEvidenceRequest(true));
+        softly.assertAll();
     }
 
     @Test
@@ -90,6 +92,7 @@ public class IncomeEvidenceMapperTest {
                 .usingRecursiveComparison()
                 .ignoringFields("laaTransactionId")
                 .isEqualTo(TestModelDataBuilder.getMaatApiUpdateAssessment(AssessmentType.INIT));
+        softly.assertAll();
     }
 
     @Test
@@ -111,6 +114,7 @@ public class IncomeEvidenceMapperTest {
                 .usingRecursiveComparison()
                 .ignoringFields("laaTransactionId")
                 .isEqualTo(TestModelDataBuilder.getMaatApiUpdateAssessment(AssessmentType.FULL));
+        softly.assertAll();
     }
 
     @Test
@@ -131,5 +135,6 @@ public class IncomeEvidenceMapperTest {
                 .isEqualTo(List.of(MeansAssessmentDataBuilder.getApplicantEvidenceDTO()));
         softly.assertThat(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence().getPartnerIncomeEvidenceList())
                 .isEqualTo(List.of(MeansAssessmentDataBuilder.getPartnerEvidenceDTO()));
+        softly.assertAll();
     }
 }
