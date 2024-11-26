@@ -5,11 +5,11 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.common.model.evidence.ApiApplicantDetails;
-import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
-import uk.gov.justice.laa.crime.common.model.evidence.ApiIncomeEvidenceMetadata;
+import uk.gov.justice.laa.crime.common.model.evidence.*;
 import uk.gov.justice.laa.crime.common.model.hardship.*;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentChildWeighting;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentDetail;
+import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.FinancialAssessmentIncomeEvidence;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCapitalEvidence;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
@@ -19,18 +19,20 @@ import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCo
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.*;
+import uk.gov.justice.laa.crime.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.dto.maat_api.PassportAssessmentDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderCCOutcomeDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RoleDataItemDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicantDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.*;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
-import uk.gov.justice.laa.crime.util.DateUtil;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
@@ -52,11 +54,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.CRITERIA_DETAIL_ID;
-import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.SECTION;
-import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.TOTAL_AGGREGATED_INCOME;
-import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.getReviewTypeDTO;
-import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.getSectionSummaryDTO;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.*;
 import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
 import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
 
@@ -548,6 +546,7 @@ public class TestModelDataBuilder {
                 .decisionDate(Date.from(DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .applicantDTO(getApplicantDTO())
                 .assessmentDTO(getAssessmentDTO(courtType))
+                .caseManagementUnitDTO(getCaseManagementUnitDTO())
                 .crownCourtOverviewDTO(getCrownCourtOverviewDTO())
                 .caseDetailsDTO(getCaseDetailDTO())
                 .offenceDTO(getOffenceDTO())
@@ -828,15 +827,24 @@ public class TestModelDataBuilder {
         return FinancialAssessmentDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
                 .full(getFullAssessmentDTO())
+                .fullAvailable(Boolean.FALSE)
                 .initial(getInitialAssessmentDTO())
                 .hardship(getHardshipOverviewDTO())
                 .incomeEvidence(getIncomeEvidenceSummaryDTO())
                 .build();
     }
 
+    public static uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO getMaatApiFinancialAssessmentDTO() {
+        return uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO.builder()
+                .id(Constants.FINANCIAL_ASSESSMENT_ID)
+                .finAssIncomeEvidences(List.of(getFinAssIncomeEvidenceDTO(NumberUtils.toInteger(APPLICANT_ID)), getFinAssIncomeEvidenceDTO(NumberUtils.toInteger(PARTNER_ID))))
+                .build();
+    }
+
     public static FullAssessmentDTO getFullAssessmentDTO() {
         return FullAssessmentDTO.builder()
                 .assessmentNotes(ASSESSMENT_NOTES)
+                .sectionSummaries(List.of(getSectionSummaryDTO()))
                 .assessmentDate(ASSESSMENT_DATE)
                 .result(RESULT_PASS)
                 .assessmnentStatusDTO(getAssessmentStatusDTO())
@@ -972,6 +980,18 @@ public class TestModelDataBuilder {
                 .evidenceReceivedDate(toDate(LocalDateTime.of(2023, 2, 18, 0, 0, 0)))
                 .evidenceDueDate(toDate(LocalDateTime.of(2023, 3, 18, 0, 0, 0)))
                 .upliftsAvailable(true)
+                .build();
+    }
+
+    private static FinAssIncomeEvidenceDTO getFinAssIncomeEvidenceDTO(Integer applicantId) {
+        return FinAssIncomeEvidenceDTO.builder()
+                .applicant(
+                        uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO.builder()
+                                .id(applicantId)
+                                .build()
+                )
+                .dateReceived(EVIDENCE_RECEIVED_DATE)
+                .incomeEvidence(IncomeEvidenceType.TAX_RETURN.getName())
                 .build();
     }
 
@@ -1377,11 +1397,38 @@ public class TestModelDataBuilder {
                 .withUserSession(getApiUserSession());
     }
 
+    public static ApiCreateIncomeEvidenceResponse getCreateIncomeEvidenceResponse() {
+        return new ApiCreateIncomeEvidenceResponse()
+                .withApplicantEvidenceItems(
+                        new ApiIncomeEvidenceItems()
+                                .withApplicantDetails(getApplicantDetails(false))
+                                .withIncomeEvidenceItems(List.of(getIncomeEvidence(APPLICANT_EVIDENCE_ID)))
+                )
+                .withPartnerEvidenceItems(
+                        new ApiIncomeEvidenceItems()
+                                .withApplicantDetails(getApplicantDetails(true))
+                                .withIncomeEvidenceItems(List.of(getIncomeEvidence(PARTNER_EVIDENCE_ID)))
+                );
+
+    }
+
+    private static ApiIncomeEvidence getIncomeEvidence(Integer id) {
+        return new ApiIncomeEvidence()
+                .withId(id)
+                .withDateReceived(EVIDENCE_RECEIVED_DATE.toLocalDate())
+                .withEvidenceType(IncomeEvidenceType.TAX_RETURN)
+                .withMandatory(Boolean.TRUE)
+                .withDescription(INCOME_EVIDENCE_DESCRIPTION);
+    }
+
     public static MaatApiUpdateAssessment getMaatApiUpdateAssessment(AssessmentType assessmentType) {
         MaatApiUpdateAssessment maatApiUpdateAssessment = new MaatApiUpdateAssessment()
                 .withFinancialAssessmentId(Constants.FINANCIAL_ASSESSMENT_ID)
                 .withUserModified(Constants.USERNAME)
-                .withFinAssIncomeEvidences() // TODO complete this
+                .withFinAssIncomeEvidences(List.of(
+                        getFinAssIncomeEvidence(APPLICANT_EVIDENCE_ID, NumberUtils.toInteger(APPLICANT_ID)),
+                        getFinAssIncomeEvidence(PARTNER_EVIDENCE_ID, NumberUtils.toInteger(PARTNER_ID))
+                ))
                 .withRepId(REP_ID)
                 .withAssessmentType(assessmentType.getType())
                 .withCmuId(CMU_ID)
@@ -1390,14 +1437,14 @@ public class TestModelDataBuilder {
                 .withInitOtherBenefitNote(null)
                 .withInitOtherIncomeNote(null)
                 .withInitTotAggregatedIncome(TOTAL_AGGREGATED_INCOME)
-                .withInitAdjustedIncomeValue(null)
+                .withInitAdjustedIncomeValue(BigDecimal.valueOf(0.0))
                 .withInitNotes(null)
                 .withInitResult(RESULT_FAIL)
                 .withInitResultReason(null)
                 .withInitialAscrId(null)
                 .withInitApplicationEmploymentStatus("EMPLOY")
-                .withAssessmentDetails() // TODO complete this need to build this
-                .withChildWeightings(getAssessmentChildWeightings())
+                .withAssessmentDetails(List.of(getAssessmentDetail()))
+                .withChildWeightings(List.of(getAssessmentChildWeighting()))
                 .withDateCompleted(null);
 
         if (AssessmentType.FULL.equals(assessmentType)) {
@@ -1406,22 +1453,45 @@ public class TestModelDataBuilder {
             maatApiUpdateAssessment.setFullResult(RESULT_PASS);
             maatApiUpdateAssessment.setFullResultReason(null);
             maatApiUpdateAssessment.setFullAssessmentNotes(ASSESSMENT_NOTES);
-            maatApiUpdateAssessment.setFullAdjustedLivingAllowance(null);
+            maatApiUpdateAssessment.setFullAdjustedLivingAllowance(BigDecimal.valueOf(0.0));
             maatApiUpdateAssessment.setFullTotalAnnualDisposableIncome(Constants.DISPOSABLE_INCOME);
             maatApiUpdateAssessment.setFullOtherHousingNote(OTHER_HOUSING_NOTES);
-            maatApiUpdateAssessment.setFullTotalAggregatedExpenses(null);
+            maatApiUpdateAssessment.setFullTotalAggregatedExpenses(BigDecimal.valueOf(0.0));
             maatApiUpdateAssessment.setFullAscrId(null);
         }
 
         return maatApiUpdateAssessment;
     }
 
-    private static List<ApiAssessmentChildWeighting> getAssessmentChildWeightings() {
-        return List.of(
-                new ApiAssessmentChildWeighting()
-                        .withId(1234)
-                        .withChildWeightingId(37)
-                        .withNoOfChildren(1)
-        );
+    private static FinancialAssessmentIncomeEvidence getFinAssIncomeEvidence(Integer evidenceId, Integer applicantId) {
+        return new FinancialAssessmentIncomeEvidence()
+                .withId(evidenceId)
+                .withDateReceived(EVIDENCE_RECEIVED_DATE)
+                .withActive("Y")
+                .withIncomeEvidence(IncomeEvidenceType.TAX_RETURN.getName())
+                .withMandatory("Y")
+                .withApplicant(applicantId)
+                .withOtherText(INCOME_EVIDENCE_DESCRIPTION)
+                .withUserCreated(Constants.USERNAME);
+    }
+
+    public static ApiAssessmentDetail getAssessmentDetail() {
+        return new ApiAssessmentDetail()
+                .withId(1)
+                .withCriteriaDetailId(1)
+                .withApplicantAmount(BigDecimal.valueOf(1000))
+                .withPartnerAmount(BigDecimal.valueOf(2000))
+                .withApplicantFrequency(Frequency.MONTHLY)
+                .withPartnerFrequency(Frequency.TWO_WEEKLY)
+                .withAssessmentDescription(ASSESSMENT_DESCRIPTION)
+                .withAssessmentDetailCode("Assessment detail code")
+                .withDateModified(DATE_MODIFIED_DATETIME);
+    }
+
+    public static ApiAssessmentChildWeighting getAssessmentChildWeighting() {
+        return new ApiAssessmentChildWeighting()
+                .withId(1234)
+                .withChildWeightingId(37)
+                .withNoOfChildren(1);
     }
 }

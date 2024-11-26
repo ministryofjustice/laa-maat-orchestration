@@ -20,11 +20,10 @@ import uk.gov.justice.laa.crime.util.NumberUtils;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
+
+import static java.util.Optional.ofNullable;
 
 @Component
 @RequiredArgsConstructor
@@ -71,8 +70,10 @@ public class IncomeEvidenceMapper {
                 .withInitialAssessmentDate(DateUtil.toLocalDateTime(initialAssessment.getAssessmentDate()))
                 .withInitOtherBenefitNote(initialAssessment.getOtherBenefitNote())
                 .withInitOtherIncomeNote(initialAssessment.getOtherIncomeNote())
-                .withInitTotAggregatedIncome(BigDecimal.valueOf(initialAssessment.getTotalAggregatedIncome()))
-                .withInitAdjustedIncomeValue(BigDecimal.valueOf(initialAssessment.getAdjustedIncomeValue()))
+                .withInitTotAggregatedIncome(
+                        BigDecimal.valueOf(ofNullable(initialAssessment.getTotalAggregatedIncome()).orElse(0.0)))
+                .withInitAdjustedIncomeValue(
+                        BigDecimal.valueOf(ofNullable(initialAssessment.getAdjustedIncomeValue()).orElse(0.0)))
                 .withInitNotes(initialAssessment.getNotes())
                 .withInitResult(initialAssessment.getResult())
                 .withInitResultReason(initialAssessment.getResultReason())
@@ -88,10 +89,13 @@ public class IncomeEvidenceMapper {
             updateAssessment.setFullResult(fullAssessment.getResult());
             updateAssessment.setFullResultReason(fullAssessment.getResultReason());
             updateAssessment.setFullAssessmentNotes(fullAssessment.getAssessmentNotes());
-            updateAssessment.setFullAdjustedLivingAllowance(BigDecimal.valueOf(fullAssessment.getAdjustedLivingAllowance()));
-            updateAssessment.setFullTotalAnnualDisposableIncome(BigDecimal.valueOf(fullAssessment.getTotalAnnualDisposableIncome()));
+            updateAssessment.setFullAdjustedLivingAllowance(
+                    BigDecimal.valueOf(ofNullable(fullAssessment.getAdjustedLivingAllowance()).orElse(0.0)));
+            updateAssessment.setFullTotalAnnualDisposableIncome(
+                    BigDecimal.valueOf(ofNullable(fullAssessment.getTotalAnnualDisposableIncome()).orElse(0.0)));
             updateAssessment.setFullOtherHousingNote(fullAssessment.getOtherHousingNote());
-            updateAssessment.setFullTotalAggregatedExpenses(BigDecimal.valueOf(fullAssessment.getTotalAggregatedExpense()));
+            updateAssessment.setFullTotalAggregatedExpenses(
+                    BigDecimal.valueOf(ofNullable(fullAssessment.getTotalAggregatedExpense()).orElse(0.0)));
             updateAssessment.setFullAscrId(NumberUtils.toInteger(fullAssessment.getCriteriaId()));
         }
 

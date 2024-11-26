@@ -22,6 +22,8 @@ spring:
             token-uri: http://localhost:${wiremock.server.port}/oauth2/token
           cat:
             token-uri: http://localhost:${wiremock.server.port}/oauth2/token
+          evidence:
+            token-uri: http://localhost:${wiremock.server.port}/oauth2/token
         registration:
           hardship:
             client-id: dummy-client
@@ -48,6 +50,10 @@ spring:
             client-secret: dummy-client
             authorization-grant-type: client_credentials
           cat:
+            client-id: dummy-client
+            client-secret: dummy-client
+            authorization-grant-type: client_credentials
+          evidence:
             client-id: dummy-client
             client-secret: dummy-client
             authorization-grant-type: client_credentials
@@ -100,6 +106,10 @@ services:
     base-url: http://localhost:${wiremock.server.port}
     endpoints:
       handle-eform-url: ${services.cat-api.base-url}/api/internal/v1/application-tracking-output-result
+  evidence-api:
+    base-url: http://localhost:${wiremock.server.port}
+    endpoints:
+      income-evidence-url: ${services.evidence-api.base-url}/api/internal/v1/evidence
 
 retry-config:
   max-retries: 2

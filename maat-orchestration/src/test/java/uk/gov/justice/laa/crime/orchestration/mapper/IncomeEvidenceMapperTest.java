@@ -73,14 +73,15 @@ public class IncomeEvidenceMapperTest {
 
     @Test
     void givenInitialAssessment_whenMapToMaatApiUpdateAssessmentIsInvoked_thenMaatApiUpdateAssessmentIsReturned() {
-        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(); // full not available
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(); // need to set full available to false
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
-        ApiCreateIncomeEvidenceResponse apiCreateIncomeEvidenceResponse = ???;
+        repOrderDTO.setFinancialAssessments(List.of(TestModelDataBuilder.getMaatApiFinancialAssessmentDTO()));
+        ApiCreateIncomeEvidenceResponse apiCreateIncomeEvidenceResponse = TestModelDataBuilder.getCreateIncomeEvidenceResponse();
 
         when(meansAssessmentMapper.assessmentDetailsBuilder(anyList()))
-                .thenReturn();
+                .thenReturn(List.of(TestModelDataBuilder.getAssessmentDetail()));
         when(meansAssessmentMapper.childWeightingsBuilder(anyList()))
-                .thenReturn();
+                .thenReturn(List.of(TestModelDataBuilder.getAssessmentChildWeighting()));
 
         MaatApiUpdateAssessment maatApiUpdateAssessment =
                 incomeEvidenceMapper.mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, apiCreateIncomeEvidenceResponse);
@@ -94,13 +95,14 @@ public class IncomeEvidenceMapperTest {
     @Test
     void givenFullAssessment_whenMapToMaatApiUpdateAssessmentIsInvoked_thenMaatApiUpdateAssessmentIsReturned() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT); // full
-        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR"); // TODO this might not be right
-        ApiCreateIncomeEvidenceResponse apiCreateIncomeEvidenceResponse = ???;
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        repOrderDTO.setFinancialAssessments(List.of(TestModelDataBuilder.getMaatApiFinancialAssessmentDTO()));
+        ApiCreateIncomeEvidenceResponse apiCreateIncomeEvidenceResponse = TestModelDataBuilder.getCreateIncomeEvidenceResponse();
 
         when(meansAssessmentMapper.assessmentDetailsBuilder(anyList()))
-                .thenReturn();
+                .thenReturn(List.of(TestModelDataBuilder.getAssessmentDetail()));
         when(meansAssessmentMapper.childWeightingsBuilder(anyList()))
-                .thenReturn();
+                .thenReturn(List.of(TestModelDataBuilder.getAssessmentChildWeighting()));
 
         MaatApiUpdateAssessment maatApiUpdateAssessment =
                 incomeEvidenceMapper.mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, apiCreateIncomeEvidenceResponse);
