@@ -47,7 +47,7 @@ public class ValidationService {
         }
     }
 
-    public Boolean isUserActionValid(UserActionDTO request, UserSummaryDTO userSummaryDTO) {
+    public boolean isUserActionValid(UserActionDTO request, UserSummaryDTO userSummaryDTO) {
         List<String> crimeValidationExceptionList = new ArrayList<>();
 
         if (request.getAction() == null && request.getNewWorkReason() == null && request.getSessionId() == null) {

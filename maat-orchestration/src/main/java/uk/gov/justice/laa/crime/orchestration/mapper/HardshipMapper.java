@@ -298,13 +298,9 @@ public class HardshipMapper {
     }
 
     public UserActionDTO getUserActionDTO(WorkflowRequest request, Action action) {
-        UserDTO userDTO = request.getUserDTO();
         HardshipReviewDTO hardshipReviewDTO = getHardshipReviewDTO(request.getApplicationDTO(), request.getCourtType());
-        return UserActionDTO.builder()
-                .username(userDTO.getUserName())
-                .sessionId(userDTO.getUserSession())
-                .newWorkReason(NewWorkReason.getFrom(hardshipReviewDTO.getNewWorkReason().getCode()))
-                .action(action)
-                .build();
+        NewWorkReason newWorkReason = NewWorkReason.getFrom(hardshipReviewDTO.getNewWorkReason().getCode());
+
+        return userMapper.getUserActionDTO(request, action, newWorkReason);
     }
 }

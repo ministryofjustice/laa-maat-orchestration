@@ -5,8 +5,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum CurrentFeatureToggles {
-    CALCULATE_CONTRIBUTION("CalculateContribution");
+public enum FeatureToggle {
+    CALCULATE_CONTRIBUTION("CalculateContribution"),
+    MAAT_POST_ASSESSMENT_PROCESSING("MaatPostAssessmentProcessing");
 
     private final String name;
 }
