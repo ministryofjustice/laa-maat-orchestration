@@ -12,14 +12,11 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.CurrentFeatureToggles;
+import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggleAction;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
-import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
-import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
-import uk.gov.justice.laa.crime.orchestration.service.FeatureDecisionService;
-import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
-import uk.gov.justice.laa.crime.orchestration.service.MeansAssessmentService;
-import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
+import uk.gov.justice.laa.crime.orchestration.service.*;
 
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_INCOMPLETE_ASSESSMENT;
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_REASSESSMENT;
@@ -35,6 +32,7 @@ public class MeansAssessmentOrchestrationService {
     private final MaatCourtDataService maatCourtDataService;
     private final AssessmentSummaryService assessmentSummaryService;
     private final FeatureDecisionService featureDecisionService;
+    private final CCLFUpdateService cclfUpdateService;
 
     public FinancialAssessmentDTO find(int assessmentId, int applicantId) {
         return meansAssessmentService.find(assessmentId, applicantId);
@@ -122,6 +120,8 @@ public class MeansAssessmentOrchestrationService {
 
         // call CCP service
         proceedingsService.updateApplication(request);
+        cclfUpdateService.updateSendToCCLF(request, request.getApplicationDTO().getRepId().intValue());
+
 
         // call post_processing_part_2
         ApplicationDTO application = maatCourtDataService.invokeStoredProcedure(

@@ -9,6 +9,8 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.SendToCCLFDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.CurrentFeatureToggles;
+import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggleAction;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
 import java.text.ParseException;
@@ -24,6 +26,7 @@ import java.util.Objects;
 public class CCLFUpdateService {
 
     private final MaatCourtDataApiService maatCourtDataApiService;
+    private final FeatureDecisionService featureDecisionService;
 
     public static String getRepOrderCcOutcome(RepOrderDTO repOrderDTO) {
         if (repOrderDTO.getRepOrderCCOutcome() == null || repOrderDTO.getRepOrderCCOutcome().isEmpty()) return null;
@@ -68,12 +71,22 @@ public class CCLFUpdateService {
             throw new ValidationException("Valid ApplicationDTO and RepOrderDTO is required");
         }
 
-        if (!compareRepOrderAndApplicationDTO(repOrderDTO, applicationDto)) {
-            SendToCCLFDTO sendToCCLFDTO = SendToCCLFDTO.builder().repId(repOrderDTO.getId())
-                    .applId(applicationDto.getApplicantDTO().getId())
-                    .applHistoryId(applicationDto.getApplicantDTO().getApplicantHistoryId()).build();
-            maatCourtDataApiService.updateSendToCCLF(sendToCCLFDTO);
+        if (featureDecisionService.isFeatureEnabled(request, CurrentFeatureToggles.MAAT_POST_ASSESSMENT_PROCESSING,
+                FeatureToggleAction.UPDATE)) {
+            if (!compareRepOrderAndApplicationDTO(repOrderDTO, applicationDto)) {
+                SendToCCLFDTO sendToCCLFDTO = SendToCCLFDTO.builder().repId(repOrderDTO.getId())
+                        .applId(applicationDto.getApplicantDTO().getId())
+                        .applHistoryId(applicationDto.getApplicantDTO().getApplicantHistoryId()).build();
+                maatCourtDataApiService.updateSendToCCLF(sendToCCLFDTO);
+            }
+        } else {
+            log.error("MAAT_POST_ASSESSMENT_PROCESSING feature is disabled {}", request.getUserDTO().getUserName());
         }
+    }
+
+    public void updateSendToCCLF(WorkflowRequest request, Integer repId) {
+        RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(repId);
+        updateSendToCCLF(request, repOrderDTO);
     }
 
     public Date parseDate(String dateString) {

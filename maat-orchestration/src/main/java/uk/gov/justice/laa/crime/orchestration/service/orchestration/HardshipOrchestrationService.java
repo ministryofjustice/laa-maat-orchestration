@@ -32,6 +32,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     private final AssessmentSummaryService assessmentSummaryService;
     private final MaatCourtDataService maatCourtDataService;
     private final ValidationService validationService;
+    private final CCLFUpdateService cclfUpdateService;
     private final HardshipMapper hardshipMapper;
 
     private final ApplicationTrackingMapper applicationTrackingMapper;
@@ -163,6 +164,8 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         ));
 
         proceedingsService.updateApplication(request);
+        cclfUpdateService.updateSendToCCLF(request, repOrderDTO);
+
         // Call application.handle_eform_result stored procedure OR Equivalent ATS service endpoint
         ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(request, repOrderDTO);
         if (null != applicationTrackingOutputResult.getUsn()) {

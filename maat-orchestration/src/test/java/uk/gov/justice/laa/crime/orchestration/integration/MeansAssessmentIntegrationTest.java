@@ -27,6 +27,7 @@ import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs;
 
 import java.util.List;
@@ -132,6 +133,7 @@ class MeansAssessmentIntegrationTest {
         String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT));
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
         String userSummaryResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getUserSummaryDTO());
+        String repOrderDTO = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getRepOrderDTO());
 
         stubForOAuth();
         wiremock.stubFor(post(urlMatching(CMA_URL))
@@ -142,6 +144,9 @@ class MeansAssessmentIntegrationTest {
         stubForCalculateContributions(cccCalculateResponse);
         stubForGetContributionsSummary(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
+        stubForGetRepOrders(repOrderDTO);
+        stubForUpdateSendToCCLF(repOrderDTO);
+
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
         stubForInvokeStoredProcedure("DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", maatApiResponse);
         stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", "DB_PRE_UPDATE_CC_APPLICATION", maatApiResponse);
@@ -199,6 +204,7 @@ class MeansAssessmentIntegrationTest {
         String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT));
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
         String userSummaryResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getUserSummaryDTO());
+        String repOrderDTO = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getRepOrderDTO());
 
         stubForOAuth();
         wiremock.stubFor(put(urlMatching(CMA_URL))
@@ -209,6 +215,9 @@ class MeansAssessmentIntegrationTest {
         stubForCalculateContributions(cccCalculateResponse);
         stubForGetContributionsSummary(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
+        stubForGetRepOrders(repOrderDTO);
+        stubForUpdateSendToCCLF(repOrderDTO);
+
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
         stubForInvokeStoredProcedure("DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", maatApiResponse);
         stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", "DB_PRE_UPDATE_CC_APPLICATION", maatApiResponse);

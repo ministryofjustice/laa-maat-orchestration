@@ -11,6 +11,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.OutcomeDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
+import uk.gov.justice.laa.crime.orchestration.service.CCLFUpdateService;
 import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
 import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 
@@ -18,9 +19,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith({MockitoExtension.class})
 class CrownCourtOrchestrationServiceTest {
@@ -30,6 +29,9 @@ class CrownCourtOrchestrationServiceTest {
 
     @Mock
     private MaatCourtDataService maatCourtDataService;
+
+    @Mock
+    private CCLFUpdateService cclfUpdateService;
 
     @InjectMocks
     private CrownCourtOrchestrationService orchestrationService;

@@ -32,4 +32,16 @@ public class FeatureDecisionService {
             t -> CurrentFeatureToggles.CALCULATE_CONTRIBUTION.getName().equals(t.getFeatureName())
                 && FeatureToggleAction.CREATE.getName().equals(t.getAction()));
     }
+
+    public boolean isFeatureEnabled(WorkflowRequest workflowRequest,
+                                    CurrentFeatureToggles feature,
+                                    FeatureToggleAction action) {
+        UserSummaryDTO userSummaryDTO = maatCourtDataService.getUserSummary(
+                workflowRequest.getUserDTO().getUserName());
+
+        return userSummaryDTO.getFeatureToggle() != null &&
+                userSummaryDTO.getFeatureToggle().stream().anyMatch(
+                        t -> feature.getName().equals(t.getFeatureName()) &&
+                                action.getName().equals(t.getAction()));
+    }
 }

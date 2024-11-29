@@ -94,4 +94,50 @@ class FeatureDecisionServiceTest {
 
         Assertions.assertTrue(result);
     }
+
+    @Test
+    void givenUserDoesNotHaveFeatureToggle_whenIsFeatureEnabledIsInvoked_thenReturnFalse() {
+        when(maatCourtDataService.getUserSummary(Constants.USERNAME))
+                .thenReturn(new UserSummaryDTO());
+
+        UserDTO userDTO = UserDTO.builder()
+                .userName(Constants.USERNAME)
+                .build();
+
+        WorkflowRequest request = WorkflowRequest.builder()
+                .userDTO(userDTO)
+                .build();
+
+        FeatureDecisionService featureDecisionService = new FeatureDecisionService(maatCourtDataService);
+        boolean result = featureDecisionService.isFeatureEnabled(request, CurrentFeatureToggles.MAAT_POST_ASSESSMENT_PROCESSING, FeatureToggleAction.UPDATE);
+
+        Assertions.assertFalse(result);
+    }
+
+    @Test
+    void givenUserHasFeatureToggle_whenIsFeatureEnabledIsInvoked_thenReturnTrue() {
+        UserSummaryDTO userSummaryDTO = UserSummaryDTO.builder()
+                .featureToggle(List.of(
+                        FeatureToggleDTO.builder()
+                                .featureName(CurrentFeatureToggles.MAAT_POST_ASSESSMENT_PROCESSING.getName())
+                                .action(FeatureToggleAction.UPDATE.getName())
+                                .build()))
+                .build();
+
+        when(maatCourtDataService.getUserSummary(Constants.USERNAME))
+                .thenReturn(userSummaryDTO);
+
+        UserDTO userDTO = UserDTO.builder()
+                .userName(Constants.USERNAME)
+                .build();
+
+        WorkflowRequest request = WorkflowRequest.builder()
+                .userDTO(userDTO)
+                .build();
+
+        FeatureDecisionService featureDecisionService = new FeatureDecisionService(maatCourtDataService);
+        boolean result = featureDecisionService.isFeatureEnabled(request, CurrentFeatureToggles.MAAT_POST_ASSESSMENT_PROCESSING, FeatureToggleAction.UPDATE);
+
+        Assertions.assertTrue(result);
+    }
 }

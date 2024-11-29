@@ -15,24 +15,17 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
-import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
-import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
-import uk.gov.justice.laa.crime.orchestration.service.FeatureDecisionService;
-import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
-import uk.gov.justice.laa.crime.orchestration.service.MeansAssessmentService;
-import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
+import uk.gov.justice.laa.crime.orchestration.service.*;
+import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_INCOMPLETE_ASSESSMENT;
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_REASSESSMENT;
 
@@ -57,6 +50,13 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Mock
     private AssessmentSummaryService assessmentSummaryService;
+
+    @Mock
+    private CCLFUpdateService cclfUpdateService;
+
+    @Mock
+    private MaatCourtDataApiService maatCourtDataApiService;
+
     @InjectMocks
     private MeansAssessmentOrchestrationService orchestrationService;
 
@@ -76,7 +76,7 @@ class MeansAssessmentOrchestrationServiceTest {
         when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
-                                                        any(StoredProcedure.class)
+                any(StoredProcedure.class)
         ))
                 .thenReturn(applicationDTO);
         when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
@@ -88,12 +88,12 @@ class MeansAssessmentOrchestrationServiceTest {
 
         verify(meansAssessmentService).create(workflowRequest);
         verify(maatCourtDataService).invokeStoredProcedure(applicationDTO, workflowRequest.getUserDTO(),
-                                                           StoredProcedure.PRE_UPDATE_CC_APPLICATION
+                StoredProcedure.PRE_UPDATE_CC_APPLICATION
         );
 
         verify(proceedingsService).updateApplication(workflowRequest);
         verify(maatCourtDataService).invokeStoredProcedure(applicationDTO, workflowRequest.getUserDTO(),
-                                                           StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
+                StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
         );
         verify(assessmentSummaryService, times(1)).getSummary(any(FinancialAssessmentDTO.class));
     }
@@ -104,7 +104,7 @@ class MeansAssessmentOrchestrationServiceTest {
         WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
 
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
-                                                        any(StoredProcedure.class)
+                any(StoredProcedure.class)
         )).thenReturn(workflowRequest.getApplicationDTO());
 
         when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(false);
@@ -113,14 +113,14 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(meansAssessmentService).create(workflowRequest);
         verify(contributionService, times(0)).calculate(workflowRequest);
         verify(maatCourtDataService).invokeStoredProcedure(workflowRequest.getApplicationDTO(),
-                                                           workflowRequest.getUserDTO(),
-                                                           StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1
+                workflowRequest.getUserDTO(),
+                StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1
         );
 
         verify(proceedingsService, times(1)).updateApplication(workflowRequest);
         verify(maatCourtDataService).invokeStoredProcedure(workflowRequest.getApplicationDTO(),
-                                                           workflowRequest.getUserDTO(),
-                                                           StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
+                workflowRequest.getUserDTO(),
+                StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
         );
         verify(assessmentSummaryService, times(1)).getSummary(any());
     }
@@ -135,7 +135,7 @@ class MeansAssessmentOrchestrationServiceTest {
         when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
-                                                        any(StoredProcedure.class)
+                any(StoredProcedure.class)
         ))
                 .thenReturn(applicationDTO);
         when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
@@ -147,14 +147,14 @@ class MeansAssessmentOrchestrationServiceTest {
 
         verify(meansAssessmentService).update(workflowRequest);
         verify(maatCourtDataService).invokeStoredProcedure(workflowRequest.getApplicationDTO(),
-                                                           workflowRequest.getUserDTO(),
-                                                           StoredProcedure.PRE_UPDATE_CC_APPLICATION
+                workflowRequest.getUserDTO(),
+                StoredProcedure.PRE_UPDATE_CC_APPLICATION
         );
 
         verify(proceedingsService).updateApplication(workflowRequest);
         verify(maatCourtDataService).invokeStoredProcedure(workflowRequest.getApplicationDTO(),
-                                                           workflowRequest.getUserDTO(),
-                                                           StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
+                workflowRequest.getUserDTO(),
+                StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
         );
         verify(assessmentSummaryService, times(1)).getSummary(any());
     }
@@ -165,7 +165,7 @@ class MeansAssessmentOrchestrationServiceTest {
         WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
 
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
-                                                        any(StoredProcedure.class)
+                any(StoredProcedure.class)
         ))
                 .thenReturn(workflowRequest.getApplicationDTO());
         when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(false);
@@ -174,14 +174,14 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(meansAssessmentService).update(workflowRequest);
         verify(contributionService, times(0)).calculate(workflowRequest);
         verify(maatCourtDataService).invokeStoredProcedure(workflowRequest.getApplicationDTO(),
-                                                           workflowRequest.getUserDTO(),
-                                                           StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1
+                workflowRequest.getUserDTO(),
+                StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1
         );
 
         verify(proceedingsService, times(1)).updateApplication(workflowRequest);
         verify(maatCourtDataService).invokeStoredProcedure(workflowRequest.getApplicationDTO(),
-                                                           workflowRequest.getUserDTO(),
-                                                           StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
+                workflowRequest.getUserDTO(),
+                StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
         );
         verify(assessmentSummaryService, times(1)).getSummary(any());
     }
@@ -229,7 +229,7 @@ class MeansAssessmentOrchestrationServiceTest {
         workflowRequest.setApplicationDTO(applicationSpy);
 
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
-                                                        any(StoredProcedure.class)
+                any(StoredProcedure.class)
         )).thenAnswer(invocation -> {
             StoredProcedure procedure = invocation.getArgument(2);
             if (procedure == StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1 ||
@@ -254,7 +254,7 @@ class MeansAssessmentOrchestrationServiceTest {
         workflowRequest.setApplicationDTO(applicationSpy);
 
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
-                                                        any(StoredProcedure.class)
+                any(StoredProcedure.class)
         )).thenAnswer(invocation -> {
             StoredProcedure procedure = invocation.getArgument(2);
             if (procedure == StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1 ||
@@ -276,7 +276,7 @@ class MeansAssessmentOrchestrationServiceTest {
         WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         workflowRequest.getApplicationDTO().setAlertMessage(MOCK_ALERT);
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
-                                                        any(StoredProcedure.class)
+                any(StoredProcedure.class)
         )).thenReturn(workflowRequest.getApplicationDTO());
 
         orchestrationService.create(workflowRequest);

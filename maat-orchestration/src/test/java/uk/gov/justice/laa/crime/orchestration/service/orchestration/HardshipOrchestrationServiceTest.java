@@ -25,13 +25,7 @@ import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
-import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
-import uk.gov.justice.laa.crime.orchestration.service.CATDataService;
-import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
-import uk.gov.justice.laa.crime.orchestration.service.HardshipService;
-import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
-import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
-import uk.gov.justice.laa.crime.orchestration.service.ValidationService;
+import uk.gov.justice.laa.crime.orchestration.service.*;
 
 import java.util.List;
 
@@ -80,6 +74,9 @@ class HardshipOrchestrationServiceTest {
 
     @Mock
     private ApplicationTrackingMapper applicationTrackingMapper;
+
+    @Mock
+    private CCLFUpdateService cclfUpdateService;
 
     @InjectMocks
     private HardshipOrchestrationService orchestrationService;

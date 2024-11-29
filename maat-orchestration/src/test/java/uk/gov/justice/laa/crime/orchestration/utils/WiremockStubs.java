@@ -143,4 +143,11 @@ public class WiremockStubs {
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response)));
     }
+
+    public static void stubForUpdateSendToCCLF(String response) {
+        stubFor(put(urlMatching(MAAT_API_ASSESSMENT_URL + "/rep-orders/" + TestModelDataBuilder.REP_ID + "/send-to-cclf"))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
 }

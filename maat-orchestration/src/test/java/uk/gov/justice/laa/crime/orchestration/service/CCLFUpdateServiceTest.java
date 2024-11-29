@@ -26,8 +26,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +38,8 @@ class CCLFUpdateServiceTest {
     private CCLFUpdateService cclfUpdateService;
     @Mock
     private MaatCourtDataApiService maatCourtDataApiService;
+    @Mock
+    FeatureDecisionService featureDecisionService;
 
 
     @Test
@@ -74,7 +75,7 @@ class CCLFUpdateServiceTest {
     @Test
     void givenInValidInputWithoutRepOrderDTO_whenUpdateSendToCCLFIsInvoked_thenValidationExceptionIsThrown() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
-        assertThatThrownBy(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, null))
+        assertThatThrownBy(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, (RepOrderDTO) null))
                 .isInstanceOf(ValidationException.class)
                 .hasMessage("Valid ApplicationDTO and RepOrderDTO is required");
     }
@@ -84,13 +85,24 @@ class CCLFUpdateServiceTest {
     void givenValidInputWithUpdateAction_whenUpdateSendToCCLFIsInvoked_thenNoExceptionIsThrown() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        when(featureDecisionService.isFeatureEnabled(any(), any(), any())).thenReturn(true);
         assertDoesNotThrow(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO));
+    }
+
+    @Test
+    void givenFeatureNotEnabledForUser_whenUpdateSendToCCLFIsInvoked_thenUpdateCCLFIsNotCalled() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        when(featureDecisionService.isFeatureEnabled(any(), any(), any())).thenReturn(false);
+        assertDoesNotThrow(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO));
+        verify(maatCourtDataApiService, times(0)).updateSendToCCLF(any());
     }
 
     @Test
     void givenValidInputWithNullAction_whenUpdateSendToCCLFIsInvoked_thenNoExceptionIsThrown() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        when(featureDecisionService.isFeatureEnabled(any(), any(), any())).thenReturn(true);
         assertDoesNotThrow(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO));
     }
 
@@ -100,6 +112,7 @@ class CCLFUpdateServiceTest {
         LocalDateTime DECISION_DATETIME = LocalDateTime.of(2000, 10, 13, 0, 0, 0);
         workflowRequest.getApplicationDTO().setDecisionDate(Date.from(DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()));
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        when(featureDecisionService.isFeatureEnabled(any(), any(), any())).thenReturn(true);
         assertDoesNotThrow(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO));
     }
 
@@ -123,6 +136,7 @@ class CCLFUpdateServiceTest {
     void givenValidInput_whenUpdateSendToCCLFIsInvoked_thenOKResponseIsReturned() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        when(featureDecisionService.isFeatureEnabled(any(), any(), any())).thenReturn(true);
         when(maatCourtDataApiService.updateSendToCCLF(any())).thenReturn(repOrderDTO);
         assertDoesNotThrow(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO));
         verify(maatCourtDataApiService).updateSendToCCLF(any());

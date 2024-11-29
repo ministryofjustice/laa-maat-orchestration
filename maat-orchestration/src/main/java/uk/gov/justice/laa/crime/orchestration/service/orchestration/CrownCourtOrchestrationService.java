@@ -7,6 +7,7 @@ import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtOverviewDTO;
+import uk.gov.justice.laa.crime.orchestration.service.CCLFUpdateService;
 import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
 import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 
@@ -17,6 +18,7 @@ public class CrownCourtOrchestrationService {
 
     private final ProceedingsService proceedingsService;
     private final MaatCourtDataService maatCourtDataService;
+    private final CCLFUpdateService cclfUpdateService;
 
     public ApplicationDTO update(WorkflowRequest request) {
 
@@ -31,6 +33,7 @@ public class CrownCourtOrchestrationService {
         );
 
         application = proceedingsService.updateCrownCourt(application, request.getUserDTO());
+        cclfUpdateService.updateSendToCCLF(request, request.getApplicationDTO().getRepId().intValue());
 
         if (hasNewOutcome(application)) {
           application = maatCourtDataService.invokeStoredProcedure(
