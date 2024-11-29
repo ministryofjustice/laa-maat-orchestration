@@ -14,6 +14,7 @@ import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBu
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.util.DateUtil;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
@@ -48,6 +49,19 @@ class MeansAssessmentMapperTest {
                 .usingRecursiveComparison()
                 .ignoringCollectionOrder()
                 .isEqualTo(expected);
+    }
+
+    @Test
+    void givenWorkflowRequestAndAction_whenGetUserActionDtoIsInvokedDtoIsInvoked_thenMappingIsCorrect() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        UserActionDTO actual =
+            meansAssessmentMapper.getUserActionDto(workflowRequest, TestModelDataBuilder.TEST_ACTION);
+        UserActionDTO expected = TestModelDataBuilder.getUserActionDTO();
+
+        softly.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expected);
     }
 
     @Test

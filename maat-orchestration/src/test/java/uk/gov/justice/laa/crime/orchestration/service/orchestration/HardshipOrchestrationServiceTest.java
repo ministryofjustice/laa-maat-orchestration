@@ -31,9 +31,10 @@ import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
 import uk.gov.justice.laa.crime.orchestration.service.HardshipService;
 import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
 import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
-import uk.gov.justice.laa.crime.orchestration.service.ValidationService;
+import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
 
 import java.util.List;
+import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -70,9 +71,6 @@ class HardshipOrchestrationServiceTest {
     private MaatCourtDataService maatCourtDataService;
 
     @Mock
-    private ValidationService validationService;
-
-    @Mock
     private HardshipMapper hardshipMapper;
 
     @Mock
@@ -80,6 +78,12 @@ class HardshipOrchestrationServiceTest {
 
     @Mock
     private ApplicationTrackingMapper applicationTrackingMapper;
+
+    @Mock
+    private RepOrderService repOrderService;
+
+    @Mock
+    private WorkflowPreProcessorService workflowPreProcessorService;
 
     @InjectMocks
     private HardshipOrchestrationService orchestrationService;
@@ -117,15 +121,11 @@ class HardshipOrchestrationServiceTest {
         when(hardshipMapper.getUserActionDTO(any(), any()))
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
-        when(validationService.isUserActionValid(any(), any()))
-                .thenReturn(Boolean.TRUE);
-
         return workflowRequest;
     }
 
     @Test
     void givenIsMagsCourtAndNoVariation_whenCreateIsInvoked_thenApplicationDTOIsUpdatedWithNewHardship() {
-
         WorkflowRequest workflowRequest = setupCreateStubs(CourtType.MAGISTRATE, CurrentStatus.COMPLETE);
 
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
@@ -565,30 +565,32 @@ class HardshipOrchestrationServiceTest {
     }
 
     @Test
-    void givenExceptionThrownInValidationService_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
+    void givenAnExceptionThrownInWorkflowPreProcessorService_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
 
-        when(validationService.isUserActionValid(any(), any()))
-                .thenThrow(new CrimeValidationException(List.of()));
-
+        when(workflowPreProcessorService.preProcessRequest(any(), any(), any()))
+            .thenThrow(new CrimeValidationException(List.of()));
         when(hardshipMapper.getUserActionDTO(any(), any()))
-                .thenReturn(UserActionDTO.builder().username("mock-u").build());
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
-        assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
-                .isInstanceOf(CrimeValidationException.class);
+        assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
+            .isInstanceOf(CrimeValidationException.class);
+
+        verify(workflowPreProcessorService).preProcessRequest(any(), any(), any());
     }
 
     @Test
-    void givenExceptionThrownInValidationService_whenUpdateIsInvoked_thenRollbackIsNotInvoked() {
+    void givenAnExceptionThrownInWorkflowPreProcessorService_whenUpdateIsInvoked_thenRollbackIsNotInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
 
-        when(validationService.isUserActionValid(any(), any()))
-                .thenThrow(new CrimeValidationException(List.of()));
-
+        when(workflowPreProcessorService.preProcessRequest(any(), any(), any()))
+            .thenThrow(new CrimeValidationException(List.of()));
         when(hardshipMapper.getUserActionDTO(any(), any()))
-                .thenReturn(UserActionDTO.builder().username("mock-u").build());
+            .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
-                .isInstanceOf(CrimeValidationException.class);
+            .isInstanceOf(CrimeValidationException.class);
+
+        verify(workflowPreProcessorService).preProcessRequest(any(), any(), any());
     }
 }
