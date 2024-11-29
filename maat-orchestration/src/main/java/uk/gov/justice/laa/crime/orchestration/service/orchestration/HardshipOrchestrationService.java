@@ -83,12 +83,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         }
         return application;
     }
-
-    private RepOrderDTO getRepOrderDTO(WorkflowRequest request) {
-        int repId = request.getApplicationDTO().getRepId().intValue();
-        return maatCourtDataService.findRepOrder(repId);
-    }
-
+    
     public ApplicationDTO update(WorkflowRequest request) {
         // invoke the validation service to check that data has not been modified by another user
         // invoke the validation service to Check user has rep order reserved
