@@ -9,7 +9,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.SendToCCLFDTO;
-import uk.gov.justice.laa.crime.orchestration.enums.CurrentFeatureToggles;
+import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggle;
 import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggleAction;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
@@ -71,7 +71,7 @@ public class CCLFUpdateService {
             throw new ValidationException("Valid ApplicationDTO and RepOrderDTO is required");
         }
 
-        if (featureDecisionService.isFeatureEnabled(request, CurrentFeatureToggles.MAAT_POST_ASSESSMENT_PROCESSING,
+        if (featureDecisionService.isFeatureEnabled(request, FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING,
                 FeatureToggleAction.UPDATE)) {
             if (!compareRepOrderAndApplicationDTO(repOrderDTO, applicationDto)) {
                 SendToCCLFDTO sendToCCLFDTO = SendToCCLFDTO.builder().repId(repOrderDTO.getId())

@@ -8,8 +8,10 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.meansassessment.*;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
+import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.util.DateUtil;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
@@ -280,6 +282,18 @@ public class MeansAssessmentMapper {
                 .incomeEvidence(incomeEvidenceSummaryToDto(apiResponse.getIncomeEvidenceSummary(), applicantId))
                 .build();
 
+    }
+
+    public UserActionDTO getUserActionDto(WorkflowRequest request, Action action) {
+        ApplicationDTO application = request.getApplicationDTO();
+        FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
+        InitialAssessmentDTO initialAssessment = financialAssessmentDTO.getInitial();
+        AssessmentType assessmentType = Boolean.TRUE.equals(financialAssessmentDTO.getFullAvailable())
+            ? AssessmentType.FULL : AssessmentType.INIT;
+        NewWorkReason newWorkReason = assessmentType == AssessmentType.INIT ?
+            NewWorkReason.getFrom(initialAssessment.getNewWorkReason().getCode()) : null;
+
+        return userMapper.getUserActionDTO(request, action, newWorkReason);
     }
 
     private IncomeEvidenceSummaryDTO incomeEvidenceSummaryToDto(ApiIncomeEvidenceSummary incomeEvidenceSummary,

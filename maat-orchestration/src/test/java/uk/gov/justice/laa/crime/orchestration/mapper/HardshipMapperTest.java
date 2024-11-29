@@ -22,7 +22,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 
 @ExtendWith(SoftAssertionsExtension.class)
-class HardshipReviewMapperTest {
+class HardshipMapperTest {
 
     UserMapper userMapper = new UserMapper();
     HardshipMapper hardshipMapper = new HardshipMapper(userMapper);

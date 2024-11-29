@@ -2,10 +2,16 @@ package uk.gov.justice.laa.crime.orchestration.service;
 
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
@@ -13,7 +19,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FeatureToggleDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.enums.CurrentFeatureToggles;
+import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggle;
 import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggleAction;
 
 @ExtendWith({MockitoExtension.class})
@@ -22,8 +28,13 @@ class FeatureDecisionServiceTest {
     @Mock
     private MaatCourtDataService maatCourtDataService;
 
-    @Test
-    void givenUserDoesNotHaveFeatureToggle_whenIsC3EnabledIsInvoked_thenReturnFalse() {
+    private static final String IS_C3_ENABLED_METHOD_NAME = "isC3Enabled";
+    private static final String IS_MAAT_POST_ASSESSMENT_PROCESSING_ENABLED_METHOD_NAME
+            = "isMaatPostAssessmentProcessingEnabled";
+
+    @ParameterizedTest
+    @ValueSource(strings = {IS_C3_ENABLED_METHOD_NAME, IS_MAAT_POST_ASSESSMENT_PROCESSING_ENABLED_METHOD_NAME})
+    void givenUserDoesNotHaveFeatureToggle_whenFeatureToggleMethodIsInvoked_thenReturnFalse(String methodName) throws Exception {
         when(maatCourtDataService.getUserSummary(Constants.USERNAME))
             .thenReturn(new UserSummaryDTO());
 
@@ -36,18 +47,24 @@ class FeatureDecisionServiceTest {
             .build();
 
         FeatureDecisionService featureDecisionService = new FeatureDecisionService(maatCourtDataService);
-        boolean result = featureDecisionService.isC3Enabled(request);
+        Method method = FeatureDecisionService.class.getMethod(methodName, WorkflowRequest.class);
+        boolean result = (boolean) method.invoke(featureDecisionService, request);
 
         Assertions.assertFalse(result);
     }
 
-    @Test
-    void givenUserHasFeatureToggleButWithoutTheCorrectAction_whenIsC3EnabledIsInvoked_thenReturnFalse() {
+    @ParameterizedTest
+    @MethodSource("userHasFeatureToggleButWithoutRequiredAction")
+    void givenUserHasFeatureToggleButWithoutTheCorrectAction_whenFeatureToggleMethodIsInvoked_thenReturnFalse(
+            String methodName,
+            FeatureToggle featureToggle,
+            FeatureToggleAction featureToggleAction
+    ) throws Exception {
         UserSummaryDTO userSummaryDTO = UserSummaryDTO.builder()
             .featureToggle(List.of(
                 FeatureToggleDTO.builder()
-                    .featureName(CurrentFeatureToggles.CALCULATE_CONTRIBUTION.getName())
-                    .action(FeatureToggleAction.READ.getName())
+                        .featureName(featureToggle.getName())
+                        .action(featureToggleAction.getName())
                     .build()))
             .build();
 
@@ -63,18 +80,24 @@ class FeatureDecisionServiceTest {
             .build();
 
         FeatureDecisionService featureDecisionService = new FeatureDecisionService(maatCourtDataService);
-        boolean result = featureDecisionService.isC3Enabled(request);
+        Method method = FeatureDecisionService.class.getMethod(methodName, WorkflowRequest.class);
+        boolean result = (boolean) method.invoke(featureDecisionService, request);
 
         Assertions.assertFalse(result);
     }
 
-    @Test
-    void givenUserHasFeatureToggleWithTheCorrectAction_whenIsC3EnabledIsInvoked_thenReturnTrue() {
+    @ParameterizedTest
+    @MethodSource("userHasFeatureToggleWithRequiredAction")
+    void givenUserHasFeatureToggleWithTheCorrectAction_whenFeatureToggleMethodIsInvoked_thenReturnTrue(
+            String methodName,
+            FeatureToggle featureToggle,
+            FeatureToggleAction featureToggleAction
+    ) throws Exception {
         UserSummaryDTO userSummaryDTO = UserSummaryDTO.builder()
             .featureToggle(List.of(
                 FeatureToggleDTO.builder()
-                    .featureName(CurrentFeatureToggles.CALCULATE_CONTRIBUTION.getName())
-                    .action(FeatureToggleAction.CREATE.getName())
+                        .featureName(featureToggle.getName())
+                        .action(featureToggleAction.getName())
                     .build()))
             .build();
 
@@ -90,7 +113,8 @@ class FeatureDecisionServiceTest {
             .build();
 
         FeatureDecisionService featureDecisionService = new FeatureDecisionService(maatCourtDataService);
-        boolean result = featureDecisionService.isC3Enabled(request);
+        Method method = FeatureDecisionService.class.getMethod(methodName, WorkflowRequest.class);
+        boolean result = (boolean) method.invoke(featureDecisionService, request);
 
         Assertions.assertTrue(result);
     }
@@ -109,7 +133,7 @@ class FeatureDecisionServiceTest {
                 .build();
 
         FeatureDecisionService featureDecisionService = new FeatureDecisionService(maatCourtDataService);
-        boolean result = featureDecisionService.isFeatureEnabled(request, CurrentFeatureToggles.MAAT_POST_ASSESSMENT_PROCESSING, FeatureToggleAction.UPDATE);
+        boolean result = featureDecisionService.isFeatureEnabled(request, FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING, FeatureToggleAction.UPDATE);
 
         Assertions.assertFalse(result);
     }
@@ -119,7 +143,7 @@ class FeatureDecisionServiceTest {
         UserSummaryDTO userSummaryDTO = UserSummaryDTO.builder()
                 .featureToggle(List.of(
                         FeatureToggleDTO.builder()
-                                .featureName(CurrentFeatureToggles.MAAT_POST_ASSESSMENT_PROCESSING.getName())
+                                .featureName(FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING.getName())
                                 .action(FeatureToggleAction.UPDATE.getName())
                                 .build()))
                 .build();
@@ -136,8 +160,34 @@ class FeatureDecisionServiceTest {
                 .build();
 
         FeatureDecisionService featureDecisionService = new FeatureDecisionService(maatCourtDataService);
-        boolean result = featureDecisionService.isFeatureEnabled(request, CurrentFeatureToggles.MAAT_POST_ASSESSMENT_PROCESSING, FeatureToggleAction.UPDATE);
+        boolean result = featureDecisionService.isFeatureEnabled(request, FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING, FeatureToggleAction.UPDATE);
 
         Assertions.assertTrue(result);
+    }
+
+    private static Stream<Arguments> userHasFeatureToggleButWithoutRequiredAction() {
+        return Stream.of(
+            Arguments.of(
+                IS_C3_ENABLED_METHOD_NAME,
+                FeatureToggle.CALCULATE_CONTRIBUTION,
+                FeatureToggleAction.READ),
+            Arguments.of(
+                IS_MAAT_POST_ASSESSMENT_PROCESSING_ENABLED_METHOD_NAME,
+                FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING,
+                FeatureToggleAction.CREATE)
+        );
+    }
+
+    private static Stream<Arguments> userHasFeatureToggleWithRequiredAction() {
+        return Stream.of(
+            Arguments.of(
+                IS_C3_ENABLED_METHOD_NAME,
+                FeatureToggle.CALCULATE_CONTRIBUTION,
+                FeatureToggleAction.CREATE),
+            Arguments.of(
+                IS_MAAT_POST_ASSESSMENT_PROCESSING_ENABLED_METHOD_NAME,
+                FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING,
+                FeatureToggleAction.READ)
+        );
     }
 }

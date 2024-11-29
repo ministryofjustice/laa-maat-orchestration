@@ -17,10 +17,19 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
+import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
+import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
+import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
+import uk.gov.justice.laa.crime.orchestration.service.FeatureDecisionService;
+import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
+import uk.gov.justice.laa.crime.orchestration.service.MeansAssessmentService;
+import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 import uk.gov.justice.laa.crime.orchestration.service.*;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
 import java.util.List;
+import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
+import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -52,6 +61,16 @@ class MeansAssessmentOrchestrationServiceTest {
     private AssessmentSummaryService assessmentSummaryService;
 
     @Mock
+    private MeansAssessmentMapper meansAssessmentMapper;
+
+    @Mock
+    private RepOrderService repOrderService;
+
+    @Mock
+    private WorkflowPreProcessorService workflowPreProcessorService;
+
+
+    @Mock
     private CCLFUpdateService cclfUpdateService;
 
     @Mock
@@ -68,7 +87,6 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Test
     void givenARequestWithC3Enabled_whenCreateIsInvoked_thenApplicationDTOIsUpdatedWithContribution() {
-
         WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         ContributionsDTO contributionsDTO = MeansAssessmentDataBuilder.getContributionsDTO();
         ApplicationDTO applicationDTO = MeansAssessmentDataBuilder.getApplicationDTO();
@@ -161,7 +179,6 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Test
     void givenARequestWithC3NotEnabled_whenUpdateIsInvoked_thenCalculationContributionIsNotCalled() {
-
         WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
 
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
@@ -184,6 +201,49 @@ class MeansAssessmentOrchestrationServiceTest {
                 StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
         );
         verify(assessmentSummaryService, times(1)).getSummary(any());
+    }
+
+    @Test
+    void givenARequestWithC3EnabledAndPostProcessingNotEnabled_whenUpdateIsInvoked_thenWorkflowPreProcessorServiceIsNotCalled() {
+        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
+        ApplicationDTO applicationDTO = MeansAssessmentDataBuilder.getApplicationDTO();
+
+        when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTO);
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+            any(StoredProcedure.class)
+        ))
+            .thenReturn(applicationDTO);
+        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
+        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(false);
+
+        orchestrationService.update(workflowRequest);
+
+        verify(maatCourtDataService).invokeStoredProcedure(
+            applicationDTO,
+            workflowRequest.getUserDTO(),
+            StoredProcedure.PRE_UPDATE_CC_APPLICATION
+        );
+        verify(workflowPreProcessorService, times(0)).preProcessRequest(any(), any(), any());
+    }
+
+    @Test
+    void givenARequestWithC3EnabledAndPostProcessingEnabled_whenUpdateIsInvoked_thenWorkflowPreProcessorServiceIsCalled() {
+        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
+
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+            any(StoredProcedure.class)
+        ))
+            .thenReturn(workflowRequest.getApplicationDTO());
+        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
+        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(true);
+
+        orchestrationService.update(workflowRequest);
+        verify(maatCourtDataService, times(0)).invokeStoredProcedure(
+            workflowRequest.getApplicationDTO(),
+            workflowRequest.getUserDTO(),
+            StoredProcedure.PRE_UPDATE_CC_APPLICATION
+        );
+        verify(workflowPreProcessorService).preProcessRequest(any(), any(), any());
     }
 
     @Test

@@ -14,12 +14,7 @@ import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentStatusDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
@@ -33,17 +28,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.buildWorkflowRequestWithHardship;
-import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getApiPerformHardshipResponse;
-import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getApplicationDTOWithHardship;
-import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getAssessmentStatusDTO;
-import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getAssessmentSummaryDTO;
-import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getContributionsDTO;
-import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getHardshipOverviewDTO;
-import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getHardshipReviewDTO;
+import static org.mockito.Mockito.*;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.*;
 
 @ExtendWith({MockitoExtension.class})
 class HardshipOrchestrationServiceTest {
@@ -64,9 +50,6 @@ class HardshipOrchestrationServiceTest {
     private MaatCourtDataService maatCourtDataService;
 
     @Mock
-    private ValidationService validationService;
-
-    @Mock
     private HardshipMapper hardshipMapper;
 
     @Mock
@@ -74,6 +57,12 @@ class HardshipOrchestrationServiceTest {
 
     @Mock
     private ApplicationTrackingMapper applicationTrackingMapper;
+
+    @Mock
+    private RepOrderService repOrderService;
+
+    @Mock
+    private WorkflowPreProcessorService workflowPreProcessorService;
 
     @Mock
     private CCLFUpdateService cclfUpdateService;
@@ -114,15 +103,11 @@ class HardshipOrchestrationServiceTest {
         when(hardshipMapper.getUserActionDTO(any(), any()))
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
-        when(validationService.isUserActionValid(any(), any()))
-                .thenReturn(Boolean.TRUE);
-
         return workflowRequest;
     }
 
     @Test
     void givenIsMagsCourtAndNoVariation_whenCreateIsInvoked_thenApplicationDTOIsUpdatedWithNewHardship() {
-
         WorkflowRequest workflowRequest = setupCreateStubs(CourtType.MAGISTRATE, CurrentStatus.COMPLETE);
 
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
@@ -562,30 +547,32 @@ class HardshipOrchestrationServiceTest {
     }
 
     @Test
-    void givenExceptionThrownInValidationService_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
+    void givenAnExceptionThrownInWorkflowPreProcessorService_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
 
-        when(validationService.isUserActionValid(any(), any()))
+        when(workflowPreProcessorService.preProcessRequest(any(), any(), any()))
                 .thenThrow(new CrimeValidationException(List.of()));
-
         when(hardshipMapper.getUserActionDTO(any(), any()))
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
-        assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
+        assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(CrimeValidationException.class);
+
+        verify(workflowPreProcessorService).preProcessRequest(any(), any(), any());
     }
 
     @Test
-    void givenExceptionThrownInValidationService_whenUpdateIsInvoked_thenRollbackIsNotInvoked() {
+    void givenAnExceptionThrownInWorkflowPreProcessorService_whenUpdateIsInvoked_thenRollbackIsNotInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
 
-        when(validationService.isUserActionValid(any(), any()))
+        when(workflowPreProcessorService.preProcessRequest(any(), any(), any()))
                 .thenThrow(new CrimeValidationException(List.of()));
-
         when(hardshipMapper.getUserActionDTO(any(), any()))
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(CrimeValidationException.class);
+
+        verify(workflowPreProcessorService).preProcessRequest(any(), any(), any());
     }
 }

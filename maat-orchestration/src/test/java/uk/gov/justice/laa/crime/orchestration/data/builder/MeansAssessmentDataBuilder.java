@@ -15,7 +15,7 @@ import java.util.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FeatureToggleDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.enums.CurrentFeatureToggles;
+import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggle;
 import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggleAction;
 
 import static uk.gov.justice.laa.crime.orchestration.data.Constants.FINANCIAL_ASSESSMENT_ID;
@@ -350,7 +350,7 @@ public class MeansAssessmentDataBuilder {
         return UserSummaryDTO.builder()
             .featureToggle(List.of(
                 FeatureToggleDTO.builder()
-                    .featureName(CurrentFeatureToggles.CALCULATE_CONTRIBUTION.getName())
+                    .featureName(FeatureToggle.CALCULATE_CONTRIBUTION.getName())
                     .action(FeatureToggleAction.CREATE.getName())
                     .build()
             ))
