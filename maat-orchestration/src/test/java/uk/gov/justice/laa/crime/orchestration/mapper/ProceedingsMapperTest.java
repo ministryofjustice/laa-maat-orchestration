@@ -167,8 +167,13 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void givenAEmptyStatus_whenGetCurrentStatusIsInvoked_thenNullIsReturned() {
+    void givenAStatusIsNull_whenGetCurrentStatusIsInvoked_thenNullIsReturned() {
         assertThat(proceedingsMapper.getCurrentStatus(null)).isNull();
+    }
+
+    @Test
+    void givenAEmptyStatus_whenGetCurrentStatusIsInvoked_thenNullIsReturned() {
+        assertThat(proceedingsMapper.getCurrentStatus("")).isNull();
     }
 
     @Test

@@ -1135,7 +1135,7 @@ public class TestModelDataBuilder {
     public static EmploymentStatusDTO getEmploymentStatusDTO() {
         return EmploymentStatusDTO.builder()
                 .code(EMST_CODE)
-                .description(EMST_CODE)
+                .description("Employed")
                 .build();
     }
 
