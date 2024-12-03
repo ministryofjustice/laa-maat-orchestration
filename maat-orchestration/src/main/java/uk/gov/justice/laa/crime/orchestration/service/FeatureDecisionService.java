@@ -48,7 +48,8 @@ public class FeatureDecisionService {
             workflowRequest.getUserDTO().getUserName());
 
         return userSummaryDTO.getFeatureToggle() != null && userSummaryDTO.getFeatureToggle().stream().anyMatch(
-            t -> featureToggle.getName().equals(t.getFeatureName())
-                && featureToggleAction.getName().equals(t.getAction()));
+            featureToggleDTO -> featureToggle.getName().equals(featureToggleDTO.getFeatureName())
+                && featureToggleAction.getName().equals(featureToggleDTO.getAction())
+                && "Y".equals(featureToggleDTO.getIsEnabled()));
     }
 }

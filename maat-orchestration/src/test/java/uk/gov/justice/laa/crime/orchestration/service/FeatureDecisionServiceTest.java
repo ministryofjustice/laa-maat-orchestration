@@ -87,7 +87,7 @@ class FeatureDecisionServiceTest {
 
     @ParameterizedTest
     @MethodSource("userHasFeatureToggleWithRequiredAction")
-    void givenUserHasFeatureToggleWithTheCorrectAction_whenFeatureToggleMethodIsInvoked_thenReturnTrue(
+    void givenUserHasFeatureToggleWithTheCorrectActionAndEnabled_whenFeatureToggleMethodIsInvoked_thenReturnTrue(
         String methodName,
         FeatureToggle featureToggle,
         FeatureToggleAction featureToggleAction
@@ -97,6 +97,7 @@ class FeatureDecisionServiceTest {
                 FeatureToggleDTO.builder()
                     .featureName(featureToggle.getName())
                     .action(featureToggleAction.getName())
+                    .isEnabled("Y")
                     .build()))
             .build();
 
@@ -116,6 +117,40 @@ class FeatureDecisionServiceTest {
         boolean result = (boolean) method.invoke(featureDecisionService, request);
 
         Assertions.assertTrue(result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("userHasFeatureToggleWithRequiredAction")
+    void givenUserHasFeatureToggleWithTheCorrectActionAndDisabled_whenFeatureToggleMethodIsInvoked_thenReturnFalse(
+            String methodName,
+            FeatureToggle featureToggle,
+            FeatureToggleAction featureToggleAction
+    ) throws Exception {
+        UserSummaryDTO userSummaryDTO = UserSummaryDTO.builder()
+                .featureToggle(List.of(
+                        FeatureToggleDTO.builder()
+                                .featureName(featureToggle.getName())
+                                .action(featureToggleAction.getName())
+                                .isEnabled("N")
+                                .build()))
+                .build();
+
+        when(maatCourtDataService.getUserSummary(Constants.USERNAME))
+                .thenReturn(userSummaryDTO);
+
+        UserDTO userDTO = UserDTO.builder()
+                .userName(Constants.USERNAME)
+                .build();
+
+        WorkflowRequest request = WorkflowRequest.builder()
+                .userDTO(userDTO)
+                .build();
+
+        FeatureDecisionService featureDecisionService = new FeatureDecisionService(maatCourtDataService);
+        Method method = FeatureDecisionService.class.getMethod(methodName, WorkflowRequest.class);
+        boolean result = (boolean) method.invoke(featureDecisionService, request);
+
+        Assertions.assertFalse(result);
     }
 
     private static Stream<Arguments> userHasFeatureToggleButWithoutRequiredAction() {
