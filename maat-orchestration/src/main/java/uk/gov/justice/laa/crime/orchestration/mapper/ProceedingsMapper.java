@@ -1,10 +1,12 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.*;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.*;
@@ -26,7 +28,15 @@ public class ProceedingsMapper extends CrownCourtMapper {
     public ApiUpdateApplicationRequest workflowRequestToUpdateApplicationRequest(
             ApplicationDTO application, UserDTO userDTO) {
 
-        ApiUpdateApplicationRequest updateApplicationRequest = new ApiUpdateApplicationRequest()
+        ApiUpdateApplicationRequest request = new ApiUpdateApplicationRequest();
+        mapToApiUpdateApplicationRequest(application, userDTO, request);
+
+        return request;
+    }
+
+    private void mapToApiUpdateApplicationRequest(ApplicationDTO application, UserDTO userDTO, ApiUpdateApplicationRequest request) {
+
+        request
                 .withRepId(NumberUtils.toInteger(application.getRepId()))
                 .withCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()))
                 .withMagCourtOutcome(MagCourtOutcome.getFrom(application.getMagsOutcomeDTO().getOutcome()))
@@ -50,13 +60,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         ApiCrownCourtSummary ccpCrownCourtSummary =
                 crownCourtSummaryDtoToApiCrownCourtSummary(crownCourtSummary);
 
-        if (null != crownCourtSummary.getOutcomeDTOs()) {
-            ccpCrownCourtSummary.setCrownCourtOutcome(mapToApiCrownCourtOutcomes(crownCourtSummary));
-        }
-
-        mapEvidenceDetailsToRequest(updateApplicationRequest, application);
-
-        return updateApplicationRequest
+        request
                 .withCrownCourtSummary(ccpCrownCourtSummary)
                 .withApplicantHistoryId(NumberUtils.toInteger(application.getApplicantDTO().getApplicantHistoryId()))
                 .withCrownRepId(NumberUtils.toInteger(crownCourtSummary.getCcRepId()))
@@ -65,6 +69,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
     }
 
     private ApiCrownCourtSummary crownCourtSummaryDtoToApiCrownCourtSummary(CrownCourtSummaryDTO crownCourtSummary) {
+
         ApiCrownCourtSummary ccpCrownCourtSummary = new ApiCrownCourtSummary();
         ccpCrownCourtSummary.setRepOrderDecision(crownCourtSummary.getRepOrderDecision().getValue());
         ccpCrownCourtSummary.setRepOrderDate(DateUtil.toLocalDateTime(crownCourtSummary.getCcRepOrderDate()));
@@ -134,9 +139,8 @@ public class ProceedingsMapper extends CrownCourtMapper {
         InitialAssessmentDTO initialAssessment = financialAssessmentDTO.getInitial();
 
         ApiFinancialAssessment assessment = new ApiFinancialAssessment();
-        assessment
-                .withInitResult(initialAssessment.getResult())
-                .withInitStatus(CurrentStatus.getFrom(initialAssessment.getAssessmnentStatusDTO().getStatus()));
+        assessment.withInitResult(initialAssessment.getResult());
+        assessment.withInitStatus(getCurrentStatus(initialAssessment.getAssessmnentStatusDTO().getStatus()));
 
         if (financialAssessmentDTO.getFull().getAssessmentDate() != null) {
             assessment
@@ -175,7 +179,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         return application;
     }
 
-    private void mapEvidenceDetailsToRequest(ApiUpdateApplicationRequest request, ApplicationDTO application) {
+    private void mapEvidenceDetailsToRequest(ApiUpdateCrownCourtRequest request, ApplicationDTO application) {
 
         FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
         CapitalEquityDTO capitalEquityDTO = application.getCapitalEquityDTO();
@@ -225,5 +229,28 @@ public class ProceedingsMapper extends CrownCourtMapper {
                 .withOutcomeType(outcomeDTO.getOutComeType())
                 .withDateSet(DateUtil.toLocalDateTime(outcomeDTO.getDateSet()))
                 .withDescription(outcomeDTO.getDescription());
+    }
+
+
+    public ApiUpdateCrownCourtRequest workflowRequestToUpdateCrownCourtRequest(
+            ApplicationDTO application, UserDTO userDTO) {
+
+        ApiUpdateCrownCourtRequest request = new ApiUpdateCrownCourtRequest();
+        mapToApiUpdateApplicationRequest(application, userDTO, request);
+
+        CrownCourtOverviewDTO crownCourtOverview = application.getCrownCourtOverviewDTO();
+        CrownCourtSummaryDTO crownCourtSummary = crownCourtOverview.getCrownCourtSummaryDTO();
+
+        if (null != crownCourtSummary.getOutcomeDTOs()) {
+            request.getCrownCourtSummary().setCrownCourtOutcome(mapToApiCrownCourtOutcomes(crownCourtSummary));
+        }
+        mapEvidenceDetailsToRequest(request, application);
+
+        return request;
+
+    }
+
+    CurrentStatus getCurrentStatus(String status) {
+        return StringUtils.isNotBlank(status) ? CurrentStatus.getFrom(status) : null;
     }
 }
