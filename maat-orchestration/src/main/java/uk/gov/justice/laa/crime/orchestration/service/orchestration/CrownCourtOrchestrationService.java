@@ -31,7 +31,7 @@ public class CrownCourtOrchestrationService {
                 application, request.getUserDTO(), StoredProcedure.UPDATE_DBMS_TRANSACTION_ID
         );
 
-        application = maatCourtDataService.invokeStoredProcedure(
+        maatCourtDataService.invokeStoredProcedure(
                 application, request.getUserDTO(), StoredProcedure.PRE_UPDATE_CHECKS
         );
 
