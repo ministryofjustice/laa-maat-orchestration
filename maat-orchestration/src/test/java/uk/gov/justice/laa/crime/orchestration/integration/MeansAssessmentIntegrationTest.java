@@ -144,7 +144,7 @@ class MeansAssessmentIntegrationTest {
         stubForGetContributionsSummary(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
         stubForGetRepOrders(repOrderDTO);
-        stubForUpdateSendToCCLF(repOrderDTO);
+        stubForUpdateSendToCCLF();
 
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
         stubForInvokeStoredProcedure("DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", maatApiResponse);
@@ -215,7 +215,7 @@ class MeansAssessmentIntegrationTest {
         stubForGetContributionsSummary(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
         stubForGetRepOrders(repOrderDTO);
-        stubForUpdateSendToCCLF(repOrderDTO);
+        stubForUpdateSendToCCLF();
 
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
         stubForInvokeStoredProcedure("DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", maatApiResponse);

@@ -71,8 +71,7 @@ public class CCLFUpdateService {
             throw new ValidationException("Valid ApplicationDTO and RepOrderDTO is required");
         }
 
-        if (featureDecisionService.isFeatureEnabled(request, FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING,
-                FeatureToggleAction.UPDATE)) {
+        if (featureDecisionService.isMaatPostAssessmentProcessingEnabled(request)) {
             if (!compareRepOrderAndApplicationDTO(repOrderDTO, applicationDto)) {
                 SendToCCLFDTO sendToCCLFDTO = SendToCCLFDTO.builder().repId(repOrderDTO.getId())
                         .applId(applicationDto.getApplicantDTO().getId())

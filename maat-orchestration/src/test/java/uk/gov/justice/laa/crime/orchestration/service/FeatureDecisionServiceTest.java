@@ -133,7 +133,7 @@ class FeatureDecisionServiceTest {
                 .build();
 
         FeatureDecisionService featureDecisionService = new FeatureDecisionService(maatCourtDataService);
-        boolean result = featureDecisionService.isFeatureEnabled(request, FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING, FeatureToggleAction.UPDATE);
+        boolean result = featureDecisionService.isMaatPostAssessmentProcessingEnabled(request);
 
         Assertions.assertFalse(result);
     }
@@ -144,7 +144,7 @@ class FeatureDecisionServiceTest {
                 .featureToggle(List.of(
                         FeatureToggleDTO.builder()
                                 .featureName(FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING.getName())
-                                .action(FeatureToggleAction.UPDATE.getName())
+                                .action(FeatureToggleAction.READ.getName())
                                 .build()))
                 .build();
 
@@ -160,7 +160,7 @@ class FeatureDecisionServiceTest {
                 .build();
 
         FeatureDecisionService featureDecisionService = new FeatureDecisionService(maatCourtDataService);
-        boolean result = featureDecisionService.isFeatureEnabled(request, FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING, FeatureToggleAction.UPDATE);
+        boolean result = featureDecisionService.isMaatPostAssessmentProcessingEnabled(request);
 
         Assertions.assertTrue(result);
     }

@@ -10,7 +10,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
-
 import uk.gov.justice.laa.crime.orchestration.service.api.ProceedingsApiService;
 
 @Slf4j

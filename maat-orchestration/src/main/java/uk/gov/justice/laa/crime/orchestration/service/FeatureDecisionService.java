@@ -41,7 +41,7 @@ public class FeatureDecisionService {
         return isFeatureEnabled(workflowRequest, FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING, FeatureToggleAction.READ);
     }
 
-    public boolean isFeatureEnabled(WorkflowRequest workflowRequest,
+    private boolean isFeatureEnabled(WorkflowRequest workflowRequest,
                                     FeatureToggle feature,
                                     FeatureToggleAction action) {
         UserSummaryDTO userSummaryDTO = maatCourtDataService.getUserSummary(
