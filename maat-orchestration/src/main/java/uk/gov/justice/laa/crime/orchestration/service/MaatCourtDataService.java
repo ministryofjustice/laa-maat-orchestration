@@ -42,11 +42,9 @@ public class MaatCourtDataService {
     public RepOrderDTO findRepOrder(Integer repId) {
         return maatCourtDataApiService.getRepOrderByRepId(repId);
     }
-    
+
     public UserSummaryDTO getUserSummary(String userName) {
         return maatCourtDataApiService.getUserSummary(userName);
     }
-
-    public FinancialAssessmentDTO getFinancialAssessment(int financialAssessmentId) {return maatCourtDataApiService.getFinancialAssessment(financialAssessmentId);}
-
+    
 }
