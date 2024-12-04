@@ -37,15 +37,14 @@ public class CrownCourtOrchestrationService {
 
         RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());
         application = proceedingsService.updateCrownCourt(request, repOrderDTO);
-        //cclfUpdateService.updateSendToCCLF(request, request.getApplicationDTO().getRepId().intValue());
 
         if (hasNewOutcome(application)) {
-          application = maatCourtDataService.invokeStoredProcedure(
+            application = maatCourtDataService.invokeStoredProcedure(
                     application, request.getUserDTO(), StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE
             );
         }
 
-       application = maatCourtDataService.invokeStoredProcedure(
+        application = maatCourtDataService.invokeStoredProcedure(
                 application, request.getUserDTO(), StoredProcedure.UPDATE_CC_APPLICANT_AND_APPLICATION
         );
         application.setTransactionId(null);

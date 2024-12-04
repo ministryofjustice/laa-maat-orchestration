@@ -161,7 +161,6 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         ));
 
         proceedingsService.updateApplication(request, repOrderDTO);
-        //cclfUpdateService.updateSendToCCLF(request, repOrderDTO);
 
         // Call application.handle_eform_result stored procedure OR Equivalent ATS service endpoint
         ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(request, repOrderDTO);

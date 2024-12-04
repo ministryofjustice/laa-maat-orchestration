@@ -147,7 +147,6 @@ public class MeansAssessmentOrchestrationService {
         RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());
         // call CCP service
         proceedingsService.updateApplication(request, repOrderDTO);
-        //cclfUpdateService.updateSendToCCLF(request, request.getApplicationDTO().getRepId().intValue());
 
 
         // call post_processing_part_2
