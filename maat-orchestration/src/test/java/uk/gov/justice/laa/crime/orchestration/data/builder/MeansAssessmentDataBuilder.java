@@ -352,6 +352,7 @@ public class MeansAssessmentDataBuilder {
                 FeatureToggleDTO.builder()
                     .featureName(FeatureToggle.CALCULATE_CONTRIBUTION.getName())
                     .action(FeatureToggleAction.CREATE.getName())
+                    .isEnabled("Y")
                     .build()
             ))
             .build();

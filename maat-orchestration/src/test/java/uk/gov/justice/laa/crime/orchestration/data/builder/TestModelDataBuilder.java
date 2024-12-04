@@ -2,6 +2,7 @@ package uk.gov.justice.laa.crime.orchestration.data.builder;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.common.model.hardship.*;
@@ -9,6 +10,7 @@ import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCapitalEvidenc
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiIOJSummary;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiRepOrderCrownCourtOutcome;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.*;
@@ -127,6 +129,9 @@ public class TestModelDataBuilder {
     private static final LocalDateTime RESERVATION_DATE = LocalDateTime.of(2022, 12, 14, 0, 0, 0);
     public static final LocalDateTime EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 11, 0, 0, 0);
     public static final long PARTNER_ID = 1234L;
+    public static final String EMST_CODE ="EMST_CODE";
+    public static final LocalDateTime INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 11, 0, 0, 0);
+
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
         return new ApiFindHardshipResponse()
@@ -240,13 +245,33 @@ public class TestModelDataBuilder {
                 .withDecisionDate(DECISION_DATETIME)
                 .withCommittalDate(COMMITAL_DATETIME)
                 .withDateReceived(DATETIME_RECEIVED)
-                .withIncomeEvidenceReceivedDate(LocalDateTime.of(2023, 2, 18, 0, 0, 0))
                 .withCrownCourtSummary(getApiCrownCourtSummary())
                 .withIojAppeal(getApiIOJSummary())
                 .withFinancialAssessment(getApiFinancialAssessment())
-                .withCapitalEvidence(List.of(getApiCapitalEvidence()))
+                .withPassportAssessment(getApiPassportAssessment());
+    }
+
+    public static ApiUpdateCrownCourtRequest getUpdateCrownCourtRequest() {
+        return new ApiUpdateCrownCourtRequest()
+                .withApplicantHistoryId(APPLICANT_HISTORY_ID)
+                .withCrownRepId(REP_ID)
+                .withIsImprisoned(Boolean.TRUE)
+                .withUserSession(getApiUserSession())
+                .withRepId(REP_ID)
+                .withCaseType(CaseType.EITHER_WAY)
+                .withMagCourtOutcome(MagCourtOutcome.SENT_FOR_TRIAL)
+                .withDecisionReason(DecisionReason.GRANTED)
+                .withDecisionDate(DECISION_DATETIME)
+                .withCommittalDate(COMMITAL_DATETIME)
+                .withDateReceived(DATETIME_RECEIVED)
+                .withCrownCourtSummary(getApiCrownCourtSummary())
+                .withIojAppeal(getApiIOJSummary())
+                .withFinancialAssessment(getApiFinancialAssessment())
                 .withPassportAssessment(getApiPassportAssessment())
-                .withEmstCode("EMPLOY");
+                .withIncomeEvidenceReceivedDate(LocalDateTime.of(2023, 2, 18, 0, 0, 0))
+                .withCapitalEvidenceReceivedDate(EVIDENCE_RECEIVED_DATE)
+                .withCapitalEvidence(List.of(getApiCapitalEvidence()))
+                .withEmstCode(EMST_CODE);
     }
 
     public static ApiCrownCourtSummary getApiCrownCourtSummary() {
@@ -259,7 +284,16 @@ public class TestModelDataBuilder {
                 .withRepOrderDecision(REP_ORDER_DECISION_GRANTED.getValue())
                 .withIsImprisoned(Boolean.TRUE)
                 .withIsWarrantIssued(Boolean.TRUE)
+                .withCrownCourtOutcome(List.of(getApiCrownCourtOutcome()))
                 .withEvidenceFeeLevel(EvidenceFeeLevel.LEVEL1);
+    }
+
+    public static ApiCrownCourtOutcome getApiCrownCourtOutcome() {
+        ApiCrownCourtOutcome apiCrownCourtOutcome = new ApiCrownCourtOutcome();
+        apiCrownCourtOutcome.setOutcome(CrownCourtOutcome.CONVICTED);
+        apiCrownCourtOutcome.withOutcomeType(CrownCourtOutcome.CONVICTED.getType());
+        apiCrownCourtOutcome.setDescription(CrownCourtOutcome.CONVICTED.getDescription());
+        return apiCrownCourtOutcome;
     }
 
     public static ApiRepOrderCrownCourtOutcome getApiRepOrderCrownCourtOutcome() {
@@ -657,7 +691,6 @@ public class TestModelDataBuilder {
     public static OutcomeDTO getOutcomeDTO(CourtType courtType) {
         if (courtType.equals(CourtType.CROWN_COURT)) {
             return OutcomeDTO.builder()
-                    .dateSet(Date.from(SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                     .description(CrownCourtOutcome.CONVICTED.getDescription())
                     .outComeType(CrownCourtOutcome.CONVICTED.getType())
                     .outcome(CrownCourtOutcome.CONVICTED.toString())
@@ -698,6 +731,13 @@ public class TestModelDataBuilder {
     public static CapitalEquityDTO getCapitalEquityDTO() {
         return CapitalEquityDTO.builder()
                 .capitalOther(List.of(getCapitalOtherDTO()))
+                .capitalEvidenceSummary(getCapitalEvidenceSummaryDTO())
+                .build();
+    }
+
+    public static CapitalEvidenceSummaryDTO getCapitalEvidenceSummaryDTO() {
+        return CapitalEvidenceSummaryDTO.builder()
+                .evidenceReceivedDate(Date.from(EVIDENCE_RECEIVED_DATE.atZone(ZoneId.systemDefault()).toInstant()))
                 .build();
     }
 
@@ -1094,7 +1134,7 @@ public class TestModelDataBuilder {
 
     public static EmploymentStatusDTO getEmploymentStatusDTO() {
         return EmploymentStatusDTO.builder()
-                .code("EMPLOY")
+                .code(EMST_CODE)
                 .description("Employed")
                 .build();
     }

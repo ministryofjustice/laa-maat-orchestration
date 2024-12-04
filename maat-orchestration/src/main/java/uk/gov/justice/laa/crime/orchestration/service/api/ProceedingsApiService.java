@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
@@ -39,7 +40,7 @@ public class ProceedingsApiService {
         return response;
     }
 
-    public ApiUpdateCrownCourtOutcomeResponse updateCrownCourt(ApiUpdateApplicationRequest request) {
+    public ApiUpdateCrownCourtOutcomeResponse updateCrownCourt(ApiUpdateCrownCourtRequest request) {
         log.debug(REQUEST_STRING, request);
         ApiUpdateCrownCourtOutcomeResponse response = crownCourtApiClient.put(
                 request,

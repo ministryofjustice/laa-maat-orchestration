@@ -42,14 +42,14 @@ public class FeatureDecisionService {
     }
 
     private boolean isFeatureEnabled(WorkflowRequest workflowRequest,
-                                    FeatureToggle feature,
-                                    FeatureToggleAction action) {
+                                     FeatureToggle featureToggle,
+                                     FeatureToggleAction featureToggleAction) {
         UserSummaryDTO userSummaryDTO = maatCourtDataService.getUserSummary(
                 workflowRequest.getUserDTO().getUserName());
 
-        return userSummaryDTO.getFeatureToggle() != null &&
-                userSummaryDTO.getFeatureToggle().stream().anyMatch(
-                        t -> feature.getName().equals(t.getFeatureName()) &&
-                                action.getName().equals(t.getAction()));
+        return userSummaryDTO.getFeatureToggle() != null && userSummaryDTO.getFeatureToggle().stream().anyMatch(
+                featureToggleDTO -> featureToggle.getName().equals(featureToggleDTO.getFeatureName())
+                        && featureToggleAction.getName().equals(featureToggleDTO.getAction())
+                        && "Y".equals(featureToggleDTO.getIsEnabled()));
     }
 }

@@ -8,24 +8,22 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.common.model.common.ApiUserSession;
+import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.OutcomeDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
-
+import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.util.DateUtil;
 
 import java.util.List;
 
-import static java.util.Collections.emptyList;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -44,12 +42,8 @@ class ProceedingsMapperTest {
 
     @Test
     void whenWorkflowRequestToUpdateApplicationRequestIsInvoked() {
-        ApiUserSession userSession = TestModelDataBuilder.getApiUserSession();
+        mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
-
-        when(userMapper.userDtoToUserSession(any(UserDTO.class)))
-                .thenReturn(userSession);
-
         ApiUpdateApplicationRequest expectedApplicationRequest = TestModelDataBuilder.getUpdateApplicationRequest();
         ApiUpdateApplicationRequest actualApplicationRequest =
                 proceedingsMapper.workflowRequestToUpdateApplicationRequest(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
@@ -60,29 +54,37 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void whenWorkflowRequestToUpdateApplicationRequestIsInvokedWithNullFields() {
-        ApiUserSession userSession = TestModelDataBuilder.getApiUserSession();
+    void givenAEmptyInitStatus_whenWorkflowRequestToUpdateCrownCourtRequestIsInvoked_thenReturnEmptyInitStatus() {
+        mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
+        InitialAssessmentDTO initialAssessmentDTO =
+                workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
+        initialAssessmentDTO.getAssessmnentStatusDTO().setStatus(null);
 
-        when(userMapper.userDtoToUserSession(any(UserDTO.class)))
-                .thenReturn(userSession);
+        ApiUpdateCrownCourtRequest expectedApplicationRequest = TestModelDataBuilder.getUpdateCrownCourtRequest();
+        expectedApplicationRequest.getFinancialAssessment().setInitStatus(null);
 
-        ApiUpdateApplicationRequest expectedApplicationRequest = TestModelDataBuilder.getUpdateApplicationRequest();
-
-        CrownCourtSummaryDTO crownCourtSummaryDTO =
-                workflowRequest.getApplicationDTO().getCrownCourtOverviewDTO().getCrownCourtSummaryDTO();
-        crownCourtSummaryDTO.setOutcomeDTOs(null);
-        crownCourtSummaryDTO.setEvidenceProvisionFee(null);
-
-        expectedApplicationRequest.getCrownCourtSummary().setEvidenceFeeLevel(null);
-        expectedApplicationRequest.getCrownCourtSummary().setCrownCourtOutcome(emptyList());
-
-        ApiUpdateApplicationRequest actualApplicationRequest =
-                proceedingsMapper.workflowRequestToUpdateApplicationRequest(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
+        ApiUpdateCrownCourtRequest actualApplicationRequest =
+                proceedingsMapper.workflowRequestToUpdateCrownCourtRequest(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
 
         softly.assertThat(actualApplicationRequest)
                 .usingRecursiveComparison()
                 .isEqualTo(expectedApplicationRequest);
+
+        softly.assertAll();
+    }
+
+    @Test
+    void givenAValidWorkflowRequest_whenWorkflowRequestToUpdateCrownCourtRequestIsInvoked_thenReturnCorrectCCRequest() {
+        mockApiUserSession();
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
+        ApiUpdateCrownCourtRequest expectedCrownCourtRequest = TestModelDataBuilder.getUpdateCrownCourtRequest();
+        ApiUpdateCrownCourtRequest actualApplicationRequest =
+                proceedingsMapper.workflowRequestToUpdateCrownCourtRequest(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
+
+        softly.assertThat(actualApplicationRequest)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedCrownCourtRequest);
     }
 
     @Test
@@ -156,5 +158,26 @@ class ProceedingsMapperTest {
                 .isEqualTo(originalOutcome.getOutcome().getDescription());
         softly.assertThat(actualOutcome.getDateSet())
                 .isEqualTo(DateUtil.toDate(originalOutcome.getOutcomeDate()));
+    }
+
+    private void mockApiUserSession() {
+        ApiUserSession userSession = TestModelDataBuilder.getApiUserSession();
+        when(userMapper.userDtoToUserSession(any(UserDTO.class)))
+                .thenReturn(userSession);
+    }
+
+    @Test
+    void givenAStatusIsNull_whenGetCurrentStatusIsInvoked_thenNullIsReturned() {
+        assertThat(proceedingsMapper.getCurrentStatus(null)).isNull();
+    }
+
+    @Test
+    void givenAEmptyStatus_whenGetCurrentStatusIsInvoked_thenNullIsReturned() {
+        assertThat(proceedingsMapper.getCurrentStatus("")).isNull();
+    }
+
+    @Test
+    void givenAEmptyStatus_whenGetCurrentStatusIsInvoked_thenCorrectStatusIsReturned() {
+        assertThat(proceedingsMapper.getCurrentStatus("COMPLETE")).isEqualTo(CurrentStatus.COMPLETE);
     }
 }
