@@ -42,12 +42,7 @@ public class MaatCourtDataService {
     public RepOrderDTO findRepOrder(Integer repId) {
         return maatCourtDataApiService.getRepOrderByRepId(repId);
     }
-
-    public RepOrderDTO findRepOrder(@NotNull WorkflowRequest request) {
-        int repId = request.getApplicationDTO().getRepId().intValue();
-        return this.findRepOrder(repId);
-    }
-
+    
     public UserSummaryDTO getUserSummary(String userName) {
         return maatCourtDataApiService.getUserSummary(userName);
     }
