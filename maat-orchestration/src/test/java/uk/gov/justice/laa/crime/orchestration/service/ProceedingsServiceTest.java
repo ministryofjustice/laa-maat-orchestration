@@ -11,6 +11,7 @@ import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownC
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
 
 import uk.gov.justice.laa.crime.orchestration.service.api.ProceedingsApiService;
@@ -31,6 +32,12 @@ class ProceedingsServiceTest {
     @InjectMocks
     private ProceedingsService proceedingsService;
 
+    @Mock
+    private FeatureDecisionService featureDecisionService;
+
+    @Mock
+    private CCLFUpdateService cclfUpdateService;
+
     @Test
     void givenWorkflowRequest_whenUpdateApplicationIsInvoked_thenApiServiceIsCalledAndApplicationUpdated() {
         when(proceedingsMapper.workflowRequestToUpdateApplicationRequest(any(ApplicationDTO.class), any(UserDTO.class)))
@@ -38,8 +45,8 @@ class ProceedingsServiceTest {
 
         when(proceedingsApiService.updateApplication(any(ApiUpdateApplicationRequest.class)))
                 .thenReturn(new ApiUpdateApplicationResponse());
-
-        proceedingsService.updateApplication(WorkflowRequest.builder().applicationDTO(new ApplicationDTO()).userDTO(new UserDTO()).build());
+        proceedingsService.updateApplication(WorkflowRequest.builder().applicationDTO(new ApplicationDTO()).userDTO(new UserDTO()).build(),
+                new RepOrderDTO());
 
         verify(proceedingsMapper)
                 .updateApplicationResponseToApplicationDto(any(ApiUpdateApplicationResponse.class),
@@ -55,7 +62,8 @@ class ProceedingsServiceTest {
         when(proceedingsApiService.updateCrownCourt(any(ApiUpdateApplicationRequest.class)))
                 .thenReturn(new ApiUpdateCrownCourtOutcomeResponse());
 
-        proceedingsService.updateCrownCourt(new ApplicationDTO(), new UserDTO());
+        proceedingsService.updateCrownCourt(WorkflowRequest.builder().applicationDTO(new ApplicationDTO()).userDTO(new UserDTO()).build(),
+                new RepOrderDTO());
 
         verify(proceedingsMapper)
                 .updateCrownCourtResponseToApplicationDto(any(ApiUpdateCrownCourtOutcomeResponse.class),

@@ -27,6 +27,7 @@ import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
 import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
 import uk.gov.justice.laa.crime.orchestration.service.*;
+import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_INCOMPLETE_ASSESSMENT;
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_REASSESSMENT;
@@ -45,6 +46,7 @@ public class MeansAssessmentOrchestrationService {
     private final WorkflowPreProcessorService workflowPreProcessorService;
     private final MeansAssessmentMapper meansAssessmentMapper;
     private final CCLFUpdateService cclfUpdateService;
+    private final MaatCourtDataApiService maatCourtDataApiService;
 
     public FinancialAssessmentDTO find(int assessmentId, int applicantId) {
         return meansAssessmentService.find(assessmentId, applicantId);
@@ -142,9 +144,10 @@ public class MeansAssessmentOrchestrationService {
             throw new MAATServerException(alertMessage);
         }
 
+        RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());
         // call CCP service
-        proceedingsService.updateApplication(request);
-        cclfUpdateService.updateSendToCCLF(request, request.getApplicationDTO().getRepId().intValue());
+        proceedingsService.updateApplication(request, repOrderDTO);
+        //cclfUpdateService.updateSendToCCLF(request, request.getApplicationDTO().getRepId().intValue());
 
 
         // call post_processing_part_2

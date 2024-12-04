@@ -85,24 +85,13 @@ class CCLFUpdateServiceTest {
     void givenValidInputWithUpdateAction_whenUpdateSendToCCLFIsInvoked_thenNoExceptionIsThrown() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
-        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(any())).thenReturn(true);
         assertDoesNotThrow(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO));
-    }
-
-    @Test
-    void givenFeatureNotEnabledForUser_whenUpdateSendToCCLFIsInvoked_thenUpdateCCLFIsNotCalled() {
-        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
-        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
-        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(any())).thenReturn(false);
-        assertDoesNotThrow(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO));
-        verify(maatCourtDataApiService, times(0)).updateSendToCCLF(any());
     }
 
     @Test
     void givenValidInputWithNullAction_whenUpdateSendToCCLFIsInvoked_thenNoExceptionIsThrown() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
-        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(any())).thenReturn(true);
         assertDoesNotThrow(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO));
     }
 
@@ -112,7 +101,6 @@ class CCLFUpdateServiceTest {
         LocalDateTime DECISION_DATETIME = LocalDateTime.of(2000, 10, 13, 0, 0, 0);
         workflowRequest.getApplicationDTO().setDecisionDate(Date.from(DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()));
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
-        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(any())).thenReturn(true);
         assertDoesNotThrow(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO));
     }
 
@@ -136,7 +124,6 @@ class CCLFUpdateServiceTest {
     void givenValidInput_whenUpdateSendToCCLFIsInvoked_thenOKResponseIsReturned() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
-        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(any())).thenReturn(true);
         when(maatCourtDataApiService.updateSendToCCLF(any())).thenReturn(repOrderDTO);
         assertDoesNotThrow(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO));
         verify(maatCourtDataApiService).updateSendToCCLF(any());

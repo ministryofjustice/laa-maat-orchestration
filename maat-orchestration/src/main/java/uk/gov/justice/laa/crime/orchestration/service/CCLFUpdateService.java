@@ -71,21 +71,12 @@ public class CCLFUpdateService {
             throw new ValidationException("Valid ApplicationDTO and RepOrderDTO is required");
         }
 
-        if (featureDecisionService.isMaatPostAssessmentProcessingEnabled(request)) {
-            if (!compareRepOrderAndApplicationDTO(repOrderDTO, applicationDto)) {
-                SendToCCLFDTO sendToCCLFDTO = SendToCCLFDTO.builder().repId(repOrderDTO.getId())
-                        .applId(applicationDto.getApplicantDTO().getId())
-                        .applHistoryId(applicationDto.getApplicantDTO().getApplicantHistoryId()).build();
-                maatCourtDataApiService.updateSendToCCLF(sendToCCLFDTO);
-            }
-        } else {
-            log.error("MAAT_POST_ASSESSMENT_PROCESSING feature is disabled {}", request.getUserDTO().getUserName());
+        if (!compareRepOrderAndApplicationDTO(repOrderDTO, applicationDto)) {
+            SendToCCLFDTO sendToCCLFDTO = SendToCCLFDTO.builder().repId(repOrderDTO.getId())
+                    .applId(applicationDto.getApplicantDTO().getId())
+                    .applHistoryId(applicationDto.getApplicantDTO().getApplicantHistoryId()).build();
+            maatCourtDataApiService.updateSendToCCLF(sendToCCLFDTO);
         }
-    }
-
-    public void updateSendToCCLF(WorkflowRequest request, Integer repId) {
-        RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(repId);
-        updateSendToCCLF(request, repOrderDTO);
     }
 
     public Date parseDate(String dateString) {

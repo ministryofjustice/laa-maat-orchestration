@@ -15,6 +15,7 @@ import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
@@ -163,6 +164,7 @@ class HardshipOrchestrationServiceTest {
         applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship()
                 .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(applicationDTO);
         when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
 
@@ -172,6 +174,7 @@ class HardshipOrchestrationServiceTest {
                 .thenReturn(applicationDTO);
 
         when(applicationTrackingMapper.build(any(), any())).thenReturn(new ApplicationTrackingOutputResult().withUsn(12345));
+        when(repOrderService.getRepOrder(any())).thenReturn(repOrderDTO);
 
         ApplicationDTO expected = orchestrationService.create(workflowRequest);
 
@@ -181,7 +184,7 @@ class HardshipOrchestrationServiceTest {
         assertThat(expected.getCrownCourtOverviewDTO().getContribution())
                 .isEqualTo(contributionsDTO);
 
-        verify(proceedingsService).updateApplication(workflowRequest);
+        verify(proceedingsService).updateApplication(workflowRequest, repOrderDTO);
 
         verify(assessmentSummaryService)
                 .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
@@ -371,6 +374,8 @@ class HardshipOrchestrationServiceTest {
         applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship()
                 .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(applicationDTO);
+
         when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
 
@@ -384,6 +389,8 @@ class HardshipOrchestrationServiceTest {
         when(hardshipMapper.getUserActionDTO(any(), any()))
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
         when(applicationTrackingMapper.build(any(), any())).thenReturn(new ApplicationTrackingOutputResult().withUsn(12345));
+        when(repOrderService.getRepOrder(any())).thenReturn(repOrderDTO);
+
         ApplicationDTO expected = orchestrationService.update(workflowRequest);
 
         assertThat(expected.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship())
@@ -392,7 +399,7 @@ class HardshipOrchestrationServiceTest {
         assertThat(expected.getCrownCourtOverviewDTO().getContribution())
                 .isEqualTo(contributionsDTO);
 
-        verify(proceedingsService).updateApplication(workflowRequest);
+        verify(proceedingsService).updateApplication(workflowRequest, repOrderDTO);
 
         verify(assessmentSummaryService)
                 .updateApplication(applicationDTO, assessmentSummaryDTO);

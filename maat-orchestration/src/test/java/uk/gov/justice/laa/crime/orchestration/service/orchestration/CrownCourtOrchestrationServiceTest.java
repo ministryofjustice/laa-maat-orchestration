@@ -11,9 +11,11 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.OutcomeDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.service.CCLFUpdateService;
 import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
 import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
+import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
 import java.util.List;
 
@@ -33,6 +35,9 @@ class CrownCourtOrchestrationServiceTest {
     @Mock
     private CCLFUpdateService cclfUpdateService;
 
+    @Mock
+    private MaatCourtDataApiService maatCourtDataApiService;
+
     @InjectMocks
     private CrownCourtOrchestrationService orchestrationService;
 
@@ -43,8 +48,9 @@ class CrownCourtOrchestrationServiceTest {
                 any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)
         )).thenReturn(applicationDTO);
 
-        when(proceedingsService.updateCrownCourt(any(ApplicationDTO.class), any(UserDTO.class)))
+        when(proceedingsService.updateCrownCourt(any(WorkflowRequest.class), any(RepOrderDTO.class)))
                 .thenReturn(applicationDTO);
+        when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(new RepOrderDTO());
     }
 
     void checkStoredProcedureInvocations(WorkflowRequest request) {

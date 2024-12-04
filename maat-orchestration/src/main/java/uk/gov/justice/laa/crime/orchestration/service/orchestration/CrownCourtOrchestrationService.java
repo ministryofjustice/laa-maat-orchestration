@@ -7,9 +7,11 @@ import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtOverviewDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.service.CCLFUpdateService;
 import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
 import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
+import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
 @Slf4j
 @Service
@@ -19,6 +21,7 @@ public class CrownCourtOrchestrationService {
     private final ProceedingsService proceedingsService;
     private final MaatCourtDataService maatCourtDataService;
     private final CCLFUpdateService cclfUpdateService;
+    private final MaatCourtDataApiService maatCourtDataApiService;
 
     public ApplicationDTO update(WorkflowRequest request) {
 
@@ -32,8 +35,9 @@ public class CrownCourtOrchestrationService {
                 application, request.getUserDTO(), StoredProcedure.PRE_UPDATE_CHECKS
         );
 
-        application = proceedingsService.updateCrownCourt(application, request.getUserDTO());
-        cclfUpdateService.updateSendToCCLF(request, request.getApplicationDTO().getRepId().intValue());
+        RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());
+        application = proceedingsService.updateCrownCourt(request, repOrderDTO);
+        //cclfUpdateService.updateSendToCCLF(request, request.getApplicationDTO().getRepId().intValue());
 
         if (hasNewOutcome(application)) {
           application = maatCourtDataService.invokeStoredProcedure(
