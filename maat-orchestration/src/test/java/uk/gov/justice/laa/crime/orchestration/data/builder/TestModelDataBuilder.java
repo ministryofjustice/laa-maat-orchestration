@@ -100,9 +100,6 @@ public class TestModelDataBuilder {
     // Solicitors Costs
     private static final BigDecimal SOLICITOR_HOURS = BigDecimal.valueOf(50)
             .setScale(1, RoundingMode.DOWN);
-    private static final LocalDateTime DATE_REQUIRED_DATETIME = LocalDateTime.of(2022, 12, 15, 0, 0, 0);
-
-    private static final LocalDateTime DATE_REQUESTED_DATETIME = LocalDateTime.of(2022, 11, 11, 0, 0, 0);
     private static final LocalDateTime DATE_REVIEWED_DATETIME = LocalDateTime.of(2022, 11, 12, 0, 0, 0);
     private static final Date DATE_REVIEWED =
             Date.from(Instant.ofEpochSecond(DATE_REVIEWED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
@@ -126,8 +123,7 @@ public class TestModelDataBuilder {
     public static final LocalDateTime EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 11, 0, 0, 0);
     public static final long PARTNER_ID = 1234L;
     public static final String EMST_CODE ="EMST_CODE";
-    public static final LocalDateTime INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 11, 0, 0, 0);
-
+    
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
         return new ApiFindHardshipResponse()
