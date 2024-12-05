@@ -2,9 +2,11 @@ package uk.gov.justice.laa.crime.orchestration.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO;
@@ -44,7 +46,5 @@ public class MaatCourtDataService {
     public UserSummaryDTO getUserSummary(String userName) {
         return maatCourtDataApiService.getUserSummary(userName);
     }
-
-    public FinancialAssessmentDTO getFinancialAssessment(int financialAssessmentId) {return maatCourtDataApiService.getFinancialAssessment(financialAssessmentId);}
-
+    
 }

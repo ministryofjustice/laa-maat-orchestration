@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.time.*;
 import java.util.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FeatureToggleDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggle;
 import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggleAction;
@@ -106,6 +107,9 @@ public class MeansAssessmentDataBuilder {
     private static final LocalDateTime PARTNER_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2020, 9, 13, 0, 0, 0);
     private static final LocalDateTime APPLICANT_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2020, 10, 1, 0, 0, 0);
     public static final Date APPEAL_RECEIVED_DATE = new GregorianCalendar(2023, Calendar.MARCH, 18).getTime();
+    public static final Integer TEST_REP_ID = 42312;
+    public static final LocalDateTime TEST_MAGS_OUTCOME_DATE = LocalDateTime.of(2022, 6, 5, 0, 0);
+
 
     private static final LocalDateTime APPLICATION_TIMESTAMP = LocalDateTime.of(2022, 10, 1, 0, 0, 0);
     public static final Date APPEAL_SENTENCE_ORDER_DATE = new GregorianCalendar(2023, Calendar.AUGUST, 3).getTime();
@@ -352,6 +356,20 @@ public class MeansAssessmentDataBuilder {
                     .build()
             ))
             .build();
+    }
+
+    public static RepOrderDTO getRepOrderDTO() {
+        return RepOrderDTO.builder()
+                .id(TEST_REP_ID)
+                .catyCaseType(CaseType.EITHER_WAY.getCaseType())
+                .magsOutcome(MagCourtOutcome.COMMITTED.getOutcome())
+                .magsOutcomeDate("05-JUN-22")
+                .magsOutcomeDateSet(TEST_MAGS_OUTCOME_DATE)
+                .committalDate(TEST_MAGS_OUTCOME_DATE.toLocalDate())
+                .decisionReasonCode("rder-code")
+                .crownRepOrderDecision("cc-rep-doc")
+                .crownRepOrderType("cc-rep-type")
+                .build();
     }
 
     private static List<ChildWeightingDTO> getChildWeightings() {
