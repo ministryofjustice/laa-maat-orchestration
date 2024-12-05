@@ -87,7 +87,6 @@ public class TestModelDataBuilder {
             Date.from(Instant.ofEpochSecond(CONTRIBUTION_EFFECTIVE_DATETIME.toEpochSecond(ZoneOffset.UTC)));
     private static final BigDecimal UPFRONT_CONTRIBUTION_AMOUNT = BigDecimal.valueOf(2000.00);
     private static final BigDecimal MONTHLY_CONTRIBUTION_AMOUNT = BigDecimal.valueOf(150.00);
-    private static final Integer HARDSHIP_REVIEW_PROGRESS_ID = 53;
     private static final String HARDSHIP_REASON_NOTE = "Mock reason note";
     private static final String HARDSHIP_OTHER_DESCRIPTION = "Mock other description";
     private static final String CASEWORKER_DECISION_NOTES = "Mock caseworker decision notes";
@@ -154,8 +153,7 @@ public class TestModelDataBuilder {
                                 getApiHardshipReviewDetails(BigDecimal.valueOf(1500.00),
                                         HardshipReviewDetailType.INCOME
                                 ).stream()
-                        ).toList())
-                .withReviewProgressItems(getReviewProgressItems());
+                        ).toList());
     }
 
     public static ApiPerformHardshipResponse getApiPerformHardshipResponse() {
@@ -218,17 +216,6 @@ public class TestModelDataBuilder {
                                 .withNotes(CASEWORKER_NOTES)
                                 .withDecisionNotes(CASEWORKER_DECISION_NOTES)
                                 .withUserSession(getApiUserSession())
-                                .withProgressItems(
-                                        List.of(
-                                                new HardshipProgress()
-                                                        .withAction(HardshipReviewProgressAction.SOLICITOR_INFORMED)
-                                                        .withResponse(
-                                                                HardshipReviewProgressResponse.ADDITIONAL_PROVIDED)
-                                                        .withDateTaken(DATE_REQUESTED_DATETIME)
-                                                        .withDateRequired(DATE_REQUIRED_DATETIME)
-                                                        .withDateCompleted(DATE_COMPLETED_DATETIME)
-                                        )
-                                )
                 );
     }
 
@@ -371,17 +358,6 @@ public class TestModelDataBuilder {
                     .setCrownCourtHardship(HardshipReviewDTO.builder().build());
         }
         return applicationDTOWithHardship;
-    }
-
-    private static List<ApiHardshipProgress> getReviewProgressItems() {
-        return List.of(new ApiHardshipProgress()
-                .withId(HARDSHIP_REVIEW_PROGRESS_ID)
-                .withProgressResponse(HardshipReviewProgressResponse.ADDITIONAL_PROVIDED)
-                .withDateCompleted(DATE_COMPLETED_DATETIME)
-                .withDateRequested(DATE_REQUESTED_DATETIME)
-                .withDateRequired(DATE_REQUIRED_DATETIME)
-                .withProgressAction(HardshipReviewProgressAction.SOLICITOR_INFORMED)
-        );
     }
 
     public static SolicitorCosts getSolicitorsCosts() {
@@ -893,32 +869,7 @@ public class TestModelDataBuilder {
                 .notes(CASEWORKER_NOTES)
                 .decisionNotes(CASEWORKER_DECISION_NOTES)
                 .solictorsCosts(getHRSolicitorsCostsDTO())
-                .progress(getHrProgressDTOs())
                 .build();
-    }
-
-    private static List<HRProgressDTO> getHrProgressDTOs() {
-        return List.of(
-                HRProgressDTO.builder()
-                        .id(HARDSHIP_REVIEW_PROGRESS_ID.longValue())
-                        .progressAction(
-                                HRProgressActionDTO.builder()
-                                        .action(HardshipReviewProgressAction.SOLICITOR_INFORMED.getAction())
-                                        .description(HardshipReviewProgressAction.SOLICITOR_INFORMED.getDescription())
-                                        .build()
-                        )
-                        .progressResponse(
-                                HRProgressResponseDTO.builder()
-                                        .response(HardshipReviewProgressResponse.ADDITIONAL_PROVIDED.getResponse())
-                                        .description(
-                                                HardshipReviewProgressResponse.ADDITIONAL_PROVIDED.getDescription())
-                                        .build()
-                        )
-                        .dateRequired(DATE_REQUIRED)
-                        .dateRequested(DATE_REQUESTED)
-                        .dateCompleted(DATE_COMPLETED)
-                        .build()
-        );
     }
 
     private static NewWorkReasonDTO getNewWorkReasonDTO() {

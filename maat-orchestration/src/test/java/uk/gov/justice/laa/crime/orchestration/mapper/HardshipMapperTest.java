@@ -10,7 +10,6 @@ import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipResponse
 import uk.gov.justice.laa.crime.common.model.hardship.DeniedIncome;
 import uk.gov.justice.laa.crime.common.model.hardship.ExtraExpenditure;
 import uk.gov.justice.laa.crime.common.model.hardship.HardshipMetadata;
-import uk.gov.justice.laa.crime.common.model.hardship.HardshipProgress;
 import uk.gov.justice.laa.crime.common.model.hardship.HardshipReview;
 import uk.gov.justice.laa.crime.common.model.hardship.SolicitorCosts;
 import uk.gov.justice.laa.crime.enums.CourtType;
@@ -89,11 +88,7 @@ class HardshipMapperTest {
 
         HardshipMetadata actualMetadata = apiPerformHardshipRequest.getHardshipMetadata();
         HardshipMetadata expectedMetadata = apiPerformHardshipRequest.getHardshipMetadata();
-        checkHardshipMetadata(actualMetadata, expectedMetadata);
-
-        HardshipProgress actualhardshipProgress = actualMetadata.getProgressItems().get(0);
-        HardshipProgress expectedhardshipProgress = expectedMetadata.getProgressItems().get(0);
-        checkHardshipProgress(actualhardshipProgress, expectedhardshipProgress);
+        checkHardshipMetadata(actualMetadata, expectedMetadata);;
     }
 
     @Test
@@ -133,20 +128,6 @@ class HardshipMapperTest {
                 .isEqualTo(Constants.POST_HARDSHIP_DISPOSABLE_INCOME);
         softly.assertThat(magCourtHardship.getDisposableIncome())
                 .isEqualTo(Constants.DISPOSABLE_INCOME);
-    }
-
-
-    private void checkHardshipProgress(HardshipProgress actualhardshipProgress, HardshipProgress other) {
-        softly.assertThat(actualhardshipProgress.getAction())
-                .isEqualTo(other.getAction());
-        softly.assertThat(actualhardshipProgress.getResponse())
-                .isEqualTo(other.getResponse());
-        softly.assertThat(actualhardshipProgress.getDateTaken())
-                .isEqualTo(other.getDateTaken());
-        softly.assertThat(actualhardshipProgress.getDateCompleted())
-                .isEqualTo(other.getDateCompleted());
-        softly.assertThat(actualhardshipProgress.getDateRequired())
-                .isEqualTo(other.getDateRequired());
     }
 
     private void checkHardshipMetadata(HardshipMetadata actualMetadata, HardshipMetadata other) {
