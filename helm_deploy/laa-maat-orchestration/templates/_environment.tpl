@@ -45,6 +45,10 @@ env:
     value: {{ .Values.catApi.baseUrl }}
   - name: CAT_API_OAUTH_URL
     value: {{ .Values.catApi.oauthUrl }}
+  - name: EVIDENCE_API_BASE_URL
+    value: {{ .Values.evidenceApi.baseUrl }}
+  - name: EVIDENCE_API_OAUTH_URL
+    value: {{ .Values.evidenceApi.oauthUrl }}
   - name: JWT_ISSUER_URI
     value: {{ .Values.jwt.issuerUri }}
   - name: HARDSHIP_API_OAUTH_CLIENT_ID
