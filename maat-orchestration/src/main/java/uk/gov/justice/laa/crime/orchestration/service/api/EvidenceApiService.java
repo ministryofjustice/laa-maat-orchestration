@@ -24,7 +24,7 @@ public class EvidenceApiService {
     private final ServicesConfiguration configuration;
 
     public ApiCreateIncomeEvidenceResponse createEvidence(ApiCreateIncomeEvidenceRequest apiCreateIncomeEvidenceRequest) {
-        log.info(REQUEST_STRING, apiCreateIncomeEvidenceRequest);
+        log.debug(REQUEST_STRING, apiCreateIncomeEvidenceRequest);
         ApiCreateIncomeEvidenceResponse apiCreateIncomeEvidenceResponse = evidenceApiClient.post(
                 apiCreateIncomeEvidenceRequest,
                 new ParameterizedTypeReference<>() {},

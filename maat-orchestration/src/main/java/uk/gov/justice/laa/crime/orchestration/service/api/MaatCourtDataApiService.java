@@ -93,7 +93,7 @@ public class MaatCourtDataApiService {
     }
 
     public MaatApiAssessmentResponse updateFinancialAssessment(MaatApiUpdateAssessment maatApiUpdateAssessment) {
-        log.info(REQUEST_STRING, maatApiUpdateAssessment);
+        log.debug(REQUEST_STRING, maatApiUpdateAssessment);
         MaatApiAssessmentResponse financialAssessmentDTO = maatApiClient.put(
                 maatApiUpdateAssessment,
                 new ParameterizedTypeReference<>() {},

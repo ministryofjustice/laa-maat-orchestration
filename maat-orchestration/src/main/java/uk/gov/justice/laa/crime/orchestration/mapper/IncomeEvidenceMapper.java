@@ -6,6 +6,7 @@ import uk.gov.justice.laa.crime.common.model.evidence.*;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.FinancialAssessmentIncomeEvidence;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
+import uk.gov.justice.laa.crime.enums.AssessmentType;
 import uk.gov.justice.laa.crime.enums.EmploymentStatus;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.exception.ValidationException;
@@ -35,15 +36,20 @@ public class IncomeEvidenceMapper {
     public ApiCreateIncomeEvidenceRequest workflowRequestToApiCreateIncomeEvidenceRequest(WorkflowRequest workflowRequest) {
         ApplicationDTO application = workflowRequest.getApplicationDTO();
         ApiApplicantDetails partnerDetails = getPartnerDetails(application.getApplicantLinks());
-        Collection<AssessmentSectionSummaryDTO> initSectionSummaries = application.getAssessmentDTO()
-                .getFinancialAssessmentDTO().getInitial().getSectionSummaries();
+        AssessmentDetailDTO pensionDetails =
+                application.getAssessmentDTO().getFinancialAssessmentDTO().getInitial().getSectionSummaries()
+                        .stream()
+                        .flatMap(section -> section.getAssessmentDetail().stream())
+                        .filter(detail -> detail.getDescription().equals("Income from Private Pension(s)"))
+                        .findFirst()
+                        .orElse(null);
 
         return new ApiCreateIncomeEvidenceRequest()
                 .withMagCourtOutcome(MagCourtOutcome.getFrom(application.getMagsOutcomeDTO().getOutcome()))
                 .withApplicantDetails(getApplicantDetails(application.getApplicantDTO()))
                 .withPartnerDetails(partnerDetails)
-                .withApplicantPensionAmount(getPensionAmount(initSectionSummaries, false))
-                .withPartnerPensionAmount(partnerDetails == null ? null : getPensionAmount(initSectionSummaries, true))
+                .withApplicantPensionAmount(getPensionAmount(pensionDetails, false))
+                .withPartnerPensionAmount(partnerDetails == null ? null : getPensionAmount(pensionDetails, true))
                 .withMetadata(getMetadata(workflowRequest));
     }
 
@@ -51,10 +57,11 @@ public class IncomeEvidenceMapper {
                                                                 RepOrderDTO repOrder,
                                                                 ApiCreateIncomeEvidenceResponse evidenceResponse) {
         ApplicationDTO application = workflowRequest.getApplicationDTO();
-        String assessmentType = Boolean.TRUE.equals(application.getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable()) ? "FULL" : "INIT";
+        AssessmentType assessmentType = Boolean.TRUE.equals(application.getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable())
+                ? AssessmentType.FULL : AssessmentType.INIT;
         InitialAssessmentDTO initialAssessment = application.getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
         FullAssessmentDTO fullAssessment = application.getAssessmentDTO().getFinancialAssessmentDTO().getFull();
-        Collection<AssessmentDetailDTO> assessmentDetails  = assessmentType.equals("FULL")
+        Collection<AssessmentDetailDTO> assessmentDetails  = assessmentType.equals(AssessmentType.FULL)
                 ? fullAssessment.getSectionSummaries().stream().flatMap(section -> section.getAssessmentDetail().stream()).toList()
                 : initialAssessment.getSectionSummaries().stream().flatMap(section -> section.getAssessmentDetail().stream()).toList();
 
@@ -64,7 +71,7 @@ public class IncomeEvidenceMapper {
                 .withFinAssIncomeEvidences(getIncomeEvidences(workflowRequest, repOrder, evidenceResponse))
                 .withLaaTransactionId(UUID.randomUUID().toString())
                 .withRepId(NumberUtils.toInteger(application.getRepId()))
-                .withAssessmentType(assessmentType)
+                .withAssessmentType(assessmentType.getType())
                 .withCmuId(NumberUtils.toInteger(application.getCaseManagementUnitDTO().getCmuId()))
                 .withFassInitStatus(initialAssessment.getAssessmnentStatusDTO().getStatus())
                 .withInitialAssessmentDate(DateUtil.toLocalDateTime(initialAssessment.getAssessmentDate()))
@@ -83,7 +90,7 @@ public class IncomeEvidenceMapper {
                 .withChildWeightings(meansAssessmentMapper.childWeightingsBuilder(initialAssessment.getChildWeightings()))
                 .withDateCompleted(application.getAssessmentDTO().getFinancialAssessmentDTO().getDateCompleted());
 
-        if ( assessmentType.equals("FULL")) {
+        if ( assessmentType.equals(AssessmentType.FULL)) {
             updateAssessment.setFassFullStatus(fullAssessment.getAssessmnentStatusDTO().getStatus());
             updateAssessment.setFullAssessmentDate(DateUtil.toLocalDateTime(fullAssessment.getAssessmentDate()));
             updateAssessment.setFullResult(fullAssessment.getResult());
@@ -110,7 +117,9 @@ public class IncomeEvidenceMapper {
         List<EvidenceDTO> partnerEvidence = new ArrayList<>();
 
         for (uk.gov.justice.laa.crime.common.model.meansassessment.ApiIncomeEvidence evidence : assessmentResponse.getIncomeEvidence()) {
-            if (evidence.getApplicantId().equals(NumberUtils.toInteger(application.getApplicantDTO().getId()))) {
+            Integer applicantId = NumberUtils.toInteger(application.getApplicantDTO().getId());
+
+            if (evidence.getApplicantId().equals(applicantId)) {
                 applicantEvidence.add(meansAssessmentMapper.getEvidenceDTO(evidence));
             } else {
                 partnerEvidence.add(meansAssessmentMapper.getEvidenceDTO(evidence));
@@ -143,23 +152,16 @@ public class IncomeEvidenceMapper {
                 .withEmploymentStatus(EmploymentStatus.getFrom(applicant.getEmploymentStatusDTO().getCode()));
     }
 
-    private BigDecimal getPensionAmount(Collection<AssessmentSectionSummaryDTO> initSectionSummaries, boolean isPartner) {
-        AssessmentDetailDTO pensionDetails = initSectionSummaries
-                .stream()
-                .flatMap(section -> section.getAssessmentDetail().stream())
-                .filter(detail -> detail.getDescription().equals("Income from Private Pension(s)"))
-                .findFirst()
-                .orElse(null);
-
+    private BigDecimal getPensionAmount(AssessmentDetailDTO pensionDetails, boolean isPartner) {
         if (pensionDetails == null) return BigDecimal.ZERO;
 
         if (isPartner) {
             return calculatePensionAmount(pensionDetails.getPartnerAmount(),
                     pensionDetails.getPartnerFrequency().getAnnualWeighting());
-        } else {
-            return calculatePensionAmount(pensionDetails.getApplicantAmount(),
-                    pensionDetails.getApplicantFrequency().getAnnualWeighting());
         }
+
+        return calculatePensionAmount(pensionDetails.getApplicantAmount(),
+                pensionDetails.getApplicantFrequency().getAnnualWeighting());
     }
 
     private BigDecimal calculatePensionAmount(Double amount, Long weighting) {
