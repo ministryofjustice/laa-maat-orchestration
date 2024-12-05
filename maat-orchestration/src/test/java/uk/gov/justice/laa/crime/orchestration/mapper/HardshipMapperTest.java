@@ -88,7 +88,7 @@ class HardshipMapperTest {
 
         HardshipMetadata actualMetadata = apiPerformHardshipRequest.getHardshipMetadata();
         HardshipMetadata expectedMetadata = apiPerformHardshipRequest.getHardshipMetadata();
-        checkHardshipMetadata(actualMetadata, expectedMetadata);;
+        checkHardshipMetadata(actualMetadata, expectedMetadata);
     }
 
     @Test
