@@ -116,8 +116,8 @@ public class IncomeEvidenceMapper {
         List<EvidenceDTO> applicantEvidence = new ArrayList<>();
         List<EvidenceDTO> partnerEvidence = new ArrayList<>();
 
+        Integer applicantId = NumberUtils.toInteger(application.getApplicantDTO().getId());
         for (uk.gov.justice.laa.crime.common.model.meansassessment.ApiIncomeEvidence evidence : assessmentResponse.getIncomeEvidence()) {
-            Integer applicantId = NumberUtils.toInteger(application.getApplicantDTO().getId());
 
             if (evidence.getApplicantId().equals(applicantId)) {
                 applicantEvidence.add(meansAssessmentMapper.getEvidenceDTO(evidence));
