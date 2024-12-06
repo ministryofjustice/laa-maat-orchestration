@@ -45,6 +45,10 @@ env:
     value: {{ .Values.catApi.baseUrl }}
   - name: CAT_API_OAUTH_URL
     value: {{ .Values.catApi.oauthUrl }}
+  - name: EVIDENCE_API_BASE_URL
+    value: {{ .Values.evidenceApi.baseUrl }}
+  - name: EVIDENCE_API_OAUTH_URL
+    value: {{ .Values.evidenceApi.oauthUrl }}
   - name: JWT_ISSUER_URI
     value: {{ .Values.jwt.issuerUri }}
   - name: HARDSHIP_API_OAUTH_CLIENT_ID
@@ -117,4 +121,14 @@ env:
         secretKeyRef:
             name: cat-api-oauth-client-secret
             key: CAT_API_OAUTH_CLIENT_SECRET
+  - name: EVIDENCE_API_OAUTH_CLIENT_ID
+    valueFrom:
+        secretKeyRef:
+            name: evidence-api-oauth-client-id
+            key: EVIDENCE_API_OAUTH_CLIENT_ID
+  - name: EVIDENCE_API_OAUTH_CLIENT_SECRET
+    valueFrom:
+        secretKeyRef:
+            name: evidence-api-oauth-client-secret
+            key: EVIDENCE_API_OAUTH_CLIENT_SECRET
 {{- end -}}

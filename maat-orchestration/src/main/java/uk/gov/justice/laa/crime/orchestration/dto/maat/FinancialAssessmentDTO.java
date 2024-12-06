@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
+
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -18,5 +20,6 @@ public class FinancialAssessmentDTO extends GenericDTO {
     private IncomeEvidenceSummaryDTO incomeEvidence;
     private Boolean fullAvailable;
     private Long usn;
+    private LocalDateTime dateCompleted;
 
 }

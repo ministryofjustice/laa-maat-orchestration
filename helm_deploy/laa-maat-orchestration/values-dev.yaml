@@ -49,6 +49,10 @@ catApi:
   baseUrl: http://laa-crime-application-tracking-service.laa-crime-application-tracking-service-dev.svc.cluster.local/
   oauthUrl: https://laa-crime-auth-ats.auth.eu-west-2.amazoncognito.com/oauth2/token
 
+evidenceApi:
+  baseUrl: http://laa-crime-evidence.laa-crime-evidence-dev.svc.cluster.local
+  oauthUrl: https://laa-crime-auth-evidence.auth.eu-west-2.amazoncognito.com/oauth2/token
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: false

@@ -295,6 +295,8 @@ class MeansAssessmentMapperTest {
                 .isEqualTo(apiMeansAssessmentResponse.getAssessmentId().intValue());
         softly.assertThat(financialAssessmentDTO.getTimestamp().toLocalDateTime())
                 .isEqualTo(apiMeansAssessmentResponse.getUpdated());
+        softly.assertThat(financialAssessmentDTO.getDateCompleted())
+                .isEqualTo(apiMeansAssessmentResponse.getDateCompleted());
         softly.assertThat(fullAssessmentDTO.getResult())
                 .isEqualTo(apiMeansAssessmentResponse.getFullResult());
         softly.assertThat(fullAssessmentDTO.getAdjustedLivingAllowance())
@@ -346,6 +348,8 @@ class MeansAssessmentMapperTest {
                 .isEqualTo(apiMeansAssessmentResponse.getAssessmentId().intValue());
         softly.assertThat(financialAssessmentDTO.getTimestamp().toLocalDateTime())
                 .isEqualTo(apiMeansAssessmentResponse.getUpdated());
+        softly.assertThat(financialAssessmentDTO.getDateCompleted())
+                .isEqualTo(apiMeansAssessmentResponse.getDateCompleted());
         softly.assertThat(financialAssessmentDTO.getFullAvailable())
                 .isEqualTo(apiMeansAssessmentResponse.getFullAssessmentAvailable());
         softly.assertThat(initialAssessmentDTO.getLowerThreshold())

@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class Constants {
 
-    public static final BigDecimal DISPOSABLE_INCOME = BigDecimal.valueOf(12000);
+    public static final BigDecimal DISPOSABLE_INCOME = BigDecimal.valueOf(12000.0);
     public static final BigDecimal POST_HARDSHIP_DISPOSABLE_INCOME = BigDecimal.valueOf(5000);
     public static final Integer FINANCIAL_ASSESSMENT_ID = 321;
     public static final Integer HARDSHIP_REVIEW_ID = 1000;
