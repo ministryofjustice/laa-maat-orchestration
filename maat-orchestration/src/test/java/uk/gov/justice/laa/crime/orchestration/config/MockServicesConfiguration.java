@@ -13,6 +13,7 @@ public class MockServicesConfiguration {
         ServicesConfiguration.CmaApi cmaApi = new ServicesConfiguration.CmaApi();
         ServicesConfiguration.MaatApi maatApi = new ServicesConfiguration.MaatApi();
         ServicesConfiguration.CATApi catApi = new ServicesConfiguration.CATApi();
+        ServicesConfiguration.EvidenceApi evidenceApi = new ServicesConfiguration.EvidenceApi();
 
         ServicesConfiguration.HardshipApi.Endpoints hardshipEndpoints =
                 new ServicesConfiguration.HardshipApi.Endpoints(
@@ -60,6 +61,10 @@ public class MockServicesConfiguration {
                 "/api/internal/v1/application-tracking-output-result"
         );
 
+        ServicesConfiguration.EvidenceApi.Endpoints evidenceEndpoints = new ServicesConfiguration.EvidenceApi.Endpoints(
+                "/api/internal/v1/evidence"
+        );
+
         hardshipApi.setBaseUrl(host);
         hardshipApi.setEndpoints(hardshipEndpoints);
 
@@ -75,7 +80,11 @@ public class MockServicesConfiguration {
         maatApi.setBaseUrl(host);
         maatApi.setEndpoints(maatEndpoints);
         maatApi.setUserEndpoints(userEndpoints);
+
         catApi.setEndpoints(catEndpoints);
+
+        evidenceApi.setBaseUrl(host);
+        evidenceApi.setEndpoints(evidenceEndpoints);
 
         servicesConfiguration.setHardshipApi(hardshipApi);
         servicesConfiguration.setContributionApi(contributionApi);
@@ -83,6 +92,7 @@ public class MockServicesConfiguration {
         servicesConfiguration.setCmaApi(cmaApi);
         servicesConfiguration.setMaatApi(maatApi);
         servicesConfiguration.setCatApi(catApi);
+        servicesConfiguration.setEvidenceApi(evidenceApi);
 
         return servicesConfiguration;
     }
