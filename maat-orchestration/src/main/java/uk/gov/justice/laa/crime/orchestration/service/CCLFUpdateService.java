@@ -24,6 +24,7 @@ import java.util.Objects;
 public class CCLFUpdateService {
 
     private final MaatCourtDataApiService maatCourtDataApiService;
+    private final FeatureDecisionService featureDecisionService;
 
     public static String getRepOrderCcOutcome(RepOrderDTO repOrderDTO) {
         if (repOrderDTO.getRepOrderCCOutcome() == null || repOrderDTO.getRepOrderCCOutcome().isEmpty()) return null;
