@@ -180,7 +180,7 @@ public class MeansAssessmentMapper {
                 .withOtherText(evidenceItem.getOtherText());
     }
 
-    private List<ApiAssessmentChildWeighting> childWeightingsBuilder(Collection<ChildWeightingDTO> childWeightings) {
+    public List<ApiAssessmentChildWeighting> childWeightingsBuilder(Collection<ChildWeightingDTO> childWeightings) {
         List<ApiAssessmentChildWeighting> childWeightingList = new ArrayList<>();
         if (childWeightings != null) {
             for (ChildWeightingDTO childWeightingDTO : childWeightings) {
@@ -250,7 +250,7 @@ public class MeansAssessmentMapper {
         return apiAssessmentSectionSummaries;
     }
 
-    private List<ApiAssessmentDetail> assessmentDetailsBuilder(Collection<AssessmentDetailDTO> assessmentDetails) {
+    public List<ApiAssessmentDetail> assessmentDetailsBuilder(Collection<AssessmentDetailDTO> assessmentDetails) {
         List<ApiAssessmentDetail> apiAssessmentDetails = new ArrayList<>();
         if (assessmentDetails != null) {
             for (AssessmentDetailDTO assessmentDetailDTO : assessmentDetails) {
@@ -332,7 +332,7 @@ public class MeansAssessmentMapper {
         return incomeEvidenceSummaryDTO;
     }
 
-    private EvidenceDTO getEvidenceDTO(ApiIncomeEvidence apiIncomeEvidence) {
+    public EvidenceDTO getEvidenceDTO(ApiIncomeEvidence apiIncomeEvidence) {
         EvidenceDTO evidenceDTO = new EvidenceDTO();
         evidenceDTO.setEvidenceTypeDTO(getEvidenceTypeDTO(apiIncomeEvidence.getApiEvidenceType()));
         evidenceDTO.setId(ofNullable(apiIncomeEvidence.getId()).map(Integer::longValue).orElse(0L));
@@ -411,7 +411,7 @@ public class MeansAssessmentMapper {
         return ReviewTypeDTO.builder().build();
     }
 
-    private static List<ChildWeightingDTO> mapChildWeightings(List<ApiAssessmentChildWeighting> childWeightings) {
+    public static List<ChildWeightingDTO> mapChildWeightings(List<ApiAssessmentChildWeighting> childWeightings) {
         List<ChildWeightingDTO> childWeightingDTOList = new ArrayList<>();
         for (ApiAssessmentChildWeighting apiAssessmentChildWeighting : childWeightings) {
             ChildWeightingDTO childWeightingDTO = new ChildWeightingDTO();
@@ -525,7 +525,7 @@ public class MeansAssessmentMapper {
         FinancialAssessmentDTO financialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO();
         financialAssessmentDTO.setId(ofNullable(apiResponse.getAssessmentId()).map(Integer::longValue).orElse(0L));
         financialAssessmentDTO.setTimestamp(toZonedDateTime(apiResponse.getUpdated()));
-
+        financialAssessmentDTO.setDateCompleted(apiResponse.getDateCompleted());
 
         if (Boolean.TRUE.equals(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable())) {
             mapFullAssessmentDTO(financialAssessmentDTO.getFull(), apiResponse);
