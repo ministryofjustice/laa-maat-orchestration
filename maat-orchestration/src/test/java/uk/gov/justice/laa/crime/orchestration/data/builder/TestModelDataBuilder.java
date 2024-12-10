@@ -129,7 +129,7 @@ public class TestModelDataBuilder {
     public static final LocalDateTime EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 11, 0, 0, 0);
     public static final long APPLICANT_ID = 1000L;
     public static final long PARTNER_ID = 1234L;
-    public static final String EMST_CODE ="EMST_CODE";
+    public static final String EMST_CODE ="EMPLOY";
    
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
