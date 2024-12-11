@@ -5,6 +5,9 @@ import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -23,10 +26,13 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
+import static uk.gov.justice.laa.crime.enums.AssessmentType.FULL;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.EVIDENCE_RECEIVED_DATE;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SoftAssertionsExtension.class)
@@ -113,7 +119,7 @@ class IncomeEvidenceMapperTest {
         softly.assertThat(maatApiUpdateAssessment)
                 .usingRecursiveComparison()
                 .ignoringFields("laaTransactionId")
-                .isEqualTo(TestModelDataBuilder.getMaatApiUpdateAssessment(AssessmentType.FULL));
+                .isEqualTo(TestModelDataBuilder.getMaatApiUpdateAssessment(FULL));
         softly.assertAll();
     }
 
@@ -136,5 +142,56 @@ class IncomeEvidenceMapperTest {
         softly.assertThat(applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence().getPartnerIncomeEvidenceList())
                 .isEqualTo(List.of(MeansAssessmentDataBuilder.getPartnerEvidenceDTO()));
         softly.assertAll();
+    }
+
+    @ParameterizedTest
+    @MethodSource("existingEvidences")
+    void givenExistingEvidences_whenMapToMaatApiUpdateAssessmentIsInvoked_thenMaatApiUpdateAssessmentIsReturned(
+            RepOrderDTO repOrderDTO, MaatApiUpdateAssessment expectedAssessment
+    ) {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT); // full
+        ApiCreateIncomeEvidenceResponse apiCreateIncomeEvidenceResponse = TestModelDataBuilder.getCreateIncomeEvidenceResponse();
+
+        when(meansAssessmentMapper.assessmentDetailsBuilder(anyList()))
+                .thenReturn(List.of(TestModelDataBuilder.getAssessmentDetail()));
+        when(meansAssessmentMapper.childWeightingsBuilder(anyList()))
+                .thenReturn(List.of(TestModelDataBuilder.getAssessmentChildWeighting()));
+
+        MaatApiUpdateAssessment maatApiUpdateAssessment =
+                incomeEvidenceMapper.mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, apiCreateIncomeEvidenceResponse);
+
+        softly.assertThat(maatApiUpdateAssessment)
+                .usingRecursiveComparison()
+                .ignoringFields("laaTransactionId")
+                .isEqualTo(expectedAssessment);
+        softly.assertAll();
+    }
+
+    private static Stream<Arguments> existingEvidences() {
+
+        MaatApiUpdateAssessment noExistingEvidences = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL);
+        noExistingEvidences.getFinAssIncomeEvidences().forEach(evidence -> evidence.setDateReceived(null));
+
+        MaatApiUpdateAssessment existingEvidencesAssessment = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL);
+        existingEvidencesAssessment.getFinAssIncomeEvidences().forEach(evidence -> evidence.setDateReceived(EVIDENCE_RECEIVED_DATE));
+        RepOrderDTO existingEvidencesRepOrderDTO = RepOrderDTO.builder()
+                .passportAssessments(List.of(TestModelDataBuilder.getPassportAssessmentDTO()))
+                .build();
+
+        MaatApiUpdateAssessment existingFinEvidencesAssessment = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL);
+        RepOrderDTO existingFinEvidenceRepOrderDTO = RepOrderDTO.builder()
+                .financialAssessments(List.of(TestModelDataBuilder.getMaatApiFinancialAssessmentDTO()))
+                .build();
+        RepOrderDTO existingBothEvidencesRepOrderDTO = RepOrderDTO.builder()
+                .financialAssessments(List.of(TestModelDataBuilder.getMaatApiFinancialAssessmentDTO()))
+                .passportAssessments(List.of(TestModelDataBuilder.getPassportAssessmentDTO()))
+                .build();
+
+        return Stream.of(
+                Arguments.of(RepOrderDTO.builder().build(), noExistingEvidences),
+                Arguments.of(existingEvidencesRepOrderDTO, existingEvidencesAssessment),
+                Arguments.of(existingFinEvidenceRepOrderDTO, existingFinEvidencesAssessment),
+                Arguments.of(existingBothEvidencesRepOrderDTO, existingFinEvidencesAssessment)
+        );
     }
 }
