@@ -52,8 +52,7 @@ public class HardshipMapper {
                 .withFinancialAssessmentId(
                         NumberUtils.toInteger(application.getAssessmentDTO().getFinancialAssessmentDTO().getId())
                 )
-                .withHardshipReviewId(NumberUtils.toInteger(current.getId()))
-                .withProgressItems(hrProgressListToHardshipProgressList(current.getProgress()));
+                .withHardshipReviewId(NumberUtils.toInteger(current.getId()));
 
         return new ApiPerformHardshipRequest()
                 .withHardship(hardship)
@@ -116,21 +115,6 @@ public class HardshipMapper {
         return null;
     }
 
-    private List<HardshipProgress> hrProgressListToHardshipProgressList(Collection<HRProgressDTO> progressItems) {
-        return progressItems.stream()
-                .map(item -> new HardshipProgress()
-                        .withAction(HardshipReviewProgressAction.getFrom(
-                                item.getProgressAction().getAction())
-                        )
-                        .withResponse(HardshipReviewProgressResponse.getFrom(
-                                item.getProgressResponse().getResponse())
-                        )
-                        .withDateTaken(toLocalDateTime(item.getDateRequested()))
-                        .withDateCompleted(toLocalDateTime(item.getDateCompleted()))
-                        .withDateRequired(toLocalDateTime(item.getDateRequired()))
-                ).collect(Collectors.toList());
-    }
-
     private Stream<HRDetailDTO> getDetailsStreamWithType(Collection<HRSectionDTO> sections,
                                                          HardshipReviewDetailType type) {
         return sections.stream()
@@ -169,7 +153,6 @@ public class HardshipMapper {
                 .newWorkReason(newWorkReasonToNewWorkReasonDto(response.getNewWorkReason()))
                 .solictorsCosts(solicitorCostsToHrSolicitorsCostsDto(response.getSolicitorCosts()))
                 .asessmentStatus(hardshipReviewStatusToAssessmentStatusDto(response.getStatus()))
-                .progress(hardshipProgressListToHrProgressDtos(response.getReviewProgressItems()))
                 .section(hardshipDetailsToHrSectionDTOs(response.getReviewDetails()))
                 .build();
     }
@@ -241,35 +224,6 @@ public class HardshipMapper {
         return HRDetailTypeDTO.builder()
                 .type(hrDetailType.getType())
                 .description(hrDetailType.getDescription())
-                .build();
-    }
-
-    private List<HRProgressDTO> hardshipProgressListToHrProgressDtos(List<ApiHardshipProgress> reviewProgressItems) {
-        return reviewProgressItems.stream()
-                .map(item -> HRProgressDTO.builder()
-                        .dateCompleted(toDate(item.getDateCompleted()))
-                        .id(item.getId().longValue())
-                        .dateRequested(toDate(item.getDateRequested()))
-                        .dateRequired(toDate(item.getDateRequired()))
-                        .progressAction(hardshipReviewProgressActionToHrProgressActionDto(item.getProgressAction()))
-                        .progressResponse(
-                                hardshipReviewProgressResponseToHrProgressResponseDto(item.getProgressResponse()))
-                        .build()).collect(Collectors.toList());
-    }
-
-    private HRProgressActionDTO hardshipReviewProgressActionToHrProgressActionDto(
-            HardshipReviewProgressAction hrProgressAction) {
-        return HRProgressActionDTO.builder()
-                .action(hrProgressAction.getAction())
-                .description(hrProgressAction.getDescription())
-                .build();
-    }
-
-    private HRProgressResponseDTO hardshipReviewProgressResponseToHrProgressResponseDto(
-            HardshipReviewProgressResponse hrProgressResponse) {
-        return HRProgressResponseDTO.builder()
-                .response(hrProgressResponse.getResponse())
-                .description(hrProgressResponse.getDescription())
                 .build();
     }
 
