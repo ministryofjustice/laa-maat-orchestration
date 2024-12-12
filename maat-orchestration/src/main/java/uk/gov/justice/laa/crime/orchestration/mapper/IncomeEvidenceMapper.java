@@ -12,9 +12,8 @@ import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinAssIncomeEvidenceDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.EvidenceDTO;
 import uk.gov.justice.laa.crime.util.DateUtil;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
@@ -113,8 +112,8 @@ public class IncomeEvidenceMapper {
                                                           ApplicationDTO application) {
         IncomeEvidenceSummaryDTO incomeEvidenceSummary =
                 application.getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence();
-        List<EvidenceDTO> applicantEvidence = new ArrayList<>();
-        List<EvidenceDTO> partnerEvidence = new ArrayList<>();
+        List<uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceDTO> applicantEvidence = new ArrayList<>();
+        List<uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceDTO> partnerEvidence = new ArrayList<>();
 
         Integer applicantId = NumberUtils.toInteger(application.getApplicantDTO().getId());
         for (uk.gov.justice.laa.crime.common.model.meansassessment.ApiIncomeEvidence evidence : assessmentResponse.getIncomeEvidence()) {
@@ -195,23 +194,22 @@ public class IncomeEvidenceMapper {
     private List<FinancialAssessmentIncomeEvidence> getIncomeEvidences(WorkflowRequest workflowRequest,
                                                                        RepOrderDTO repOrder,
                                                                        ApiCreateIncomeEvidenceResponse evidenceResponse) {
-        Integer financialAssessmentId = NumberUtils.toInteger(
-                workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getId());
-        FinancialAssessmentDTO existingFinancialAssessment = repOrder.getFinancialAssessments()
-                .stream()
-                .filter(assessment -> assessment.getId().equals(financialAssessmentId))
-                .findFirst()
-                .orElse(null);
+        List<EvidenceDTO> existingEvidences = new ArrayList<>();
+        repOrder.getFinancialAssessments()
+                .forEach(financialAssessmentDTO -> existingEvidences.addAll(financialAssessmentDTO.getFinAssIncomeEvidences()));
+        repOrder.getPassportAssessments()
+                .forEach(passportAssessmentDTO -> existingEvidences.addAll(passportAssessmentDTO.getPassportAssessmentEvidences()));
+
         UserDTO user = workflowRequest.getUserDTO();
 
-        return Stream.of(getEvidences(evidenceResponse.getApplicantEvidenceItems(), existingFinancialAssessment, user),
-                        getEvidences(evidenceResponse.getPartnerEvidenceItems(), existingFinancialAssessment, user))
+        return Stream.of(getEvidences(evidenceResponse.getApplicantEvidenceItems(), existingEvidences, user),
+                        getEvidences(evidenceResponse.getPartnerEvidenceItems(), existingEvidences, user))
                 .flatMap(List::stream)
                 .toList();
     }
 
     private List<FinancialAssessmentIncomeEvidence> getEvidences(ApiIncomeEvidenceItems evidenceItems,
-                                                                 FinancialAssessmentDTO existingFinancialAssessment,
+                                                                 List<EvidenceDTO> existingEvidences,
                                                                  UserDTO user) {
         Integer applicantId = evidenceItems.getApplicantDetails().getId();
 
@@ -219,7 +217,7 @@ public class IncomeEvidenceMapper {
                 .stream()
                 .map(evidence -> new FinancialAssessmentIncomeEvidence()
                         .withId(evidence.getId())
-                        .withDateReceived(getDateReceived(applicantId, evidence, existingFinancialAssessment))
+                        .withDateReceived(getDateReceived(applicantId, evidence, existingEvidences))
                         .withActive("Y")
                         .withIncomeEvidence(evidence.getEvidenceType().getName())
                         .withMandatory(Boolean.TRUE.equals(evidence.getMandatory()) ? "Y" : "N")
@@ -231,13 +229,13 @@ public class IncomeEvidenceMapper {
 
     private LocalDateTime getDateReceived(Integer applicantId,
                                           ApiIncomeEvidence evidence,
-                                          FinancialAssessmentDTO existingFinancialAssessment) {
-        return existingFinancialAssessment.getFinAssIncomeEvidences()
-                .stream()
+                                          List<EvidenceDTO> existingEvidences) {
+
+        return existingEvidences.stream()
                 .filter(existingEvidence -> existingEvidence.getApplicant().getId().equals(applicantId)
                         && existingEvidence.getIncomeEvidence().equals(evidence.getEvidenceType().getName()))
-                .map(FinAssIncomeEvidenceDTO::getDateReceived)
-                .findFirst()
+                .max(Comparator.comparing(uk.gov.justice.laa.crime.orchestration.dto.maat_api.EvidenceDTO::getDateCreated))
+                .map(uk.gov.justice.laa.crime.orchestration.dto.maat_api.EvidenceDTO::getDateReceived)
                 .orElse(null);
     }
 }

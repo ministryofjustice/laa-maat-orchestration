@@ -25,6 +25,7 @@ import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicantDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
@@ -126,11 +127,12 @@ public class TestModelDataBuilder {
     public static final String TEST_USER_SESSION = "sessionId_e5712593c198";
     private static final Integer TEST_RECORD_ID = 100;
     private static final LocalDateTime RESERVATION_DATE = LocalDateTime.of(2022, 12, 14, 0, 0, 0);
-    public static final LocalDateTime EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 11, 0, 0, 0);
+    public static final LocalDateTime EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 10, 0, 0, 0);
     public static final long APPLICANT_ID = 1000L;
     public static final long PARTNER_ID = 1234L;
     public static final String EMST_CODE ="EMPLOY";
-   
+    public static final LocalDateTime INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 11, 0, 0, 0);
+
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
         return new ApiFindHardshipResponse()
@@ -810,6 +812,14 @@ public class TestModelDataBuilder {
                 .build();
     }
 
+    public static PassportAssessmentDTO getPassportAssessmentDTO() {
+        return PassportAssessmentDTO.builder()
+                .id(Constants.FINANCIAL_ASSESSMENT_ID)
+                .passportAssessmentEvidences(List.of(getPassportAssessmentEvidenceDTO(NumberUtils.toInteger(APPLICANT_ID)),
+                        getPassportAssessmentEvidenceDTO(NumberUtils.toInteger(PARTNER_ID))))
+                .build();
+    }
+
     public static FullAssessmentDTO getFullAssessmentDTO() {
         return FullAssessmentDTO.builder()
                 .assessmentNotes(ASSESSMENT_NOTES)
@@ -928,15 +938,25 @@ public class TestModelDataBuilder {
     }
 
     private static FinAssIncomeEvidenceDTO getFinAssIncomeEvidenceDTO(Integer applicantId) {
-        return FinAssIncomeEvidenceDTO.builder()
-                .applicant(
-                        uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO.builder()
-                                .id(applicantId)
-                                .build()
-                )
-                .dateReceived(EVIDENCE_RECEIVED_DATE)
-                .incomeEvidence(IncomeEvidenceType.TAX_RETURN.getName())
-                .build();
+        FinAssIncomeEvidenceDTO finAssIncomeEvidenceDTO = new FinAssIncomeEvidenceDTO();
+        finAssIncomeEvidenceDTO.setApplicant(uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO.builder()
+                .id(applicantId)
+                .build());
+        finAssIncomeEvidenceDTO.setIncomeEvidence(IncomeEvidenceType.TAX_RETURN.getName());
+        finAssIncomeEvidenceDTO.setDateReceived(INCOME_EVIDENCE_RECEIVED_DATE);
+        finAssIncomeEvidenceDTO.setDateCreated(INCOME_EVIDENCE_RECEIVED_DATE);
+        return finAssIncomeEvidenceDTO;
+    }
+
+    private static PassportAssessmentEvidenceDTO getPassportAssessmentEvidenceDTO(Integer applicantId) {
+        PassportAssessmentEvidenceDTO passportAssessmentEvidenceDTO = new PassportAssessmentEvidenceDTO();
+        passportAssessmentEvidenceDTO.setApplicant(uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO.builder()
+                .id(applicantId)
+                .build());
+        passportAssessmentEvidenceDTO.setIncomeEvidence(IncomeEvidenceType.TAX_RETURN.getName());
+        passportAssessmentEvidenceDTO.setDateReceived(EVIDENCE_RECEIVED_DATE);
+        passportAssessmentEvidenceDTO.setDateCreated(EVIDENCE_RECEIVED_DATE);
+        return passportAssessmentEvidenceDTO;
     }
 
     private static ExtraEvidenceDTO getExtraEvidenceDTO() {
@@ -1410,7 +1430,7 @@ public class TestModelDataBuilder {
     private static FinancialAssessmentIncomeEvidence getFinAssIncomeEvidence(Integer evidenceId, Integer applicantId) {
         return new FinancialAssessmentIncomeEvidence()
                 .withId(evidenceId)
-                .withDateReceived(EVIDENCE_RECEIVED_DATE)
+                .withDateReceived(INCOME_EVIDENCE_RECEIVED_DATE)
                 .withActive("Y")
                 .withIncomeEvidence(IncomeEvidenceType.TAX_RETURN.getName())
                 .withMandatory("Y")
