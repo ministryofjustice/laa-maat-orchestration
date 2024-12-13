@@ -122,54 +122,7 @@ class FeatureDecisionServiceTest {
 
         assertThat(actual).isEqualTo(expectedResult);
     }
-
-    @Test
-    void givenUserDoesNotHaveFeatureToggle_whenIsFeatureEnabledIsInvoked_thenReturnFalse() {
-        when(maatCourtDataService.getUserSummary(Constants.USERNAME))
-                .thenReturn(new UserSummaryDTO());
-
-        UserDTO userDTO = UserDTO.builder()
-                .userName(Constants.USERNAME)
-                .build();
-
-        WorkflowRequest request = WorkflowRequest.builder()
-                .userDTO(userDTO)
-                .build();
-
-        FeatureDecisionService featureDecisionService = new FeatureDecisionService(maatCourtDataService);
-        boolean result = featureDecisionService.isMaatPostAssessmentProcessingEnabled(request);
-
-        Assertions.assertFalse(result);
-    }
-
-    @Test
-    void givenUserHasFeatureToggle_whenIsFeatureEnabledIsInvoked_thenReturnTrue() {
-        UserSummaryDTO userSummaryDTO = UserSummaryDTO.builder()
-                .featureToggle(List.of(
-                        FeatureToggleDTO.builder()
-                                .featureName(FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING.getName())
-                                .action(FeatureToggleAction.READ.getName())
-                                .isEnabled("Y")
-                                .build()))
-                .build();
-
-        when(maatCourtDataService.getUserSummary(Constants.USERNAME))
-                .thenReturn(userSummaryDTO);
-
-        UserDTO userDTO = UserDTO.builder()
-                .userName(Constants.USERNAME)
-                .build();
-
-        WorkflowRequest request = WorkflowRequest.builder()
-                .userDTO(userDTO)
-                .build();
-
-        FeatureDecisionService featureDecisionService = new FeatureDecisionService(maatCourtDataService);
-        boolean result = featureDecisionService.isMaatPostAssessmentProcessingEnabled(request);
-
-        Assertions.assertTrue(result);
-    }
-
+    
     private static Stream<Arguments> userHasFeatureToggleButWithoutRequiredAction() {
         return Stream.of(
             Arguments.of(

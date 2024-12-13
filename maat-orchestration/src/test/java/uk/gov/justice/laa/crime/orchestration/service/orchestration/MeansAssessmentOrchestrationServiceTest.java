@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,18 +20,10 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
-import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
-import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
-import uk.gov.justice.laa.crime.orchestration.service.FeatureDecisionService;
-import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
-import uk.gov.justice.laa.crime.orchestration.service.MeansAssessmentService;
-import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 import uk.gov.justice.laa.crime.orchestration.service.*;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
 import java.util.List;
-import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
-import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -80,6 +73,20 @@ class MeansAssessmentOrchestrationServiceTest {
     @InjectMocks
     private MeansAssessmentOrchestrationService orchestrationService;
 
+    private WorkflowRequest workflowRequest;
+    private ApplicationDTO applicationDTO;
+    private ContributionsDTO contributionsDTO;
+    private RepOrderDTO repOrderDTO;
+
+    @BeforeEach
+    void setUp() {
+        workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
+        applicationDTO = MeansAssessmentDataBuilder.getApplicationDTO();
+        contributionsDTO = MeansAssessmentDataBuilder.getContributionsDTO();
+        applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
+        repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(applicationDTO);
+    }
+
     @Test
     void givenFinancialAssessmentId_whenFindIsInvoked_thenMeansAssessmentServiceIsCalled() {
         orchestrationService.find(Constants.FINANCIAL_ASSESSMENT_ID, Constants.APPLICANT_ID);
@@ -88,11 +95,6 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Test
     void givenARequestWithC3Enabled_whenCreateIsInvoked_thenApplicationDTOIsUpdatedWithContribution() {
-        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
-        ContributionsDTO contributionsDTO = MeansAssessmentDataBuilder.getContributionsDTO();
-        ApplicationDTO applicationDTO = MeansAssessmentDataBuilder.getApplicationDTO();
-        applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
-        RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(applicationDTO);
         when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
@@ -120,9 +122,6 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Test
     void givenARequestWithC3NotEnabled_whenCreateIsInvoked_thenCalculationContributionIsNotCalled() {
-
-        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
-        RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO());
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
                 any(StoredProcedure.class)
         )).thenReturn(workflowRequest.getApplicationDTO());
@@ -148,13 +147,6 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Test
     void givenARequestWithC3Enabled_whenUpdateIsInvoked_thenApplicationDTOIsUpdatedWithContribution() {
-
-        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
-        ContributionsDTO contributionsDTO = MeansAssessmentDataBuilder.getContributionsDTO();
-        ApplicationDTO applicationDTO = MeansAssessmentDataBuilder.getApplicationDTO();
-        applicationDTO.getCrownCourtOverviewDTO().setContribution(contributionsDTO);
-        RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(applicationDTO);
-
         when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
@@ -185,9 +177,6 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Test
     void givenARequestWithC3NotEnabled_whenUpdateIsInvoked_thenCalculationContributionIsNotCalled() {
-        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
-        RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO());
-
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
                 any(StoredProcedure.class)
         ))
@@ -214,50 +203,44 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Test
     void givenARequestWithC3EnabledAndPostProcessingNotEnabled_whenUpdateIsInvoked_thenWorkflowPreProcessorServiceIsNotCalled() {
-        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
-        ApplicationDTO applicationDTO = MeansAssessmentDataBuilder.getApplicationDTO();
-
         when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTO);
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
-            any(StoredProcedure.class)
+                any(StoredProcedure.class)
         ))
-            .thenReturn(applicationDTO);
+                .thenReturn(applicationDTO);
         when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
         when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(false);
 
         orchestrationService.update(workflowRequest);
 
         verify(maatCourtDataService).invokeStoredProcedure(
-            applicationDTO,
-            workflowRequest.getUserDTO(),
-            StoredProcedure.PRE_UPDATE_CC_APPLICATION
+                applicationDTO,
+                workflowRequest.getUserDTO(),
+                StoredProcedure.PRE_UPDATE_CC_APPLICATION
         );
         verify(workflowPreProcessorService, times(0)).preProcessRequest(any(), any(), any());
     }
 
     @Test
     void givenARequestWithC3EnabledAndPostProcessingEnabled_whenUpdateIsInvoked_thenWorkflowPreProcessorServiceIsCalled() {
-        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
-
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
-            any(StoredProcedure.class)
+                any(StoredProcedure.class)
         ))
-            .thenReturn(workflowRequest.getApplicationDTO());
+                .thenReturn(workflowRequest.getApplicationDTO());
         when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
         when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(true);
 
         orchestrationService.update(workflowRequest);
         verify(maatCourtDataService, times(0)).invokeStoredProcedure(
-            workflowRequest.getApplicationDTO(),
-            workflowRequest.getUserDTO(),
-            StoredProcedure.PRE_UPDATE_CC_APPLICATION
+                workflowRequest.getApplicationDTO(),
+                workflowRequest.getUserDTO(),
+                StoredProcedure.PRE_UPDATE_CC_APPLICATION
         );
         verify(workflowPreProcessorService).preProcessRequest(any(), any(), any());
     }
 
     @Test
     void givenCrimeValidationExceptionThrownInCMAService_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
-        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         doThrow(new CrimeValidationException(List.of())).when(meansAssessmentService).create(workflowRequest);
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(CrimeValidationException.class);
@@ -266,7 +249,6 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Test
     void givenValidationExceptionThrownInCMAService_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
-        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         doThrow(new ValidationException()).when(meansAssessmentService).create(workflowRequest);
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(ValidationException.class);
@@ -275,7 +257,6 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Test
     void givenCrimeValidationExceptionThrownInCMAService_whenUpdateIsInvoked_thenRollbackIsNotInvoked() {
-        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         doThrow(new CrimeValidationException(List.of())).when(meansAssessmentService).update(workflowRequest);
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(CrimeValidationException.class);
@@ -284,7 +265,6 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Test
     void givenValidationExceptionThrownInCMAService_whenUpdateIsInvoked_thenRollbackIsNotInvoked() {
-        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         doThrow(new ValidationException()).when(meansAssessmentService).update(workflowRequest);
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(ValidationException.class);
@@ -293,7 +273,6 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Test
     void givenValidationFailureAtPostAssessmentProcessing_whenUpdateIsInvoked_thenRollbackIsInvoked() {
-        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         ApplicationDTO applicationSpy = spy(workflowRequest.getApplicationDTO());
         workflowRequest.setApplicationDTO(applicationSpy);
 
@@ -319,7 +298,6 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Test
     void givenValidationFailureAtPostAssessmentProcessing_whenCreateIsInvoked_thenRollbackIsInvoked() {
-        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         ApplicationDTO applicationSpy = spy(workflowRequest.getApplicationDTO());
         workflowRequest.setApplicationDTO(applicationSpy);
 
@@ -344,9 +322,7 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Test
     void givenSuccessfulPostAssessmentProcessing_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
-        WorkflowRequest workflowRequest = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         workflowRequest.getApplicationDTO().setAlertMessage(MOCK_ALERT);
-        RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO());
 
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
                 any(StoredProcedure.class)

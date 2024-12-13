@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -71,6 +72,16 @@ class HardshipOrchestrationServiceTest {
     @InjectMocks
     private HardshipOrchestrationService orchestrationService;
 
+    private WorkflowRequest workflowRequest;
+    private ApiPerformHardshipResponse performHardshipResponse;
+    private AssessmentSummaryDTO assessmentSummaryDTO;
+
+    @BeforeEach
+    void setUp() {
+        performHardshipResponse = getApiPerformHardshipResponse();
+        assessmentSummaryDTO = getAssessmentSummaryDTO();
+    }
+
     @Test
     void givenHardshipReviewId_whenFindIsInvoked_thenHardshipServiceIsCalled() {
         orchestrationService.find(Constants.HARDSHIP_REVIEW_ID);
@@ -80,7 +91,6 @@ class HardshipOrchestrationServiceTest {
     private WorkflowRequest setupCreateStubs(CourtType courtType, CurrentStatus status) {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(courtType);
 
-        ApiPerformHardshipResponse performHardshipResponse = getApiPerformHardshipResponse();
         when(hardshipService.create(workflowRequest))
                 .thenReturn(performHardshipResponse);
 
@@ -241,7 +251,6 @@ class HardshipOrchestrationServiceTest {
     @Test
     void givenMagCourt_whenCreateIsInvokedAndExceptionThrownInCreateHardship_thenRollbackHardshipIsInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
-        ApiPerformHardshipResponse performHardshipResponse = getApiPerformHardshipResponse();
         when(hardshipService.create(workflowRequest))
                 .thenReturn(performHardshipResponse);
 
@@ -267,7 +276,6 @@ class HardshipOrchestrationServiceTest {
     @Test
     void givenMagCourt_whenCreateIsInvokedAndExceptionThrownInFind_thenRollbackHardshipIsInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
-        ApiPerformHardshipResponse performHardshipResponse = getApiPerformHardshipResponse();
         when(hardshipService.create(workflowRequest))
                 .thenReturn(performHardshipResponse);
 
@@ -286,7 +294,6 @@ class HardshipOrchestrationServiceTest {
     @Test
     void givenMagCourt_whenCreateIsInvokedAndExceptionThrownInGetSummary_thenRollbackHardshipIsInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
-        ApiPerformHardshipResponse performHardshipResponse = getApiPerformHardshipResponse();
         when(hardshipService.create(workflowRequest))
                 .thenReturn(performHardshipResponse);
 
@@ -316,7 +323,7 @@ class HardshipOrchestrationServiceTest {
                 .thenReturn(workflowRequest.getApplicationDTO());
         when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
                 .thenReturn(false);
-        AssessmentSummaryDTO assessmentSummaryDTO = getAssessmentSummaryDTO();
+
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), any()))
                 .thenReturn(assessmentSummaryDTO);
 
@@ -347,7 +354,7 @@ class HardshipOrchestrationServiceTest {
                 .thenReturn(applicationDTO);
         when(contributionService.isVariationRequired(any(ApplicationDTO.class)))
                 .thenReturn(true);
-        AssessmentSummaryDTO assessmentSummaryDTO = getAssessmentSummaryDTO();
+
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), any()))
                 .thenReturn(assessmentSummaryDTO);
         when(hardshipMapper.getUserActionDTO(any(), any()))
@@ -383,7 +390,7 @@ class HardshipOrchestrationServiceTest {
                 any(StoredProcedure.class)
         ))
                 .thenReturn(applicationDTO);
-        AssessmentSummaryDTO assessmentSummaryDTO = getAssessmentSummaryDTO();
+
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), any()))
                 .thenReturn(assessmentSummaryDTO);
         when(hardshipMapper.getUserActionDTO(any(), any()))

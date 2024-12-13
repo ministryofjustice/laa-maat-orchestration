@@ -8,7 +8,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtOverviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
-import uk.gov.justice.laa.crime.orchestration.service.CCLFUpdateService;
 import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
 import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
@@ -20,7 +19,6 @@ public class CrownCourtOrchestrationService {
 
     private final ProceedingsService proceedingsService;
     private final MaatCourtDataService maatCourtDataService;
-    private final CCLFUpdateService cclfUpdateService;
     private final MaatCourtDataApiService maatCourtDataApiService;
 
     public ApplicationDTO update(WorkflowRequest request) {

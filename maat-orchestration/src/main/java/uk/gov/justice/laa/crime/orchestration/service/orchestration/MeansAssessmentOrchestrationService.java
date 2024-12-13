@@ -26,7 +26,6 @@ import uk.gov.justice.laa.crime.orchestration.service.MeansAssessmentService;
 import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
 import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
-import uk.gov.justice.laa.crime.orchestration.service.*;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_INCOMPLETE_ASSESSMENT;
@@ -45,7 +44,6 @@ public class MeansAssessmentOrchestrationService {
     private final RepOrderService repOrderService;
     private final WorkflowPreProcessorService workflowPreProcessorService;
     private final MeansAssessmentMapper meansAssessmentMapper;
-    private final CCLFUpdateService cclfUpdateService;
     private final MaatCourtDataApiService maatCourtDataApiService;
 
     public FinancialAssessmentDTO find(int assessmentId, int applicantId) {
