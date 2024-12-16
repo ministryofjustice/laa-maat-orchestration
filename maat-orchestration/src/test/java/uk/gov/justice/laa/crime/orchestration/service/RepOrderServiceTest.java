@@ -24,7 +24,7 @@ class RepOrderServiceTest {
     @Test
     void givenUnknownRepOrder_whenGetRepOrderIsInvoked_thenNoRepOrderIsReturned() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
-        when(maatCourtDataService.findRepOrder(any())).thenReturn(null);
+        when(maatCourtDataService.findRepOrder(any(Integer.class))).thenReturn(null);
 
         RepOrderDTO actualRepOrder = repOrderService.getRepOrder(workflowRequest);
 
@@ -36,8 +36,8 @@ class RepOrderServiceTest {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         int repOrderId = workflowRequest.getApplicationDTO().getRepId().intValue();
         RepOrderDTO expectedRepOrder = RepOrderDTO.builder()
-            .id(repOrderId)
-            .build();
+                .id(repOrderId)
+                .build();
 
         when(maatCourtDataService.findRepOrder(repOrderId)).thenReturn(expectedRepOrder);
 
