@@ -72,7 +72,6 @@ class HardshipOrchestrationServiceTest {
     @InjectMocks
     private HardshipOrchestrationService orchestrationService;
 
-    private WorkflowRequest workflowRequest;
     private ApiPerformHardshipResponse performHardshipResponse;
     private AssessmentSummaryDTO assessmentSummaryDTO;
 
