@@ -29,11 +29,14 @@ public class CrownCourtOrchestrationService {
                 application, request.getUserDTO(), StoredProcedure.UPDATE_DBMS_TRANSACTION_ID
         );
 
-        maatCourtDataService.invokeStoredProcedure(
-                application, request.getUserDTO(), StoredProcedure.PRE_UPDATE_CHECKS
+        request.setApplicationDTO(
+                maatCourtDataService.invokeStoredProcedure(
+                        application, request.getUserDTO(), StoredProcedure.PRE_UPDATE_CHECKS
+                )
         );
 
-        RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());
+        RepOrderDTO repOrderDTO =
+                maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());
         application = proceedingsService.updateCrownCourt(request, repOrderDTO);
 
         if (hasNewOutcome(application)) {
@@ -46,7 +49,6 @@ public class CrownCourtOrchestrationService {
                 application, request.getUserDTO(), StoredProcedure.UPDATE_CC_APPLICANT_AND_APPLICATION
         );
         application.setTransactionId(null);
-
         return application;
     }
 

@@ -54,12 +54,12 @@ public class MeansAssessmentOrchestrationService {
         ApplicationDTO application = request.getApplicationDTO();
         try {
             Long repId = application.getRepId();
-            log.debug("Creating Means assessment for applicationId = " + repId);
+            log.debug("Creating Means assessment for applicationId = {}", repId);
 
             preProcessRequest(request, Action.CREATE_ASSESSMENT);
             meansAssessmentService.create(request);
             application = processCrownCourtProceedings(request);
-            log.debug("Created Means assessment for applicationId = " + repId);
+            log.debug("Created Means assessment for applicationId = {}", repId);
         } catch (ValidationException | CrimeValidationException exception) {
             throw exception;
         } catch (MAATServerException exception) {
@@ -79,12 +79,12 @@ public class MeansAssessmentOrchestrationService {
         ApplicationDTO application = request.getApplicationDTO();
         try {
             Long repId = application.getRepId();
-            log.debug("Updating Means assessment for applicationId = " + repId);
+            log.debug("Updating Means assessment for applicationId = {}", repId);
 
             preProcessRequest(request, Action.UPDATE_ASSESSMENT);
             meansAssessmentService.update(request);
             application = processCrownCourtProceedings(request);
-            log.debug("Updated Means assessment for applicationId = " + repId);
+            log.debug("Updated Means assessment for applicationId = {}", repId);
         } catch (ValidationException | CrimeValidationException exception) {
             throw exception;
         } catch (MAATServerException exception) {
