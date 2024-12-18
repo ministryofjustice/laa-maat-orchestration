@@ -39,11 +39,11 @@ public class ProceedingsService {
                 proceedingsMapper.workflowRequestToUpdateCrownCourtRequest(request.getApplicationDTO(), request.getUserDTO());
         ApiUpdateCrownCourtOutcomeResponse updateCrownCourtResponse =
                 proceedingsApiService.updateCrownCourt(apiUpdateCrownCourtRequest);
-        ApplicationDTO applicationDTO = proceedingsMapper.updateCrownCourtResponseToApplicationDto(
+        ApplicationDTO application = proceedingsMapper.updateCrownCourtResponseToApplicationDto(
                 updateCrownCourtResponse, request.getApplicationDTO()
         );
         updateCCLF(request, repOrderDTO);
-        return applicationDTO;
+        return application;
     }
 
     public void updateCCLF(WorkflowRequest request, RepOrderDTO repOrderDTO) {
