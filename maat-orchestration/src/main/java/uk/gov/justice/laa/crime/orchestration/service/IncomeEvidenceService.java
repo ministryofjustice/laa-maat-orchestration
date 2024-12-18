@@ -5,9 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceResponse;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceRequest;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.IncomeEvidenceMapper;
 import uk.gov.justice.laa.crime.orchestration.service.api.EvidenceApiService;
@@ -35,5 +38,22 @@ public class IncomeEvidenceService {
                 incomeEvidenceMapper.mapToMaatApiUpdateAssessment(request, repOrder, evidenceResponse);
         MaatApiAssessmentResponse maatApiResponse = maatCourtDataApiService.updateFinancialAssessment(maatApiRequest);
         incomeEvidenceMapper.maatApiAssessmentResponseToApplicationDTO(maatApiResponse, request.getApplicationDTO());
+    }
+
+    public ApplicationDTO updateEvidence(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {
+        ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
+        log.debug("Updating evidence items for financialAssessmentId: {}",
+                applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getId());
+
+        ApiUpdateIncomeEvidenceRequest evidenceRequest = incomeEvidenceMapper
+                .workflowRequestToApiUpdateIncomeEvidenceRequest(applicationDTO, workflowRequest.getUserDTO());
+
+        ApiUpdateIncomeEvidenceResponse evidenceResponse = evidenceApiService.updateEvidence(evidenceRequest);
+        MaatApiUpdateAssessment maatApiRequest =
+                incomeEvidenceMapper.mapUpdateEvidenceToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, evidenceResponse);
+
+        MaatApiAssessmentResponse maatApiResponse = maatCourtDataApiService.updateFinancialAssessment(maatApiRequest);
+        incomeEvidenceMapper.maatApiAssessmentResponseToApplicationDTO(maatApiResponse, applicationDTO);
+        return applicationDTO;
     }
 }

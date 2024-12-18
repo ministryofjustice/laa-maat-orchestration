@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceResponse;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceRequest;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiIncomeEvidence;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
@@ -28,6 +29,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
@@ -194,4 +196,31 @@ class IncomeEvidenceMapperTest {
                 Arguments.of(existingBothEvidencesRepOrderDTO, existingFinEvidencesAssessment)
         );
     }
+
+    @ParameterizedTest
+    @MethodSource("updateIncomeEvidences")
+    void givenValidWorkflowRequest_whenWorkflowRequestToApiUpdateIncomeEvidenceRequestIsInvoked_thenApiUpdateIncomeEvidenceRequestIsReturned(
+            WorkflowRequest workflowRequest,
+            ApiUpdateIncomeEvidenceRequest expectedRequest) {
+        ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
+        UserDTO userDTO = workflowRequest.getUserDTO();
+
+        when(userMapper.userDtoToUserSession(userDTO))
+                .thenReturn(TestModelDataBuilder.getApiUserSession());
+
+        ApiUpdateIncomeEvidenceRequest actualRequest =
+                incomeEvidenceMapper.workflowRequestToApiUpdateIncomeEvidenceRequest(applicationDTO, userDTO);
+
+        assertThat(actualRequest).usingRecursiveComparison().isEqualTo(expectedRequest);
+    }
+
+    private static Stream<Arguments> updateIncomeEvidences() {
+        return Stream.of(
+                Arguments.of(TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT),
+                        TestModelDataBuilder.getApiUpdateEvidenceRequest(false)),
+                Arguments.of(TestModelDataBuilder.buildWorkFlowRequest(),
+                        TestModelDataBuilder.getApiUpdateEvidenceRequest(true))
+        );
+    }
+
 }

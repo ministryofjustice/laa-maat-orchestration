@@ -131,7 +131,9 @@ public class TestModelDataBuilder {
     public static final long APPLICANT_ID = 1000L;
     public static final long PARTNER_ID = 1234L;
     public static final String EMST_CODE ="EMPLOY";
-    public static final LocalDateTime INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 11, 0, 0, 0);
+    public static final LocalDateTime FINASS_INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 11, 0, 0, 0);
+    public static final LocalDateTime EVIDENCE_DUE_DATE = LocalDateTime.of(2023, 3, 18, 0, 0, 0);
+    public static final LocalDateTime INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 2, 18, 0, 0, 0);
 
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
@@ -257,7 +259,7 @@ public class TestModelDataBuilder {
                 .withIojAppeal(getApiIOJSummary())
                 .withFinancialAssessment(getApiFinancialAssessment())
                 .withPassportAssessment(getApiPassportAssessment())
-                .withIncomeEvidenceReceivedDate(LocalDateTime.of(2023, 2, 18, 0, 0, 0))
+                .withIncomeEvidenceReceivedDate(INCOME_EVIDENCE_RECEIVED_DATE)
                 .withCapitalEvidenceReceivedDate(EVIDENCE_RECEIVED_DATE)
                 .withCapitalEvidence(List.of(getApiCapitalEvidence()))
                 .withEmstCode(EMST_CODE);
@@ -931,8 +933,8 @@ public class TestModelDataBuilder {
                 .extraEvidenceList(List.of(getExtraEvidenceDTO()))
                 .applicantIncomeEvidenceList(List.of(getEvidenceDTO(APPLICANT_EVIDENCE_ID)))
                 .partnerIncomeEvidenceList(List.of(getEvidenceDTO(PARTNER_EVIDENCE_ID)))
-                .evidenceReceivedDate(toDate(LocalDateTime.of(2023, 2, 18, 0, 0, 0)))
-                .evidenceDueDate(toDate(LocalDateTime.of(2023, 3, 18, 0, 0, 0)))
+                .evidenceReceivedDate(toDate(INCOME_EVIDENCE_RECEIVED_DATE))
+                .evidenceDueDate(toDate(EVIDENCE_DUE_DATE))
                 .upliftsAvailable(true)
                 .build();
     }
@@ -943,8 +945,8 @@ public class TestModelDataBuilder {
                 .id(applicantId)
                 .build());
         finAssIncomeEvidenceDTO.setIncomeEvidence(IncomeEvidenceType.TAX_RETURN.getName());
-        finAssIncomeEvidenceDTO.setDateReceived(INCOME_EVIDENCE_RECEIVED_DATE);
-        finAssIncomeEvidenceDTO.setDateCreated(INCOME_EVIDENCE_RECEIVED_DATE);
+        finAssIncomeEvidenceDTO.setDateReceived(FINASS_INCOME_EVIDENCE_RECEIVED_DATE);
+        finAssIncomeEvidenceDTO.setDateCreated(FINASS_INCOME_EVIDENCE_RECEIVED_DATE);
         return finAssIncomeEvidenceDTO;
     }
 
@@ -993,7 +995,7 @@ public class TestModelDataBuilder {
     private static AppealDTO getAppealDTO() {
         return AppealDTO.builder()
                 .available(true)
-                .appealReceivedDate(toDate(LocalDateTime.of(2023, 3, 18, 0, 0, 0)))
+                .appealReceivedDate(toDate(EVIDENCE_DUE_DATE))
                 .appealSentenceOrderDate(toDate(LocalDateTime.of(2023, 8, 3, 0, 0, 0)))
                 .appealTypeDTO(getAppealTypeDTO())
                 .build();
@@ -1347,6 +1349,39 @@ public class TestModelDataBuilder {
                 .withMetadata(getMetadata());
     }
 
+    public static ApiUpdateIncomeEvidenceRequest getApiUpdateEvidenceRequest(boolean isPartner) {
+        return new ApiUpdateIncomeEvidenceRequest()
+                .withMagCourtOutcome(MagCourtOutcome.SENT_FOR_TRIAL)
+                .withApplicantEvidenceItems(getApiIncomeEvidenceItems(false))
+                .withPartnerEvidenceItems(isPartner ? getApiIncomeEvidenceItems(true) : null)
+                .withApplicantPensionAmount(BigDecimal.valueOf(1000.0 * Frequency.MONTHLY.getWeighting()))
+                .withPartnerPensionAmount(isPartner ? BigDecimal.valueOf(2000.0 * Frequency.TWO_WEEKLY.getWeighting()) : null)
+                .withEvidenceDueDate(EVIDENCE_DUE_DATE)
+                .withEvidenceReceivedDate(INCOME_EVIDENCE_RECEIVED_DATE)
+                .withMetadata(getMetadata());
+    }
+
+    private static ApiIncomeEvidenceItems getApiIncomeEvidenceItems(boolean isPartner) {
+        List<ApiIncomeEvidence> incomeEvidenceItems = List.of(new ApiIncomeEvidence()
+                        .withId(APPLICANT_EVIDENCE_ID)
+                        .withDateReceived(EVIDENCE_RECEIVED_DATE.toLocalDate())
+                        .withEvidenceType(IncomeEvidenceType.TAX_RETURN)
+                        .withMandatory(true),
+                new ApiIncomeEvidence()
+                        .withId(EXTRA_EVIDENCE_ID)
+                        .withDateReceived(EVIDENCE_RECEIVED_DATE.toLocalDate())
+                        .withEvidenceType(IncomeEvidenceType.TAX_RETURN)
+                        .withMandatory(true));
+        List<ApiIncomeEvidence> partnerIncomeEvidenceItems = List.of(new ApiIncomeEvidence()
+                        .withId(PARTNER_EVIDENCE_ID)
+                        .withDateReceived(EVIDENCE_RECEIVED_DATE.toLocalDate())
+                        .withEvidenceType(IncomeEvidenceType.TAX_RETURN)
+                        .withMandatory(true));
+        return new ApiIncomeEvidenceItems()
+                .withIncomeEvidenceItems(isPartner ? partnerIncomeEvidenceItems : incomeEvidenceItems)
+                .withApplicantDetails(getApplicantDetails(isPartner));
+    }
+
     private static ApiApplicantDetails getApplicantDetails(boolean isPartner) {
         return new ApiApplicantDetails()
                 .withId(isPartner ? NumberUtils.toInteger(PARTNER_ID) : NumberUtils.toInteger(APPLICANT_ID))
@@ -1430,7 +1465,7 @@ public class TestModelDataBuilder {
     private static FinancialAssessmentIncomeEvidence getFinAssIncomeEvidence(Integer evidenceId, Integer applicantId) {
         return new FinancialAssessmentIncomeEvidence()
                 .withId(evidenceId)
-                .withDateReceived(INCOME_EVIDENCE_RECEIVED_DATE)
+                .withDateReceived(FINASS_INCOME_EVIDENCE_RECEIVED_DATE)
                 .withActive("Y")
                 .withIncomeEvidence(IncomeEvidenceType.TAX_RETURN.getName())
                 .withMandatory("Y")
