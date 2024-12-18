@@ -25,7 +25,9 @@ public class ProceedingsService {
 
     public void updateApplication(WorkflowRequest request, RepOrderDTO repOrderDTO) {
         ApiUpdateApplicationRequest apiUpdateApplicationRequest =
-                proceedingsMapper.workflowRequestToUpdateApplicationRequest(request.getApplicationDTO(), request.getUserDTO());
+                proceedingsMapper.workflowRequestToUpdateApplicationRequest(request.getApplicationDTO(),
+                                                                            request.getUserDTO()
+                );
         ApiUpdateApplicationResponse updateApplicationResponse =
                 proceedingsApiService.updateApplication(apiUpdateApplicationRequest);
         proceedingsMapper.updateApplicationResponseToApplicationDto(
@@ -36,14 +38,19 @@ public class ProceedingsService {
 
     public ApplicationDTO updateCrownCourt(WorkflowRequest request, RepOrderDTO repOrderDTO) {
         ApiUpdateCrownCourtRequest apiUpdateCrownCourtRequest =
-                proceedingsMapper.workflowRequestToUpdateCrownCourtRequest(request.getApplicationDTO(), request.getUserDTO());
+                proceedingsMapper.workflowRequestToUpdateCrownCourtRequest(request.getApplicationDTO(),
+                                                                           request.getUserDTO()
+                );
         ApiUpdateCrownCourtOutcomeResponse updateCrownCourtResponse =
                 proceedingsApiService.updateCrownCourt(apiUpdateCrownCourtRequest);
-        ApplicationDTO application = proceedingsMapper.updateCrownCourtResponseToApplicationDto(
-                updateCrownCourtResponse, request.getApplicationDTO()
+
+        request.setApplicationDTO(
+                proceedingsMapper.updateCrownCourtResponseToApplicationDto(
+                        updateCrownCourtResponse, request.getApplicationDTO()
+                )
         );
         updateCCLF(request, repOrderDTO);
-        return application;
+        return request.getApplicationDTO();
     }
 
     public void updateCCLF(WorkflowRequest request, RepOrderDTO repOrderDTO) {
