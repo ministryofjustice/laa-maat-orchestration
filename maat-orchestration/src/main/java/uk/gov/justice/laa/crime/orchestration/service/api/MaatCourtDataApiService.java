@@ -66,16 +66,14 @@ public class MaatCourtDataApiService {
         return userSummaryDTO;
     }
 
-    public RepOrderDTO updateSendToCCLF(SendToCCLFDTO sendToCCLFDTO) {
+    public void updateSendToCCLF(SendToCCLFDTO sendToCCLFDTO) {
         log.debug(REQUEST_STRING, sendToCCLFDTO);
-        RepOrderDTO response = maatApiClient.put(sendToCCLFDTO,
+        maatApiClient.put(sendToCCLFDTO,
                 new ParameterizedTypeReference<>() {
                 },
                 configuration.getMaatApi().getEndpoints().getUpdateSendToCCLFUrl(),
                 Map.of()
         );
-        log.debug(RESPONSE_STRING, response);
-        return response;
     }
 
     public FinancialAssessmentDTO getFinancialAssessment(int financialAssessmentId) {

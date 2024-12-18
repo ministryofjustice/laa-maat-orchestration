@@ -124,7 +124,6 @@ class CCLFUpdateServiceTest {
     void givenValidInput_whenUpdateSendToCCLFIsInvoked_thenOKResponseIsReturned() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
-        when(maatCourtDataApiService.updateSendToCCLF(any())).thenReturn(repOrderDTO);
         assertDoesNotThrow(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO));
         verify(maatCourtDataApiService).updateSendToCCLF(any());
     }
