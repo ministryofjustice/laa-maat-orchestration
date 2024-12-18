@@ -26,6 +26,7 @@ import uk.gov.justice.laa.crime.orchestration.service.MeansAssessmentService;
 import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
 import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
+import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_INCOMPLETE_ASSESSMENT;
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_REASSESSMENT;
@@ -43,6 +44,7 @@ public class MeansAssessmentOrchestrationService {
     private final RepOrderService repOrderService;
     private final WorkflowPreProcessorService workflowPreProcessorService;
     private final MeansAssessmentMapper meansAssessmentMapper;
+    private final MaatCourtDataApiService maatCourtDataApiService;
 
     public FinancialAssessmentDTO find(int assessmentId, int applicantId) {
         return meansAssessmentService.find(assessmentId, applicantId);
@@ -52,12 +54,12 @@ public class MeansAssessmentOrchestrationService {
         ApplicationDTO application = request.getApplicationDTO();
         try {
             Long repId = application.getRepId();
-            log.debug("Creating Means assessment for applicationId = " + repId);
+            log.debug("Creating Means assessment for applicationId = {}", repId);
 
             preProcessRequest(request, Action.CREATE_ASSESSMENT);
             meansAssessmentService.create(request);
             application = processCrownCourtProceedings(request);
-            log.debug("Created Means assessment for applicationId = " + repId);
+            log.debug("Created Means assessment for applicationId = {}", repId);
         } catch (ValidationException | CrimeValidationException exception) {
             throw exception;
         } catch (MAATServerException exception) {
@@ -73,15 +75,16 @@ public class MeansAssessmentOrchestrationService {
     }
 
     public ApplicationDTO update(WorkflowRequest request) {
+
         ApplicationDTO application = request.getApplicationDTO();
         try {
             Long repId = application.getRepId();
-            log.debug("Updating Means assessment for applicationId = " + repId);
+            log.debug("Updating Means assessment for applicationId = {}", repId);
 
             preProcessRequest(request, Action.UPDATE_ASSESSMENT);
             meansAssessmentService.update(request);
             application = processCrownCourtProceedings(request);
-            log.debug("Updated Means assessment for applicationId = " + repId);
+            log.debug("Updated Means assessment for applicationId = {}", repId);
         } catch (ValidationException | CrimeValidationException exception) {
             throw exception;
         } catch (MAATServerException exception) {
@@ -111,9 +114,9 @@ public class MeansAssessmentOrchestrationService {
         if (featureDecisionService.isC3Enabled(request)) {
             // call post_processing_part_1_c3 and map the application
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                request.getApplicationDTO(),
-                request.getUserDTO(),
-                StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3)
+                    request.getApplicationDTO(),
+                    request.getUserDTO(),
+                    StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3)
             );
 
             if (!featureDecisionService.isMaatPostAssessmentProcessingEnabled(request)) {
@@ -121,14 +124,14 @@ public class MeansAssessmentOrchestrationService {
                 request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
                     contributionService.calculate(request),
                     request.getUserDTO(),
-                    StoredProcedure.PRE_UPDATE_CC_APPLICATION));
+                        StoredProcedure.PRE_UPDATE_CC_APPLICATION));
             }
         } else {
             // call post_processing_part1 and map the application
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                request.getApplicationDTO(),
-                request.getUserDTO(),
-                StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1)
+                    request.getApplicationDTO(),
+                    request.getUserDTO(),
+                    StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1)
             );
         }
 
@@ -139,8 +142,10 @@ public class MeansAssessmentOrchestrationService {
             throw new MAATServerException(alertMessage);
         }
 
+        RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());
         // call CCP service
-        proceedingsService.updateApplication(request);
+        proceedingsService.updateApplication(request, repOrderDTO);
+
 
         // call post_processing_part_2
         ApplicationDTO application = maatCourtDataService.invokeStoredProcedure(

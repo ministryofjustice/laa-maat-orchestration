@@ -19,7 +19,7 @@ def versions = [
 		pitest                  : "1.16.1",
 		springdocVersion        : "2.5.0",
 		commonsModSchemas       : "1.23.1",
-		crimeCommonsClasses     : "4.1.0",
+		crimeCommonsClasses     : "4.2.1",
 		commonsRestClient       : "3.18.0",
 		okhttpVersion           : "4.12.0",
 		wmStubRunnerVersion    	: "4.1.3"

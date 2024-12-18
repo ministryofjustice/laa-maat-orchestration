@@ -75,14 +75,14 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(newHardship, courtType);
             assessmentSummaryService.updateApplication(application, hardshipSummary);
         } catch (Exception ex) {
-            log.warn("Create Hardship Review failed with the exception: {}", ex);
+            log.warn("Create Hardship Review failed with the exception: {}", ex.getMessage(), ex);
             hardshipService.rollback(request);
             Sentry.captureException(ex);
             throw new MaatOrchestrationException(request.getApplicationDTO());
         }
         return application;
     }
-
+    
     public ApplicationDTO update(WorkflowRequest request) {
         // invoke the validation service to check that data has not been modified by another user
         // invoke the validation service to Check user has rep order reserved
@@ -111,7 +111,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(hardshipReviewDTO, courtType);
             assessmentSummaryService.updateApplication(request.getApplicationDTO(), hardshipSummary);
         } catch (Exception ex) {
-            log.warn("Update Hardship Review failed with the exception: {}", ex);
+            log.warn("Update Hardship Review failed with the exception: {}", ex.getMessage(), ex);
             hardshipService.rollback(request);
             Sentry.captureException(ex);
             throw new MaatOrchestrationException(request.getApplicationDTO());
@@ -159,7 +159,8 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                 request.getApplicationDTO(), request.getUserDTO(), StoredProcedure.PRE_UPDATE_CC_APPLICATION
         ));
 
-        proceedingsService.updateApplication(request);
+        proceedingsService.updateApplication(request, repOrderDTO);
+
         // Call application.handle_eform_result stored procedure OR Equivalent ATS service endpoint
         ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(request, repOrderDTO);
         if (null != applicationTrackingOutputResult.getUsn()) {
@@ -175,4 +176,5 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
 
         return request.getApplicationDTO();
     }
+
 }
