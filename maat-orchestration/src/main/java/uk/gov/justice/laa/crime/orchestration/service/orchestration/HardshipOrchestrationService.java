@@ -28,7 +28,6 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     private final ProceedingsService proceedingsService;
     private final AssessmentSummaryService assessmentSummaryService;
     private final MaatCourtDataService maatCourtDataService;
-    private final CCLFUpdateService cclfUpdateService;
     private final HardshipMapper hardshipMapper;
     private final WorkflowPreProcessorService workflowPreProcessorService;
     private final RepOrderService repOrderService;
