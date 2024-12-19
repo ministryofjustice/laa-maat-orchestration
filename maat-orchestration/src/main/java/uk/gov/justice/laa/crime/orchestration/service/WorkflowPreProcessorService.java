@@ -48,7 +48,8 @@ public class WorkflowPreProcessorService {
     }
 
     public void preProcessEvidenceRequest(UserActionDTO userActionDTO) {
-        UserSummaryDTO userSummaryDTO = Optional.ofNullable(userActionDTO.getUsername()).map(maatCourtDataService::getUserSummary).orElse(null);
+        UserSummaryDTO userSummaryDTO = Optional.ofNullable(userActionDTO.getUsername())
+                .map(maatCourtDataService::getUserSummary).orElse(null);
         validationService.isUserActionValid(userActionDTO, userSummaryDTO);
     }
 }

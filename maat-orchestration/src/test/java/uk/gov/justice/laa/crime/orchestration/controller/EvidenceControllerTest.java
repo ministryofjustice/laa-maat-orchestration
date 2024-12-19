@@ -28,7 +28,7 @@ import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWith
 @WebMvcTest(controllers = EvidenceController.class)
 @Import(OrchestrationTestConfiguration.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class EvidenceControllerTest {
+class EvidenceControllerTest {
     private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/evidence";
 
     @MockBean

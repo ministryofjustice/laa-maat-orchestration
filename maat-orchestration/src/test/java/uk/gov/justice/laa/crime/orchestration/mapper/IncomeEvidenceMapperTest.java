@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceRequest;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiIncomeEvidence;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
@@ -223,4 +224,25 @@ class IncomeEvidenceMapperTest {
         );
     }
 
+    @ParameterizedTest
+    @MethodSource("existingEvidences")
+    void givenExistingEvidences_whenMapUpdateEvidenceToMaatApiUpdateAssessmentIsInvoked_thenMaatApiUpdateAssessmentIsReturned(
+            RepOrderDTO repOrderDTO, MaatApiUpdateAssessment expectedAssessment) {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
+        ApiUpdateIncomeEvidenceResponse apiUpdateIncomeEvidenceResponse = TestModelDataBuilder.getUpdateIncomeEvidenceResponse();
+        expectedAssessment.setIncomeEvidenceDueDate(TestModelDataBuilder.EVIDENCE_DUE_DATE);
+
+        when(meansAssessmentMapper.assessmentDetailsBuilder(anyList()))
+                .thenReturn(List.of(TestModelDataBuilder.getAssessmentDetail()));
+        when(meansAssessmentMapper.childWeightingsBuilder(anyList()))
+                .thenReturn(List.of(TestModelDataBuilder.getAssessmentChildWeighting()));
+
+        MaatApiUpdateAssessment maatApiUpdateAssessment =
+                incomeEvidenceMapper.mapUpdateEvidenceToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, apiUpdateIncomeEvidenceResponse);
+
+        assertThat(maatApiUpdateAssessment)
+                .usingRecursiveComparison()
+                .ignoringFields("laaTransactionId")
+                .isEqualTo(expectedAssessment);
+    }
 }
