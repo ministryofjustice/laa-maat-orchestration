@@ -137,4 +137,18 @@ class WorkflowPreProcessorServiceTest {
         request.getApplicationDTO().getCaseDetailsDTO().setCaseType(caseType);
         return request;
     }
+
+    @Test
+    void givenRequestValidationFails_whenPreProcessEvidenceRequestIsInvoked_thenExceptionIsThrown() {
+        UserActionDTO userActionDTO = TestModelDataBuilder.getUserActionDTO();
+        UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
+
+        when(maatCourtDataService.getUserSummary(userActionDTO.getUsername())).thenReturn(userSummaryDTO);
+        doThrow(new CrimeValidationException(List.of(ValidationService.USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION)))
+                .when(validationService).isUserActionValid(userActionDTO, userSummaryDTO);
+
+        assertThatThrownBy(() -> workflowPreProcessorService.preProcessEvidenceRequest(userActionDTO))
+                .isInstanceOf(CrimeValidationException.class);
+    }
+
 }
