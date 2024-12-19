@@ -148,7 +148,7 @@ public class IncomeEvidenceMapper {
             throw new ValidationException("The applicant has more than one partner linked.");
         }
 
-        return partnerDetails.get(0);
+        return partnerDetails.isEmpty() ? null : partnerDetails.get(0);
     }
 
     private ApiApplicantDetails getApplicantDetails(ApplicantDTO applicant) {
