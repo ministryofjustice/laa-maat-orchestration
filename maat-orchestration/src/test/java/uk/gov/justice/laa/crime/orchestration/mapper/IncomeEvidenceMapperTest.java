@@ -13,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceResponse;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceRequest;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiIncomeEvidence;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
@@ -28,6 +30,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
@@ -193,5 +196,53 @@ class IncomeEvidenceMapperTest {
                 Arguments.of(existingFinEvidenceRepOrderDTO, existingFinEvidencesAssessment),
                 Arguments.of(existingBothEvidencesRepOrderDTO, existingFinEvidencesAssessment)
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource("updateIncomeEvidences")
+    void givenValidWorkflowRequest_whenWorkflowRequestToApiUpdateIncomeEvidenceRequestIsInvoked_thenApiUpdateIncomeEvidenceRequestIsReturned(
+            WorkflowRequest workflowRequest,
+            ApiUpdateIncomeEvidenceRequest expectedRequest) {
+        ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
+        UserDTO userDTO = workflowRequest.getUserDTO();
+
+        when(userMapper.userDtoToUserSession(userDTO))
+                .thenReturn(TestModelDataBuilder.getApiUserSession());
+
+        ApiUpdateIncomeEvidenceRequest actualRequest =
+                incomeEvidenceMapper.workflowRequestToApiUpdateIncomeEvidenceRequest(applicationDTO, userDTO);
+
+        assertThat(actualRequest).usingRecursiveComparison().isEqualTo(expectedRequest);
+    }
+
+    private static Stream<Arguments> updateIncomeEvidences() {
+        return Stream.of(
+                Arguments.of(TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT),
+                        TestModelDataBuilder.getApiUpdateEvidenceRequest(false)),
+                Arguments.of(TestModelDataBuilder.buildWorkFlowRequest(),
+                        TestModelDataBuilder.getApiUpdateEvidenceRequest(true))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("existingEvidences")
+    void givenExistingEvidences_whenMapUpdateEvidenceToMaatApiUpdateAssessmentIsInvoked_thenMaatApiUpdateAssessmentIsReturned(
+            RepOrderDTO repOrderDTO, MaatApiUpdateAssessment expectedAssessment) {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
+        ApiUpdateIncomeEvidenceResponse apiUpdateIncomeEvidenceResponse = TestModelDataBuilder.getUpdateIncomeEvidenceResponse();
+        expectedAssessment.setIncomeEvidenceDueDate(TestModelDataBuilder.EVIDENCE_DUE_DATE);
+
+        when(meansAssessmentMapper.assessmentDetailsBuilder(anyList()))
+                .thenReturn(List.of(TestModelDataBuilder.getAssessmentDetail()));
+        when(meansAssessmentMapper.childWeightingsBuilder(anyList()))
+                .thenReturn(List.of(TestModelDataBuilder.getAssessmentChildWeighting()));
+
+        MaatApiUpdateAssessment maatApiUpdateAssessment =
+                incomeEvidenceMapper.mapUpdateEvidenceToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, apiUpdateIncomeEvidenceResponse);
+
+        assertThat(maatApiUpdateAssessment)
+                .usingRecursiveComparison()
+                .ignoringFields("laaTransactionId")
+                .isEqualTo(expectedAssessment);
     }
 }

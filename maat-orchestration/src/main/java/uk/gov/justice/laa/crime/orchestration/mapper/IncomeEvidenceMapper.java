@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.evidence.*;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.FinancialAssessmentIncomeEvidence;
@@ -9,15 +10,17 @@ import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpda
 import uk.gov.justice.laa.crime.enums.AssessmentType;
 import uk.gov.justice.laa.crime.enums.EmploymentStatus;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.EvidenceDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.util.DateUtil;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -35,13 +38,7 @@ public class IncomeEvidenceMapper {
     public ApiCreateIncomeEvidenceRequest workflowRequestToApiCreateIncomeEvidenceRequest(WorkflowRequest workflowRequest) {
         ApplicationDTO application = workflowRequest.getApplicationDTO();
         ApiApplicantDetails partnerDetails = getPartnerDetails(application.getApplicantLinks());
-        AssessmentDetailDTO pensionDetails =
-                application.getAssessmentDTO().getFinancialAssessmentDTO().getInitial().getSectionSummaries()
-                        .stream()
-                        .flatMap(section -> section.getAssessmentDetail().stream())
-                        .filter(detail -> detail.getDescription().equals("Income from Private Pension(s)"))
-                        .findFirst()
-                        .orElse(null);
+        AssessmentDetailDTO pensionDetails = getPensionDetails(application);
 
         return new ApiCreateIncomeEvidenceRequest()
                 .withMagCourtOutcome(MagCourtOutcome.getFrom(application.getMagsOutcomeDTO().getOutcome()))
@@ -49,7 +46,16 @@ public class IncomeEvidenceMapper {
                 .withPartnerDetails(partnerDetails)
                 .withApplicantPensionAmount(getPensionAmount(pensionDetails, false))
                 .withPartnerPensionAmount(partnerDetails == null ? null : getPensionAmount(pensionDetails, true))
-                .withMetadata(getMetadata(workflowRequest));
+                .withMetadata(getMetadata(application, workflowRequest.getUserDTO()));
+    }
+
+    private static @Nullable AssessmentDetailDTO getPensionDetails(ApplicationDTO application) {
+        return application.getAssessmentDTO().getFinancialAssessmentDTO().getInitial().getSectionSummaries()
+                .stream()
+                .flatMap(section -> section.getAssessmentDetail().stream())
+                .filter(detail -> detail.getDescription().equals("Income from Private Pension(s)"))
+                .findFirst()
+                .orElse(null);
     }
 
     public MaatApiUpdateAssessment mapToMaatApiUpdateAssessment(WorkflowRequest workflowRequest,
@@ -60,7 +66,7 @@ public class IncomeEvidenceMapper {
                 ? AssessmentType.FULL : AssessmentType.INIT;
         InitialAssessmentDTO initialAssessment = application.getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
         FullAssessmentDTO fullAssessment = application.getAssessmentDTO().getFinancialAssessmentDTO().getFull();
-        Collection<AssessmentDetailDTO> assessmentDetails  = assessmentType.equals(AssessmentType.FULL)
+        Collection<AssessmentDetailDTO> assessmentDetails = assessmentType.equals(AssessmentType.FULL)
                 ? fullAssessment.getSectionSummaries().stream().flatMap(section -> section.getAssessmentDetail().stream()).toList()
                 : initialAssessment.getSectionSummaries().stream().flatMap(section -> section.getAssessmentDetail().stream()).toList();
 
@@ -89,7 +95,7 @@ public class IncomeEvidenceMapper {
                 .withChildWeightings(meansAssessmentMapper.childWeightingsBuilder(initialAssessment.getChildWeightings()))
                 .withDateCompleted(application.getAssessmentDTO().getFinancialAssessmentDTO().getDateCompleted());
 
-        if ( assessmentType.equals(AssessmentType.FULL)) {
+        if (assessmentType.equals(AssessmentType.FULL)) {
             updateAssessment.setFassFullStatus(fullAssessment.getAssessmnentStatusDTO().getStatus());
             updateAssessment.setFullAssessmentDate(DateUtil.toLocalDateTime(fullAssessment.getAssessmentDate()));
             updateAssessment.setFullResult(fullAssessment.getResult());
@@ -167,9 +173,7 @@ public class IncomeEvidenceMapper {
         return weighting == null ? BigDecimal.ZERO : BigDecimal.valueOf(amount * weighting);
     }
 
-    private ApiIncomeEvidenceMetadata getMetadata(WorkflowRequest workflowRequest) {
-        ApplicationDTO application = workflowRequest.getApplicationDTO();
-
+    private ApiIncomeEvidenceMetadata getMetadata(ApplicationDTO application, UserDTO user) {
 
         return new ApiIncomeEvidenceMetadata()
                 .withApplicationReceivedDate(application.getDateReceived().toInstant().atZone(ZoneId.systemDefault())
@@ -178,7 +182,7 @@ public class IncomeEvidenceMapper {
                         .getIncomeEvidence()))
                 .withNotes(application.getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence()
                         .getIncomeEvidenceNotes())
-                .withUserSession(userMapper.userDtoToUserSession(workflowRequest.getUserDTO()));
+                .withUserSession(userMapper.userDtoToUserSession(user));
     }
 
     private Boolean isEvidencePending(IncomeEvidenceSummaryDTO incomeEvidence) {
@@ -237,5 +241,71 @@ public class IncomeEvidenceMapper {
                 .max(Comparator.comparing(uk.gov.justice.laa.crime.orchestration.dto.maat_api.EvidenceDTO::getDateCreated))
                 .map(uk.gov.justice.laa.crime.orchestration.dto.maat_api.EvidenceDTO::getDateReceived)
                 .orElse(null);
+    }
+
+    public ApiUpdateIncomeEvidenceRequest workflowRequestToApiUpdateIncomeEvidenceRequest(ApplicationDTO applicationDTO, UserDTO userDTO) {
+        ApiApplicantDetails partnerDetails = getPartnerDetails(applicationDTO.getApplicantLinks());
+        AssessmentDetailDTO pensionDetails = getPensionDetails(applicationDTO);
+        IncomeEvidenceSummaryDTO incomeEvidenceSummaryDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence();
+        ApiIncomeEvidenceItems applicantIncomeEvidenceItems = new ApiIncomeEvidenceItems()
+                .withApplicantDetails(getApplicantDetails(applicationDTO.getApplicantDTO()))
+                .withIncomeEvidenceItems(mapIncomeEvidenceItems(incomeEvidenceSummaryDTO.getApplicantIncomeEvidenceList(),
+                        incomeEvidenceSummaryDTO.getExtraEvidenceList(),
+                        false));
+
+        return new ApiUpdateIncomeEvidenceRequest()
+                .withMagCourtOutcome(MagCourtOutcome.getFrom(applicationDTO.getMagsOutcomeDTO().getOutcome()))
+                .withEvidenceDueDate(DateUtil.toLocalDateTime(incomeEvidenceSummaryDTO.getEvidenceDueDate()))
+                .withEvidenceReceivedDate(DateUtil.toLocalDateTime(incomeEvidenceSummaryDTO.getEvidenceReceivedDate()))
+                .withApplicantPensionAmount(getPensionAmount(pensionDetails, false))
+                .withApplicantEvidenceItems(applicantIncomeEvidenceItems)
+                .withPartnerPensionAmount(partnerDetails == null ? null : getPensionAmount(pensionDetails, true))
+                .withPartnerEvidenceItems(partnerDetails == null ? null : getPartnerIncomeEvidenceItems(incomeEvidenceSummaryDTO, partnerDetails))
+                .withMetadata(getMetadata(applicationDTO, userDTO));
+    }
+
+    private ApiIncomeEvidenceItems getPartnerIncomeEvidenceItems(IncomeEvidenceSummaryDTO incomeEvidenceSummaryDTO,
+                                                                 ApiApplicantDetails partnerDetails) {
+        return new ApiIncomeEvidenceItems()
+                .withApplicantDetails(partnerDetails)
+                .withIncomeEvidenceItems(mapIncomeEvidenceItems(incomeEvidenceSummaryDTO.getPartnerIncomeEvidenceList(),
+                        incomeEvidenceSummaryDTO.getExtraEvidenceList(),
+                        true));
+    }
+
+    private List<ApiIncomeEvidence> mapIncomeEvidenceItems(Collection<uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceDTO> incomeEvidenceList,
+                                                           Collection<ExtraEvidenceDTO> extraEvidenceList,
+                                                           boolean isPartner) {
+
+        List<ApiIncomeEvidence> incomeEvidences = new ArrayList<>();
+
+        incomeEvidenceList.forEach(evidence -> incomeEvidences.add(new ApiIncomeEvidence()
+                .withId(NumberUtils.toInteger(evidence.getId()))
+                .withMandatory(true)
+                .withDateReceived(evidence.getDateReceived() != null ? LocalDate.ofInstant(evidence.getDateReceived().toInstant(), ZoneId.systemDefault()) : null)
+                .withEvidenceType(IncomeEvidenceType.getFrom(evidence.getEvidenceTypeDTO().getEvidence()))
+        ));
+
+        extraEvidenceList.stream()
+                .filter(extraEvidenceDTO -> (isPartner && "P".equals(extraEvidenceDTO.getAdhoc()))
+                        || (!isPartner && "A".equals(extraEvidenceDTO.getAdhoc())))
+                .forEach(extraEvidence -> incomeEvidences.add(new ApiIncomeEvidence()
+                        .withId(NumberUtils.toInteger(extraEvidence.getId()))
+                        .withDescription(extraEvidence.getOtherText())
+                        .withMandatory(true)
+                        .withDateReceived(extraEvidence.getDateReceived() != null ? LocalDate.ofInstant(extraEvidence.getDateReceived().toInstant(), ZoneId.systemDefault()) : null)
+                        .withEvidenceType(IncomeEvidenceType.getFrom(extraEvidence.getEvidenceTypeDTO().getEvidence()))
+                ));
+
+        return incomeEvidences;
+    }
+
+    public MaatApiUpdateAssessment mapUpdateEvidenceToMaatApiUpdateAssessment(WorkflowRequest workflowRequest,
+                                                                              RepOrderDTO repOrderDTO,
+                                                                              ApiUpdateIncomeEvidenceResponse evidenceResponse) {
+
+        MaatApiUpdateAssessment maatApiUpdateAssessment = mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, evidenceResponse);
+        maatApiUpdateAssessment.withIncomeEvidenceDueDate(DateUtil.convertDateToDateTime(evidenceResponse.getDueDate()));
+        return maatApiUpdateAssessment;
     }
 }

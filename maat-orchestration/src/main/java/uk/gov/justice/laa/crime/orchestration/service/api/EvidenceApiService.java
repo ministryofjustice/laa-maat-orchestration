@@ -7,6 +7,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceResponse;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceRequest;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceResponse;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
 import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
 
@@ -33,5 +35,17 @@ public class EvidenceApiService {
         );
         log.debug(RESPONSE_STRING, apiCreateIncomeEvidenceResponse);
         return apiCreateIncomeEvidenceResponse;
+    }
+
+    public ApiUpdateIncomeEvidenceResponse updateEvidence(ApiUpdateIncomeEvidenceRequest apiUpdateIncomeEvidenceRequest) {
+        log.debug(REQUEST_STRING, apiUpdateIncomeEvidenceRequest);
+        ApiUpdateIncomeEvidenceResponse apiUpdateIncomeEvidenceResponse = evidenceApiClient.put(
+                apiUpdateIncomeEvidenceRequest,
+                new ParameterizedTypeReference<>() {},
+                configuration.getEvidenceApi().getEndpoints().getIncomeEvidenceUrl(),
+                Map.of()
+        );
+        log.debug(RESPONSE_STRING, apiUpdateIncomeEvidenceResponse);
+        return apiUpdateIncomeEvidenceResponse;
     }
 }
