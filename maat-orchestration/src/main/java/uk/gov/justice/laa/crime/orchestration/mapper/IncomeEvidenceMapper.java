@@ -3,14 +3,7 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.common.model.evidence.ApiApplicantDetails;
-import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
-import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceResponse;
-import uk.gov.justice.laa.crime.common.model.evidence.ApiIncomeEvidence;
-import uk.gov.justice.laa.crime.common.model.evidence.ApiIncomeEvidenceItems;
-import uk.gov.justice.laa.crime.common.model.evidence.ApiIncomeEvidenceMetadata;
-import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceRequest;
-import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceResponse;
+import uk.gov.justice.laa.crime.common.model.evidence.*;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.FinancialAssessmentIncomeEvidence;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
@@ -20,15 +13,7 @@ import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicantDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicantLinkDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentDetailDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ExtraEvidenceDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.FullAssessmentDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.IncomeEvidenceSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.EvidenceDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.util.DateUtil;
@@ -38,11 +23,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
@@ -293,8 +274,8 @@ public class IncomeEvidenceMapper {
     }
 
     private List<ApiIncomeEvidence> mapIncomeEvidenceItems(Collection<uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceDTO> incomeEvidenceList,
-                                                          Collection<ExtraEvidenceDTO> extraEvidenceList,
-                                                          boolean isPartner) {
+                                                           Collection<ExtraEvidenceDTO> extraEvidenceList,
+                                                           boolean isPartner) {
 
         List<ApiIncomeEvidence> incomeEvidences = new ArrayList<>();
 
@@ -309,21 +290,21 @@ public class IncomeEvidenceMapper {
                 .filter(extraEvidenceDTO -> (isPartner && "P".equals(extraEvidenceDTO.getAdhoc()))
                         || (!isPartner && "A".equals(extraEvidenceDTO.getAdhoc())))
                 .forEach(extraEvidence -> incomeEvidences.add(new ApiIncomeEvidence()
-                    .withId(NumberUtils.toInteger(extraEvidence.getId()))
-                    .withDescription(extraEvidence.getOtherText())
-                    .withMandatory(true)
-                    .withDateReceived(extraEvidence.getDateReceived() != null ? LocalDate.ofInstant(extraEvidence.getDateReceived().toInstant(), ZoneId.systemDefault()) : null)
-                    .withEvidenceType(IncomeEvidenceType.getFrom(extraEvidence.getEvidenceTypeDTO().getEvidence()))
+                        .withId(NumberUtils.toInteger(extraEvidence.getId()))
+                        .withDescription(extraEvidence.getOtherText())
+                        .withMandatory(true)
+                        .withDateReceived(extraEvidence.getDateReceived() != null ? LocalDate.ofInstant(extraEvidence.getDateReceived().toInstant(), ZoneId.systemDefault()) : null)
+                        .withEvidenceType(IncomeEvidenceType.getFrom(extraEvidence.getEvidenceTypeDTO().getEvidence()))
                 ));
 
         return incomeEvidences;
     }
 
     public MaatApiUpdateAssessment mapUpdateEvidenceToMaatApiUpdateAssessment(WorkflowRequest workflowRequest,
-                                                                             RepOrderDTO repOrderDTO,
-                                                                             ApiUpdateIncomeEvidenceResponse evidenceResponse) {
+                                                                              RepOrderDTO repOrderDTO,
+                                                                              ApiUpdateIncomeEvidenceResponse evidenceResponse) {
 
-        MaatApiUpdateAssessment maatApiUpdateAssessment = this.mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, evidenceResponse);
+        MaatApiUpdateAssessment maatApiUpdateAssessment = mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, evidenceResponse);
         maatApiUpdateAssessment.withIncomeEvidenceDueDate(DateUtil.convertDateToDateTime(evidenceResponse.getDueDate()));
         return maatApiUpdateAssessment;
     }

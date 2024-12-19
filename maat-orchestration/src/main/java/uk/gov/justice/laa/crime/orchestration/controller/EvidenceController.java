@@ -27,7 +27,7 @@ public class EvidenceController {
 
     private final EvidenceOrchestrationService evidenceOrchestrationService;
 
-    @PutMapping(produces = APPLICATION_JSON_VALUE)
+    @PutMapping(value="/income", produces = APPLICATION_JSON_VALUE)
     @Operation(description = "Update Income Evidence for a means assessment")
     @ApiResponse(responseCode = "200",
             content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApplicationDTO.class)))

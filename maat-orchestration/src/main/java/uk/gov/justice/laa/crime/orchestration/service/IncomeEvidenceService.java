@@ -49,10 +49,11 @@ public class IncomeEvidenceService {
                 .workflowRequestToApiUpdateIncomeEvidenceRequest(applicationDTO, workflowRequest.getUserDTO());
 
         ApiUpdateIncomeEvidenceResponse evidenceResponse = evidenceApiService.updateEvidence(evidenceRequest);
+
         MaatApiUpdateAssessment maatApiRequest =
                 incomeEvidenceMapper.mapUpdateEvidenceToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, evidenceResponse);
-
         MaatApiAssessmentResponse maatApiResponse = maatCourtDataApiService.updateFinancialAssessment(maatApiRequest);
+
         incomeEvidenceMapper.maatApiAssessmentResponseToApplicationDTO(maatApiResponse, applicationDTO);
         return applicationDTO;
     }

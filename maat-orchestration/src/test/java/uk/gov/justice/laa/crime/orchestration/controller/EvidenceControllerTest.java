@@ -29,7 +29,7 @@ import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWith
 @Import(OrchestrationTestConfiguration.class)
 @AutoConfigureMockMvc(addFilters = false)
 class EvidenceControllerTest {
-    private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/evidence";
+    private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/evidence/income";
 
     @MockBean
     private EvidenceOrchestrationService evidenceOrchestrationService;
