@@ -121,6 +121,8 @@ public class MeansAssessmentOrchestrationService {
 
             if (!featureDecisionService.isMaatPostAssessmentProcessingEnabled(request)) {
                 // check feature flag here - only need to do this for the new workflow, not for the old way of doing things
+                log.info("Calling to calculate contributions");
+
                 request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
                     contributionService.calculate(request),
                     request.getUserDTO(),
