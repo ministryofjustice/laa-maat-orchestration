@@ -7,7 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum FeatureToggle {
     CALCULATE_CONTRIBUTION("CalculateContribution"),
-    MAAT_POST_ASSESSMENT_PROCESSING("MaatPostAssessmentProcessing");
+    MAAT_POST_ASSESSMENT_PROCESSING("MaatPostAssessmentProcessing"),
+
+    CRIME_APPLY_SERVICE_INTEGRATION("CrimeApplyServiceIntegration");
 
     private final String name;
 }

@@ -5,28 +5,33 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.commons.exception.MAATServerException;
+import uk.gov.justice.laa.crime.enums.AssessmentResult;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
+import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
-import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
-import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
-import uk.gov.justice.laa.crime.orchestration.service.FeatureDecisionService;
-import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
-import uk.gov.justice.laa.crime.orchestration.service.MeansAssessmentService;
-import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
-import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
-import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
+import uk.gov.justice.laa.crime.orchestration.service.*;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
+import uk.gov.justice.laa.crime.util.DateUtil;
+
+import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType.MEANS_FULL;
+import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource.MEANS_ASSESSMENT;
+import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType.MEANS_INIT;
+
+import java.util.Date;
+import java.util.Set;
 
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_INCOMPLETE_ASSESSMENT;
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_REASSESSMENT;
@@ -45,6 +50,11 @@ public class MeansAssessmentOrchestrationService {
     private final WorkflowPreProcessorService workflowPreProcessorService;
     private final MeansAssessmentMapper meansAssessmentMapper;
     private final MaatCourtDataApiService maatCourtDataApiService;
+
+    private final ApplicationTrackingMapper applicationTrackingMapper;
+    private final CATDataService catDataService;
+
+    private final IncomeEvidenceService incomeEvidenceService;
 
     public FinancialAssessmentDTO find(int assessmentId, int applicantId) {
         return meansAssessmentService.find(assessmentId, applicantId);
@@ -127,12 +137,16 @@ public class MeansAssessmentOrchestrationService {
                         StoredProcedure.PRE_UPDATE_CC_APPLICATION));
             }
         } else {
-            // call post_processing_part1 and map the application
-            request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                    request.getApplicationDTO(),
-                    request.getUserDTO(),
-                    StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1)
-            );
+
+            if (featureDecisionService.isMaatPostAssessmentProcessingEnabled(request)) {
+                processPostProcessAssessment(request);
+            } else {
+                request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                        request.getApplicationDTO(),
+                        request.getUserDTO(),
+                        StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1)
+                );
+            }
         }
 
         // Check for any validation alerts resulted as part of the pre_update_checks and raise exception
@@ -160,4 +174,31 @@ public class MeansAssessmentOrchestrationService {
         application.setTransactionId(null);
         return application;
     }
+
+    private void processPostProcessAssessment(WorkflowRequest request) {
+
+        request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                request.getApplicationDTO(), request.getUserDTO(), StoredProcedure.UPDATE_DBMS_TRANSACTION_ID
+        ));
+        RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());
+        incomeEvidenceService.createEvidence(request, repOrderDTO);
+        ApiDetermineMagsRepDecisionResponse magsRepDecisionResponse = proceedingsService.determineMsgRepDecision(request, repOrderDTO);
+
+        if (null != magsRepDecisionResponse.getDecisionResult()
+                && null != magsRepDecisionResponse.getDecisionResult().getDecisionReason()) {
+
+            ApplicationTrackingOutputResult.AssessmentType  assessmentType = MEANS_INIT;
+            if (request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable()) {
+                assessmentType = MEANS_FULL;
+            }
+            ApplicationTrackingOutputResult eFormResult = applicationTrackingMapper.build(request, repOrderDTO, assessmentType, MEANS_ASSESSMENT);
+            if (null != eFormResult.getUsn() && featureDecisionService.isCrimeApplyServiceIntegrationEnabled(request)) {
+                catDataService.handleEformResult(eFormResult);
+            }
+        }
+        request.setApplicationDTO(contributionService.calculate(request));
+        request.getApplicationDTO().setTransactionId(null);
+    }
+
+
 }

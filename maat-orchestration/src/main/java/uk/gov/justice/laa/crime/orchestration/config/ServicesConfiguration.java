@@ -108,6 +108,9 @@ public class ServicesConfiguration {
             @NotNull
             private String updateCrownCourtUrl;
 
+            @NotNull
+            private String determineMsgRepDecisionUrl;
+
         }
     }
 

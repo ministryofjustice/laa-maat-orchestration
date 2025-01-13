@@ -182,7 +182,8 @@ class HardshipOrchestrationServiceTest {
         ))
                 .thenReturn(applicationDTO);
 
-        when(applicationTrackingMapper.build(any(), any())).thenReturn(new ApplicationTrackingOutputResult().withUsn(12345));
+        when(applicationTrackingMapper.build(any(), any(), any(ApplicationTrackingOutputResult.AssessmentType.class),
+                any(ApplicationTrackingOutputResult.RequestSource.class))).thenReturn(new ApplicationTrackingOutputResult().withUsn(12345));
         when(repOrderService.getRepOrder(any())).thenReturn(repOrderDTO);
 
         ApplicationDTO expected = orchestrationService.create(workflowRequest);
@@ -394,7 +395,8 @@ class HardshipOrchestrationServiceTest {
                 .thenReturn(assessmentSummaryDTO);
         when(hardshipMapper.getUserActionDTO(any(), any()))
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
-        when(applicationTrackingMapper.build(any(), any())).thenReturn(new ApplicationTrackingOutputResult().withUsn(12345));
+        when(applicationTrackingMapper.build(any(), any(), any(ApplicationTrackingOutputResult.AssessmentType.class),
+                any(ApplicationTrackingOutputResult.RequestSource.class))).thenReturn(new ApplicationTrackingOutputResult().withUsn(12345));
         when(repOrderService.getRepOrder(any())).thenReturn(repOrderDTO);
 
         ApplicationDTO expected = orchestrationService.update(workflowRequest);

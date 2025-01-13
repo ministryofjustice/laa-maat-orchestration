@@ -33,7 +33,8 @@ public class MockServicesConfiguration {
         ServicesConfiguration.CrownCourtApi.Endpoints crownCourtEndpoints =
                 new ServicesConfiguration.CrownCourtApi.Endpoints(
                         "/proceedings",
-                        "/proceedings/update-crown-court"
+                        "/proceedings/update-crown-court",
+                        "proceedings/determine-mags-rep-decision"
                 );
 
         ServicesConfiguration.CmaApi.Endpoints cmaEndpoints =

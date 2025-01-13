@@ -97,6 +97,7 @@ services:
     endpoints:
       update-application-url: ${services.crown-court-api.base-url}/api/internal/v1/proceedings
       update-crown-court-url: ${services.crown-court-api.base-url}/api/internal/v1/proceedings/update-crown-court
+      determine-mags-rep-decision-url: ${services.crown-court-api.base-url}/api/internal/v1/proceedings/determine-mags-rep-decision
 
   cma-api:
     base-url: ${CMA_API_BASE_URL}

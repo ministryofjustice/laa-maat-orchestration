@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
@@ -47,6 +49,20 @@ public class ProceedingsApiService {
                 new ParameterizedTypeReference<>() {
                 },
                 configuration.getCrownCourtApi().getEndpoints().getUpdateCrownCourtUrl(),
+                Collections.emptyMap()
+        );
+
+        log.debug(RESPONSE_STRING, response);
+        return response;
+    }
+
+    public ApiDetermineMagsRepDecisionResponse determineMsgRepDecision(ApiDetermineMagsRepDecisionRequest request) {
+        log.debug(REQUEST_STRING, request);
+        ApiDetermineMagsRepDecisionResponse response = crownCourtApiClient.put(
+                request,
+                new ParameterizedTypeReference<>() {
+                },
+                configuration.getCrownCourtApi().getEndpoints().getDetermineMsgRepDecisionUrl(),
                 Collections.emptyMap()
         );
 

@@ -18,6 +18,9 @@ import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationExcepti
 import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.service.*;
+import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource.HARDSHIP;
+import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType.CCHARDSHIP;
+
 
 @Slf4j
 @Service
@@ -162,7 +165,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         proceedingsService.updateApplication(request, repOrderDTO);
 
         // Call application.handle_eform_result stored procedure OR Equivalent ATS service endpoint
-        ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(request, repOrderDTO);
+        ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(request, repOrderDTO, CCHARDSHIP, HARDSHIP);
         if (null != applicationTrackingOutputResult.getUsn()) {
             catDataService.handleEformResult(applicationTrackingOutputResult);
         }
