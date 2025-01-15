@@ -73,12 +73,8 @@ public class ProceedingsService {
 
             repDecisionResponse = proceedingsApiService.determineMsgRepDecision(
                     proceedingsMapper.buildDetermineMagsRepDecision(request.getApplicationDTO(), request.getUserDTO()));
+            proceedingsMapper.mapDecisionResultToApplicationDTO(request.getApplicationDTO(), repDecisionResponse);
 
-            if (null != repDecisionResponse.getDecisionResult()
-                    && null != repDecisionResponse.getDecisionResult().getDecisionReason()) {
-                request.getApplicationDTO().getRepOrderDecision().setDescription(
-                        new SysGenString(repDecisionResponse.getDecisionResult().getDecisionReason().getDescription()));
-            }
         }
 
         return repDecisionResponse;
@@ -86,14 +82,15 @@ public class ProceedingsService {
 
     boolean canInvokeMsgRepDecision(ApplicationDTO application) {
 
-        if (Set.of(CaseType.INDICTABLE, CaseType.SUMMARY_ONLY, CaseType.EITHER_WAY).contains(application.getCaseDetailsDTO().getCaseType())){
+        if (Set.of(CaseType.INDICTABLE.getCaseType(), CaseType.SUMMARY_ONLY.getCaseType(), CaseType.EITHER_WAY.getCaseType())
+                .contains(application.getCaseDetailsDTO().getCaseType())){
 
             FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
             InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
             FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
 
             if ((initialAssessmentDTO.getAssessmnentStatusDTO().getStatus().equals(CurrentStatus.COMPLETE.getStatus())
-                    && initialAssessmentDTO.getResult().equals(AssessmentResult.FAIL.getResult())) ||
+                    && initialAssessmentDTO.getResult().equals(AssessmentResult.FULL.getResult())) ||
                     fullAssessmentDTO.getAssessmnentStatusDTO().getStatus().equals(CurrentStatus.COMPLETE.getStatus()) ) {
                 return true;
             }

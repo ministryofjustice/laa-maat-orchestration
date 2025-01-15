@@ -8,6 +8,7 @@ import uk.gov.justice.laa.crime.common.model.proceeding.common.*;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.*;
@@ -271,5 +272,14 @@ public class ProceedingsMapper extends CrownCourtMapper {
         request.setUserSession(userMapper.userDtoToUserSession(userDTO));
 
         return request;
+    }
+
+    public void mapDecisionResultToApplicationDTO(ApplicationDTO application, ApiDetermineMagsRepDecisionResponse response) {
+
+        if (null != response.getDecisionResult()
+                && null != response.getDecisionResult().getDecisionReason()) {
+            application.getRepOrderDecision().setDescription(
+                    new SysGenString(response.getDecisionResult().getDecisionReason().getDescription()));
+        }
     }
 }

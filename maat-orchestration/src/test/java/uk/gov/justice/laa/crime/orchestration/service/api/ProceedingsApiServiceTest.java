@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
@@ -41,5 +42,13 @@ class ProceedingsApiServiceTest {
 
         verify(crownCourtApiClient)
                 .put(any(ApiUpdateApplicationRequest.class), any(), anyString(), anyMap());
+    }
+
+    @Test
+    void givenValidRequest_whenDetermineMsgRepDecisionIsInvoked_thenAPIRequestIsSent() {
+        proceedingsApiService.determineMsgRepDecision(new ApiDetermineMagsRepDecisionRequest());
+
+        verify(crownCourtApiClient)
+                .post(any(ApiDetermineMagsRepDecisionRequest.class), any(), anyString(), anyMap());
     }
 }

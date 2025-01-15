@@ -58,7 +58,7 @@ public class ProceedingsApiService {
 
     public ApiDetermineMagsRepDecisionResponse determineMsgRepDecision(ApiDetermineMagsRepDecisionRequest request) {
         log.debug(REQUEST_STRING, request);
-        ApiDetermineMagsRepDecisionResponse response = crownCourtApiClient.put(
+        ApiDetermineMagsRepDecisionResponse response = crownCourtApiClient.post(
                 request,
                 new ParameterizedTypeReference<>() {
                 },

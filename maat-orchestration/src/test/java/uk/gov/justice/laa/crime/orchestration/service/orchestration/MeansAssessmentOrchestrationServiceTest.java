@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
@@ -19,6 +20,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
+import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
 import uk.gov.justice.laa.crime.orchestration.service.*;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
@@ -69,6 +71,14 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Mock
     private MaatCourtDataApiService maatCourtDataApiService;
+
+    @Mock
+    private IncomeEvidenceService incomeEvidenceService;
+
+    @Mock
+    private ApplicationTrackingMapper applicationTrackingMapper;
+    @Mock
+    private CATDataService catDataService;
 
     @InjectMocks
     private MeansAssessmentOrchestrationService orchestrationService;
@@ -332,5 +342,52 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(proceedingsService, times(1)).updateApplication(workflowRequest,
                 repOrderDTO);
         verify(meansAssessmentService, times(0)).rollback(any());
+    }
+
+    @Test
+    void givenARequestWithC3NotEnabled_MattPostProcessIsEnabled_thenPostProcessorShouldCalled() {
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                any(StoredProcedure.class)
+        )).thenReturn(workflowRequest.getApplicationDTO());
+
+        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(false);
+        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(true);
+        when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
+        when(applicationTrackingMapper.buildForAssessmentFlow(any(WorkflowRequest.class), any(RepOrderDTO.class)))
+                .thenReturn(new ApplicationTrackingOutputResult());
+        when(contributionService.calculate(workflowRequest))
+                .thenReturn(applicationDTO);
+
+        ApplicationDTO actual = orchestrationService.create(workflowRequest);
+
+        verify(contributionService).calculate(workflowRequest);
+        verify(incomeEvidenceService).mangeIncomeEvidence(workflowRequest, repOrderDTO);
+
+        verify(proceedingsService).determineMsgRepDecision(workflowRequest, repOrderDTO);
+        verify(catDataService, times(0)).handleEformResult(any());
+    }
+
+    @Test
+    void givenARequestWithC3NotEnabled_MattPostProcessIsEnabled_thenHandleEformResultShouldCalled() {
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                any(StoredProcedure.class)
+        )).thenReturn(workflowRequest.getApplicationDTO());
+
+        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(false);
+        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(true);
+        when(featureDecisionService.isCrimeApplyServiceIntegrationEnabled(workflowRequest)).thenReturn(true);
+        when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
+        when(applicationTrackingMapper.buildForAssessmentFlow(any(WorkflowRequest.class), any(RepOrderDTO.class)))
+                .thenReturn(new ApplicationTrackingOutputResult().withUsn(1234));
+        when(contributionService.calculate(workflowRequest))
+                .thenReturn(applicationDTO);
+
+        orchestrationService.create(workflowRequest);
+
+        verify(contributionService).calculate(workflowRequest);
+        verify(incomeEvidenceService).mangeIncomeEvidence(workflowRequest, repOrderDTO);
+
+        verify(proceedingsService).determineMsgRepDecision(workflowRequest, repOrderDTO);
+        verify(catDataService).handleEformResult(any());
     }
 }

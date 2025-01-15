@@ -175,29 +175,17 @@ public class MeansAssessmentOrchestrationService {
         return application;
     }
 
-    private void processPostProcessAssessment(WorkflowRequest request) {
+   private void processPostProcessAssessment(WorkflowRequest request) {
 
-        request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                request.getApplicationDTO(), request.getUserDTO(), StoredProcedure.UPDATE_DBMS_TRANSACTION_ID
-        ));
         RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());
-        incomeEvidenceService.createEvidence(request, repOrderDTO);
-        ApiDetermineMagsRepDecisionResponse magsRepDecisionResponse = proceedingsService.determineMsgRepDecision(request, repOrderDTO);
-
-        if (null != magsRepDecisionResponse.getDecisionResult()
-                && null != magsRepDecisionResponse.getDecisionResult().getDecisionReason()) {
-
-            ApplicationTrackingOutputResult.AssessmentType  assessmentType = MEANS_INIT;
-            if (request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable()) {
-                assessmentType = MEANS_FULL;
-            }
-            ApplicationTrackingOutputResult eFormResult = applicationTrackingMapper.build(request, repOrderDTO, assessmentType, MEANS_ASSESSMENT);
-            if (null != eFormResult.getUsn() && featureDecisionService.isCrimeApplyServiceIntegrationEnabled(request)) {
+        incomeEvidenceService.mangeIncomeEvidence(request, repOrderDTO);
+        proceedingsService.determineMsgRepDecision(request, repOrderDTO);
+        // Single call for both handle_eform_tracking and handle_eform_result
+        ApplicationTrackingOutputResult eFormResult = applicationTrackingMapper.buildForAssessmentFlow(request, repOrderDTO);
+        if (null != eFormResult.getUsn() && featureDecisionService.isCrimeApplyServiceIntegrationEnabled(request)) {
                 catDataService.handleEformResult(eFormResult);
-            }
         }
         request.setApplicationDTO(contributionService.calculate(request));
-        request.getApplicationDTO().setTransactionId(null);
     }
 
 

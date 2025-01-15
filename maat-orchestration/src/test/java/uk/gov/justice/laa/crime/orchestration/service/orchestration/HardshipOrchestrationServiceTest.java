@@ -69,6 +69,9 @@ class HardshipOrchestrationServiceTest {
     @Mock
     private CCLFUpdateService cclfUpdateService;
 
+    @Mock
+    private FeatureDecisionService featureDecisionService;
+
     @InjectMocks
     private HardshipOrchestrationService orchestrationService;
 

@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.internal.verification.Times;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.verification.VerificationMode;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceRequest;
@@ -23,6 +25,7 @@ import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiServic
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @ExtendWith(MockitoExtension.class)
 class IncomeEvidenceServiceTest {
@@ -78,5 +81,43 @@ class IncomeEvidenceServiceTest {
         verify(maatCourtDataApiService).updateFinancialAssessment(any(MaatApiUpdateAssessment.class));
         verify(incomeEvidenceMapper).maatApiAssessmentResponseToApplicationDTO(any(MaatApiAssessmentResponse.class),
                 any(ApplicationDTO.class));
-    }}
+    }
+
+    @Test
+    void givenAInitAssessmentIsInProgress_whenMangeIncomeEvidenceIsInvoked_thenCreateEvidenceShouldNotCalled() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        RepOrderDTO repOrder = TestModelDataBuilder.buildRepOrderDTO("CURR");
+
+        incomeEvidenceService.mangeIncomeEvidence(workflowRequest, repOrder);
+
+        verify(evidenceApiService, times(0)).createEvidence(any(ApiCreateIncomeEvidenceRequest.class));
+        verify(maatCourtDataApiService, times(0)).updateFinancialAssessment(any(MaatApiUpdateAssessment.class));
+        verify(incomeEvidenceMapper, times(0)).maatApiAssessmentResponseToApplicationDTO(any(MaatApiAssessmentResponse.class),
+                any(ApplicationDTO.class));
+    }
+    @Test
+    void givenVInitAsessmentIsCompleted_whenMangeIncomeEvidenceIsInvoked_thenApiServicesCalledAndResponseMapped() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        RepOrderDTO repOrder = TestModelDataBuilder.buildRepOrderDTO("CURR");
+
+        when(incomeEvidenceMapper.workflowRequestToApiCreateIncomeEvidenceRequest(any(WorkflowRequest.class)))
+                .thenReturn(new ApiCreateIncomeEvidenceRequest());
+        when(evidenceApiService.createEvidence(any(ApiCreateIncomeEvidenceRequest.class)))
+                .thenReturn(new ApiCreateIncomeEvidenceResponse());
+        when(incomeEvidenceMapper.mapToMaatApiUpdateAssessment(any(WorkflowRequest.class), any(RepOrderDTO.class), any(ApiCreateIncomeEvidenceResponse.class)))
+                .thenReturn(new MaatApiUpdateAssessment());
+        when(maatCourtDataApiService.updateFinancialAssessment(any(MaatApiUpdateAssessment.class)))
+                .thenReturn(new MaatApiAssessmentResponse());
+
+        incomeEvidenceService.mangeIncomeEvidence(workflowRequest, repOrder);
+
+        verify(evidenceApiService).createEvidence(any(ApiCreateIncomeEvidenceRequest.class));
+        verify(maatCourtDataApiService).updateFinancialAssessment(any(MaatApiUpdateAssessment.class));
+        verify(incomeEvidenceMapper).maatApiAssessmentResponseToApplicationDTO(any(MaatApiAssessmentResponse.class),
+                any(ApplicationDTO.class));
+    }
+
+}
+
+
 

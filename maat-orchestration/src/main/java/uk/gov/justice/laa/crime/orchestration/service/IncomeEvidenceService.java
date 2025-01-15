@@ -9,8 +9,12 @@ import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceReq
 import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FullAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.IncomeEvidenceMapper;
 import uk.gov.justice.laa.crime.orchestration.service.api.EvidenceApiService;
@@ -56,5 +60,19 @@ public class IncomeEvidenceService {
 
         incomeEvidenceMapper.maatApiAssessmentResponseToApplicationDTO(maatApiResponse, applicationDTO);
         return applicationDTO;
+    }
+
+    /**
+     * Replace manage_income_evidence stored procedure
+     * When Initial assessment status complete then Call the Evidence Service’s new create income evidence endpoint
+     * updates will be handled via a new dedicated flow.
+     */
+    public void mangeIncomeEvidence(WorkflowRequest request, RepOrderDTO repOrder) {
+
+        FinancialAssessmentDTO financialAssessmentDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO();
+        InitialAssessmentDTO initialAssessment = financialAssessmentDTO.getInitial();
+        if (initialAssessment.getAssessmnentStatusDTO().getStatus().equals(CurrentStatus.COMPLETE.getStatus())) {
+            createEvidence(request, repOrder);
+        }
     }
 }

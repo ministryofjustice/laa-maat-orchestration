@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.common.model.common.ApiUserSession;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
@@ -179,5 +180,14 @@ class ProceedingsMapperTest {
     @Test
     void givenAEmptyStatus_whenGetCurrentStatusIsInvoked_thenCorrectStatusIsReturned() {
         assertThat(proceedingsMapper.getCurrentStatus("COMPLETE")).isEqualTo(CurrentStatus.COMPLETE);
+    }
+
+    @Test
+    void givenAValidWorkflowRequest_whenDetermineMagsRepDecisionIsInvoked_thenReturnCorrectMapper() {
+        mockApiUserSession();
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
+        ApiDetermineMagsRepDecisionRequest apiDetermineMagsRepDecisionRequest =
+                proceedingsMapper.buildDetermineMagsRepDecision(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
+        assertThat(apiDetermineMagsRepDecisionRequest).isEqualTo(TestModelDataBuilder.getApiDetermineMagsRepDecisionRequest());
     }
 }
