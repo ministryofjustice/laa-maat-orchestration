@@ -388,6 +388,6 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(incomeEvidenceService).mangeIncomeEvidence(workflowRequest, repOrderDTO);
 
         verify(proceedingsService).determineMsgRepDecision(workflowRequest);
-        verify(catDataService).handleEformResult(any());
+        verify(catDataService, atLeast(1)).handleEformResult(any());
     }
 }

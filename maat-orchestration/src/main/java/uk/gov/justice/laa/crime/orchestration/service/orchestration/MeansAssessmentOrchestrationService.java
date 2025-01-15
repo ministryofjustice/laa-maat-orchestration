@@ -182,7 +182,7 @@ public class MeansAssessmentOrchestrationService {
         proceedingsService.determineMsgRepDecision(request);
         // Single call for both handle_eform_tracking and handle_eform_result
         ApplicationTrackingOutputResult eFormResult = applicationTrackingMapper.buildForAssessmentFlow(request, repOrderDTO);
-        if (null != eFormResult.getUsn() && featureDecisionService.isCrimeApplyServiceIntegrationEnabled(request)) {
+        if (featureDecisionService.isCrimeApplyServiceIntegrationEnabled(request) && null != eFormResult.getUsn()) {
                 catDataService.handleEformResult(eFormResult);
         }
         request.setApplicationDTO(contributionService.calculate(request));
