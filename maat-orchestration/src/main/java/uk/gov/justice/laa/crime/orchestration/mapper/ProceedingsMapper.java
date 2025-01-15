@@ -278,6 +278,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
 
         if (null != response.getDecisionResult()
                 && null != response.getDecisionResult().getDecisionReason()) {
+            application.getRepOrderDecision().setCode(response.getDecisionResult().getDecisionReason().getCode());
             application.getRepOrderDecision().setDescription(
                     new SysGenString(response.getDecisionResult().getDecisionReason().getDescription()));
         }

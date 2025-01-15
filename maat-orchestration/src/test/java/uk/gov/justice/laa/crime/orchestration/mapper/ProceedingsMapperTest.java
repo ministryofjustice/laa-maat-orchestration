@@ -13,13 +13,16 @@ import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSumm
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
+import uk.gov.justice.laa.crime.enums.DecisionReason;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.proceeding.MagsDecisionResult;
 import uk.gov.justice.laa.crime.util.DateUtil;
 
 import java.util.List;
@@ -34,12 +37,10 @@ class ProceedingsMapperTest {
 
     @Mock
     UserMapper userMapper;
-
-    @InjectSoftAssertions
-    private SoftAssertions softly;
-
     @InjectMocks
     ProceedingsMapper proceedingsMapper;
+    @InjectSoftAssertions
+    private SoftAssertions softly;
 
     @Test
     void whenWorkflowRequestToUpdateApplicationRequestIsInvoked() {
@@ -189,5 +190,42 @@ class ProceedingsMapperTest {
         ApiDetermineMagsRepDecisionRequest apiDetermineMagsRepDecisionRequest =
                 proceedingsMapper.buildDetermineMagsRepDecision(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
         assertThat(apiDetermineMagsRepDecisionRequest).isEqualTo(TestModelDataBuilder.getApiDetermineMagsRepDecisionRequest());
+    }
+
+    @Test
+    void givenDecisionResultIsEmpty_whenMapDecisionResultToApplicationDTOIsInvoked_thenApplicationDecisionShouldNull() {
+
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
+        workflowRequest.getApplicationDTO().getRepOrderDecision().setCode(null);
+        workflowRequest.getApplicationDTO().getRepOrderDecision().setDescription(null);
+        proceedingsMapper.mapDecisionResultToApplicationDTO(workflowRequest.getApplicationDTO(), new ApiDetermineMagsRepDecisionResponse());
+        assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getCode()).isNull();
+        assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getDescription()).isNull();
+
+    }
+
+    @Test
+    void givenDecisionReasonIsEmpty_whenMapDecisionResultToApplicationDTOIsInvoked_thenApplicationDecisionShouldNull() {
+
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
+        workflowRequest.getApplicationDTO().getRepOrderDecision().setCode(null);
+        workflowRequest.getApplicationDTO().getRepOrderDecision().setDescription(null);
+        ApiDetermineMagsRepDecisionResponse response = new ApiDetermineMagsRepDecisionResponse();
+        response.setDecisionResult(new MagsDecisionResult());
+        proceedingsMapper.mapDecisionResultToApplicationDTO(workflowRequest.getApplicationDTO(), new ApiDetermineMagsRepDecisionResponse());
+        assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getCode()).isNull();
+        assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getDescription()).isNull();
+
+    }
+
+    @Test
+    void givenAValidDecisionResponseIsEmpty_whenMapDecisionResultToApplicationDTOIsInvoked_thenCorrectMappingReturned() {
+
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
+        proceedingsMapper.mapDecisionResultToApplicationDTO(workflowRequest.getApplicationDTO(),
+                TestModelDataBuilder.getApiDetermineMagsRepDecisionResponse());
+        assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getCode()).isEqualTo(DecisionReason.GRANTED.getCode());
+        assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getDescription()).isEqualTo(DecisionReason.GRANTED.getDescription());
+
     }
 }

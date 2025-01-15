@@ -358,12 +358,12 @@ class MeansAssessmentOrchestrationServiceTest {
         when(contributionService.calculate(workflowRequest))
                 .thenReturn(applicationDTO);
 
-        ApplicationDTO actual = orchestrationService.create(workflowRequest);
+        orchestrationService.create(workflowRequest);
 
         verify(contributionService).calculate(workflowRequest);
         verify(incomeEvidenceService).mangeIncomeEvidence(workflowRequest, repOrderDTO);
 
-        verify(proceedingsService).determineMsgRepDecision(workflowRequest, repOrderDTO);
+        verify(proceedingsService).determineMsgRepDecision(workflowRequest);
         verify(catDataService, times(0)).handleEformResult(any());
     }
 
@@ -387,7 +387,7 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(contributionService).calculate(workflowRequest);
         verify(incomeEvidenceService).mangeIncomeEvidence(workflowRequest, repOrderDTO);
 
-        verify(proceedingsService).determineMsgRepDecision(workflowRequest, repOrderDTO);
+        verify(proceedingsService).determineMsgRepDecision(workflowRequest);
         verify(catDataService).handleEformResult(any());
     }
 }

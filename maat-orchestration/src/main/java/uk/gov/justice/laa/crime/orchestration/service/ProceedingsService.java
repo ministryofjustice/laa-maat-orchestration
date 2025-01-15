@@ -12,7 +12,10 @@ import uk.gov.justice.laa.crime.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FullAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
 import uk.gov.justice.laa.crime.orchestration.service.api.ProceedingsApiService;
@@ -65,7 +68,7 @@ public class ProceedingsService {
         }
     }
 
-    public ApiDetermineMagsRepDecisionResponse determineMsgRepDecision(WorkflowRequest request, RepOrderDTO repOrderDTO) {
+    public ApiDetermineMagsRepDecisionResponse determineMsgRepDecision(WorkflowRequest request) {
 
         ApiDetermineMagsRepDecisionResponse repDecisionResponse = null;
 

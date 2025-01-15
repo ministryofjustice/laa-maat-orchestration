@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
@@ -22,7 +21,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentStatusDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
-
 import uk.gov.justice.laa.crime.orchestration.service.api.ProceedingsApiService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -110,6 +108,7 @@ class ProceedingsServiceTest {
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().setStatus(AssessmentStatusDTO.INCOMPLETE);
         assertThat(proceedingsService.canInvokeMsgRepDecision(applicationDTO)).isTrue();
     }
+
     @Test
     void givenFullAssessmentIsCompleted_whenCanInvokeMsgRepDecisionIsInvoked_thenTrueIsReturned() {
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO();
@@ -117,12 +116,11 @@ class ProceedingsServiceTest {
         assertThat(proceedingsService.canInvokeMsgRepDecision(applicationDTO)).isTrue();
     }
 
-   @Test
+    @Test
     void givenAInitAssessmentIsFailed_whenCanInvokeMsgRepDecisionIsInvoked_thenNullIsReturned() {
-       WorkflowRequest request = MeansAssessmentDataBuilder.buildWorkFlowRequest();
-       request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().setStatus(AssessmentStatusDTO.INCOMPLETE);
-        assertThat(proceedingsService.determineMsgRepDecision(request,
-                MeansAssessmentDataBuilder.getRepOrderDTO())).isNull();
+        WorkflowRequest request = MeansAssessmentDataBuilder.buildWorkFlowRequest();
+        request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().setStatus(AssessmentStatusDTO.INCOMPLETE);
+        assertThat(proceedingsService.determineMsgRepDecision(request)).isNull();
     }
 
     @Test
@@ -132,7 +130,7 @@ class ProceedingsServiceTest {
                 .thenReturn(TestModelDataBuilder.getApiDetermineMagsRepDecisionResponse());
         WorkflowRequest request = MeansAssessmentDataBuilder.buildWorkFlowRequest();
 
-        ApiDetermineMagsRepDecisionResponse response = proceedingsService.determineMsgRepDecision(request, MeansAssessmentDataBuilder.getRepOrderDTO());
+        ApiDetermineMagsRepDecisionResponse response = proceedingsService.determineMsgRepDecision(request);
         assertThat(response.getDecisionResult().getDecisionReason()).isEqualTo(DecisionReason.GRANTED);
     }
 
