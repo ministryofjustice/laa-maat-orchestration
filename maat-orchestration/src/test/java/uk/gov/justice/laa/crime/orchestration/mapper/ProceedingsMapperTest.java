@@ -225,7 +225,8 @@ class ProceedingsMapperTest {
         proceedingsMapper.mapDecisionResultToApplicationDTO(workflowRequest.getApplicationDTO(),
                 TestModelDataBuilder.getApiDetermineMagsRepDecisionResponse());
         assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getCode()).isEqualTo(DecisionReason.GRANTED.getCode());
-        assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getDescription()).isEqualTo(DecisionReason.GRANTED.getDescription());
+        assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getDescription())
+                .isEqualTo(new SysGenString(DecisionReason.GRANTED.getDescription()).getValue());
 
     }
 }
