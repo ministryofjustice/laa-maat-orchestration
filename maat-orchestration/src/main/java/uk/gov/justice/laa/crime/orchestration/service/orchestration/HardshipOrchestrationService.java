@@ -168,8 +168,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
 
         // Call application.handle_eform_result stored procedure OR Equivalent ATS service endpoint
         ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(request, repOrderDTO, CCHARDSHIP, HARDSHIP);
-        if (null != applicationTrackingOutputResult.getUsn()
-                && featureDecisionService.isMaatPostAssessmentProcessingEnabled(request)) {
+        if (featureDecisionService.isCrimeApplyServiceIntegrationEnabled(request) && null != applicationTrackingOutputResult.getUsn()) {
             catDataService.handleEformResult(applicationTrackingOutputResult);
         }
         // Call crown_court.xx_process_activity_and_get_correspondence stored procedure
