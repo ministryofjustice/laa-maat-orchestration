@@ -109,7 +109,7 @@ public class ServicesConfiguration {
             private String updateCrownCourtUrl;
 
             @NotNull
-            private String determineMsgRepDecisionUrl;
+            private String determineMagsRepDecisionUrl;
 
         }
     }

@@ -23,6 +23,7 @@ public class WiremockStubs {
     private static final String MAAT_API_USER_URL = "/api/internal/v1/users/summary/";
 
     private static final String CAT_URL = "/api/internal/v1/application-tracking-output-result";
+    private static final String EVIDENCE_URL = "/api/internal/v1/evidence";
 
     public static void stubForOAuth() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
@@ -79,6 +80,22 @@ public class WiremockStubs {
     }
 
     public static void assertStubForHandleEformSerivce(int times) {
+        verify(exactly(times), postRequestedFor(urlPathMatching(CAT_URL)));
+    }
+
+    public static void assertStubForDetermineMsgRepDecision(int times) {
+        verify(exactly(times), postRequestedFor(urlPathMatching(CCP_URL + "/determine-mags-rep-decision")));
+    }
+
+
+    public static void assertStubForCreateIncomeEvidence(int times) {
+        verify(exactly(times), postRequestedFor(urlPathMatching(EVIDENCE_URL )));
+    }
+
+    public static void assertStubForUpdateFinancialAssessment(int times) {
+        verify(exactly(times), putRequestedFor(urlPathMatching(MAAT_API_ASSESSMENT_URL + "/financial-assessments")));
+    }
+    public static void assertStubForCAT(int times) {
         verify(exactly(times), postRequestedFor(urlPathMatching(CAT_URL)));
     }
 
@@ -147,5 +164,30 @@ public class WiremockStubs {
     public static void stubForUpdateSendToCCLF() {
         stubFor(put(urlMatching(MAAT_API_ASSESSMENT_URL + "/rep-orders/" + TestModelDataBuilder.REP_ID + "/send-to-cclf"))
                 .willReturn(WireMock.ok()));
+    }
+
+    public static void stubForDetermineMsgRepDecision(String response) {
+
+        stubFor(post(urlMatching(CCP_URL + "/determine-mags-rep-decision"))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
+
+    public static void stubForCreateIncomeEvidence(String response) {
+        stubFor(post(urlMatching(EVIDENCE_URL))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
+
+    public static void stubForUpdateFinancialAssessment(String response) {
+        stubFor(put(urlMatching(MAAT_API_ASSESSMENT_URL + "/financial-assessments"))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
+    public static void stubForATS() {
+        stubFor(post(urlMatching(CAT_URL)).willReturn(WireMock.ok()));
     }
 }

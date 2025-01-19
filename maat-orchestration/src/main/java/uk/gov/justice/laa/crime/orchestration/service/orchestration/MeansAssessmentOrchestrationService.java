@@ -180,12 +180,11 @@ public class MeansAssessmentOrchestrationService {
         RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());
         incomeEvidenceService.mangeIncomeEvidence(request, repOrderDTO);
         proceedingsService.determineMsgRepDecision(request);
-        // Single call for both handle_eform_tracking and handle_eform_result
+        request.setApplicationDTO(contributionService.calculate(request));
         ApplicationTrackingOutputResult eFormResult = applicationTrackingMapper.buildForAssessmentFlow(request, repOrderDTO);
-        if (featureDecisionService.isCrimeApplyServiceIntegrationEnabled(request) && null != eFormResult.getUsn()) {
+        if (null != eFormResult.getUsn()) {
                 catDataService.handleEformResult(eFormResult);
         }
-        request.setApplicationDTO(contributionService.calculate(request));
     }
 
 

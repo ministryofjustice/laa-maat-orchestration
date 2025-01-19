@@ -41,10 +41,6 @@ public class FeatureDecisionService {
         return isFeatureEnabled(workflowRequest, FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING, FeatureToggleAction.READ);
     }
 
-    public boolean isCrimeApplyServiceIntegrationEnabled(WorkflowRequest workflowRequest) {
-        return isFeatureEnabled(workflowRequest, FeatureToggle.CRIME_APPLY_SERVICE_INTEGRATION, FeatureToggleAction.READ);
-    }
-
     private boolean isFeatureEnabled(WorkflowRequest workflowRequest,
                                      FeatureToggle featureToggle,
                                      FeatureToggleAction featureToggleAction) {

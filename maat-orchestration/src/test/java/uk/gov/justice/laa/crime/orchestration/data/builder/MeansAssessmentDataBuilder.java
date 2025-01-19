@@ -1,9 +1,11 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
+import org.eclipse.jgit.internal.util.Optionally;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.common.ApiUserSession;
 import uk.gov.justice.laa.crime.common.model.meansassessment.*;
 import uk.gov.justice.laa.crime.enums.*;
+import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
@@ -358,6 +360,19 @@ public class MeansAssessmentDataBuilder {
             .build();
     }
 
+    public static UserSummaryDTO getUserSummaryDTOForPostProcess() {
+        return UserSummaryDTO.builder()
+                .featureToggle(List.of(
+                        FeatureToggleDTO.builder()
+                                .featureName(FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING.getName())
+                                .action(FeatureToggleAction.READ.getName())
+                                .isEnabled("Y")
+                                .build()
+                ))
+                .roleActions(List.of(Action.CREATE_ASSESSMENT.getCode()))
+                .build();
+    }
+
     public static RepOrderDTO getRepOrderDTO() {
         return RepOrderDTO.builder()
                 .id(TEST_REP_ID)
@@ -369,6 +384,7 @@ public class MeansAssessmentDataBuilder {
                 .decisionReasonCode("rder-code")
                 .crownRepOrderDecision("cc-rep-doc")
                 .crownRepOrderType("cc-rep-type")
+                .userCreatedEntity(getUserDTO())
                 .build();
     }
 
@@ -484,6 +500,7 @@ public class MeansAssessmentDataBuilder {
         return RepStatusDTO.builder()
                 .status("RepStatus")
                 .removeContribs(true)
+                .updateAllowed(false)
                 .build();
     }
 

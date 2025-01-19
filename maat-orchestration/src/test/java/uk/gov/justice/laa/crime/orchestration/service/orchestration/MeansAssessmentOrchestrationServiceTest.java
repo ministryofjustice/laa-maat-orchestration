@@ -375,7 +375,6 @@ class MeansAssessmentOrchestrationServiceTest {
 
         when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(false);
         when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(true);
-        when(featureDecisionService.isCrimeApplyServiceIntegrationEnabled(workflowRequest)).thenReturn(true);
         when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
         when(applicationTrackingMapper.buildForAssessmentFlow(any(WorkflowRequest.class), any(RepOrderDTO.class)))
                 .thenReturn(new ApplicationTrackingOutputResult().withUsn(1234));

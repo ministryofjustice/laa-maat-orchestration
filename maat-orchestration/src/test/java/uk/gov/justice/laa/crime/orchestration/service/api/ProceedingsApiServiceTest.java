@@ -46,7 +46,7 @@ class ProceedingsApiServiceTest {
 
     @Test
     void givenValidRequest_whenDetermineMsgRepDecisionIsInvoked_thenAPIRequestIsSent() {
-        proceedingsApiService.determineMsgRepDecision(new ApiDetermineMagsRepDecisionRequest());
+        proceedingsApiService.determineMagsRepDecision(new ApiDetermineMagsRepDecisionRequest());
 
         verify(crownCourtApiClient)
                 .post(any(ApiDetermineMagsRepDecisionRequest.class), any(), anyString(), anyMap());

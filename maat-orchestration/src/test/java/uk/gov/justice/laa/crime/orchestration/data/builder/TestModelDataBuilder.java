@@ -10,6 +10,7 @@ import uk.gov.justice.laa.crime.common.model.hardship.*;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentChildWeighting;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentDetail;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.FinancialAssessmentIncomeEvidence;
+import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.*;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCapitalEvidence;
@@ -1528,6 +1529,20 @@ public class TestModelDataBuilder {
         MagsDecisionResult magsDecisionResult = new MagsDecisionResult();
         magsDecisionResult.setDecisionReason(DecisionReason.GRANTED);
         response.setDecisionResult(magsDecisionResult);
+        return response;
+    }
+
+
+    public static ApiUpdateIncomeEvidenceResponse getMApiUpdateIncomeEvidenceResponse() {
+        ApiUpdateIncomeEvidenceResponse response = new ApiUpdateIncomeEvidenceResponse();
+        response.setDueDate(EVIDENCE_DUE_DATE.toLocalDate());
+        return response;
+    }
+
+    public static MaatApiAssessmentResponse getMaatApiAssessmentResponse() {
+        MaatApiAssessmentResponse response = new MaatApiAssessmentResponse();
+        response.setId(REP_ID);
+        response.setIncomeEvidence(Collections.emptyList());
         return response;
     }
 }

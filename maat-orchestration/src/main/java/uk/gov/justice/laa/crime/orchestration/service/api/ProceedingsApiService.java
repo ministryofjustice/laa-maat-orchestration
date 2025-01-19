@@ -56,13 +56,13 @@ public class ProceedingsApiService {
         return response;
     }
 
-    public ApiDetermineMagsRepDecisionResponse determineMsgRepDecision(ApiDetermineMagsRepDecisionRequest request) {
+    public ApiDetermineMagsRepDecisionResponse determineMagsRepDecision(ApiDetermineMagsRepDecisionRequest request) {
         log.debug(REQUEST_STRING, request);
         ApiDetermineMagsRepDecisionResponse response = crownCourtApiClient.post(
                 request,
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getCrownCourtApi().getEndpoints().getDetermineMsgRepDecisionUrl(),
+                configuration.getCrownCourtApi().getEndpoints().getDetermineMagsRepDecisionUrl(),
                 Collections.emptyMap()
         );
 

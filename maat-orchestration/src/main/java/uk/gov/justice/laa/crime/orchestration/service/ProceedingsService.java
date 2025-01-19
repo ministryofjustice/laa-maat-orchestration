@@ -74,7 +74,7 @@ public class ProceedingsService {
 
         if (canInvokeMsgRepDecision(request.getApplicationDTO())) {
 
-            repDecisionResponse = proceedingsApiService.determineMsgRepDecision(
+            repDecisionResponse = proceedingsApiService.determineMagsRepDecision(
                     proceedingsMapper.buildDetermineMagsRepDecision(request.getApplicationDTO(), request.getUserDTO()));
             proceedingsMapper.mapDecisionResultToApplicationDTO(request.getApplicationDTO(), repDecisionResponse);
 

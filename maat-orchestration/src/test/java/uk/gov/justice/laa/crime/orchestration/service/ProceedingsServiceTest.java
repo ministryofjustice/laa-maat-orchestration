@@ -126,7 +126,7 @@ class ProceedingsServiceTest {
     @Test
     void givenAValidWorkflowRequest_whenCanInvokeMsgRepDecisionIsInvoked_thenCorrectResponse() {
 
-        when(proceedingsApiService.determineMsgRepDecision(any()))
+        when(proceedingsApiService.determineMagsRepDecision(any()))
                 .thenReturn(TestModelDataBuilder.getApiDetermineMagsRepDecisionResponse());
         WorkflowRequest request = MeansAssessmentDataBuilder.buildWorkFlowRequest();
 

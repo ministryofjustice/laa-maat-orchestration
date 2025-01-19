@@ -11,6 +11,7 @@ import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceReq
 import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
@@ -84,6 +85,36 @@ class IncomeEvidenceServiceTest {
     @Test
     void givenAInitAssessmentIsInProgress_whenMangeIncomeEvidenceIsInvoked_thenCreateEvidenceShouldNotCalled() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getInitial().getAssessmnentStatusDTO().setStatus(CurrentStatus.IN_PROGRESS.getStatus());
+        RepOrderDTO repOrder = TestModelDataBuilder.buildRepOrderDTO("CURR");
+
+        incomeEvidenceService.mangeIncomeEvidence(workflowRequest, repOrder);
+
+        verify(evidenceApiService, times(0)).createEvidence(any(ApiCreateIncomeEvidenceRequest.class));
+        verify(maatCourtDataApiService, times(0)).updateFinancialAssessment(any(MaatApiUpdateAssessment.class));
+        verify(incomeEvidenceMapper, times(0)).maatApiAssessmentResponseToApplicationDTO(any(MaatApiAssessmentResponse.class),
+                any(ApplicationDTO.class));
+    }
+
+    @Test
+    void givenAFullAssessmentIsInProgress_whenMangeIncomeEvidenceIsInvoked_thenCreateEvidenceShouldNotCalled() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().setStatus(CurrentStatus.IN_PROGRESS.getStatus());
+        RepOrderDTO repOrder = TestModelDataBuilder.buildRepOrderDTO("CURR");
+
+        incomeEvidenceService.mangeIncomeEvidence(workflowRequest, repOrder);
+
+        verify(evidenceApiService, times(0)).createEvidence(any(ApiCreateIncomeEvidenceRequest.class));
+        verify(maatCourtDataApiService, times(0)).updateFinancialAssessment(any(MaatApiUpdateAssessment.class));
+        verify(incomeEvidenceMapper, times(0)).maatApiAssessmentResponseToApplicationDTO(any(MaatApiAssessmentResponse.class),
+                any(ApplicationDTO.class));
+    }
+
+    @Test
+    void givenAssessmentIsInProgress_whenMangeIncomeEvidenceIsInvoked_thenCreateEvidenceShouldNotCalled() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getInitial().getAssessmnentStatusDTO().setStatus(CurrentStatus.IN_PROGRESS.getStatus());
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().setStatus(CurrentStatus.IN_PROGRESS.getStatus());
         RepOrderDTO repOrder = TestModelDataBuilder.buildRepOrderDTO("CURR");
 
         incomeEvidenceService.mangeIncomeEvidence(workflowRequest, repOrder);
@@ -94,8 +125,9 @@ class IncomeEvidenceServiceTest {
                 any(ApplicationDTO.class));
     }
     @Test
-    void givenVInitAsessmentIsCompleted_whenMangeIncomeEvidenceIsInvoked_thenApiServicesCalledAndResponseMapped() {
+    void givenAInitAssessmentIsCompleted_whenMangeIncomeEvidenceIsInvoked_thenApiServicesCalledAndResponseMapped() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().setStatus(CurrentStatus.IN_PROGRESS.getStatus());
         RepOrderDTO repOrder = TestModelDataBuilder.buildRepOrderDTO("CURR");
 
         when(incomeEvidenceMapper.workflowRequestToApiCreateIncomeEvidenceRequest(any(WorkflowRequest.class)))
