@@ -139,7 +139,7 @@ public class MeansAssessmentOrchestrationService {
         } else {
 
             if (featureDecisionService.isMaatPostAssessmentProcessingEnabled(request)) {
-                processPostProcessAssessment(request);
+                postProcessAssessment(request);
             } else {
                 request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
                         request.getApplicationDTO(),
@@ -175,7 +175,7 @@ public class MeansAssessmentOrchestrationService {
         return application;
     }
 
-   private void processPostProcessAssessment(WorkflowRequest request) {
+   private void postProcessAssessment(WorkflowRequest request) {
 
         RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());
         incomeEvidenceService.mangeIncomeEvidence(request, repOrderDTO);
