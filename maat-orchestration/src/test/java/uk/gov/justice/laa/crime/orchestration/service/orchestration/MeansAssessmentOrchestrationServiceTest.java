@@ -363,7 +363,7 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(contributionService).calculate(workflowRequest);
         verify(incomeEvidenceService).mangeIncomeEvidence(workflowRequest, repOrderDTO);
 
-        verify(proceedingsService).determineMsgRepDecision(workflowRequest);
+        verify(proceedingsService).determineMagsRepDecision(workflowRequest);
         verify(catDataService, times(0)).handleEformResult(any());
     }
 
@@ -386,7 +386,7 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(contributionService).calculate(workflowRequest);
         verify(incomeEvidenceService).mangeIncomeEvidence(workflowRequest, repOrderDTO);
 
-        verify(proceedingsService).determineMsgRepDecision(workflowRequest);
+        verify(proceedingsService).determineMagsRepDecision(workflowRequest);
         verify(catDataService, atLeast(1)).handleEformResult(any());
     }
 }

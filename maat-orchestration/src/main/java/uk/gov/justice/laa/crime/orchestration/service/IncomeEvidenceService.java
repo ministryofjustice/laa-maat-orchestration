@@ -71,9 +71,7 @@ public class IncomeEvidenceService {
 
         FinancialAssessmentDTO financialAssessmentDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO();
         InitialAssessmentDTO initialAssessment = financialAssessmentDTO.getInitial();
-        FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
-        if (initialAssessment.getAssessmnentStatusDTO().getStatus().equals(CurrentStatus.COMPLETE.getStatus())
-                && fullAssessmentDTO.getAssessmnentStatusDTO().getStatus().equals(CurrentStatus.IN_PROGRESS.getStatus())) {
+        if (initialAssessment.getAssessmnentStatusDTO().getStatus().equals(CurrentStatus.COMPLETE.getStatus())) {
             createEvidence(request, repOrder);
         }
     }

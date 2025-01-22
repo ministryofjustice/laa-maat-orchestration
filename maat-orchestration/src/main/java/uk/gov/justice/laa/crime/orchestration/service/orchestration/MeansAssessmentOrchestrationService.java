@@ -5,17 +5,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.commons.exception.MAATServerException;
-import uk.gov.justice.laa.crime.enums.AssessmentResult;
-import uk.gov.justice.laa.crime.enums.CaseType;
-import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
@@ -24,14 +22,6 @@ import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
 import uk.gov.justice.laa.crime.orchestration.service.*;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
-import uk.gov.justice.laa.crime.util.DateUtil;
-
-import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType.MEANS_FULL;
-import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource.MEANS_ASSESSMENT;
-import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType.MEANS_INIT;
-
-import java.util.Date;
-import java.util.Set;
 
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_INCOMPLETE_ASSESSMENT;
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_REASSESSMENT;
@@ -179,7 +169,7 @@ public class MeansAssessmentOrchestrationService {
 
         RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());
         incomeEvidenceService.mangeIncomeEvidence(request, repOrderDTO);
-        proceedingsService.determineMsgRepDecision(request);
+        proceedingsService.determineMagsRepDecision(request);
         request.setApplicationDTO(contributionService.calculate(request));
         ApplicationTrackingOutputResult eFormResult = applicationTrackingMapper.buildForAssessmentFlow(request, repOrderDTO);
         if (null != eFormResult.getUsn()) {

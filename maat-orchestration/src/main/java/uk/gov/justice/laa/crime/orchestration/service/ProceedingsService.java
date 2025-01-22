@@ -68,11 +68,11 @@ public class ProceedingsService {
         }
     }
 
-    public ApiDetermineMagsRepDecisionResponse determineMsgRepDecision(WorkflowRequest request) {
+    public ApiDetermineMagsRepDecisionResponse determineMagsRepDecision(WorkflowRequest request) {
 
         ApiDetermineMagsRepDecisionResponse repDecisionResponse = null;
 
-        if (canInvokeMsgRepDecision(request.getApplicationDTO())) {
+        if (canInvokeMagsRepDecision(request.getApplicationDTO())) {
 
             repDecisionResponse = proceedingsApiService.determineMagsRepDecision(
                     proceedingsMapper.buildDetermineMagsRepDecision(request.getApplicationDTO(), request.getUserDTO()));
@@ -83,7 +83,7 @@ public class ProceedingsService {
         return repDecisionResponse;
     }
 
-    boolean canInvokeMsgRepDecision(ApplicationDTO application) {
+    boolean canInvokeMagsRepDecision(ApplicationDTO application) {
 
         if (Set.of(CaseType.INDICTABLE.getCaseType(), CaseType.SUMMARY_ONLY.getCaseType(), CaseType.EITHER_WAY.getCaseType())
                 .contains(application.getCaseDetailsDTO().getCaseType())){

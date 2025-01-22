@@ -83,7 +83,7 @@ class ProceedingsServiceTest {
     void givenAAppealToCC_whenCanInvokeMsgRepDecisionIsInvoked_thenFalseIsReturned() {
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO();
         applicationDTO.getCaseDetailsDTO().setCaseType(CaseType.APPEAL_CC.getCaseType());
-        assertThat(proceedingsService.canInvokeMsgRepDecision(applicationDTO)).isFalse();
+        assertThat(proceedingsService.canInvokeMagsRepDecision(applicationDTO)).isFalse();
     }
 
     @Test
@@ -91,14 +91,14 @@ class ProceedingsServiceTest {
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO();
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getInitial().getAssessmnentStatusDTO().setStatus(AssessmentStatusDTO.INCOMPLETE);
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().setStatus(AssessmentStatusDTO.INCOMPLETE);
-        assertThat(proceedingsService.canInvokeMsgRepDecision(applicationDTO)).isFalse();
+        assertThat(proceedingsService.canInvokeMagsRepDecision(applicationDTO)).isFalse();
     }
 
     @Test
     void givenAInitAssessmentResultIsFailed_FullAssessmentIsInProgress_thenFalseIsReturned() {
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO();
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().setStatus(AssessmentStatusDTO.INCOMPLETE);
-        assertThat(proceedingsService.canInvokeMsgRepDecision(applicationDTO)).isFalse();
+        assertThat(proceedingsService.canInvokeMagsRepDecision(applicationDTO)).isFalse();
     }
 
     @Test
@@ -106,21 +106,21 @@ class ProceedingsServiceTest {
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO();
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getInitial().setResult(AssessmentResult.FULL.getResult());
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().setStatus(AssessmentStatusDTO.INCOMPLETE);
-        assertThat(proceedingsService.canInvokeMsgRepDecision(applicationDTO)).isTrue();
+        assertThat(proceedingsService.canInvokeMagsRepDecision(applicationDTO)).isTrue();
     }
 
     @Test
     void givenFullAssessmentIsCompleted_whenCanInvokeMsgRepDecisionIsInvoked_thenTrueIsReturned() {
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO();
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getInitial().setResult(AssessmentResult.FULL.getResult());
-        assertThat(proceedingsService.canInvokeMsgRepDecision(applicationDTO)).isTrue();
+        assertThat(proceedingsService.canInvokeMagsRepDecision(applicationDTO)).isTrue();
     }
 
     @Test
     void givenAInitAssessmentIsFailed_whenCanInvokeMsgRepDecisionIsInvoked_thenNullIsReturned() {
         WorkflowRequest request = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().setStatus(AssessmentStatusDTO.INCOMPLETE);
-        assertThat(proceedingsService.determineMsgRepDecision(request)).isNull();
+        assertThat(proceedingsService.determineMagsRepDecision(request)).isNull();
     }
 
     @Test
@@ -130,7 +130,7 @@ class ProceedingsServiceTest {
                 .thenReturn(TestModelDataBuilder.getApiDetermineMagsRepDecisionResponse());
         WorkflowRequest request = MeansAssessmentDataBuilder.buildWorkFlowRequest();
 
-        ApiDetermineMagsRepDecisionResponse response = proceedingsService.determineMsgRepDecision(request);
+        ApiDetermineMagsRepDecisionResponse response = proceedingsService.determineMagsRepDecision(request);
         assertThat(response.getDecisionResult().getDecisionReason()).isEqualTo(DecisionReason.GRANTED);
     }
 
