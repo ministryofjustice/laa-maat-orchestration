@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.RepOrderStatus;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
-import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
@@ -27,16 +27,8 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.TEST_USER_SESSION;
-import static uk.gov.justice.laa.crime.orchestration.service.ValidationService.ACTION_NEW_WORK_REASON_AND_SESSION_DOES_NOT_EXIST;
-import static uk.gov.justice.laa.crime.orchestration.service.ValidationService.CANNOT_MODIFY_APPLICATION_ERROR;
-import static uk.gov.justice.laa.crime.orchestration.service.ValidationService.USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION;
-import static uk.gov.justice.laa.crime.orchestration.service.ValidationService.USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE;
-import static uk.gov.justice.laa.crime.orchestration.service.ValidationService.USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED;
+import static uk.gov.justice.laa.crime.orchestration.service.ValidationService.*;
 
 @ExtendWith(MockitoExtension.class)
 class ValidationServiceTest {
@@ -107,8 +99,7 @@ class ValidationServiceTest {
     void validateApplicationTimestamp_whenApplicationTimestampIsNull_thenNoExceptionIsThrow() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTOWithModifiedDate();
-
-        assertDoesNotThrow(() -> validationService.validate(workflowRequest, repOrderDTO));
+        Assertions.assertThatCode(() -> validationService.validate(workflowRequest, repOrderDTO)).doesNotThrowAnyException();
     }
 
     @Test
@@ -118,7 +109,7 @@ class ValidationServiceTest {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestForApplicationTimestampValidation(Optional.of(timestamp));
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTOWithModifiedDateOf(timestamp);
 
-        assertDoesNotThrow(() -> validationService.validate(workflowRequest, repOrderDTO));
+        Assertions.assertThatCode(() -> validationService.validate(workflowRequest, repOrderDTO)).doesNotThrowAnyException();
     }
 
     @Test
@@ -129,29 +120,25 @@ class ValidationServiceTest {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestForApplicationTimestampValidation(Optional.of(applicationTimestamp));
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTOWithModifiedDateOf(repOrderTimestamp);
 
-        assertDoesNotThrow(() -> validationService.validate(workflowRequest, repOrderDTO));
+        Assertions.assertThatCode(() -> validationService.validate(workflowRequest, repOrderDTO)).doesNotThrowAnyException();
     }
 
     @ParameterizedTest
     @MethodSource("validateApplicationTimestamp")
     void validateApplicationTimestamp_whenApplicationHasBeenModifiedByAnotherUser_thenExceptionIsThrown(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.
-                validate(workflowRequest, repOrderDTO));
-        assertThat(validationException.getMessage()).isEqualTo(CANNOT_MODIFY_APPLICATION_ERROR);
+        assertThatThrownBy(() -> validationService. validate(workflowRequest, repOrderDTO)).hasMessageContaining(CANNOT_MODIFY_APPLICATION_ERROR);
     }
 
     @ParameterizedTest
     @MethodSource("validateApplicationStatus")
     void validateApplicationStatus(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.
-                validate(workflowRequest, repOrderDTO));
-        assertThat(validationException.getMessage()).contains("Cannot update case in status of");
+        assertThatThrownBy(() -> validationService. validate(workflowRequest, repOrderDTO)).hasMessageContaining("Cannot update case in status of");
     }
 
     @ParameterizedTest
     @MethodSource("validateApplicationStatusNoException")
     void validateApplicationStatus_noException(final WorkflowRequest workflowRequest, final RepOrderDTO repOrderDTO) {
-        assertDoesNotThrow(() -> validationService.validate(workflowRequest, repOrderDTO));
+        Assertions.assertThatCode(() -> validationService.validate(workflowRequest, repOrderDTO)).doesNotThrowAnyException();
     }
 
     @Test
@@ -159,7 +146,7 @@ class ValidationServiceTest {
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
         Boolean isUserActionValid =
                 validationService.isUserActionValid(TestModelDataBuilder.getUserActionDTO(), userSummaryDTO);
-        assertTrue(isUserActionValid);
+        assertThat(isUserActionValid).isTrue();
     }
 
     @Test
@@ -319,7 +306,7 @@ class ValidationServiceTest {
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
 
         boolean isUserActionValid = validationService.isUserActionValid(userActionDTO, userSummaryDTO);
-        assertTrue(isUserActionValid);
+        assertThat(isUserActionValid).isTrue();
     }
 
     @Test
@@ -330,7 +317,7 @@ class ValidationServiceTest {
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
 
         boolean isUserActionValid = validationService.isUserActionValid(userActionDTO, userSummaryDTO);
-        assertTrue(isUserActionValid);
+        assertThat(isUserActionValid).isTrue();
     }
 
     @Test
@@ -356,7 +343,7 @@ class ValidationServiceTest {
 
         boolean isUserActionValid = validationService.isUserActionValid(userActionDTO, userSummaryDTO);
 
-        assertTrue(isUserActionValid);
+        assertThat(isUserActionValid).isTrue();
     }
 
     @Test
@@ -365,7 +352,7 @@ class ValidationServiceTest {
 
         boolean result = validationService.isUserAuthorisedToEditField(userSummaryDTO, RestrictedField.APPEAL_CC_OUTCOME);
 
-        assertFalse(result);
+        assertThat(result).isFalse();
     }
 
     @ParameterizedTest
@@ -379,7 +366,7 @@ class ValidationServiceTest {
 
         boolean result = validationService.isUserAuthorisedToEditField(userSummaryDTO, restrictedField);
 
-        assertFalse(result);
+        assertThat(result).isFalse();
     }
 
     @Test
@@ -395,7 +382,7 @@ class ValidationServiceTest {
 
         boolean result = validationService.isUserAuthorisedToEditField(userSummaryDTO, restrictedField);
 
-        assertFalse(result);
+        assertThat(result).isFalse();
     }
 
     @ParameterizedTest
@@ -412,15 +399,15 @@ class ValidationServiceTest {
 
         boolean result = validationService.isUserAuthorisedToEditField(userSummaryDTO, restrictedField);
 
-        assertTrue(result);
+        assertThat(result).isTrue();
     }
 
     @Test
     void givenUserHasNoUpliftPermissions_whenCheckUpliftFieldPermissionsInInvoked_thenExceptionIsThrown() {
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
 
-        ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.checkUpliftFieldPermissions(userSummaryDTO));
-        assertThat(validationException.getMessage()).isEqualTo(USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION);
+        assertThatThrownBy(() -> validationService.checkUpliftFieldPermissions(userSummaryDTO))
+                .hasMessageContaining(USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION);
     }
 
     @Test
@@ -431,8 +418,9 @@ class ValidationServiceTest {
         );
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO(roleDataItems);
 
-        ValidationException validationException = assertThrows(ValidationException.class, () -> validationService.checkUpliftFieldPermissions(userSummaryDTO));
-        assertThat(validationException.getMessage()).isEqualTo(USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION);
+        assertThatThrownBy(() -> validationService.checkUpliftFieldPermissions(userSummaryDTO))
+                .hasMessageContaining(USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION);
+
     }
 
     @Test
@@ -443,6 +431,6 @@ class ValidationServiceTest {
         );
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO(roleDataItems);
 
-        assertDoesNotThrow(() -> validationService.checkUpliftFieldPermissions(userSummaryDTO));
+        Assertions.assertThatCode(() -> validationService.checkUpliftFieldPermissions(userSummaryDTO)).doesNotThrowAnyException();
     }
 }
