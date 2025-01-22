@@ -221,7 +221,7 @@ class CCLFUpdateServiceTest {
     void givenValidInput_whenGetOutcomeIsInvoked_thenValidResponseIsReturned() {
         ApplicationDTO applicationDTO = TestModelDataBuilder.buildWorkFlowRequest().getApplicationDTO();
         applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().setCcOutcome(TestModelDataBuilder.getOutcomeDTO());
-        assertThat(CrownCourtOutcome.SUCCESSFUL.toString()).isEqualTo(CCLFUpdateService.getOutcome(applicationDTO));
+        assertThat(CrownCourtOutcome.SUCCESSFUL.getCode()).isEqualTo(CCLFUpdateService.getOutcome(applicationDTO));
     }
 
     @Test
