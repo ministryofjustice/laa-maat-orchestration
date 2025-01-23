@@ -77,6 +77,7 @@ public class MeansAssessmentController {
     public ResponseEntity<ApplicationDTO> update(
             @Valid @RequestBody WorkflowRequest workflowRequest) {
         log.info("Received request to update means assessment");
+        log.info("Workflow request: {}", workflowRequest);
         ApplicationDTO applicationDTO;
         try {
             applicationDTO = assessmentOrchestrationService.update(workflowRequest);
