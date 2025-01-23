@@ -36,8 +36,14 @@ public class ContributionService {
     public ApplicationDTO calculate(WorkflowRequest request) {
 
         ApplicationDTO application = request.getApplicationDTO();
-        if (isRecalculationRequired(application)) {
 
+        log.info("--- About to calculate whether re-calculation is required ---");
+        boolean recalcRequired = isRecalculationRequired(application);
+        log.info("--- Recalculation is required: {}", recalcRequired);
+
+        if (recalcRequired) {
+
+            log.info("--- Recalculation is required ---");
             ApiMaatCalculateContributionRequest calculateContributionRequest =
                     contributionMapper.workflowRequestToMaatCalculateContributionRequest(request);
 
@@ -64,6 +70,9 @@ public class ContributionService {
                         contributionMapper.contributionSummaryToDto(contributionSummaries)
                 );
             }
+        }
+        else {
+            log.info("--- Recalculation is not required ---");
         }
 
         return application;

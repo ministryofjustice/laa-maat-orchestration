@@ -55,6 +55,7 @@ public class MeansAssessmentController {
     public ResponseEntity<ApplicationDTO> create(
             @Valid @RequestBody WorkflowRequest workflowRequest) {
         log.info("Received request to create means assessment");
+        log.info("Workflow request: {}", workflowRequest);
         ApplicationDTO applicationDTO;
         try {
             applicationDTO = assessmentOrchestrationService.create(workflowRequest);
