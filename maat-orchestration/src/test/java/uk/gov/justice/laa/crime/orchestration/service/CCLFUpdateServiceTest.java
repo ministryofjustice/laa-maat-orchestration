@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,7 +25,6 @@ import java.util.Date;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.*;
@@ -85,14 +85,14 @@ class CCLFUpdateServiceTest {
     void givenValidInputWithUpdateAction_whenUpdateSendToCCLFIsInvoked_thenNoExceptionIsThrown() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
-        assertDoesNotThrow(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO));
+        Assertions.assertThatCode(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO)).doesNotThrowAnyException();
     }
 
     @Test
     void givenValidInputWithNullAction_whenUpdateSendToCCLFIsInvoked_thenNoExceptionIsThrown() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
-        assertDoesNotThrow(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO));
+        Assertions.assertThatCode(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO)).doesNotThrowAnyException();
     }
 
     @Test
@@ -101,7 +101,7 @@ class CCLFUpdateServiceTest {
         LocalDateTime DECISION_DATETIME = LocalDateTime.of(2000, 10, 13, 0, 0, 0);
         workflowRequest.getApplicationDTO().setDecisionDate(Date.from(DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()));
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
-        assertDoesNotThrow(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO));
+        Assertions.assertThatCode(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO)).doesNotThrowAnyException();
     }
 
     @Test
@@ -124,7 +124,7 @@ class CCLFUpdateServiceTest {
     void givenValidInput_whenUpdateSendToCCLFIsInvoked_thenOKResponseIsReturned() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
-        assertDoesNotThrow(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO));
+        Assertions.assertThatCode(() -> cclfUpdateService.updateSendToCCLF(workflowRequest, repOrderDTO)).doesNotThrowAnyException();
         verify(maatCourtDataApiService).updateSendToCCLF(any());
     }
 
@@ -139,21 +139,21 @@ class CCLFUpdateServiceTest {
     void givenInputWithOutCCO_whenGetWithdrawalDateIsInvoked_thenNullIsReturned() {
         ApplicationDTO applicationDTO = TestModelDataBuilder.buildWorkFlowRequest().getApplicationDTO();
         applicationDTO.setCrownCourtOverviewDTO(null);
-        assertNull(cclfUpdateService.getWithDrawalDate(applicationDTO));
+        assertThat(cclfUpdateService.getWithDrawalDate(applicationDTO)).isNull();
     }
 
     @Test
     void givenInputWithOutCCSummary_whenGetWithdrawalDateIsInvoked_thenNullIsReturned() {
         ApplicationDTO applicationDTO = TestModelDataBuilder.buildWorkFlowRequest().getApplicationDTO();
         applicationDTO.getCrownCourtOverviewDTO().setCrownCourtSummaryDTO(null);
-        assertNull(cclfUpdateService.getWithDrawalDate(applicationDTO));
+        assertThat(cclfUpdateService.getWithDrawalDate(applicationDTO)).isNull();
     }
 
     @Test
     void givenInputWithOutCCWithdrawal_whenGetWithdrawalDateIsInvoked_thenNullIsReturned() {
         ApplicationDTO applicationDTO = TestModelDataBuilder.buildWorkFlowRequest().getApplicationDTO();
         applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().setCcWithDrawalDate(null);
-        assertNull(cclfUpdateService.getWithDrawalDate(applicationDTO));
+        assertThat(cclfUpdateService.getWithDrawalDate(applicationDTO)).isNull();
     }
 
     @Test
@@ -167,21 +167,21 @@ class CCLFUpdateServiceTest {
     void givenInputWithOutCCO_whenGetRepOrderDateIsInvoked_thenNullIsReturned() {
         ApplicationDTO applicationDTO = TestModelDataBuilder.buildWorkFlowRequest().getApplicationDTO();
         applicationDTO.setCrownCourtOverviewDTO(null);
-        assertNull(cclfUpdateService.getRepOrderDate(applicationDTO));
+        assertThat(cclfUpdateService.getRepOrderDate(applicationDTO)).isNull();
     }
 
     @Test
     void givenInputWithOutCCSummary_whenGetRepOrderDateIsInvoked_thenNullIsReturned() {
         ApplicationDTO applicationDTO = TestModelDataBuilder.buildWorkFlowRequest().getApplicationDTO();
         applicationDTO.getCrownCourtOverviewDTO().setCrownCourtSummaryDTO(null);
-        assertNull(cclfUpdateService.getRepOrderDate(applicationDTO));
+        assertThat(cclfUpdateService.getRepOrderDate(applicationDTO)).isNull();
     }
 
     @Test
     void givenInputWithOutCCRepOrder_whenGetRepOrderDateIsInvoked_thenNullIsReturned() {
         ApplicationDTO applicationDTO = TestModelDataBuilder.buildWorkFlowRequest().getApplicationDTO();
         applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().setCcRepOrderDate(null);
-        assertNull(cclfUpdateService.getRepOrderDate(applicationDTO));
+        assertThat(cclfUpdateService.getRepOrderDate(applicationDTO)).isNull();
     }
 
     @Test
@@ -190,7 +190,7 @@ class CCLFUpdateServiceTest {
         Date result = cclfUpdateService.parseDate(date);
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Date expected = format.parse(date);
-        assertEquals(expected, result);
+        assertThat(expected).isEqualTo(result);
     }
 
     @Test()
@@ -200,34 +200,34 @@ class CCLFUpdateServiceTest {
 
     @Test()
     void parseNullDate() {
-        assertNull(cclfUpdateService.parseDate(null));
+        assertThat(cclfUpdateService.parseDate(null)).isNull();
     }
 
     @Test
     void givenValidInput_whenGetRepOrderCcOutcomeIsInvoked_thenValidResponseIsReturned() {
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
         repOrderDTO.getRepOrderCCOutcome().add(TestModelDataBuilder.getRepOrderCCOutcomeDTO());
-        assertEquals("CONVICTED", CCLFUpdateService.getRepOrderCcOutcome(repOrderDTO));
+        assertThat("CONVICTED").isEqualTo(CCLFUpdateService.getRepOrderCcOutcome(repOrderDTO));
     }
 
     @Test
     void givenValidInput_whenGetAppealTypeIsInvoked_thenValidResponseIsReturned() {
         ApplicationDTO applicationDTO = TestModelDataBuilder.buildWorkFlowRequest().getApplicationDTO();
         applicationDTO.getCrownCourtOverviewDTO().getAppealDTO().getAppealTypeDTO().setCode(AppealType.ACS.getCode());
-        assertEquals(AppealType.ACS.getCode(), CCLFUpdateService.getAppealType(applicationDTO));
+        assertThat(AppealType.ACS.getCode()).isEqualTo(CCLFUpdateService.getAppealType(applicationDTO));
     }
 
     @Test
     void givenValidInput_whenGetOutcomeIsInvoked_thenValidResponseIsReturned() {
         ApplicationDTO applicationDTO = TestModelDataBuilder.buildWorkFlowRequest().getApplicationDTO();
         applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().setCcOutcome(TestModelDataBuilder.getOutcomeDTO());
-        assertEquals(CrownCourtOutcome.SUCCESSFUL.toString(), CCLFUpdateService.getOutcome(applicationDTO));
+        assertThat(CrownCourtOutcome.SUCCESSFUL.getCode()).isEqualTo(CCLFUpdateService.getOutcome(applicationDTO));
     }
 
     @Test
     void givenValidInput_whenGetFeeLevelIsInvoked_thenValidResponseIsReturned() {
         ApplicationDTO applicationDTO = TestModelDataBuilder.buildWorkFlowRequest().getApplicationDTO();
         applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getEvidenceProvisionFee().setFeeLevel("TEST");
-        assertEquals("TEST", CCLFUpdateService.getFeeLevel(applicationDTO));
+        assertThat("TEST").isEqualTo(CCLFUpdateService.getFeeLevel(applicationDTO));
     }
 }
