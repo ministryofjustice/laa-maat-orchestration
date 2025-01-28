@@ -111,4 +111,4 @@ actuator:
     failureThreshold: 5
 
 logging:
-  level: INFO
+  level: DEBUG
