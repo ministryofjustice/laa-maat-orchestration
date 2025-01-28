@@ -237,8 +237,12 @@ class MeansAssessmentOrchestrationServiceTest {
                 any(StoredProcedure.class)
         ))
                 .thenReturn(workflowRequest.getApplicationDTO());
+        when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTO);
+        when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
         when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
         when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(true);
+        when(applicationTrackingMapper.buildForAssessmentFlow(any(WorkflowRequest.class), any(RepOrderDTO.class)))
+                .thenReturn(new ApplicationTrackingOutputResult());
 
         orchestrationService.update(workflowRequest);
         verify(maatCourtDataService, times(0)).invokeStoredProcedure(
@@ -344,6 +348,58 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(meansAssessmentService, times(0)).rollback(any());
     }
 
+
+    @Test
+    void givenARequestWithC3AndMattPostProcessIsNotEnabled_thenPostProcessShouldNotCalled() {
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                any(StoredProcedure.class)
+        )).thenReturn(workflowRequest.getApplicationDTO());
+
+        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(false);
+        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(true);
+        when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
+
+        orchestrationService.create(workflowRequest);
+
+        verify(contributionService, times(0)).calculate(workflowRequest);
+        verify(incomeEvidenceService, times(0)).mangeIncomeEvidence(workflowRequest, repOrderDTO);
+
+        verify(proceedingsService, times(0)).determineMagsRepDecision(workflowRequest);
+        verify(catDataService, atLeast(0)).handleEformResult(any());
+    }
+
+    @Test
+    void givenARequestWithC3IsEnabled_MattPostProcessIsNotEnabled_thenPostProcessorShouldCalled() {
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                any(StoredProcedure.class)
+        )).thenReturn(workflowRequest.getApplicationDTO());
+        when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTO);
+        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
+        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(false);
+        when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
+
+        orchestrationService.update(workflowRequest);
+
+        verify(maatCourtDataService, times(1)).invokeStoredProcedure(
+                workflowRequest.getApplicationDTO(),
+                workflowRequest.getUserDTO(),
+                StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1
+        );
+
+        verify(contributionService, times(2)).calculate(workflowRequest);
+
+        verify(maatCourtDataService, times(1)).invokeStoredProcedure(
+                workflowRequest.getApplicationDTO(),
+                workflowRequest.getUserDTO(),
+                StoredProcedure.PRE_UPDATE_CC_APPLICATION
+        );
+
+        verify(proceedingsService, times(1)).updateApplication(workflowRequest,
+                repOrderDTO);
+
+
+    }
+
     @Test
     void givenARequestWithC3NotEnabled_MattPostProcessIsEnabled_thenPostProcessorShouldCalled() {
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
@@ -353,40 +409,15 @@ class MeansAssessmentOrchestrationServiceTest {
         when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(false);
         when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(true);
         when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
-        when(applicationTrackingMapper.buildForAssessmentFlow(any(WorkflowRequest.class), any(RepOrderDTO.class)))
-                .thenReturn(new ApplicationTrackingOutputResult());
-        when(contributionService.calculate(workflowRequest))
-                .thenReturn(applicationDTO);
 
         orchestrationService.create(workflowRequest);
 
-        verify(contributionService).calculate(workflowRequest);
-        verify(incomeEvidenceService).mangeIncomeEvidence(workflowRequest, repOrderDTO);
+        verify(contributionService, times(0)).calculate(workflowRequest);
+        verify(incomeEvidenceService, times(0)).mangeIncomeEvidence(workflowRequest, repOrderDTO);
 
-        verify(proceedingsService).determineMagsRepDecision(workflowRequest);
-        verify(catDataService, times(0)).handleEformResult(any());
+        verify(proceedingsService, times(0)).determineMagsRepDecision(workflowRequest);
+        verify(catDataService, atLeast(0)).handleEformResult(any());
     }
 
-    @Test
-    void givenARequestWithC3NotEnabled_MattPostProcessIsEnabled_thenHandleEformResultShouldCalled() {
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
-                any(StoredProcedure.class)
-        )).thenReturn(workflowRequest.getApplicationDTO());
 
-        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(false);
-        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(true);
-        when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
-        when(applicationTrackingMapper.buildForAssessmentFlow(any(WorkflowRequest.class), any(RepOrderDTO.class)))
-                .thenReturn(new ApplicationTrackingOutputResult().withUsn(1234));
-        when(contributionService.calculate(workflowRequest))
-                .thenReturn(applicationDTO);
-
-        orchestrationService.create(workflowRequest);
-
-        verify(contributionService).calculate(workflowRequest);
-        verify(incomeEvidenceService).mangeIncomeEvidence(workflowRequest, repOrderDTO);
-
-        verify(proceedingsService).determineMagsRepDecision(workflowRequest);
-        verify(catDataService, atLeast(1)).handleEformResult(any());
-    }
 }

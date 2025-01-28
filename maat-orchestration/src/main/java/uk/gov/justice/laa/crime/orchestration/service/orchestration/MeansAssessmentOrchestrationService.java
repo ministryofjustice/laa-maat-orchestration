@@ -112,21 +112,6 @@ public class MeansAssessmentOrchestrationService {
         request.getApplicationDTO().setAlertMessage("");
 
         if (featureDecisionService.isC3Enabled(request)) {
-            // call post_processing_part_1_c3 and map the application
-            request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                    request.getApplicationDTO(),
-                    request.getUserDTO(),
-                    StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3)
-            );
-
-            if (!featureDecisionService.isMaatPostAssessmentProcessingEnabled(request)) {
-                // check feature flag here - only need to do this for the new workflow, not for the old way of doing things
-                request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                    contributionService.calculate(request),
-                    request.getUserDTO(),
-                        StoredProcedure.PRE_UPDATE_CC_APPLICATION));
-            }
-        } else {
 
             if (featureDecisionService.isMaatPostAssessmentProcessingEnabled(request)) {
                 postProcessAssessment(request);
@@ -137,6 +122,23 @@ public class MeansAssessmentOrchestrationService {
                         StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1)
                 );
             }
+
+            request.setApplicationDTO(contributionService.calculate(request));
+
+            if (!featureDecisionService.isMaatPostAssessmentProcessingEnabled(request)) {
+                // check feature flag here - only need to do this for the new workflow, not for the old way of doing things
+                request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                    contributionService.calculate(request),
+                    request.getUserDTO(),
+                        StoredProcedure.PRE_UPDATE_CC_APPLICATION));
+            }
+        } else {
+
+            request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                    request.getApplicationDTO(),
+                    request.getUserDTO(),
+                    StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1));
+
         }
 
         // Check for any validation alerts resulted as part of the pre_update_checks and raise exception
