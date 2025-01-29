@@ -46,11 +46,11 @@ public class EvidenceOrchestrationService {
     }
 
     private static boolean hasUpliftChanged(ApplicationDTO applicationDTO, RepOrderDTO repOrderDTO) {
-        LocalDateTime currentDate = LocalDateTime.now();
-        Date today = DateUtil.toDate(currentDate);
+        LocalDateTime defaultDateTime = LocalDateTime.of(9999, 12, 31, 0, 0, 0);
+        Date defaultDate = DateUtil.toDate(defaultDateTime);
         var incomeEvidenceSummaryDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence();
-        Date upliftAppliedDate = Objects.requireNonNullElse(incomeEvidenceSummaryDTO.getUpliftAppliedDate(), today);
-        Date upliftRemovedDate = Objects.requireNonNullElse(incomeEvidenceSummaryDTO.getUpliftRemovedDate(), today);
+        Date upliftAppliedDate = Objects.requireNonNullElse(incomeEvidenceSummaryDTO.getUpliftAppliedDate(), defaultDate);
+        Date upliftRemovedDate = Objects.requireNonNullElse(incomeEvidenceSummaryDTO.getUpliftRemovedDate(), defaultDate);
 
         Integer financialAssessmentId = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getId().intValue();
         FinancialAssessmentDTO financialAssessmentDTO = repOrderDTO.getFinancialAssessments()
@@ -58,9 +58,9 @@ public class EvidenceOrchestrationService {
                 .filter(assessment -> assessment.getId().equals(financialAssessmentId))
                 .findFirst().orElse(FinancialAssessmentDTO.builder().build());
         Date oldUpliftAppliedDate = DateUtil
-                .toDate(Objects.requireNonNullElse(financialAssessmentDTO.getIncomeUpliftApplyDate(), currentDate));
+                .toDate(Objects.requireNonNullElse(financialAssessmentDTO.getIncomeUpliftApplyDate(), defaultDateTime));
         Date oldUpliftRemovedDate = DateUtil
-                .toDate(Objects.requireNonNullElse(financialAssessmentDTO.getIncomeUpliftRemoveDate(), currentDate));
+                .toDate(Objects.requireNonNullElse(financialAssessmentDTO.getIncomeUpliftRemoveDate(), defaultDateTime));
 
         return !upliftAppliedDate.equals(oldUpliftAppliedDate)
                 || !upliftRemovedDate.equals(oldUpliftRemovedDate);
