@@ -138,6 +138,8 @@ public class TestModelDataBuilder {
     public static final LocalDateTime EVIDENCE_DUE_DATE = LocalDateTime.of(2023, 3, 18, 0, 0, 0);
     public static final LocalDateTime INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 2, 18, 0, 0, 0);
     public static final LocalDate ALL_EVIDENCE_RECEIVED_DATE = LocalDate.of(2024, 12, 18);
+    public static final LocalDate UPLIFT_APPLIED_DATE = LocalDate.of(2025, 1, 18);
+    public static final LocalDate UPLIFT_REMOVED_DATE = LocalDate.of(2025, 1, 21);
 
     public static final Integer USN = 156789;
 
@@ -1430,7 +1432,9 @@ public class TestModelDataBuilder {
                                 .withIncomeEvidenceItems(List.of(getIncomeEvidence(PARTNER_EVIDENCE_ID)))
                 )
                 .withAllEvidenceReceivedDate(ALL_EVIDENCE_RECEIVED_DATE)
-                .withDueDate(EVIDENCE_DUE_DATE.toLocalDate());
+                .withDueDate(EVIDENCE_DUE_DATE.toLocalDate())
+                .withUpliftAppliedDate(UPLIFT_APPLIED_DATE)
+                .withUpliftRemovedDate(UPLIFT_REMOVED_DATE);
     }
 
     private static ApiIncomeEvidence getIncomeEvidence(Integer id) {

@@ -47,9 +47,12 @@ public class WorkflowPreProcessorService {
                 && !repOrderDTO.getRorsStatus().equalsIgnoreCase(status);
     }
 
-    public void preProcessEvidenceRequest(UserActionDTO userActionDTO) {
+    public void preProcessEvidenceRequest(UserActionDTO userActionDTO, boolean isUpliftChanged) {
         UserSummaryDTO userSummaryDTO = Optional.ofNullable(userActionDTO.getUsername())
                 .map(maatCourtDataService::getUserSummary).orElse(null);
         validationService.isUserActionValid(userActionDTO, userSummaryDTO);
+        if (isUpliftChanged) {
+            validationService.checkUpliftFieldPermissions(userSummaryDTO);
+        }
     }
 }

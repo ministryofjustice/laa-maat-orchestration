@@ -133,6 +133,9 @@ public class IncomeEvidenceMapper {
 
         incomeEvidenceSummary.setApplicantIncomeEvidenceList(applicantEvidence);
         incomeEvidenceSummary.setPartnerIncomeEvidenceList(partnerEvidence);
+        incomeEvidenceSummary.setEvidenceReceivedDate(DateUtil.toDate(assessmentResponse.getEvidenceReceivedDate()));
+        incomeEvidenceSummary.setUpliftAppliedDate(DateUtil.toDate(assessmentResponse.getIncomeUpliftApplyDate()));
+        incomeEvidenceSummary.setUpliftRemovedDate(DateUtil.toDate(assessmentResponse.getIncomeUpliftRemoveDate()));
     }
 
     private ApiApplicantDetails getPartnerDetails(Collection<ApplicantLinkDTO> applicantLinks) {
@@ -306,6 +309,9 @@ public class IncomeEvidenceMapper {
 
         MaatApiUpdateAssessment maatApiUpdateAssessment = mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, evidenceResponse);
         maatApiUpdateAssessment.withIncomeEvidenceDueDate(DateUtil.convertDateToDateTime(evidenceResponse.getDueDate()));
+        maatApiUpdateAssessment.withEvidenceReceivedDate(DateUtil.convertDateToDateTime(evidenceResponse.getAllEvidenceReceivedDate()));
+        maatApiUpdateAssessment.withIncomeUpliftApplyDate(DateUtil.convertDateToDateTime(evidenceResponse.getUpliftAppliedDate()));
+        maatApiUpdateAssessment.withIncomeUpliftRemoveDate(DateUtil.convertDateToDateTime(evidenceResponse.getUpliftRemovedDate()));
         return maatApiUpdateAssessment;
     }
 }

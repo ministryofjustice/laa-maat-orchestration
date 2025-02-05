@@ -1,6 +1,5 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -51,7 +50,7 @@ class FeatureDecisionServiceTest {
         Method method = FeatureDecisionService.class.getMethod(methodName, WorkflowRequest.class);
         boolean result = (boolean) method.invoke(featureDecisionService, request);
 
-        Assertions.assertFalse(result);
+        assertThat(result).isFalse();
     }
 
     @ParameterizedTest
@@ -84,7 +83,7 @@ class FeatureDecisionServiceTest {
         Method method = FeatureDecisionService.class.getMethod(methodName, WorkflowRequest.class);
         boolean result = (boolean) method.invoke(featureDecisionService, request);
 
-        Assertions.assertFalse(result);
+        assertThat(result).isFalse();
     }
 
     @ParameterizedTest

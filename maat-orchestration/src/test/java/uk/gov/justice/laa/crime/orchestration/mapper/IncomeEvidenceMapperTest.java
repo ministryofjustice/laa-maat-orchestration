@@ -26,7 +26,9 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.util.DateUtil;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -35,11 +37,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static uk.gov.justice.laa.crime.enums.AssessmentType.FULL;
-import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.EVIDENCE_RECEIVED_DATE;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SoftAssertionsExtension.class)
 class IncomeEvidenceMapperTest {
+
+    private static final LocalDateTime EVIDENCE_RECEIVED_DATE = DateUtil
+            .convertDateToDateTime(TestModelDataBuilder.ALL_EVIDENCE_RECEIVED_DATE);
+    private static final LocalDateTime INCOME_UPLIFT_APPLY_DATE = DateUtil
+            .convertDateToDateTime(TestModelDataBuilder.UPLIFT_APPLIED_DATE);
+    private static final LocalDateTime INCOME_UPLIFT_REMOVED_DATE = DateUtil
+            .convertDateToDateTime(TestModelDataBuilder.UPLIFT_REMOVED_DATE);
 
     @Mock
     private UserMapper userMapper;
@@ -176,7 +184,8 @@ class IncomeEvidenceMapperTest {
         noExistingEvidences.getFinAssIncomeEvidences().forEach(evidence -> evidence.setDateReceived(null));
 
         MaatApiUpdateAssessment existingEvidencesAssessment = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL);
-        existingEvidencesAssessment.getFinAssIncomeEvidences().forEach(evidence -> evidence.setDateReceived(EVIDENCE_RECEIVED_DATE));
+        existingEvidencesAssessment.getFinAssIncomeEvidences()
+                .forEach(evidence -> evidence.setDateReceived(TestModelDataBuilder.EVIDENCE_RECEIVED_DATE));
         RepOrderDTO existingEvidencesRepOrderDTO = RepOrderDTO.builder()
                 .passportAssessments(List.of(TestModelDataBuilder.getPassportAssessmentDTO()))
                 .build();
@@ -231,6 +240,9 @@ class IncomeEvidenceMapperTest {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
         ApiUpdateIncomeEvidenceResponse apiUpdateIncomeEvidenceResponse = TestModelDataBuilder.getUpdateIncomeEvidenceResponse();
         expectedAssessment.setIncomeEvidenceDueDate(TestModelDataBuilder.EVIDENCE_DUE_DATE);
+        expectedAssessment.setEvidenceReceivedDate(EVIDENCE_RECEIVED_DATE);
+        expectedAssessment.setIncomeUpliftApplyDate(INCOME_UPLIFT_APPLY_DATE);
+        expectedAssessment.setIncomeUpliftRemoveDate(INCOME_UPLIFT_REMOVED_DATE);
 
         when(meansAssessmentMapper.assessmentDetailsBuilder(anyList()))
                 .thenReturn(List.of(TestModelDataBuilder.getAssessmentDetail()));
