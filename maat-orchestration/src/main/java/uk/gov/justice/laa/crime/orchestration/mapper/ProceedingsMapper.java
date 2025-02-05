@@ -260,7 +260,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         return StringUtils.isNotBlank(status) ? CurrentStatus.getFrom(status) : null;
     }
 
-    public ApiDetermineMagsRepDecisionRequest ApplicationDTOToApiDetermineMagsRepDecisionRequest(ApplicationDTO application, UserDTO userDTO) {
+    public ApiDetermineMagsRepDecisionRequest applicationDTOToApiDetermineMagsRepDecisionRequest(ApplicationDTO application, UserDTO userDTO) {
 
         ApiDetermineMagsRepDecisionRequest request = new ApiDetermineMagsRepDecisionRequest();
 
@@ -274,7 +274,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
         return request;
     }
 
-    public void ApiDetermineMagsRepDecisionResponseToApplicationDTO(ApplicationDTO application, ApiDetermineMagsRepDecisionResponse response) {
+    public void apiDetermineMagsRepDecisionResponseToApplicationDTO(ApplicationDTO application, ApiDetermineMagsRepDecisionResponse response) {
             application.getRepOrderDecision().setCode(response.getDecisionResult().getDecisionReason().getCode());
             application.getRepOrderDecision().setDescription(
                     new SysGenString(response.getDecisionResult().getDecisionReason().getDescription()));

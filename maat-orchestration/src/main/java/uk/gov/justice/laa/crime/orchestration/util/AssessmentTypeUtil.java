@@ -13,6 +13,10 @@ import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTracking
 
 public class AssessmentTypeUtil {
 
+    private AssessmentTypeUtil() {
+
+    }
+
     public static boolean isInitialAssessmentCompleted(WorkflowRequest request) {
 
         FinancialAssessmentDTO financialAssessmentDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO();

@@ -13,7 +13,6 @@ import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSumm
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
-import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.CourtType;
@@ -22,7 +21,6 @@ import uk.gov.justice.laa.crime.enums.DecisionReason;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.proceeding.MagsDecisionResult;
 import uk.gov.justice.laa.crime.util.DateUtil;
 
 import java.util.List;
@@ -188,7 +186,7 @@ class ProceedingsMapperTest {
         mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
         ApiDetermineMagsRepDecisionRequest apiDetermineMagsRepDecisionRequest =
-                proceedingsMapper.ApplicationDTOToApiDetermineMagsRepDecisionRequest(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
+                proceedingsMapper.applicationDTOToApiDetermineMagsRepDecisionRequest(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
         assertThat(apiDetermineMagsRepDecisionRequest).isEqualTo(TestModelDataBuilder.getApiDetermineMagsRepDecisionRequest());
     }
 
@@ -196,7 +194,7 @@ class ProceedingsMapperTest {
     void givenAValidDecisionResponse_ApiDetermineMagsRepDecisionResponseToApplicationDTOsInvoked_thenCorrectMappingReturned() {
 
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
-        proceedingsMapper.ApiDetermineMagsRepDecisionResponseToApplicationDTO(workflowRequest.getApplicationDTO(),
+        proceedingsMapper.apiDetermineMagsRepDecisionResponseToApplicationDTO(workflowRequest.getApplicationDTO(),
                 TestModelDataBuilder.getApiDetermineMagsRepDecisionResponse());
         assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getCode()).isEqualTo(DecisionReason.GRANTED.getCode());
         assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getDescription().getValue())

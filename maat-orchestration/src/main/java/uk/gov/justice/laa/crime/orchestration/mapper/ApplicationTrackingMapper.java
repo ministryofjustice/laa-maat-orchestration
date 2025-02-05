@@ -2,18 +2,14 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
+import uk.gov.justice.laa.crime.common.model.tracking.*;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.CaseType;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
-import uk.gov.justice.laa.crime.common.model.tracking.Hardship;
 import uk.gov.justice.laa.crime.common.model.tracking.Hardship.HardshipResult;
 import uk.gov.justice.laa.crime.common.model.tracking.Hardship.HardshipType;
-import uk.gov.justice.laa.crime.common.model.tracking.Ioj;
 import uk.gov.justice.laa.crime.common.model.tracking.Ioj.IojAppealResult;
-import uk.gov.justice.laa.crime.common.model.tracking.MeansAssessment;
 import uk.gov.justice.laa.crime.common.model.tracking.MeansAssessment.MeansAssessmentResult;
-import uk.gov.justice.laa.crime.common.model.tracking.Passport;
 import uk.gov.justice.laa.crime.common.model.tracking.Passport.PassportResult;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
@@ -23,8 +19,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType.MEANS_FULL;
-import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType.MEANS_INIT;
 import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
 
 @Component

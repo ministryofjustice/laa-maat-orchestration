@@ -11,14 +11,12 @@ import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCo
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
-import uk.gov.justice.laa.crime.enums.AssessmentResult;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.DecisionReason;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentStatusDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
@@ -92,7 +90,7 @@ class ProceedingsServiceTest {
 
         when(proceedingsApiService.determineMagsRepDecision(any(ApiDetermineMagsRepDecisionRequest.class)))
                 .thenReturn(TestModelDataBuilder.getApiDetermineMagsRepDecisionResponse());
-        when(proceedingsMapper.ApplicationDTOToApiDetermineMagsRepDecisionRequest(any(ApplicationDTO.class), any(UserDTO.class)))
+        when(proceedingsMapper.applicationDTOToApiDetermineMagsRepDecisionRequest(any(ApplicationDTO.class), any(UserDTO.class)))
                 .thenReturn(TestModelDataBuilder.getApiDetermineMagsRepDecisionRequest());
         ApiDetermineMagsRepDecisionResponse response = proceedingsService.determineMagsRepDecision(MeansAssessmentDataBuilder.buildWorkFlowRequest());
 
