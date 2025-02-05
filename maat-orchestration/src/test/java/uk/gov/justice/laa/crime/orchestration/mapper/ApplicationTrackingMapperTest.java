@@ -241,28 +241,4 @@ class ApplicationTrackingMapperTest {
         softly.assertAll();
 
     }
-
-    @Test
-    void giveAValidWorkflowRequest_whenBuildForAssessmentIsInvoked_thenMappingIsCorrect() {
-
-        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkflowRequestWithCCHardship(CourtType.CROWN_COURT);
-        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTOWithAssessorName();
-        ApplicationTrackingOutputResult request = mapper.buildForAssessmentFlow(workflowRequest, repOrderDTO);
-
-        softly.assertThat(request.getUsn()).isNull();
-        softly.assertThat(request.getMaatRef()).isEqualTo(TestModelDataBuilder.REP_ID.intValue());
-        softly.assertThat(request.getActionKeyId()).isEqualTo(Constants.FINANCIAL_ASSESSMENT_ID);
-        softly.assertThat(request.getCaseId()).isEqualTo(workflowRequest.getApplicationDTO().getCaseId());
-        softly.assertThat(request.getCaseType()).isEqualTo(CaseType.EITHER_WAY);
-        softly.assertThat(request.getAssessmentId()).isEqualTo(Constants.FINANCIAL_ASSESSMENT_ID);
-        softly.assertThat(request.getAssessmentType()).isEqualTo(AssessmentType.MEANS_FULL);
-        softly.assertThat(request.getDwpResult()).isNull();
-        softly.assertThat(request.getRepDecision()).isEqualTo(DecisionReason.GRANTED.getDescription());
-        softly.assertThat(request.getCcRepDecision()).isEqualTo(CrownCourtSummaryDTO.REP_ORDER_DECISION_GRANTED);
-        softly.assertThat(request.getMagsOutcome()).isEqualTo(workflowRequest.getApplicationDTO().getMagsOutcomeDTO().getOutcome());
-        softly.assertThat(request.getRequestSource()).isEqualTo(RequestSource.MEANS_ASSESSMENT);
-        softly.assertAll();
-
-    }
-
 }

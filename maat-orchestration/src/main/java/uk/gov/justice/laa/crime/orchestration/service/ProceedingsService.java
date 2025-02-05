@@ -19,6 +19,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
 import uk.gov.justice.laa.crime.orchestration.service.api.ProceedingsApiService;
+import uk.gov.justice.laa.crime.orchestration.util.AssessmentTypeUtil;
 
 import java.util.Set;
 
@@ -69,36 +70,12 @@ public class ProceedingsService {
     }
 
     public ApiDetermineMagsRepDecisionResponse determineMagsRepDecision(WorkflowRequest request) {
-
         ApiDetermineMagsRepDecisionResponse repDecisionResponse = null;
-
-        if (canInvokeMagsRepDecision(request.getApplicationDTO())) {
-
+        if (CaseType.isMagsCaseType(request.getApplicationDTO().getCaseDetailsDTO().getCaseType())) {
             repDecisionResponse = proceedingsApiService.determineMagsRepDecision(
-                    proceedingsMapper.buildDetermineMagsRepDecision(request.getApplicationDTO(), request.getUserDTO()));
-            proceedingsMapper.mapDecisionResultToApplicationDTO(request.getApplicationDTO(), repDecisionResponse);
-
+                    proceedingsMapper.ApplicationDTOToApiDetermineMagsRepDecisionRequest(request.getApplicationDTO(), request.getUserDTO()));
+            proceedingsMapper.ApiDetermineMagsRepDecisionResponseToApplicationDTO(request.getApplicationDTO(), repDecisionResponse);
         }
-
         return repDecisionResponse;
-    }
-
-    boolean canInvokeMagsRepDecision(ApplicationDTO application) {
-
-        if (Set.of(CaseType.INDICTABLE.getCaseType(), CaseType.SUMMARY_ONLY.getCaseType(), CaseType.EITHER_WAY.getCaseType())
-                .contains(application.getCaseDetailsDTO().getCaseType())){
-
-            FinancialAssessmentDTO financialAssessmentDTO = application.getAssessmentDTO().getFinancialAssessmentDTO();
-            InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
-            FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
-
-            if ((initialAssessmentDTO.getAssessmnentStatusDTO().getStatus().equals(CurrentStatus.COMPLETE.getStatus())
-                    && initialAssessmentDTO.getResult().equals(AssessmentResult.FULL.getResult())) ||
-                    fullAssessmentDTO.getAssessmnentStatusDTO().getStatus().equals(CurrentStatus.COMPLETE.getStatus()) ) {
-                return true;
-            }
-
-        }
-        return false;
     }
 }

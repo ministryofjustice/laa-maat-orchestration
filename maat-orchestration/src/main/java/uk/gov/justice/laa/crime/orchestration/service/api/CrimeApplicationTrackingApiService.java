@@ -14,14 +14,14 @@ import java.util.Collections;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CATApiService {
+public class CrimeApplicationTrackingApiService {
 
     private static final String REQUEST_STRING = "Request to Application Tracking Service: {}";
     @Qualifier("catApiClient")
     private final RestAPIClient catApiClient;
     private final ServicesConfiguration configuration;
 
-    public void handleEformResult(ApplicationTrackingOutputResult request) {
+    public void sendApplicationTrackingData(ApplicationTrackingOutputResult request) {
         log.debug(REQUEST_STRING, request);
         catApiClient.post(
                 request,

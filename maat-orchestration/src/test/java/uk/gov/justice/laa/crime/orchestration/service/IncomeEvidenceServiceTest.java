@@ -81,43 +81,6 @@ class IncomeEvidenceServiceTest {
         verify(incomeEvidenceMapper).maatApiAssessmentResponseToApplicationDTO(any(MaatApiAssessmentResponse.class),
                 any(ApplicationDTO.class));
     }
-
-    @Test
-    void givenAInitAssessmentIsInProgress_whenMangeIncomeEvidenceIsInvoked_thenCreateEvidenceShouldNotCalled() {
-        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
-        workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getInitial().getAssessmnentStatusDTO().setStatus(CurrentStatus.IN_PROGRESS.getStatus());
-        RepOrderDTO repOrder = TestModelDataBuilder.buildRepOrderDTO("CURR");
-
-        incomeEvidenceService.mangeIncomeEvidence(workflowRequest, repOrder);
-
-        verify(evidenceApiService, times(0)).createEvidence(any(ApiCreateIncomeEvidenceRequest.class));
-        verify(maatCourtDataApiService, times(0)).updateFinancialAssessment(any(MaatApiUpdateAssessment.class));
-        verify(incomeEvidenceMapper, times(0)).maatApiAssessmentResponseToApplicationDTO(any(MaatApiAssessmentResponse.class),
-                any(ApplicationDTO.class));
-    }
-
-    @Test
-    void givenAInitAssessmentIsCompleted_whenMangeIncomeEvidenceIsInvoked_thenApiServicesCalledAndResponseMapped() {
-        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
-        RepOrderDTO repOrder = TestModelDataBuilder.buildRepOrderDTO("CURR");
-
-        when(incomeEvidenceMapper.workflowRequestToApiCreateIncomeEvidenceRequest(any(WorkflowRequest.class)))
-                .thenReturn(new ApiCreateIncomeEvidenceRequest());
-        when(evidenceApiService.createEvidence(any(ApiCreateIncomeEvidenceRequest.class)))
-                .thenReturn(new ApiCreateIncomeEvidenceResponse());
-        when(incomeEvidenceMapper.mapToMaatApiUpdateAssessment(any(WorkflowRequest.class), any(RepOrderDTO.class), any(ApiCreateIncomeEvidenceResponse.class)))
-                .thenReturn(new MaatApiUpdateAssessment());
-        when(maatCourtDataApiService.updateFinancialAssessment(any(MaatApiUpdateAssessment.class)))
-                .thenReturn(new MaatApiAssessmentResponse());
-
-        incomeEvidenceService.mangeIncomeEvidence(workflowRequest, repOrder);
-
-        verify(evidenceApiService).createEvidence(any(ApiCreateIncomeEvidenceRequest.class));
-        verify(maatCourtDataApiService).updateFinancialAssessment(any(MaatApiUpdateAssessment.class));
-        verify(incomeEvidenceMapper).maatApiAssessmentResponseToApplicationDTO(any(MaatApiAssessmentResponse.class),
-                any(ApplicationDTO.class));
-    }
-
 }
 
 

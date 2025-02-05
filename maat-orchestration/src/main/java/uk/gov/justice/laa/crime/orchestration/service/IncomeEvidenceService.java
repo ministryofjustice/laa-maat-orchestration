@@ -19,6 +19,9 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.IncomeEvidenceMapper;
 import uk.gov.justice.laa.crime.orchestration.service.api.EvidenceApiService;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
+import uk.gov.justice.laa.crime.orchestration.util.AssessmentTypeUtil;
+
+import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType.MEANS_FULL;
 
 @Slf4j
 @Service
@@ -60,19 +63,5 @@ public class IncomeEvidenceService {
 
         incomeEvidenceMapper.maatApiAssessmentResponseToApplicationDTO(maatApiResponse, applicationDTO);
         return applicationDTO;
-    }
-
-    /**
-     * Replace manage_income_evidence stored procedure
-     * When Initial assessment status complete then Call the Evidence Service’s new create income evidence endpoint
-     * updates will be handled via a new dedicated flow.
-     */
-    public void mangeIncomeEvidence(WorkflowRequest request, RepOrderDTO repOrder) {
-
-        FinancialAssessmentDTO financialAssessmentDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO();
-        InitialAssessmentDTO initialAssessment = financialAssessmentDTO.getInitial();
-        if (initialAssessment.getAssessmnentStatusDTO().getStatus().equals(CurrentStatus.COMPLETE.getStatus())) {
-            createEvidence(request, repOrder);
-        }
     }
 }

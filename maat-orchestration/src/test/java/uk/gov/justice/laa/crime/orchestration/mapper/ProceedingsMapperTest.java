@@ -184,45 +184,19 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void givenAValidWorkflowRequest_whenDetermineMagsRepDecisionIsInvoked_thenReturnCorrectMapper() {
+    void givenAValidWorkflowRequest_whenApplicationDTOToApiDetermineMagsRepDecisionRequestIsInvoked_thenReturnCorrectMapper() {
         mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
         ApiDetermineMagsRepDecisionRequest apiDetermineMagsRepDecisionRequest =
-                proceedingsMapper.buildDetermineMagsRepDecision(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
+                proceedingsMapper.ApplicationDTOToApiDetermineMagsRepDecisionRequest(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
         assertThat(apiDetermineMagsRepDecisionRequest).isEqualTo(TestModelDataBuilder.getApiDetermineMagsRepDecisionRequest());
     }
 
     @Test
-    void givenDecisionResultIsEmpty_whenMapDecisionResultToApplicationDTOIsInvoked_thenApplicationDecisionShouldNull() {
+    void givenAValidDecisionResponse_ApiDetermineMagsRepDecisionResponseToApplicationDTOsInvoked_thenCorrectMappingReturned() {
 
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
-        workflowRequest.getApplicationDTO().getRepOrderDecision().setCode(null);
-        workflowRequest.getApplicationDTO().getRepOrderDecision().setDescription(null);
-        proceedingsMapper.mapDecisionResultToApplicationDTO(workflowRequest.getApplicationDTO(), new ApiDetermineMagsRepDecisionResponse());
-        assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getCode()).isNull();
-        assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getDescription()).isNull();
-
-    }
-
-    @Test
-    void givenDecisionReasonIsEmpty_whenMapDecisionResultToApplicationDTOIsInvoked_thenApplicationDecisionShouldNull() {
-
-        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
-        workflowRequest.getApplicationDTO().getRepOrderDecision().setCode(null);
-        workflowRequest.getApplicationDTO().getRepOrderDecision().setDescription(null);
-        ApiDetermineMagsRepDecisionResponse response = new ApiDetermineMagsRepDecisionResponse();
-        response.setDecisionResult(new MagsDecisionResult());
-        proceedingsMapper.mapDecisionResultToApplicationDTO(workflowRequest.getApplicationDTO(), new ApiDetermineMagsRepDecisionResponse());
-        assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getCode()).isNull();
-        assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getDescription()).isNull();
-
-    }
-
-    @Test
-    void givenAValidDecisionResponseIsEmpty_whenMapDecisionResultToApplicationDTOIsInvoked_thenCorrectMappingReturned() {
-
-        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
-        proceedingsMapper.mapDecisionResultToApplicationDTO(workflowRequest.getApplicationDTO(),
+        proceedingsMapper.ApiDetermineMagsRepDecisionResponseToApplicationDTO(workflowRequest.getApplicationDTO(),
                 TestModelDataBuilder.getApiDetermineMagsRepDecisionResponse());
         assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getCode()).isEqualTo(DecisionReason.GRANTED.getCode());
         assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getDescription().getValue())

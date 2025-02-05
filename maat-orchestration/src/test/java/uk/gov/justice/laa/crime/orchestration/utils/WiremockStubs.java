@@ -25,6 +25,10 @@ public class WiremockStubs {
     private static final String CAT_URL = "/api/internal/v1/application-tracking-output-result";
     private static final String EVIDENCE_URL = "/api/internal/v1/evidence";
 
+    private static final String FINANCIAL_ASSESSMENTS = "/financial-assessments";
+
+    private static final String CMA_URL = "/api/internal/v1/assessment/means";
+
     public static void stubForOAuth() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> token = Map.of(
@@ -46,12 +50,21 @@ public class WiremockStubs {
                     .withBody(response))));
     }
 
-    public static void stubForGetAssessment(int financialAssessmentId, String response) {
-        stubFor((get(urlMatching(MAAT_API_ASSESSMENT_URL + "/financial-assessments/" + financialAssessmentId))
+    public static void stubForUpdateMeansAssessment(String response) {
+        stubFor(put(urlMatching(CMA_URL))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(response))));
+                        .withBody(response)));
     }
+
+    public static void stubForCreateMeansAssessment(String response) {
+        stubFor(post(urlMatching(CMA_URL))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
+
+
 
     public static void assertStubForUpdateCrownCourtProceedings(int times) {
         verify(exactly(times), putRequestedFor(urlPathMatching(CCP_URL)));
@@ -79,9 +92,6 @@ public class WiremockStubs {
         verify(exactly(times), getRequestedFor(urlPathMatching(CCC_URL + "/summaries")));
     }
 
-    public static void assertStubForHandleEformSerivce(int times) {
-        verify(exactly(times), postRequestedFor(urlPathMatching(CAT_URL)));
-    }
 
     public static void assertStubForDetermineMsgRepDecision(int times) {
         verify(exactly(times), postRequestedFor(urlPathMatching(CCP_URL + "/determine-mags-rep-decision")));
@@ -93,9 +103,9 @@ public class WiremockStubs {
     }
 
     public static void assertStubForUpdateFinancialAssessment(int times) {
-        verify(exactly(times), putRequestedFor(urlPathMatching(MAAT_API_ASSESSMENT_URL + "/financial-assessments")));
+        verify(exactly(times), putRequestedFor(urlPathMatching(MAAT_API_ASSESSMENT_URL + FINANCIAL_ASSESSMENTS)));
     }
-    public static void assertStubForCAT(int times) {
+    public static void assertStubForApplicationTrackingService(int times) {
         verify(exactly(times), postRequestedFor(urlPathMatching(CAT_URL)));
     }
 
@@ -182,12 +192,12 @@ public class WiremockStubs {
     }
 
     public static void stubForUpdateFinancialAssessment(String response) {
-        stubFor(put(urlMatching(MAAT_API_ASSESSMENT_URL + "/financial-assessments"))
+        stubFor(put(urlMatching(MAAT_API_ASSESSMENT_URL + FINANCIAL_ASSESSMENTS))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response)));
     }
-    public static void stubForATS() {
+    public static void stubForApplicationTrackingService() {
         stubFor(post(urlMatching(CAT_URL)).willReturn(WireMock.ok()));
     }
 }

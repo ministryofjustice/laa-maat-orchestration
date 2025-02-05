@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
@@ -77,11 +77,13 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Mock
     private ApplicationTrackingMapper applicationTrackingMapper;
+
     @Mock
-    private CATDataService catDataService;
+    private CrimeApplicationTrackingService crimeApplicationTrackingService;
 
     @InjectMocks
     private MeansAssessmentOrchestrationService orchestrationService;
+
 
     private WorkflowRequest workflowRequest;
     private ApplicationDTO applicationDTO;
@@ -241,8 +243,6 @@ class MeansAssessmentOrchestrationServiceTest {
         when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
         when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
         when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(true);
-        when(applicationTrackingMapper.buildForAssessmentFlow(any(WorkflowRequest.class), any(RepOrderDTO.class)))
-                .thenReturn(new ApplicationTrackingOutputResult());
 
         orchestrationService.update(workflowRequest);
         verify(maatCourtDataService, times(0)).invokeStoredProcedure(
@@ -350,73 +350,61 @@ class MeansAssessmentOrchestrationServiceTest {
 
 
     @Test
-    void givenARequestWithC3AndMattPostProcessIsNotEnabled_thenPostProcessShouldNotCalled() {
+    void givenMattPostProcessIsNotEnabled_whenCreateIsInvoked_thenPostProcessShouldNotCalled() {
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
                 any(StoredProcedure.class)
         )).thenReturn(workflowRequest.getApplicationDTO());
 
-        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(false);
-        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(true);
-        when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
-
-        orchestrationService.create(workflowRequest);
-
-        verify(contributionService, times(0)).calculate(workflowRequest);
-        verify(incomeEvidenceService, times(0)).mangeIncomeEvidence(workflowRequest, repOrderDTO);
-
-        verify(proceedingsService, times(0)).determineMagsRepDecision(workflowRequest);
-        verify(catDataService, atLeast(0)).handleEformResult(any());
-    }
-
-    @Test
-    void givenARequestWithC3IsEnabled_MattPostProcessIsNotEnabled_thenPostProcessorShouldCalled() {
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
-                any(StoredProcedure.class)
-        )).thenReturn(workflowRequest.getApplicationDTO());
-        when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTO);
         when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
         when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(false);
         when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
+        when(contributionService.calculate(any(WorkflowRequest.class))).thenReturn(workflowRequest.getApplicationDTO());
 
-        orchestrationService.update(workflowRequest);
+        orchestrationService.create(workflowRequest);
 
-        verify(maatCourtDataService, times(1)).invokeStoredProcedure(
-                workflowRequest.getApplicationDTO(),
-                workflowRequest.getUserDTO(),
-                StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1
-        );
-
-        verify(contributionService, times(2)).calculate(workflowRequest);
-
-        verify(maatCourtDataService, times(1)).invokeStoredProcedure(
-                workflowRequest.getApplicationDTO(),
-                workflowRequest.getUserDTO(),
-                StoredProcedure.PRE_UPDATE_CC_APPLICATION
-        );
-
-        verify(proceedingsService, times(1)).updateApplication(workflowRequest,
-                repOrderDTO);
-
-
+        verify(incomeEvidenceService, times(0)).createEvidence(workflowRequest, repOrderDTO);
+        verify(proceedingsService, times(0)).determineMagsRepDecision(workflowRequest);
+        verify(crimeApplicationTrackingService, atLeast(0)).sendApplicationTrackingData(any());
     }
 
     @Test
-    void givenARequestWithC3NotEnabled_MattPostProcessIsEnabled_thenPostProcessorShouldCalled() {
+    void givenMattPostProcessIsEnabledAndAssessmentIsNotCompleted_whenCreateIsInvoked_thenPostProcessShouldNotCalled() {
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
                 any(StoredProcedure.class)
         )).thenReturn(workflowRequest.getApplicationDTO());
 
-        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(false);
+        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
         when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(true);
         when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
+        when(contributionService.calculate(any(WorkflowRequest.class))).thenReturn(workflowRequest.getApplicationDTO());
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getInitial().getAssessmnentStatusDTO().
+                setStatus(CurrentStatus.IN_PROGRESS.getStatus());
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().
+                setStatus(CurrentStatus.IN_PROGRESS.getStatus());
+        orchestrationService.create(workflowRequest);
+
+        verify(incomeEvidenceService, times(0)).createEvidence(workflowRequest, repOrderDTO);
+        verify(proceedingsService, times(0)).determineMagsRepDecision(workflowRequest);
+        verify(crimeApplicationTrackingService, atLeast(0)).sendApplicationTrackingData(any());
+    }
+
+    @Test
+    void givenMattPostProcessIsEnabled_whenCreateIsInvoked_thenPostProcessorShouldCalled() {
+        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
+                any(StoredProcedure.class)
+        )).thenReturn(workflowRequest.getApplicationDTO());
+
+        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
+        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(true);
+        when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
+        when(contributionService.calculate(any(WorkflowRequest.class))).thenReturn(workflowRequest.getApplicationDTO());
 
         orchestrationService.create(workflowRequest);
 
-        verify(contributionService, times(0)).calculate(workflowRequest);
-        verify(incomeEvidenceService, times(0)).mangeIncomeEvidence(workflowRequest, repOrderDTO);
-
-        verify(proceedingsService, times(0)).determineMagsRepDecision(workflowRequest);
-        verify(catDataService, atLeast(0)).handleEformResult(any());
+        verify(contributionService, times(2)).calculate(workflowRequest);
+        verify(incomeEvidenceService, times(1)).createEvidence(workflowRequest, repOrderDTO);
+        verify(proceedingsService, times(1)).determineMagsRepDecision(workflowRequest);
+        verify(crimeApplicationTrackingService, atLeast(1)).sendApplicationTrackingData(any());
     }
 
 

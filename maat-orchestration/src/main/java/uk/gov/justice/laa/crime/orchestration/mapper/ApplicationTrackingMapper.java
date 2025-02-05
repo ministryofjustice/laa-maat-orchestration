@@ -151,17 +151,4 @@ public class ApplicationTrackingMapper {
                 .map(StringUtils::capitalize)
                 .collect(Collectors.joining(StringUtils.SPACE));
     }
-
-    public ApplicationTrackingOutputResult buildForAssessmentFlow(WorkflowRequest request, RepOrderDTO repOrderDTO) {
-
-        ApplicationTrackingOutputResult.AssessmentType  assessmentType = MEANS_INIT;
-
-        FinancialAssessmentDTO financialAssessmentDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO();
-        FullAssessmentDTO fullAssessment = financialAssessmentDTO.getFull();
-
-        if (fullAssessment.getAssessmentDate() != null) {
-            assessmentType = MEANS_FULL;
-        }
-        return build(request,repOrderDTO,assessmentType, RequestSource.MEANS_ASSESSMENT);
-    }
 }

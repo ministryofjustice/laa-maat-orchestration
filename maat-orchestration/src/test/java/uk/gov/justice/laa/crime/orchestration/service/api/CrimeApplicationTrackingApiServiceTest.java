@@ -17,7 +17,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith({MockitoExtension.class})
-class CATApiServiceTest {
+class CrimeApplicationTrackingApiServiceTest {
 
 
     @Mock
@@ -27,11 +27,11 @@ class CATApiServiceTest {
     private ServicesConfiguration configuration = MockServicesConfiguration.getConfiguration(1000);
 
     @InjectMocks
-    private CATApiService catApiService;
+    private CrimeApplicationTrackingApiService crimeApplicationTrackingApiService;
 
     @Test
-    void givenValidRequest_whenHandleEformResultIsInvoked_thenApplicationTrackingServiceIsCalled() {
-        catApiService.handleEformResult(new ApplicationTrackingOutputResult());
+    void givenValidRequest_whenSendApplicationTrackingDataIsInvoked_thenApplicationTrackingServiceIsCalled() {
+        crimeApplicationTrackingApiService.sendApplicationTrackingData(new ApplicationTrackingOutputResult());
         verify(catApiClient).post(any(ApplicationTrackingOutputResult.class), any(), anyString(), anyMap());
     }
 

@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.commons.exception.MAATServerException;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.exception.ValidationException;
@@ -22,7 +23,9 @@ import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
 import uk.gov.justice.laa.crime.orchestration.service.*;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
+import uk.gov.justice.laa.crime.orchestration.util.AssessmentTypeUtil;
 
+import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType.MEANS_FULL;
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_INCOMPLETE_ASSESSMENT;
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_REASSESSMENT;
 
@@ -42,7 +45,8 @@ public class MeansAssessmentOrchestrationService {
     private final MaatCourtDataApiService maatCourtDataApiService;
 
     private final ApplicationTrackingMapper applicationTrackingMapper;
-    private final CATDataService catDataService;
+
+    private final CrimeApplicationTrackingService crimeApplicationTrackingService;
 
     private final IncomeEvidenceService incomeEvidenceService;
 
@@ -119,19 +123,16 @@ public class MeansAssessmentOrchestrationService {
                 request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
                         request.getApplicationDTO(),
                         request.getUserDTO(),
-                        StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1)
+                        StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3)
                 );
             }
 
             request.setApplicationDTO(contributionService.calculate(request));
 
-            if (!featureDecisionService.isMaatPostAssessmentProcessingEnabled(request)) {
-                // check feature flag here - only need to do this for the new workflow, not for the old way of doing things
-                request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                    contributionService.calculate(request),
+            request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                    request.getApplicationDTO(),
                     request.getUserDTO(),
-                        StoredProcedure.PRE_UPDATE_CC_APPLICATION));
-            }
+                    StoredProcedure.PRE_UPDATE_CC_APPLICATION));
         } else {
 
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
@@ -167,17 +168,18 @@ public class MeansAssessmentOrchestrationService {
         return application;
     }
 
-   private void postProcessAssessment(WorkflowRequest request) {
+    private void postProcessAssessment(WorkflowRequest request) {
 
         RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());
-        incomeEvidenceService.mangeIncomeEvidence(request, repOrderDTO);
-        proceedingsService.determineMagsRepDecision(request);
-        request.setApplicationDTO(contributionService.calculate(request));
-        ApplicationTrackingOutputResult eFormResult = applicationTrackingMapper.buildForAssessmentFlow(request, repOrderDTO);
-        if (null != eFormResult.getUsn()) {
-                catDataService.handleEformResult(eFormResult);
+        if (AssessmentTypeUtil.isAssessmentCompleted(request)) {
+            if (AssessmentTypeUtil.isInitialAssessmentCompleted(request)) {
+                incomeEvidenceService.createEvidence(request, repOrderDTO);
+            }
+            proceedingsService.determineMagsRepDecision(request);
+            request.setApplicationDTO(contributionService.calculate(request));
+            ApplicationTrackingOutputResult trackingResult = applicationTrackingMapper.build(request, repOrderDTO,
+                    AssessmentTypeUtil.getAssessmentType(request), ApplicationTrackingOutputResult.RequestSource.MEANS_ASSESSMENT);
+            crimeApplicationTrackingService.sendApplicationTrackingData(trackingResult);
         }
     }
-
-
 }

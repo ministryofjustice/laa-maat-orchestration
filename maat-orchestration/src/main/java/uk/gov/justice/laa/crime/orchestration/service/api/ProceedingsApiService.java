@@ -23,14 +23,14 @@ import java.util.Collections;
 public class ProceedingsApiService {
 
     @Qualifier("ccpApiClient")
-    private final RestAPIClient crownCourtApiClient;
+    private final RestAPIClient proceedingsApiClient;
     private final ServicesConfiguration configuration;
     private static final String RESPONSE_STRING = "Response from Proceedings Service: {}";
     private static final String REQUEST_STRING = "Request to Proceedings Service: {}";
 
     public ApiUpdateApplicationResponse updateApplication(ApiUpdateApplicationRequest request) {
         log.debug(REQUEST_STRING, request);
-        ApiUpdateApplicationResponse response = crownCourtApiClient.put(
+        ApiUpdateApplicationResponse response = proceedingsApiClient.put(
                 request,
                 new ParameterizedTypeReference<>() {
                 },
@@ -44,7 +44,7 @@ public class ProceedingsApiService {
 
     public ApiUpdateCrownCourtOutcomeResponse updateCrownCourt(ApiUpdateCrownCourtRequest request) {
         log.debug(REQUEST_STRING, request);
-        ApiUpdateCrownCourtOutcomeResponse response = crownCourtApiClient.put(
+        ApiUpdateCrownCourtOutcomeResponse response = proceedingsApiClient.put(
                 request,
                 new ParameterizedTypeReference<>() {
                 },
@@ -58,7 +58,7 @@ public class ProceedingsApiService {
 
     public ApiDetermineMagsRepDecisionResponse determineMagsRepDecision(ApiDetermineMagsRepDecisionRequest request) {
         log.debug(REQUEST_STRING, request);
-        ApiDetermineMagsRepDecisionResponse response = crownCourtApiClient.post(
+        ApiDetermineMagsRepDecisionResponse response = proceedingsApiClient.post(
                 request,
                 new ParameterizedTypeReference<>() {
                 },

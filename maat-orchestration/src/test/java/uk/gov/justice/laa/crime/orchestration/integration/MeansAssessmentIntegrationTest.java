@@ -138,10 +138,7 @@ class MeansAssessmentIntegrationTest {
         String repOrderDTO = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getRepOrderDTO());
 
         stubForOAuth();
-        wiremock.stubFor(post(urlMatching(CMA_URL))
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(cmaResponse)));
+        stubForCreateMeansAssessment(cmaResponse);
         stubForUpdateCrownCourtProceedings(ccpResponse);
         stubForCalculateContributions(cccCalculateResponse);
         stubForGetContributionsSummary(cccSummariesResponse);
@@ -161,6 +158,10 @@ class MeansAssessmentIntegrationTest {
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1);
         assertStubForInvokeStoredProcedure(4);
+
+        assertStubForDetermineMsgRepDecision(0);
+        assertStubForCreateIncomeEvidence(0);
+        assertStubForApplicationTrackingService(0);
     }
 
     @Test
@@ -209,10 +210,7 @@ class MeansAssessmentIntegrationTest {
         String repOrderDTO = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getRepOrderDTO());
 
         stubForOAuth();
-        wiremock.stubFor(put(urlMatching(CMA_URL))
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(cmaResponse)));
+        stubForUpdateMeansAssessment(cmaResponse);
         stubForUpdateCrownCourtProceedings(ccpResponse);
         stubForCalculateContributions(cccCalculateResponse);
         stubForGetContributionsSummary(cccSummariesResponse);
@@ -232,6 +230,10 @@ class MeansAssessmentIntegrationTest {
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1);
         assertStubForInvokeStoredProcedure(4);
+
+        assertStubForDetermineMsgRepDecision(0);
+        assertStubForCreateIncomeEvidence(0);
+        assertStubForApplicationTrackingService(0);
     }
 
     @Test
@@ -269,109 +271,45 @@ class MeansAssessmentIntegrationTest {
     }
 
     @Test
-    void givenAPostAssessmentProcessingEnabled_whenCreateIsInvoked_thenAssessmentIsCreated() throws Exception {
+    void givenPostAssessmentProcessingEnabled_whenCreateIsInvoked_thenAssessmentIsCreated() throws Exception {
         String cmaResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiMeansAssessmentResponse());
         String ccpResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
         String cccCalculateResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse());
-        String cccSummariesResponse = objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary()));
+
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT);
-        applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().setUsn(123l);
+        applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().setUsn(TestModelDataBuilder.USN.longValue());
         String maatApiResponse = objectMapper.writeValueAsString(applicationDTO);
         WorkflowRequest request = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().setHardship(TestModelDataBuilder.getHardshipOverviewDTO());
-        request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getInitial().setResult(AssessmentResult.FULL.getResult());
-        request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().setStatus(CurrentStatus.IN_PROGRESS.getStatus());
         String requestBody = objectMapper.writeValueAsString(request);
-        String userSummaryResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getUserSummaryDTOForPostProcess());
+
+        String userSummaryResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getUserSummaryDTOForPostProcessing());
         String repOrderDTO = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getRepOrderDTO());
         String createIncomeEvidenceResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getCreateIncomeEvidenceResponse());
         String assessmentResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getMaatApiAssessmentResponse());
         String determineRepDecision = objectMapper.writeValueAsString(TestModelDataBuilder.getApiDetermineMagsRepDecisionResponse());
 
-
         stubForOAuth();
-        wiremock.stubFor(post(urlMatching(CMA_URL))
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(cmaResponse)));
+        stubForCreateMeansAssessment(cmaResponse);
         stubForUpdateCrownCourtProceedings(ccpResponse);
         stubForCalculateContributions(cccCalculateResponse);
-        stubForGetContributionsSummary(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
         stubForGetRepOrders(repOrderDTO);
         stubForUpdateSendToCCLF();
         stubForCreateIncomeEvidence(createIncomeEvidenceResponse);
         stubForUpdateFinancialAssessment(assessmentResponse);
         stubForDetermineMsgRepDecision(determineRepDecision);
-        stubForATS();
-
-        stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", "DB_PRE_UPDATE_CC_APPLICATION", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_PRE_UPDATE_CC_APPLICATION", "DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
+        stubForApplicationTrackingService();
+        stubForInvokeStoredProcedure(maatApiResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk());
 
         assertStubForUpdateCrownCourtProceedings(1);
-        assertStubForInvokeStoredProcedure(1);
-        assertStubForHandleEformSerivce(1);
+        assertStubForCalculateContributions(2);
         assertStubForDetermineMsgRepDecision(1);
         assertStubForCreateIncomeEvidence(1);
         assertStubForUpdateFinancialAssessment(1);
-        assertStubForCAT(1);
-    }
-
-    @Test
-    void givenAPostAssessmentProcessingEnabled_whenUpdateIsInvoked_thenAssessmentIsCreated() throws Exception {
-        String cmaResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiMeansAssessmentResponse());
-        String ccpResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
-        String cccCalculateResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse());
-        String cccSummariesResponse = objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary()));
-        ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT);
-        applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().setUsn(123l);
-        String maatApiResponse = objectMapper.writeValueAsString(applicationDTO);
-        WorkflowRequest request = MeansAssessmentDataBuilder.buildWorkFlowRequest();
-        request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().setHardship(TestModelDataBuilder.getHardshipOverviewDTO());
-        String requestBody = objectMapper.writeValueAsString(request);
-        String userSummaryResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getUserSummaryDTOForPostProcess());
-        String repOrderDTO = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getRepOrderDTO());
-        String createIncomeEvidenceResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getCreateIncomeEvidenceResponse());
-        String assessmentResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getMaatApiAssessmentResponse());
-        String determineRepDecision = objectMapper.writeValueAsString(TestModelDataBuilder.getApiDetermineMagsRepDecisionResponse());
-
-
-        stubForOAuth();
-        wiremock.stubFor(post(urlMatching(CMA_URL))
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(cmaResponse)));
-        stubForUpdateCrownCourtProceedings(ccpResponse);
-        stubForCalculateContributions(cccCalculateResponse);
-        stubForGetContributionsSummary(cccSummariesResponse);
-        stubForGetUserSummary(userSummaryResponse);
-        stubForGetRepOrders(repOrderDTO);
-        stubForUpdateSendToCCLF();
-        stubForCreateIncomeEvidence(createIncomeEvidenceResponse);
-        stubForUpdateFinancialAssessment(assessmentResponse);
-        stubForDetermineMsgRepDecision(determineRepDecision);
-        stubForATS();
-
-        stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", "DB_PRE_UPDATE_CC_APPLICATION", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_PRE_UPDATE_CC_APPLICATION", "DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
-
-        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
-                .andExpect(status().isOk());
-
-        assertStubForUpdateCrownCourtProceedings(1);
-        assertStubForInvokeStoredProcedure(2);
-        assertStubForHandleEformSerivce(1);
-        assertStubForCalculateContributions(1);
-        assertStubForDetermineMsgRepDecision(1);
-        assertStubForCAT(1);
+        assertStubForApplicationTrackingService(1);
     }
 }

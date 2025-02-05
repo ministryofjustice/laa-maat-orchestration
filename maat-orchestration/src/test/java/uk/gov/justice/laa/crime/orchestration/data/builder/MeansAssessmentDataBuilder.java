@@ -359,16 +359,21 @@ public class MeansAssessmentDataBuilder {
             .build();
     }
 
-    public static UserSummaryDTO getUserSummaryDTOForPostProcess() {
+    public static UserSummaryDTO getUserSummaryDTOForPostProcessing() {
         return UserSummaryDTO.builder()
                 .featureToggle(List.of(
                         FeatureToggleDTO.builder()
                                 .featureName(FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING.getName())
                                 .action(FeatureToggleAction.READ.getName())
                                 .isEnabled("Y")
+                                .build(),
+                        FeatureToggleDTO.builder()
+                                .featureName(FeatureToggle.CALCULATE_CONTRIBUTION.getName())
+                                .action(FeatureToggleAction.CREATE.getName())
+                                .isEnabled("Y")
                                 .build()
                 ))
-                .roleActions(List.of(Action.CREATE_ASSESSMENT.getCode()))
+                .roleActions(List.of(Action.CREATE_ASSESSMENT.getCode(), Action.UPDATE_ASSESSMENT.getCode()))
                 .build();
     }
 

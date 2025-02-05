@@ -19,6 +19,7 @@ import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCo
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
@@ -137,6 +138,8 @@ public class TestModelDataBuilder {
     public static final LocalDateTime EVIDENCE_DUE_DATE = LocalDateTime.of(2023, 3, 18, 0, 0, 0);
     public static final LocalDateTime INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 2, 18, 0, 0, 0);
     public static final LocalDate ALL_EVIDENCE_RECEIVED_DATE = LocalDate.of(2024, 12, 18);
+
+    public static final Integer USN = 156789;
 
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
@@ -1533,7 +1536,7 @@ public class TestModelDataBuilder {
     }
 
 
-    public static ApiUpdateIncomeEvidenceResponse getMApiUpdateIncomeEvidenceResponse() {
+    public static ApiUpdateIncomeEvidenceResponse getApiUpdateIncomeEvidenceResponse() {
         ApiUpdateIncomeEvidenceResponse response = new ApiUpdateIncomeEvidenceResponse();
         response.setDueDate(EVIDENCE_DUE_DATE.toLocalDate());
         return response;
@@ -1544,5 +1547,11 @@ public class TestModelDataBuilder {
         response.setId(REP_ID);
         response.setIncomeEvidence(Collections.emptyList());
         return response;
+    }
+
+    public static ApplicationTrackingOutputResult getApplicationTrackingOutputResult() {
+        ApplicationTrackingOutputResult request = new ApplicationTrackingOutputResult();
+        request.setUsn(USN);
+        return request;
     }
 }
