@@ -27,6 +27,7 @@ import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiServic
 
 import java.util.List;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -400,7 +401,7 @@ class MeansAssessmentOrchestrationServiceTest {
         when(contributionService.calculate(any(WorkflowRequest.class))).thenReturn(workflowRequest.getApplicationDTO());
 
         workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().
-                setStatus(CurrentStatus.IN_PROGRESS.getStatus());
+                setStatus(EMPTY);
         orchestrationService.create(workflowRequest);
 
         verify(contributionService, times(2)).calculate(workflowRequest);

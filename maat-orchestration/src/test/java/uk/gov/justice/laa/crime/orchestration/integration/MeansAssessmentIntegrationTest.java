@@ -34,6 +34,7 @@ import uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -281,7 +282,8 @@ class MeansAssessmentIntegrationTest {
         WorkflowRequest request = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().setHardship(TestModelDataBuilder.getHardshipOverviewDTO());
         request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().
-                setStatus(CurrentStatus.IN_PROGRESS.getStatus());
+                setStatus(EMPTY);
+        request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().setAssessmentDate(null);
         String requestBody = objectMapper.writeValueAsString(request);
 
         String userSummaryResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getUserSummaryDTOForPostProcessing());

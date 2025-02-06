@@ -172,8 +172,7 @@ public class MeansAssessmentOrchestrationService {
 
         RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());
         if (AssessmentTypeUtil.isAssessmentCompleted(request)) {
-            if (AssessmentTypeUtil.isInitialAssessmentCompleted(request)
-                    && !AssessmentTypeUtil.isFullAssessmentCompleted(request)) {
+            if (AssessmentTypeUtil.isInitCompletedAndFullAssessmentNotStarted(request)) {
                 incomeEvidenceService.createEvidence(request, repOrderDTO);
             }
             proceedingsService.determineMagsRepDecision(request);

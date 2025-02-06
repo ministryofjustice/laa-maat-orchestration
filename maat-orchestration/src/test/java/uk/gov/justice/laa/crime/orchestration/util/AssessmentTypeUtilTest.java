@@ -12,6 +12,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 
 import java.util.stream.Stream;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType.MEANS_FULL;
 import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType.MEANS_INIT;
@@ -40,8 +41,14 @@ class AssessmentTypeUtilTest {
 
     @ParameterizedTest
     @MethodSource("workflowRequestForGetAssessmentType")
-    void givenAValidInput_whenAetAssessmentTypeIsInvoked_thenCorrectAssessmentIsReturned(WorkflowRequest request, ApplicationTrackingOutputResult.AssessmentType expected) {
+    void givenAValidInput_whenAssessmentTypeIsInvoked_thenCorrectAssessmentIsReturned(WorkflowRequest request, ApplicationTrackingOutputResult.AssessmentType expected) {
         assertEquals(AssessmentTypeUtil.getAssessmentType(request), expected);
+    }
+
+    @ParameterizedTest
+    @MethodSource("workflowRequestForInitCompletedAndFullAssessmentNotStarted")
+    void givenAValidInput_whenInitCompletedAndFullAssessmentNotStartedIsInvoked_thenExpectedIsReturned(WorkflowRequest request, boolean expected) {
+        assertEquals(AssessmentTypeUtil.isInitCompletedAndFullAssessmentNotStarted(request), expected);
     }
 
     private static Stream<Arguments> workflowRequestForInitialAssessment() {
@@ -97,6 +104,28 @@ class AssessmentTypeUtilTest {
         return Stream.of(
                 Arguments.of(fullAssessmentInProgress, MEANS_INIT),
                 Arguments.of(TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT), MEANS_FULL)
+        );
+    }
+
+    private static Stream<Arguments> workflowRequestForInitCompletedAndFullAssessmentNotStarted() {
+
+        WorkflowRequest initialAssessmentResult = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
+        initialAssessmentResult.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getInitial().setResult(AssessmentResult.FULL.getResult());
+        initialAssessmentResult.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().setStatus(CurrentStatus.IN_PROGRESS.getDescription());
+
+
+        WorkflowRequest fullAssessmentInProgress = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
+        fullAssessmentInProgress.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().setStatus(CurrentStatus.IN_PROGRESS.getDescription());
+
+        WorkflowRequest fullNotStarted = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
+        fullNotStarted.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().setStatus(EMPTY);
+
+
+        return Stream.of(
+                Arguments.of(initialAssessmentResult, false),
+                Arguments.of(fullAssessmentInProgress, false),
+                Arguments.of(TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT), false),
+                Arguments.of(fullNotStarted, true)
         );
     }
 
