@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiRollbackMeansAssessmentResponse;
 import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
@@ -279,6 +280,8 @@ class MeansAssessmentIntegrationTest {
         String maatApiResponse = objectMapper.writeValueAsString(applicationDTO);
         WorkflowRequest request = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().setHardship(TestModelDataBuilder.getHardshipOverviewDTO());
+        request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().
+                setStatus(CurrentStatus.IN_PROGRESS.getStatus());
         String requestBody = objectMapper.writeValueAsString(request);
 
         String userSummaryResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getUserSummaryDTOForPostProcessing());

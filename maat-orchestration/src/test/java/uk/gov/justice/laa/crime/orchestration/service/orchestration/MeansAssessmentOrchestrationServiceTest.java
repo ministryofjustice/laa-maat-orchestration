@@ -389,7 +389,7 @@ class MeansAssessmentOrchestrationServiceTest {
     }
 
     @Test
-    void givenMattPostProcessIsEnabled_whenCreateIsInvoked_thenPostProcessorShouldCalled() {
+    void givenMattPostProcessIsEnabled_whenCreateIsInvoked_thenPostProcessShouldCalled() {
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
                 any(StoredProcedure.class)
         )).thenReturn(workflowRequest.getApplicationDTO());
@@ -399,6 +399,8 @@ class MeansAssessmentOrchestrationServiceTest {
         when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
         when(contributionService.calculate(any(WorkflowRequest.class))).thenReturn(workflowRequest.getApplicationDTO());
 
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().
+                setStatus(CurrentStatus.IN_PROGRESS.getStatus());
         orchestrationService.create(workflowRequest);
 
         verify(contributionService, times(2)).calculate(workflowRequest);

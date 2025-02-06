@@ -81,7 +81,7 @@ class ProceedingsServiceTest {
     void givenACaseTypeAsAppealToCC_whenCanInvokeMsgRepDecisionIsInvoked_thenApiServiceIsNotCalled() {
         WorkflowRequest request = MeansAssessmentDataBuilder.buildWorkFlowRequest();
         request.getApplicationDTO().getCaseDetailsDTO().setCaseType(CaseType.APPEAL_CC.getCaseType());
-        ApiDetermineMagsRepDecisionResponse response = proceedingsService.determineMagsRepDecision(request);
+        proceedingsService.determineMagsRepDecision(request);
         verify(proceedingsApiService, times(0)).determineMagsRepDecision(any(ApiDetermineMagsRepDecisionRequest.class));
     }
 
