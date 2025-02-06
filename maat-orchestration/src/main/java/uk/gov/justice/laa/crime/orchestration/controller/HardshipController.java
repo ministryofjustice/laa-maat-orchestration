@@ -54,6 +54,7 @@ public class HardshipController {
     public ResponseEntity<ApplicationDTO> create(
             @Valid @RequestBody WorkflowRequest workflowRequest) {
         log.info("Received request to create hardship");
+        log.info("Create Workflow request for Hardship-->" + workflowRequest);
         ApplicationDTO applicationDTO;
         try {
             applicationDTO = orchestrationService.create(workflowRequest);
@@ -75,6 +76,7 @@ public class HardshipController {
     public ResponseEntity<ApplicationDTO> update(
             @Valid @RequestBody WorkflowRequest workflowRequest) {
         log.info("Received request to update hardship");
+        log.info("Update Workflow request for Hardship-->" + workflowRequest);
         ApplicationDTO applicationDTO;
         try {
             applicationDTO = orchestrationService.update(workflowRequest);
