@@ -6,6 +6,7 @@ logging:
     root: ${LOG_LEVEL}
     org.springframework.web: ${LOG_LEVEL}
     org.springframework.security: ${LOG_LEVEL}
+    u.g.j.l.c.c.filters: ERROR
 
 management:
   server:
