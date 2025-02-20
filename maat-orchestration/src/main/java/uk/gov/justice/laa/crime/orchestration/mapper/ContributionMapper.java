@@ -142,7 +142,7 @@ public class ContributionMapper extends CrownCourtMapper {
             HardshipReviewDTO magsHardshipReviewDTO = financialAssessmentDTO.getHardship().getMagCourtHardship();
             HardshipReviewDTO crownCourtHardshipReviewDTO = financialAssessmentDTO.getHardship().getCrownCourtHardship();
 
-            if (magsHardshipReviewDTO != null) {
+            if (magsHardshipReviewDTO != null && magsHardshipReviewDTO.getId() != null) {
                 log.info("applicationDtoToAssessments.magsHardshipReviewDTO.status-->" + magsHardshipReviewDTO.getAsessmentStatus().getStatus());
                 assessmentList.add(
                     new ApiAssessment()
@@ -153,7 +153,7 @@ public class ContributionMapper extends CrownCourtMapper {
                         .withStatus(CurrentStatus.getFrom(magsHardshipReviewDTO.getAsessmentStatus().getStatus())));
             }
 
-            if (crownCourtHardshipReviewDTO != null) {
+            if (crownCourtHardshipReviewDTO != null && crownCourtHardshipReviewDTO.getId() != null) {
                 log.info("applicationDtoToAssessments.crownCourtHardshipReviewDTO.status-->" + crownCourtHardshipReviewDTO.getAsessmentStatus().getStatus());
                 assessmentList.add(
                     new ApiAssessment()
