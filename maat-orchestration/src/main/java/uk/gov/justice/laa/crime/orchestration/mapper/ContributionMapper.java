@@ -137,6 +137,35 @@ public class ContributionMapper extends CrownCourtMapper {
                             .withStatus(CurrentStatus.getFrom(passported.getAssessementStatusDTO().getStatus()))
             );
         }
+
+        if (financialAssessmentDTO.getHardship() != null) {
+            HardshipReviewDTO magsHardshipReviewDTO = financialAssessmentDTO.getHardship().getMagCourtHardship();
+            HardshipReviewDTO crownCourtHardshipReviewDTO = financialAssessmentDTO.getHardship().getCrownCourtHardship();
+
+            if (magsHardshipReviewDTO != null) {
+                log.info("applicationDtoToAssessments.magsHardshipReviewDTO.status-->" + magsHardshipReviewDTO.getAsessmentStatus().getStatus());
+                assessmentList.add(
+                    new ApiAssessment()
+                        .withAssessmentType(AssessmentType.HARDSHIP)
+                        .withResult(AssessmentResult.getFrom(magsHardshipReviewDTO.getReviewResult()))
+                        .withAssessmentDate(toLocalDateTime(magsHardshipReviewDTO.getReviewDate()))
+                        .withNewWorkReason(NewWorkReason.getFrom(magsHardshipReviewDTO.getNewWorkReason().getCode()))
+                        .withStatus(CurrentStatus.getFrom(magsHardshipReviewDTO.getAsessmentStatus().getStatus())));
+            }
+
+            if (crownCourtHardshipReviewDTO != null) {
+                log.info("applicationDtoToAssessments.crownCourtHardshipReviewDTO.status-->" + crownCourtHardshipReviewDTO.getAsessmentStatus().getStatus());
+                assessmentList.add(
+                    new ApiAssessment()
+                        .withAssessmentType(AssessmentType.HARDSHIP)
+                        .withResult(AssessmentResult.getFrom(crownCourtHardshipReviewDTO.getReviewResult()))
+                        .withAssessmentDate(toLocalDateTime(crownCourtHardshipReviewDTO.getReviewDate()))
+                        .withNewWorkReason(NewWorkReason.getFrom(crownCourtHardshipReviewDTO.getNewWorkReason().getCode()))
+                        .withStatus(CurrentStatus.getFrom(crownCourtHardshipReviewDTO.getAsessmentStatus().getStatus())));
+            }
+
+        }
+
         log.info("applicationDtoToAssessments.assessmentList-->" + assessmentList);
         return assessmentList;
     }
