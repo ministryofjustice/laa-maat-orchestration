@@ -5,6 +5,7 @@ logging:
   level:
     root: ${LOG_LEVEL}
     org.springframework.web: ${LOG_LEVEL}
+    org.springframework.web.filter: ERROR
     org.springframework.security: ${LOG_LEVEL}
 
 management:
