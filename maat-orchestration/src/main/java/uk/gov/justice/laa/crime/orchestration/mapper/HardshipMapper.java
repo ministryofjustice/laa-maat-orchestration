@@ -106,9 +106,8 @@ public class HardshipMapper {
             return new SolicitorCosts()
                     .withVat(solicitorsCosts.getSolicitorVat())
                     .withRate(solicitorsCosts.getSolicitorRate())
-                    // Converting from double to BigDecimal, truncate to 1 decimal place
                     .withHours(BigDecimal.valueOf(solicitorsCosts.getSolicitorHours())
-                            .setScale(1, RoundingMode.DOWN))
+                            .setScale(2, RoundingMode.DOWN))
                     .withDisbursements(solicitorsCosts.getSolicitorDisb())
                     .withEstimatedTotal(solicitorsCosts.getSolicitorEstimatedTotalCost());
         }
