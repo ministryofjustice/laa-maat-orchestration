@@ -137,6 +137,22 @@ public class ContributionMapper extends CrownCourtMapper {
                             .withStatus(CurrentStatus.getFrom(passported.getAssessementStatusDTO().getStatus()))
             );
         }
+
+        if (financialAssessmentDTO.getHardship() != null) {
+            HardshipReviewDTO crownCourtHardshipReviewDTO = financialAssessmentDTO.getHardship().getCrownCourtHardship();
+
+            if (crownCourtHardshipReviewDTO != null && crownCourtHardshipReviewDTO.getId() != null) {
+                log.info("applicationDtoToAssessments.crownCourtHardshipReviewDTO.status-->" + crownCourtHardshipReviewDTO.getAsessmentStatus().getStatus());
+                assessmentList.add(
+                    new ApiAssessment()
+                        .withAssessmentType(AssessmentType.HARDSHIP)
+                        .withResult(AssessmentResult.getFrom(crownCourtHardshipReviewDTO.getReviewResult()))
+                        .withAssessmentDate(toLocalDateTime(crownCourtHardshipReviewDTO.getReviewDate()))
+                        .withNewWorkReason(NewWorkReason.getFrom(crownCourtHardshipReviewDTO.getNewWorkReason().getCode()))
+                        .withStatus(CurrentStatus.getFrom(crownCourtHardshipReviewDTO.getAsessmentStatus().getStatus())));
+            }
+        }
+
         log.info("applicationDtoToAssessments.assessmentList-->" + assessmentList);
         return assessmentList;
     }
