@@ -105,8 +105,8 @@ public class TestModelDataBuilder {
     private static final BigDecimal SOLICITOR_DISBURSEMENTS = BigDecimal.valueOf(375);
     private static final BigDecimal SOLICITOR_RATE = BigDecimal.valueOf(200);
     // Solicitors Costs
-    private static final BigDecimal SOLICITOR_HOURS = BigDecimal.valueOf(50)
-            .setScale(1, RoundingMode.DOWN);
+    private static final BigDecimal SOLICITOR_HOURS = BigDecimal.valueOf(52.45)
+        .setScale(2, RoundingMode.DOWN);
     private static final LocalDateTime DATE_REVIEWED_DATETIME = LocalDateTime.of(2022, 11, 12, 0, 0, 0);
     private static final Date DATE_REVIEWED =
             Date.from(Instant.ofEpochSecond(DATE_REVIEWED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
