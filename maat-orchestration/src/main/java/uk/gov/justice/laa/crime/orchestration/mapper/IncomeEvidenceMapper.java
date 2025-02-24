@@ -218,20 +218,23 @@ public class IncomeEvidenceMapper {
     private List<FinancialAssessmentIncomeEvidence> getEvidences(ApiIncomeEvidenceItems evidenceItems,
                                                                  List<EvidenceDTO> existingEvidences,
                                                                  UserDTO user) {
-        Integer applicantId = evidenceItems.getApplicantDetails().getId();
+        if (null !=evidenceItems) {
+            Integer applicantId = evidenceItems.getApplicantDetails().getId();
 
-        return evidenceItems.getIncomeEvidenceItems()
-                .stream()
-                .map(evidence -> new FinancialAssessmentIncomeEvidence()
-                        .withId(evidence.getId())
-                        .withDateReceived(getDateReceived(applicantId, evidence, existingEvidences))
-                        .withActive("Y")
-                        .withIncomeEvidence(evidence.getEvidenceType().getName())
-                        .withMandatory(Boolean.TRUE.equals(evidence.getMandatory()) ? "Y" : "N")
-                        .withApplicant(applicantId)
-                        .withOtherText(evidence.getDescription())
-                        .withUserCreated(user.getUserName()))
-                .toList();
+            return evidenceItems.getIncomeEvidenceItems()
+                    .stream()
+                    .map(evidence -> new FinancialAssessmentIncomeEvidence()
+                            .withId(evidence.getId())
+                            .withDateReceived(getDateReceived(applicantId, evidence, existingEvidences))
+                            .withActive("Y")
+                            .withIncomeEvidence(evidence.getEvidenceType().getName())
+                            .withMandatory(Boolean.TRUE.equals(evidence.getMandatory()) ? "Y" : "N")
+                            .withApplicant(applicantId)
+                            .withOtherText(evidence.getDescription())
+                            .withUserCreated(user.getUserName()))
+                    .toList();
+        }
+        return Collections.emptyList();
     }
 
     private LocalDateTime getDateReceived(Integer applicantId,
