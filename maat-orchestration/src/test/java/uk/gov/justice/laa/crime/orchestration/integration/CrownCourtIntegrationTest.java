@@ -7,13 +7,13 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getApplicationDTO;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForInvokeStoredProcedure;
-import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForUpdateCrownCourt;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForUpdateCrownCourtOutcome;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForUpdateSendToCCLF;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetRepOrders;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForOAuth;
-import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForUpdateCrownCourt;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForUpdateCrownCourtOutcome;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForUpdateSendToCCLF;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
@@ -132,7 +132,7 @@ class CrownCourtIntegrationTest {
 
         stubForOAuth();
         stubForInvokeStoredProcedure(objectMapper.writeValueAsString(applicationDTO));
-        stubForUpdateCrownCourt(objectMapper.writeValueAsString(updateCrownCourtOutcomeResponse));
+        stubForUpdateCrownCourtOutcome(objectMapper.writeValueAsString(updateCrownCourtOutcomeResponse));
         stubForGetUserSummary(objectMapper.writeValueAsString(userSummaryDTO));
         stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
         stubForUpdateSendToCCLF();
@@ -140,7 +140,7 @@ class CrownCourtIntegrationTest {
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
             .andExpect(status().isOk());
 
-        assertStubForUpdateCrownCourt(1);
+        assertStubForUpdateCrownCourtOutcome(1);
         assertStubForUpdateSendToCCLF(1);
         assertStubForInvokeStoredProcedure(3);
     }

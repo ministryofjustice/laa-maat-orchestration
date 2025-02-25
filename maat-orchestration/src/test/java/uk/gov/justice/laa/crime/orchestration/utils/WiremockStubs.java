@@ -46,7 +46,7 @@ public class WiremockStubs {
                     .withBody(response))));
     }
 
-    public static void stubForUpdateCrownCourt(String response) {
+    public static void stubForUpdateCrownCourtOutcome(String response) {
         stubFor((put(urlMatching(CCP_URL + "/update-crown-court"))
             .willReturn(WireMock.ok()
                 .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
@@ -60,11 +60,11 @@ public class WiremockStubs {
                         .withBody(response))));
     }
 
-    public static void assertStubForUpdateCrownCourtProceedings(int times) {
+    public static void assertStubForUpdateCrownCourtApplication(int times) {
         verify(exactly(times), putRequestedFor(urlPathMatching(CCP_URL)));
     }
 
-    public static void assertStubForUpdateCrownCourt(int times) {
+    public static void assertStubForUpdateCrownCourtOutcome(int times) {
         verify(exactly(times), putRequestedFor(urlPathMatching(CCP_URL + "/update-crown-court")));
     }
 

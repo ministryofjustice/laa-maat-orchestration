@@ -154,7 +154,7 @@ class MeansAssessmentIntegrationTest {
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk());
-        assertStubForUpdateCrownCourtProceedings(1);
+        assertStubForUpdateCrownCourtApplication(1);
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1);
         assertStubForInvokeStoredProcedure(4);
@@ -225,7 +225,7 @@ class MeansAssessmentIntegrationTest {
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk());
-        assertStubForUpdateCrownCourtProceedings(1);
+        assertStubForUpdateCrownCourtApplication(1);
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1);
         assertStubForInvokeStoredProcedure(4);
