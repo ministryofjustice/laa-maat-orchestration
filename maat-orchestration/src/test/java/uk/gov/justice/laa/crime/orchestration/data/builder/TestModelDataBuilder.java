@@ -10,14 +10,16 @@ import uk.gov.justice.laa.crime.common.model.hardship.*;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentChildWeighting;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentDetail;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.FinancialAssessmentIncomeEvidence;
+import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
+import uk.gov.justice.laa.crime.common.model.proceeding.common.*;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCapitalEvidence;
-import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
-import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiIOJSummary;
-import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiRepOrderCrownCourtOutcome;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
@@ -34,6 +36,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.*;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
+import uk.gov.justice.laa.crime.proceeding.MagsDecisionResult;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
@@ -137,6 +140,8 @@ public class TestModelDataBuilder {
     public static final LocalDate ALL_EVIDENCE_RECEIVED_DATE = LocalDate.of(2024, 12, 18);
     public static final LocalDate UPLIFT_APPLIED_DATE = LocalDate.of(2025, 1, 18);
     public static final LocalDate UPLIFT_REMOVED_DATE = LocalDate.of(2025, 1, 21);
+
+    public static final Integer USN = 156789;
 
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
@@ -1513,5 +1518,44 @@ public class TestModelDataBuilder {
                 .withId(1234)
                 .withChildWeightingId(37)
                 .withNoOfChildren(1);
+    }
+
+    public static ApiDetermineMagsRepDecisionRequest getApiDetermineMagsRepDecisionRequest() {
+        ApiDetermineMagsRepDecisionRequest request = new ApiDetermineMagsRepDecisionRequest();
+        request.setRepId(REP_ID);
+        request.setCaseType(CaseType.EITHER_WAY);
+        request.setIojAppeal(getApiIOJSummary());
+        request.setFinancialAssessment(getApiFinancialAssessment());
+        request.setPassportAssessment(getApiPassportAssessment());
+        request.setUserSession(getApiUserSession());
+        return request;
+    }
+
+    public static ApiDetermineMagsRepDecisionResponse getApiDetermineMagsRepDecisionResponse() {
+        ApiDetermineMagsRepDecisionResponse response = new ApiDetermineMagsRepDecisionResponse();
+        MagsDecisionResult magsDecisionResult = new MagsDecisionResult();
+        magsDecisionResult.setDecisionReason(DecisionReason.GRANTED);
+        response.setDecisionResult(magsDecisionResult);
+        return response;
+    }
+
+
+    public static ApiUpdateIncomeEvidenceResponse getApiUpdateIncomeEvidenceResponse() {
+        ApiUpdateIncomeEvidenceResponse response = new ApiUpdateIncomeEvidenceResponse();
+        response.setDueDate(EVIDENCE_DUE_DATE.toLocalDate());
+        return response;
+    }
+
+    public static MaatApiAssessmentResponse getMaatApiAssessmentResponse() {
+        MaatApiAssessmentResponse response = new MaatApiAssessmentResponse();
+        response.setId(REP_ID);
+        response.setIncomeEvidence(Collections.emptyList());
+        return response;
+    }
+
+    public static ApplicationTrackingOutputResult getApplicationTrackingOutputResult() {
+        ApplicationTrackingOutputResult request = new ApplicationTrackingOutputResult();
+        request.setUsn(USN);
+        return request;
     }
 }
