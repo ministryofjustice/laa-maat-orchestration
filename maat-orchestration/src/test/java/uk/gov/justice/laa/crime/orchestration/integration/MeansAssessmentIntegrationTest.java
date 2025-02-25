@@ -139,7 +139,7 @@ class MeansAssessmentIntegrationTest {
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(cmaResponse)));
-        stubForUpdateCrownCourtProceedings(ccpResponse);
+        stubForUpdateCrownCourtApplication(ccpResponse);
         stubForCalculateContributions(cccCalculateResponse);
         stubForGetContributionsSummary(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
@@ -210,7 +210,7 @@ class MeansAssessmentIntegrationTest {
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(cmaResponse)));
-        stubForUpdateCrownCourtProceedings(ccpResponse);
+        stubForUpdateCrownCourtApplication(ccpResponse);
         stubForCalculateContributions(cccCalculateResponse);
         stubForGetContributionsSummary(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
