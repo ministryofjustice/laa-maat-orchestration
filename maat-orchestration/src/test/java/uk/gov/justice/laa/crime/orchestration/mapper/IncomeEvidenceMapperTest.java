@@ -108,7 +108,7 @@ class IncomeEvidenceMapperTest {
         softly.assertThat(maatApiUpdateAssessment)
                 .usingRecursiveComparison()
                 .ignoringFields("laaTransactionId")
-                .isEqualTo(TestModelDataBuilder.getMaatApiUpdateAssessment(AssessmentType.INIT));
+                .isEqualTo(TestModelDataBuilder.getMaatApiUpdateAssessment(AssessmentType.INIT, Boolean.TRUE));
         softly.assertAll();
     }
 
@@ -130,7 +130,7 @@ class IncomeEvidenceMapperTest {
         softly.assertThat(maatApiUpdateAssessment)
                 .usingRecursiveComparison()
                 .ignoringFields("laaTransactionId")
-                .isEqualTo(TestModelDataBuilder.getMaatApiUpdateAssessment(FULL));
+                .isEqualTo(TestModelDataBuilder.getMaatApiUpdateAssessment(FULL, Boolean.TRUE));
         softly.assertAll();
     }
 
@@ -178,19 +178,21 @@ class IncomeEvidenceMapperTest {
         softly.assertAll();
     }
 
+
+
     private static Stream<Arguments> existingEvidences() {
 
-        MaatApiUpdateAssessment noExistingEvidences = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL);
+        MaatApiUpdateAssessment noExistingEvidences = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL, Boolean.TRUE);
         noExistingEvidences.getFinAssIncomeEvidences().forEach(evidence -> evidence.setDateReceived(null));
 
-        MaatApiUpdateAssessment existingEvidencesAssessment = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL);
+        MaatApiUpdateAssessment existingEvidencesAssessment = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL, Boolean.TRUE);
         existingEvidencesAssessment.getFinAssIncomeEvidences()
                 .forEach(evidence -> evidence.setDateReceived(TestModelDataBuilder.EVIDENCE_RECEIVED_DATE));
         RepOrderDTO existingEvidencesRepOrderDTO = RepOrderDTO.builder()
                 .passportAssessments(List.of(TestModelDataBuilder.getPassportAssessmentDTO()))
                 .build();
 
-        MaatApiUpdateAssessment existingFinEvidencesAssessment = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL);
+        MaatApiUpdateAssessment existingFinEvidencesAssessment = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL, Boolean.TRUE);
         RepOrderDTO existingFinEvidenceRepOrderDTO = RepOrderDTO.builder()
                 .financialAssessments(List.of(TestModelDataBuilder.getMaatApiFinancialAssessmentDTO()))
                 .build();
@@ -204,6 +206,40 @@ class IncomeEvidenceMapperTest {
                 Arguments.of(existingEvidencesRepOrderDTO, existingEvidencesAssessment),
                 Arguments.of(existingFinEvidenceRepOrderDTO, existingFinEvidencesAssessment),
                 Arguments.of(existingBothEvidencesRepOrderDTO, existingFinEvidencesAssessment)
+        );
+    }
+
+
+    private static Stream<Arguments> parameterizedUpdateIncomeEvidences() {
+
+        ApiUpdateIncomeEvidenceResponse apiUpdateIncomeEvidenceResponse = TestModelDataBuilder.getUpdateIncomeEvidenceResponse(Boolean.TRUE);
+
+        MaatApiUpdateAssessment noExistingEvidences = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL, Boolean.TRUE);
+        noExistingEvidences.getFinAssIncomeEvidences().forEach(evidence -> evidence.setDateReceived(null));
+
+        MaatApiUpdateAssessment existingEvidencesAssessment = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL, Boolean.TRUE);
+        existingEvidencesAssessment.getFinAssIncomeEvidences()
+                .forEach(evidence -> evidence.setDateReceived(TestModelDataBuilder.EVIDENCE_RECEIVED_DATE));
+        RepOrderDTO existingEvidencesRepOrderDTO = RepOrderDTO.builder()
+                .passportAssessments(List.of(TestModelDataBuilder.getPassportAssessmentDTO()))
+                .build();
+
+        MaatApiUpdateAssessment existingFinEvidencesAssessment = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL, Boolean.TRUE);
+        RepOrderDTO existingFinEvidenceRepOrderDTO = RepOrderDTO.builder()
+                .financialAssessments(List.of(TestModelDataBuilder.getMaatApiFinancialAssessmentDTO()))
+                .build();
+        RepOrderDTO existingBothEvidencesRepOrderDTO = RepOrderDTO.builder()
+                .financialAssessments(List.of(TestModelDataBuilder.getMaatApiFinancialAssessmentDTO()))
+                .passportAssessments(List.of(TestModelDataBuilder.getPassportAssessmentDTO()))
+                .build();
+
+        return Stream.of(
+                Arguments.of(RepOrderDTO.builder().build(), noExistingEvidences,  apiUpdateIncomeEvidenceResponse),
+                Arguments.of(existingEvidencesRepOrderDTO, existingEvidencesAssessment,  apiUpdateIncomeEvidenceResponse),
+                Arguments.of(existingFinEvidenceRepOrderDTO, existingFinEvidencesAssessment, apiUpdateIncomeEvidenceResponse),
+                Arguments.of(existingBothEvidencesRepOrderDTO, existingFinEvidencesAssessment, apiUpdateIncomeEvidenceResponse),
+                Arguments.of(existingBothEvidencesRepOrderDTO, TestModelDataBuilder.getMaatApiUpdateAssessment(FULL, Boolean.FALSE),
+                        TestModelDataBuilder.getUpdateIncomeEvidenceResponse(Boolean.FALSE))
         );
     }
 
@@ -234,11 +270,10 @@ class IncomeEvidenceMapperTest {
     }
 
     @ParameterizedTest
-    @MethodSource("existingEvidences")
+    @MethodSource("parameterizedUpdateIncomeEvidences")
     void givenExistingEvidences_whenMapUpdateEvidenceToMaatApiUpdateAssessmentIsInvoked_thenMaatApiUpdateAssessmentIsReturned(
-            RepOrderDTO repOrderDTO, MaatApiUpdateAssessment expectedAssessment) {
+            RepOrderDTO repOrderDTO, MaatApiUpdateAssessment expectedAssessment , ApiUpdateIncomeEvidenceResponse apiUpdateIncomeEvidenceResponse) {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
-        ApiUpdateIncomeEvidenceResponse apiUpdateIncomeEvidenceResponse = TestModelDataBuilder.getUpdateIncomeEvidenceResponse();
         expectedAssessment.setIncomeEvidenceDueDate(TestModelDataBuilder.EVIDENCE_DUE_DATE);
         expectedAssessment.setEvidenceReceivedDate(EVIDENCE_RECEIVED_DATE);
         expectedAssessment.setIncomeUpliftApplyDate(INCOME_UPLIFT_APPLY_DATE);
