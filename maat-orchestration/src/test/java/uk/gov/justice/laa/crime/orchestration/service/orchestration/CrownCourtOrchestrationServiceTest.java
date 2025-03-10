@@ -70,30 +70,30 @@ class CrownCourtOrchestrationServiceTest {
     }
 
     @Test
-    void givenNoNewOutcomes_whenUpdateIsInvoked_thenTransactionIdIsReset() {
+    void givenNoNewOutcomes_whenUpdateOutcomeIsInvoked_thenTransactionIdIsReset() {
         WorkflowRequest request = TestModelDataBuilder.buildWorkFlowRequest();
         ApplicationDTO applicationDTO = request.getApplicationDTO();
 
         setupStubs(applicationDTO);
         applicationDTO.setTransactionId(TRANSACTION_ID);
 
-        orchestrationService.update(request);
+        orchestrationService.updateOutcome(request);
         checkStoredProcedureInvocations(request);
         assertThat(applicationDTO.getTransactionId()).isNull();
     }
 
     @Test
-    void givenNoNewOutcomes_whenUpdateIsInvoked_thenApplicationIsUpdatedAndCorrectStoredProceduresAreInvoked() {
+    void givenNoNewOutcomes_whenUpdateOutcomeIsInvoked_thenApplicationIsUpdatedAndCorrectStoredProceduresAreInvoked() {
         WorkflowRequest request = TestModelDataBuilder.buildWorkFlowRequest();
         ApplicationDTO applicationDTO = request.getApplicationDTO();
 
         setupStubs(applicationDTO);
-        orchestrationService.update(request);
+        orchestrationService.updateOutcome(request);
         checkStoredProcedureInvocations(request);
     }
 
     @Test
-    void givenNewOutcome_whenUpdateIsInvoked_thenApplicationIsUpdatedAndCorrectStoredProceduresAreInvoked() {
+    void givenNewOutcome_whenUpdateOutcomeIsInvoked_thenApplicationIsUpdatedAndCorrectStoredProceduresAreInvoked() {
         WorkflowRequest request = TestModelDataBuilder.buildWorkFlowRequest();
         ApplicationDTO applicationDTO = request.getApplicationDTO();
 
@@ -101,7 +101,7 @@ class CrownCourtOrchestrationServiceTest {
         applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().setOutcomeDTOs(outcomes);
 
         setupStubs(applicationDTO);
-        orchestrationService.update(request);
+        orchestrationService.updateOutcome(request);
         checkStoredProcedureInvocations(request);
 
         verify(maatCourtDataService).invokeStoredProcedure(
@@ -110,14 +110,14 @@ class CrownCourtOrchestrationServiceTest {
     }
 
     @Test
-    void givenNoCrownCourtSummary_whenUpdateIsInvoked_thenApplicationIsUpdatedAndCorrectStoredProceduresAreInvoked() {
+    void givenNoCrownCourtSummary_whenUpdateOutcomeIsInvoked_thenApplicationIsUpdatedAndCorrectStoredProceduresAreInvoked() {
         WorkflowRequest request = TestModelDataBuilder.buildWorkFlowRequest();
         ApplicationDTO applicationDTO = request.getApplicationDTO();
 
         applicationDTO.getCrownCourtOverviewDTO().setCrownCourtSummaryDTO(null);
 
         setupStubs(applicationDTO);
-        orchestrationService.update(request);
+        orchestrationService.updateOutcome(request);
         checkStoredProcedureInvocations(request);
 
         verify(maatCourtDataService, never()).invokeStoredProcedure(
@@ -126,14 +126,14 @@ class CrownCourtOrchestrationServiceTest {
     }
 
     @Test
-    void givenNoOutcomes_whenUpdateIsInvoked_thenApplicationIsUpdatedAndCorrectStoredProceduresAreInvoked() {
+    void givenNoOutcomes_whenUpdateOutcomeIsInvoked_thenApplicationIsUpdatedAndCorrectStoredProceduresAreInvoked() {
         WorkflowRequest request = TestModelDataBuilder.buildWorkFlowRequest();
         ApplicationDTO applicationDTO = request.getApplicationDTO();
 
         applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().setOutcomeDTOs(null);
 
         setupStubs(applicationDTO);
-        orchestrationService.update(request);
+        orchestrationService.updateOutcome(request);
         checkStoredProcedureInvocations(request);
 
         verify(maatCourtDataService, never()).invokeStoredProcedure(
