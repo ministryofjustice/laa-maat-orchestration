@@ -28,7 +28,6 @@ public class HardshipReviewDTO extends GenericDTO {
     private BigDecimal disposableIncome;
     private BigDecimal disposableIncomeAfterHardship;
     private Collection<HRSectionDTO> section;
-    private Collection<HRProgressDTO> progress;
     // Spelling mistake in MAAT
     private AssessmentStatusDTO asessmentStatus;
 }

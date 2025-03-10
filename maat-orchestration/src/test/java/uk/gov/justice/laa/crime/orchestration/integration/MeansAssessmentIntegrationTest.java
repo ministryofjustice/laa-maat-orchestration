@@ -138,7 +138,7 @@ class MeansAssessmentIntegrationTest {
 
         stubForOAuth();
         stubForCreateMeansAssessment(cmaResponse);
-        stubForUpdateCrownCourtProceedings(ccpResponse);
+        stubForUpdateCrownCourtApplication(ccpResponse);
         stubForCalculateContributions(cccCalculateResponse);
         stubForGetContributionsSummary(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
@@ -153,7 +153,7 @@ class MeansAssessmentIntegrationTest {
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk());
-        assertStubForUpdateCrownCourtProceedings(1);
+        assertStubForUpdateCrownCourtApplication(1);
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1);
         assertStubForInvokeStoredProcedure(4);
@@ -210,7 +210,7 @@ class MeansAssessmentIntegrationTest {
 
         stubForOAuth();
         stubForUpdateMeansAssessment(cmaResponse);
-        stubForUpdateCrownCourtProceedings(ccpResponse);
+        stubForUpdateCrownCourtApplication(ccpResponse);
         stubForCalculateContributions(cccCalculateResponse);
         stubForGetContributionsSummary(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
@@ -225,7 +225,7 @@ class MeansAssessmentIntegrationTest {
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk());
-        assertStubForUpdateCrownCourtProceedings(1);
+        assertStubForUpdateCrownCourtApplication(1);
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1);
         assertStubForInvokeStoredProcedure(4);
@@ -293,7 +293,7 @@ class MeansAssessmentIntegrationTest {
 
         stubForOAuth();
         stubForCreateMeansAssessment(cmaResponse);
-        stubForUpdateCrownCourtProceedings(ccpResponse);
+        stubForUpdateCrownCourtApplication(ccpResponse);
         stubForCalculateContributions(cccCalculateResponse);
         stubForGetUserSummary(userSummaryResponse);
         stubForGetRepOrders(repOrderDTO);
@@ -307,7 +307,7 @@ class MeansAssessmentIntegrationTest {
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk());
 
-        assertStubForUpdateCrownCourtProceedings(1);
+        assertStubForUpdateCrownCourtApplication(1);
         assertStubForCalculateContributions(2);
         assertStubForDetermineMsgRepDecision(1);
         assertStubForCreateIncomeEvidence(1);

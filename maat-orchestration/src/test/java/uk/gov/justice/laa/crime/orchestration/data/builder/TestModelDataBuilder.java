@@ -108,8 +108,8 @@ public class TestModelDataBuilder {
     private static final BigDecimal SOLICITOR_DISBURSEMENTS = BigDecimal.valueOf(375);
     private static final BigDecimal SOLICITOR_RATE = BigDecimal.valueOf(200);
     // Solicitors Costs
-    private static final BigDecimal SOLICITOR_HOURS = BigDecimal.valueOf(50)
-            .setScale(1, RoundingMode.DOWN);
+    private static final BigDecimal SOLICITOR_HOURS = BigDecimal.valueOf(52.45)
+        .setScale(2, RoundingMode.DOWN);
     private static final LocalDateTime DATE_REVIEWED_DATETIME = LocalDateTime.of(2022, 11, 12, 0, 0, 0);
     private static final Date DATE_REVIEWED =
             Date.from(Instant.ofEpochSecond(DATE_REVIEWED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
@@ -1419,22 +1419,26 @@ public class TestModelDataBuilder {
 
     }
 
-    public static ApiUpdateIncomeEvidenceResponse getUpdateIncomeEvidenceResponse() {
-        return new ApiUpdateIncomeEvidenceResponse()
+    public static ApiUpdateIncomeEvidenceResponse getUpdateIncomeEvidenceResponse(boolean hasPartnerIncome) {
+       ApiUpdateIncomeEvidenceResponse response = new ApiUpdateIncomeEvidenceResponse()
                 .withApplicantEvidenceItems(
                         new ApiIncomeEvidenceItems()
                                 .withApplicantDetails(getApplicantDetails(false))
                                 .withIncomeEvidenceItems(List.of(getIncomeEvidence(APPLICANT_EVIDENCE_ID)))
                 )
-                .withPartnerEvidenceItems(
-                        new ApiIncomeEvidenceItems()
-                                .withApplicantDetails(getApplicantDetails(true))
-                                .withIncomeEvidenceItems(List.of(getIncomeEvidence(PARTNER_EVIDENCE_ID)))
-                )
                 .withAllEvidenceReceivedDate(ALL_EVIDENCE_RECEIVED_DATE)
                 .withDueDate(EVIDENCE_DUE_DATE.toLocalDate())
                 .withUpliftAppliedDate(UPLIFT_APPLIED_DATE)
                 .withUpliftRemovedDate(UPLIFT_REMOVED_DATE);
+
+       if (hasPartnerIncome) {
+           response.setPartnerEvidenceItems(new ApiIncomeEvidenceItems()
+                   .withApplicantDetails(getApplicantDetails(true))
+                   .withIncomeEvidenceItems(List.of(getIncomeEvidence(PARTNER_EVIDENCE_ID))));
+       }
+
+       return  response;
+
     }
 
     private static ApiIncomeEvidence getIncomeEvidence(Integer id) {
@@ -1446,14 +1450,10 @@ public class TestModelDataBuilder {
                 .withDescription(INCOME_EVIDENCE_DESCRIPTION);
     }
 
-    public static MaatApiUpdateAssessment getMaatApiUpdateAssessment(AssessmentType assessmentType) {
+    public static MaatApiUpdateAssessment getMaatApiUpdateAssessment(AssessmentType assessmentType, boolean hasPartnerIncome) {
         MaatApiUpdateAssessment maatApiUpdateAssessment = new MaatApiUpdateAssessment()
                 .withFinancialAssessmentId(Constants.FINANCIAL_ASSESSMENT_ID)
                 .withUserModified(Constants.USERNAME)
-                .withFinAssIncomeEvidences(List.of(
-                        getFinAssIncomeEvidence(APPLICANT_EVIDENCE_ID, NumberUtils.toInteger(APPLICANT_ID)),
-                        getFinAssIncomeEvidence(PARTNER_EVIDENCE_ID, NumberUtils.toInteger(PARTNER_ID))
-                ))
                 .withRepId(REP_ID)
                 .withAssessmentType(assessmentType.getType())
                 .withCmuId(CMU_ID)
@@ -1471,6 +1471,13 @@ public class TestModelDataBuilder {
                 .withAssessmentDetails(List.of(getAssessmentDetail()))
                 .withChildWeightings(List.of(getAssessmentChildWeighting()))
                 .withDateCompleted(null);
+
+        List incomeEvidenceList = new ArrayList();
+        incomeEvidenceList.add(getFinAssIncomeEvidence(APPLICANT_EVIDENCE_ID, NumberUtils.toInteger(APPLICANT_ID)));
+        if (hasPartnerIncome) {
+            incomeEvidenceList.add(getFinAssIncomeEvidence(PARTNER_EVIDENCE_ID, NumberUtils.toInteger(PARTNER_ID)));
+        }
+        maatApiUpdateAssessment.setFinAssIncomeEvidences(incomeEvidenceList);
 
         if (AssessmentType.FULL.equals(assessmentType)) {
             maatApiUpdateAssessment.setFassFullStatus(AssessmentStatusDTO.COMPLETE);

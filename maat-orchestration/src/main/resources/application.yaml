@@ -71,7 +71,7 @@ spring:
           evidence:
             client-id: ${EVIDENCE_API_OAUTH_CLIENT_ID}
             client-secret: ${EVIDENCE_API_OAUTH_CLIENT_SECRET}
-            authorization-grant-type: client-credentials
+            authorization-grant-type: client_credentials
       resource-server:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI}

@@ -180,7 +180,19 @@ class HardshipIntegrationTest {
                 .andExpect(status().is5xxServerError());
         verify(exactly(1), putRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
         verify(exactly(1), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
+    }
 
+    @Test
+    void givenAValidContent_whenUpdateIsInvoked_thenShouldSuccess() throws Exception {
+        stubForUpdateHardship();
+        String requestBody = objectMapper
+            .writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
+        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.crownCourtOverviewDTO.contribution.monthlyContribs").value(150.0));
+
+        verifyStubForUpdateHardship(CourtType.MAGISTRATE);
     }
 
     @Test
@@ -207,18 +219,7 @@ class HardshipIntegrationTest {
         verify(exactly(0), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
     }
 
-    @Test
-    void givenAValidContent_whenUpdateIsInvoked_thenShouldSuccess() throws Exception {
-        stubForUpdateHardship();
-        String requestBody = objectMapper
-                .writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
-        mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.crownCourtOverviewDTO.contribution.monthlyContribs").value(150.0));
 
-        verifyStubForUpdateHardship(CourtType.MAGISTRATE);
-    }
 
     private void stubForUpdateHardship() throws JsonProcessingException {
         wiremock.stubFor(put(urlMatching("/api/internal/v1/hardship/.*"))

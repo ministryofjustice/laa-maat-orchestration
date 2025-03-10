@@ -18,6 +18,7 @@ public class WiremockStubs {
 
     private static final String CCP_URL = "/api/internal/v1/proceedings";
     private static final String CCC_URL = "/api/internal/v1/contribution";
+    private static final String MAAT_API_APPLICATION_URL = "/api/internal/v1/application";
     private static final String MAAT_API_ASSESSMENT_URL = "/api/internal/v1/assessment";
     private static final String CMA_ROLLBACK_URL = "/api/internal/v1/assessment/means/rollback/";
     private static final String MAAT_API_USER_URL = "/api/internal/v1/users/summary/";
@@ -43,18 +44,25 @@ public class WiremockStubs {
                     .withBody(mapper.writeValueAsString(token))));
     }
 
-    public static void stubForUpdateCrownCourtProceedings(String response) {
+    public static void stubForUpdateCrownCourtApplication(String response) {
         stubFor((put(urlMatching(CCP_URL))
             .willReturn(WireMock.ok()
                     .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                     .withBody(response))));
     }
 
-    public static void stubForUpdateMeansAssessment(String response) {
-        stubFor(put(urlMatching(CMA_URL))
+    public static void stubForUpdateCrownCourtOutcome(String response) {
+        stubFor((put(urlMatching(CCP_URL + "/update-crown-court"))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(response)));
+                        .withBody(response))));
+    }
+
+    public static void stubForUpdateMeansAssessment(String response) {
+        stubFor((put(urlMatching(CMA_URL))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response))));
     }
 
     public static void stubForCreateMeansAssessment(String response) {
@@ -64,10 +72,12 @@ public class WiremockStubs {
                         .withBody(response)));
     }
 
-
-
-    public static void assertStubForUpdateCrownCourtProceedings(int times) {
+    public static void assertStubForUpdateCrownCourtApplication(int times) {
         verify(exactly(times), putRequestedFor(urlPathMatching(CCP_URL)));
+    }
+
+    public static void assertStubForUpdateCrownCourtOutcome(int times) {
+        verify(exactly(times), putRequestedFor(urlPathMatching(CCP_URL + "/update-crown-court")));
     }
 
     public static void stubForCalculateContributions(String response) {
@@ -172,7 +182,7 @@ public class WiremockStubs {
     }
 
     public static void stubForUpdateSendToCCLF() {
-        stubFor(put(urlMatching(MAAT_API_ASSESSMENT_URL + "/rep-orders/" + TestModelDataBuilder.REP_ID + "/send-to-cclf"))
+        stubFor(put(urlMatching(MAAT_API_APPLICATION_URL + "/applicant/update-cclf"))
                 .willReturn(WireMock.ok()));
     }
 
@@ -199,5 +209,8 @@ public class WiremockStubs {
     }
     public static void stubForApplicationTrackingService() {
         stubFor(post(urlMatching(CAT_URL)).willReturn(WireMock.ok()));
+    }
+    public static void assertStubForUpdateSendToCCLF(int times) {
+        verify(exactly(times), putRequestedFor(urlPathMatching(MAAT_API_APPLICATION_URL + "/applicant/update-cclf")));
     }
 }
