@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
+import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
@@ -57,5 +59,15 @@ public class ProceedingsService {
         if (featureDecisionService.isMaatPostAssessmentProcessingEnabled(request)) {
             cclfUpdateService.updateSendToCCLF(request, repOrderDTO);
         }
+    }
+
+    public ApiDetermineMagsRepDecisionResponse determineMagsRepDecision(WorkflowRequest request) {
+        ApiDetermineMagsRepDecisionResponse repDecisionResponse = null;
+        if (CaseType.isMagsCaseType(request.getApplicationDTO().getCaseDetailsDTO().getCaseType())) {
+            repDecisionResponse = proceedingsApiService.determineMagsRepDecision(
+                    proceedingsMapper.applicationDTOToApiDetermineMagsRepDecisionRequest(request.getApplicationDTO(), request.getUserDTO()));
+            proceedingsMapper.apiDetermineMagsRepDecisionResponseToApplicationDTO(request.getApplicationDTO(), repDecisionResponse);
+        }
+        return repDecisionResponse;
     }
 }

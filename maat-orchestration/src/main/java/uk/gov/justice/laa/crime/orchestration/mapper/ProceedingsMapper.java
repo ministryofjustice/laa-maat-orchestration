@@ -5,8 +5,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.*;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.*;
@@ -45,11 +47,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
                 .withCommittalDate(DateUtil.toLocalDateTime(application.getCommittalDate()))
                 .withDateReceived(DateUtil.toLocalDateTime(application.getDateReceived()))
                 .withIojAppeal(
-                        new ApiIOJSummary()
-                                .withDecisionResult(
-                                        application.getAssessmentDTO().getIojAppeal().getAppealDecisionResult()
-                                )
-                                .withIojResult(application.getIojResult())
+                        getIojAppeal(application)
                 )
                 .withPassportAssessment(applicationDtoToPassportAssessment(application))
                 .withFinancialAssessment(applicationDtoToFinancialAssessment(application));
@@ -66,6 +64,14 @@ public class ProceedingsMapper extends CrownCourtMapper {
                 .withCrownRepId(NumberUtils.toInteger(crownCourtSummary.getCcRepId()))
                 .withIsImprisoned(crownCourtSummary.getInPrisoned())
                 .withUserSession(userMapper.userDtoToUserSession(userDTO));
+    }
+
+    private static ApiIOJSummary getIojAppeal(ApplicationDTO application) {
+        return new ApiIOJSummary()
+                .withDecisionResult(
+                        application.getAssessmentDTO().getIojAppeal().getAppealDecisionResult()
+                )
+                .withIojResult(application.getIojResult());
     }
 
     private ApiCrownCourtSummary crownCourtSummaryDtoToApiCrownCourtSummary(CrownCourtSummaryDTO crownCourtSummary) {
@@ -252,5 +258,25 @@ public class ProceedingsMapper extends CrownCourtMapper {
 
     CurrentStatus getCurrentStatus(String status) {
         return StringUtils.isNotBlank(status) ? CurrentStatus.getFrom(status) : null;
+    }
+
+    public ApiDetermineMagsRepDecisionRequest applicationDTOToApiDetermineMagsRepDecisionRequest(ApplicationDTO application, UserDTO userDTO) {
+
+        ApiDetermineMagsRepDecisionRequest request = new ApiDetermineMagsRepDecisionRequest();
+
+        request.setRepId(application.getRepId().intValue());
+        request.setCaseType(CaseType.getFrom(application.getCaseDetailsDTO().getCaseType()));
+        request.setIojAppeal(getIojAppeal(application));
+        request.setFinancialAssessment(applicationDtoToFinancialAssessment(application));
+        request.setPassportAssessment(applicationDtoToPassportAssessment(application));
+        request.setUserSession(userMapper.userDtoToUserSession(userDTO));
+
+        return request;
+    }
+
+    public void apiDetermineMagsRepDecisionResponseToApplicationDTO(ApplicationDTO application, ApiDetermineMagsRepDecisionResponse response) {
+            application.getRepOrderDecision().setCode(response.getDecisionResult().getDecisionReason().getCode());
+            application.getRepOrderDecision().setDescription(
+                    new SysGenString(response.getDecisionResult().getDecisionReason().getDescription()));
     }
 }

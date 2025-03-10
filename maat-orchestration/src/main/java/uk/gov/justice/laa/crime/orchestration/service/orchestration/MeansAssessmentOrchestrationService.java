@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.commons.exception.MAATServerException;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.exception.ValidationException;
@@ -17,17 +19,13 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
+import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
-import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
-import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
-import uk.gov.justice.laa.crime.orchestration.service.FeatureDecisionService;
-import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
-import uk.gov.justice.laa.crime.orchestration.service.MeansAssessmentService;
-import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
-import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
-import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
+import uk.gov.justice.laa.crime.orchestration.service.*;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
+import uk.gov.justice.laa.crime.orchestration.util.AssessmentTypeUtil;
 
+import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType.MEANS_FULL;
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_INCOMPLETE_ASSESSMENT;
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_REASSESSMENT;
 
@@ -45,6 +43,12 @@ public class MeansAssessmentOrchestrationService {
     private final WorkflowPreProcessorService workflowPreProcessorService;
     private final MeansAssessmentMapper meansAssessmentMapper;
     private final MaatCourtDataApiService maatCourtDataApiService;
+
+    private final ApplicationTrackingMapper applicationTrackingMapper;
+
+    private final CrimeApplicationTrackingService crimeApplicationTrackingService;
+
+    private final IncomeEvidenceService incomeEvidenceService;
 
     public FinancialAssessmentDTO find(int assessmentId, int applicantId) {
         return meansAssessmentService.find(assessmentId, applicantId);
@@ -112,27 +116,30 @@ public class MeansAssessmentOrchestrationService {
         request.getApplicationDTO().setAlertMessage("");
 
         if (featureDecisionService.isC3Enabled(request)) {
-            // call post_processing_part_1_c3 and map the application
-            request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                    request.getApplicationDTO(),
-                    request.getUserDTO(),
-                    StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3)
-            );
 
-            if (!featureDecisionService.isMaatPostAssessmentProcessingEnabled(request)) {
-                // check feature flag here - only need to do this for the new workflow, not for the old way of doing things
+            if (featureDecisionService.isMaatPostAssessmentProcessingEnabled(request)) {
+                postProcessAssessment(request);
+            } else {
                 request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                    contributionService.calculate(request),
-                    request.getUserDTO(),
-                        StoredProcedure.PRE_UPDATE_CC_APPLICATION));
+                        request.getApplicationDTO(),
+                        request.getUserDTO(),
+                        StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3)
+                );
             }
-        } else {
-            // call post_processing_part1 and map the application
+
+            request.setApplicationDTO(contributionService.calculate(request));
+
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
                     request.getApplicationDTO(),
                     request.getUserDTO(),
-                    StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1)
-            );
+                    StoredProcedure.PRE_UPDATE_CC_APPLICATION));
+        } else {
+
+            request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                    request.getApplicationDTO(),
+                    request.getUserDTO(),
+                    StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1));
+
         }
 
         // Check for any validation alerts resulted as part of the pre_update_checks and raise exception
@@ -159,5 +166,20 @@ public class MeansAssessmentOrchestrationService {
 
         application.setTransactionId(null);
         return application;
+    }
+
+    private void postProcessAssessment(WorkflowRequest request) {
+
+        RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());
+        if (AssessmentTypeUtil.isAssessmentCompleted(request)) {
+            if (AssessmentTypeUtil.isInitCompletedAndFullAssessmentNotStarted(request)) {
+                incomeEvidenceService.createEvidence(request, repOrderDTO);
+            }
+            proceedingsService.determineMagsRepDecision(request);
+            request.setApplicationDTO(contributionService.calculate(request));
+            ApplicationTrackingOutputResult trackingResult = applicationTrackingMapper.build(request, repOrderDTO,
+                    AssessmentTypeUtil.getAssessmentType(request), ApplicationTrackingOutputResult.RequestSource.MEANS_ASSESSMENT);
+            crimeApplicationTrackingService.sendApplicationTrackingData(trackingResult);
+        }
     }
 }
