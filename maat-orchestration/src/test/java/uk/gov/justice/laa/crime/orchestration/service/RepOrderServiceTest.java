@@ -2,8 +2,10 @@ package uk.gov.justice.laa.crime.orchestration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -44,5 +46,13 @@ class RepOrderServiceTest {
         RepOrderDTO actualRepOrder = repOrderService.getRepOrder(workflowRequest);
 
         assertThat(actualRepOrder).isEqualTo(expectedRepOrder);
+    }
+
+    @Test
+    void givenValidDateModified_whenUpdateRepOrderDateModified_thenRepOrderIsUpdated() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+
+        repOrderService.updateRepOrderDateModified(workflowRequest, LocalDateTime.now());
+        verify(maatCourtDataService).updateRepOrderDateModified(any(), any());
     }
 }

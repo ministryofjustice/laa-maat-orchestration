@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import io.sentry.Sentry;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -59,6 +60,8 @@ public class MeansAssessmentOrchestrationService {
             preProcessRequest(request, Action.CREATE_ASSESSMENT);
             meansAssessmentService.create(request);
             application = processCrownCourtProceedings(request);
+            repOrderService.updateRepOrderDateModified(request, LocalDateTime.now());
+
             log.debug("Created Means assessment for applicationId = {}", repId);
         } catch (ValidationException | CrimeValidationException exception) {
             throw exception;
@@ -71,6 +74,7 @@ public class MeansAssessmentOrchestrationService {
             Sentry.captureException(ex);
             throw new MaatOrchestrationException(request.getApplicationDTO());
         }
+
         return application;
     }
 
@@ -84,6 +88,8 @@ public class MeansAssessmentOrchestrationService {
             preProcessRequest(request, Action.UPDATE_ASSESSMENT);
             meansAssessmentService.update(request);
             application = processCrownCourtProceedings(request);
+            repOrderService.updateRepOrderDateModified(request, LocalDateTime.now());
+
             log.debug("Updated Means assessment for applicationId = {}", repId);
         } catch (ValidationException | CrimeValidationException exception) {
             throw exception;
@@ -96,6 +102,7 @@ public class MeansAssessmentOrchestrationService {
             Sentry.captureException(ex);
             throw new MaatOrchestrationException(request.getApplicationDTO());
         }
+
         return application;
     }
 

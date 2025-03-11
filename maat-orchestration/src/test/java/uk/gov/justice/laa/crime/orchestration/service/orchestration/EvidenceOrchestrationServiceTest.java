@@ -26,7 +26,9 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,6 +65,7 @@ class EvidenceOrchestrationServiceTest {
         ApplicationDTO actual = evidenceOrchestrationService.updateIncomeEvidence(workflowRequest);
 
         assertThat(actual).isEqualTo(expected);
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @ParameterizedTest
@@ -78,6 +81,7 @@ class EvidenceOrchestrationServiceTest {
 
         ApplicationDTO actual = evidenceOrchestrationService.updateIncomeEvidence(workflowRequest);
         assertThat(actual).isEqualTo(expected);
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     private static Stream<Arguments> upliftChangeSet() {
