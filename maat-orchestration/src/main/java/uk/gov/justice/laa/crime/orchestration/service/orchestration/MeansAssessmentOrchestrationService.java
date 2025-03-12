@@ -64,10 +64,12 @@ public class MeansAssessmentOrchestrationService {
 
             log.debug("Created Means assessment for applicationId = {}", repId);
         } catch (ValidationException | CrimeValidationException exception) {
+            log.info("------------ VALIDATION EXCEPTION -------------");
+            log.info("--- MESSAGE: {}", exception.getMessage());
             throw exception;
         } catch (MAATServerException exception) {
             meansAssessmentService.rollback(request);
-            log.info("------------ VALIDATION EXCEPTION -------------");
+            log.info("------------ MAATServerException EXCEPTION -------------");
             log.info("--- MESSAGE: {}", exception.getMessage());
             throw new ValidationException(exception.getMessage());
         } catch (Exception ex) {
