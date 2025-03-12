@@ -58,9 +58,13 @@ public class MeansAssessmentOrchestrationService {
             log.debug("Creating Means assessment for applicationId = {}", repId);
 
             preProcessRequest(request, Action.CREATE_ASSESSMENT);
+            log.info("------------ CREATING MEANS ASSESSMENT ------------");
             meansAssessmentService.create(request);
+            log.info("------------ PROCESSING CROWN COURT PROCEEDINGS ------------");
             application = processCrownCourtProceedings(request);
+            log.info("------------ UPDATING REP ORDER DATE MODIFIED ------------");
             repOrderService.updateRepOrderDateModified(request, LocalDateTime.now());
+            log.info("------------ FINISHED CREATING MEANS ASSESSMENT ------------");
 
             log.debug("Created Means assessment for applicationId = {}", repId);
         } catch (ValidationException | CrimeValidationException exception) {

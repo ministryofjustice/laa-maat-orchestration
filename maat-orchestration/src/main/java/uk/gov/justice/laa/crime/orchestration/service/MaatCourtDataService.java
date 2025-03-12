@@ -47,7 +47,15 @@ public class MaatCourtDataService {
     }
 
     public void updateRepOrderDateModified(Integer repId, Map<String, Object> fieldsToUpdate) {
-        maatCourtDataApiService.patchRepOrder(repId, fieldsToUpdate);
+        try {
+            maatCourtDataApiService.patchRepOrder(repId, fieldsToUpdate);
+        }
+        catch (Exception e) {
+            log.info("------------ EXCEPTION UPDATING DATE MODIFIED: ------------");
+            log.info(e.getMessage());
+            log.info(e.toString());
+            log.info("------------ END: EXCEPTION DETAILS ------------");
+        }
     }
     
 }
