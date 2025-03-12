@@ -67,6 +67,8 @@ public class MeansAssessmentOrchestrationService {
             throw exception;
         } catch (MAATServerException exception) {
             meansAssessmentService.rollback(request);
+            log.info("------------ VALIDATION EXCEPTION -------------");
+            log.info("--- MESSAGE: {}", exception.getMessage());
             throw new ValidationException(exception.getMessage());
         } catch (Exception ex) {
             log.warn("Create Means assessment failed with the exception: {}", ex.getMessage(), ex);
