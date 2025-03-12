@@ -3,6 +3,8 @@ package uk.gov.justice.laa.crime.orchestration.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.time.LocalDateTime;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -61,5 +63,13 @@ class MaatCourtDataServiceTest {
         mapper.registerModule(new JavaTimeModule());
         RepOrderDTO repOrderDTO = mapper.readValue(readFileToString(TEST_FILE_PATH_REPORDER_DTO_JSON), RepOrderDTO.class);
         assertThat(repOrderDTO.getId()).isEqualTo(5788163);
+    }
+
+    @Test
+    void givenValidReqest_whenUpdateRepOrderDateModifiedIsInvoked_thenApiServiceIsCalled() {
+        Map<String, Object> fieldsToUpdate = Map.of("dateModified", LocalDateTime.now());
+
+        maatCourtDataService.updateRepOrderDateModified(1234, fieldsToUpdate);
+        verify(maatCourtDataApiService).patchRepOrder(1234, fieldsToUpdate);
     }
 }

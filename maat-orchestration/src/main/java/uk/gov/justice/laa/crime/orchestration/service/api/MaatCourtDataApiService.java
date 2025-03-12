@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service.api;
 
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -102,4 +103,14 @@ public class MaatCourtDataApiService {
         return financialAssessmentDTO;
     }
 
+    public void patchRepOrder(int repOrderId, Map<String, Object> fieldsToUpdate) {
+        log.debug(REQUEST_STRING, fieldsToUpdate);
+        maatApiClient.patch(
+            fieldsToUpdate,
+            new ParameterizedTypeReference<>() {},
+            configuration.getMaatApi().getEndpoints().getRepOrderUrl(),
+            Collections.emptyMap(),
+            repOrderId
+        );
+    }
 }

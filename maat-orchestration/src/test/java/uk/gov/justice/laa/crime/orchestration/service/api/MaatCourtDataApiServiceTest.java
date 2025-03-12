@@ -1,5 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.service.api;
 
+import java.time.LocalDateTime;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -67,5 +69,15 @@ class MaatCourtDataApiServiceTest {
     void givenValidRequest_whenUpdateFinancialAssessmentIsInvoked_thenMaatApiAssessmentResponseIsReturned() {
         maatCourtDataApiService.updateFinancialAssessment(new MaatApiUpdateAssessment());
         verify(cmaApiClient).put(any(MaatApiUpdateAssessment.class), any(), any(), any());
+    }
+
+    @Test
+    void givenValidRequest_whenPatchRepOrderIsInvoked_thenIsUpdated() {
+        int repOrderId = 1234;
+        LocalDateTime dateModified = LocalDateTime.now();
+        Map<String, Object> fieldsToUpdate = Map.of("dateModified", dateModified);
+
+        maatCourtDataApiService.patchRepOrder(1234, fieldsToUpdate);
+        verify(cmaApiClient).patch(eq(fieldsToUpdate), any(), anyString(), anyMap(), eq(repOrderId));
     }
 }
