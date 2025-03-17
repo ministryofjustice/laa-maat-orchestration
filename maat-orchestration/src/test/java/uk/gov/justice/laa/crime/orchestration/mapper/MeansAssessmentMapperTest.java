@@ -189,11 +189,8 @@ class MeansAssessmentMapperTest {
 
         // Helper method to assert income evidence
         BiConsumer<EvidenceDTO, ApiIncomeEvidence> assertCommonFields = (evidenceDTO, apiIncomeEvidence) -> {
-            softly.assertThat(apiIncomeEvidence.getApiEvidenceType().getCode())
+            softly.assertThat(apiIncomeEvidence.getIncomeEvidence())
                     .isEqualTo(evidenceDTO.getEvidenceTypeDTO().getEvidence());
-
-            softly.assertThat(apiIncomeEvidence.getApiEvidenceType().getDescription())
-                    .isEqualTo(evidenceDTO.getEvidenceTypeDTO().getDescription());
 
             softly.assertThat(apiIncomeEvidence.getDateReceived())
                     .isEqualTo(DateUtil.toLocalDateTime(evidenceDTO.getDateReceived()));

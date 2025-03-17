@@ -138,7 +138,7 @@ class IncomeEvidenceMapperTest {
     void givenValidParams_whenMaatApiAssessmentResponseToApplicationDTOIsInvoked_thenApplicationDTOIsUpdated() {
         List<ApiIncomeEvidence> incomeEvidences = MeansAssessmentDataBuilder.getIncomeEvidence(false);
         MaatApiAssessmentResponse maatApiAssessmentResponse =
-                new MaatApiAssessmentResponse().withIncomeEvidence(incomeEvidences);
+                new MaatApiAssessmentResponse().withFinAssIncomeEvidences(incomeEvidences);
         ApplicationDTO applicationDTO = MeansAssessmentDataBuilder.getApplicationDTO();
 
         when(meansAssessmentMapper.getEvidenceDTO(incomeEvidences.get(0)))

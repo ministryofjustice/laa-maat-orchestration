@@ -122,7 +122,7 @@ public class IncomeEvidenceMapper {
         List<uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceDTO> partnerEvidence = new ArrayList<>();
 
         Integer applicantId = NumberUtils.toInteger(application.getApplicantDTO().getId());
-        for (uk.gov.justice.laa.crime.common.model.meansassessment.ApiIncomeEvidence evidence : assessmentResponse.getIncomeEvidence()) {
+        for (uk.gov.justice.laa.crime.common.model.meansassessment.ApiIncomeEvidence evidence : assessmentResponse.getFinAssIncomeEvidences()) {
 
             if (evidence.getApplicantId().equals(applicantId)) {
                 applicantEvidence.add(meansAssessmentMapper.getEvidenceDTO(evidence));

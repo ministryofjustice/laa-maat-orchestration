@@ -161,7 +161,7 @@ public class MeansAssessmentMapper {
         return new ApiIncomeEvidence()
                 .withId(NumberUtils.toInteger(evidenceItem.getId()))
                 .withDateReceived(DateUtil.toLocalDateTime(evidenceItem.getDateReceived()))
-                .withApiEvidenceType(new ApiEvidenceType(evidenceType.getName(), evidenceType.getDescription()))
+                .withIncomeEvidence(evidenceItem.getEvidenceTypeDTO().getEvidence())
                 .withApplicantId(applicantId);
     }
 
@@ -173,7 +173,7 @@ public class MeansAssessmentMapper {
         return new ApiIncomeEvidence()
                 .withId(NumberUtils.toInteger(evidenceItem.getId()))
                 .withDateReceived(DateUtil.toLocalDateTime(evidenceItem.getDateReceived()))
-                .withApiEvidenceType(new ApiEvidenceType(evidenceType.getName(), evidenceType.getDescription()))
+                .withIncomeEvidence(evidenceItem.getEvidenceTypeDTO().getEvidence())
                 .withApplicantId(applicantId)
                 .withMandatory("Y")
                 .withAdhoc(evidenceItem.getAdhoc())
@@ -334,7 +334,7 @@ public class MeansAssessmentMapper {
 
     public EvidenceDTO getEvidenceDTO(ApiIncomeEvidence apiIncomeEvidence) {
         EvidenceDTO evidenceDTO = new EvidenceDTO();
-        evidenceDTO.setEvidenceTypeDTO(getEvidenceTypeDTO(apiIncomeEvidence.getApiEvidenceType()));
+        evidenceDTO.setEvidenceTypeDTO(getEvidenceTypeDTO(apiIncomeEvidence.getIncomeEvidence()));
         evidenceDTO.setId(ofNullable(apiIncomeEvidence.getId()).map(Integer::longValue).orElse(0L));
         evidenceDTO.setOtherDescription(apiIncomeEvidence.getOtherText());
         evidenceDTO.setDateReceived(toDate(apiIncomeEvidence.getDateReceived()));
@@ -347,18 +347,18 @@ public class MeansAssessmentMapper {
         extraEvidenceDTO.setAdhoc(apiIncomeEvidence.getAdhoc());
         extraEvidenceDTO.setId(ofNullable(apiIncomeEvidence.getId()).map(Integer::longValue).orElse(0L));
         extraEvidenceDTO.setDateReceived(toDate(apiIncomeEvidence.getDateReceived()));
-        extraEvidenceDTO.setEvidenceTypeDTO(getEvidenceTypeDTO(apiIncomeEvidence.getApiEvidenceType()));
+        extraEvidenceDTO.setEvidenceTypeDTO(getEvidenceTypeDTO(apiIncomeEvidence.getIncomeEvidence()));
         extraEvidenceDTO.setMandatory(Boolean.valueOf(apiIncomeEvidence.getMandatory()));
         extraEvidenceDTO.setOtherText(apiIncomeEvidence.getOtherText());
         extraEvidenceDTO.setTimestamp(toZonedDateTime(apiIncomeEvidence.getDateModified()));
         return extraEvidenceDTO;
     }
 
-    private EvidenceTypeDTO getEvidenceTypeDTO(ApiEvidenceType apiEvidenceType) {
+    private EvidenceTypeDTO getEvidenceTypeDTO(String incomeEvidence) {
         EvidenceTypeDTO evidenceTypeDTO = new EvidenceTypeDTO();
-        if (apiEvidenceType != null) {
-            evidenceTypeDTO.setEvidence(apiEvidenceType.getCode());
-            evidenceTypeDTO.setDescription(apiEvidenceType.getDescription());
+        if (StringUtils.isNotBlank(incomeEvidence)) {
+            evidenceTypeDTO.setEvidence(incomeEvidence);
+            evidenceTypeDTO.setDescription(IncomeEvidenceType.getFrom(incomeEvidence).getDescription());
         }
         return evidenceTypeDTO;
     }

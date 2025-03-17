@@ -609,19 +609,20 @@ public class MeansAssessmentDataBuilder {
                 .withApplicantId(Constants.APPLICANT_ID)
                 .withDateReceived(APPLICANT_EVIDENCE_RECEIVED_DATE)
                 .withDateModified(DATE_MODIFIED)
-                .withApiEvidenceType(getApiEvidenceType()));
+                .withIncomeEvidence(INCOME_EVIDENCE));
+
         incomeEvidences.add(new ApiIncomeEvidence()
                 .withId(PARTNER_EVIDENCE_ID)
                 .withApplicantId(PARTNER_ID)
                 .withDateReceived(PARTNER_EVIDENCE_RECEIVED_DATE)
                 .withDateModified(DATE_MODIFIED)
-                .withApiEvidenceType(getApiEvidenceType()));
+                .withIncomeEvidence(INCOME_EVIDENCE));
 
         if (withExtra) {
             incomeEvidences.add(new ApiIncomeEvidence()
                     .withAdhoc("Y")
                     .withId(EXTRA_EVIDENCE_ID)
-                    .withApiEvidenceType(getApiEvidenceType())
+                    .withIncomeEvidence(INCOME_EVIDENCE)
                     .withDateReceived(DATETIME_RECEIVED)
                     .withOtherText(OTHER_DESCRIPTION)
                     .withMandatory("true")
@@ -629,12 +630,6 @@ public class MeansAssessmentDataBuilder {
         }
 
         return incomeEvidences;
-    }
-
-    private static ApiEvidenceType getApiEvidenceType() {
-        return new ApiEvidenceType()
-                .withCode(INCOME_EVIDENCE)
-                .withDescription(INCOME_EVIDENCE_DESCRIPTION);
     }
 
     public static List<ApiAssessmentChildWeighting> getAssessmentChildWeightings() {
