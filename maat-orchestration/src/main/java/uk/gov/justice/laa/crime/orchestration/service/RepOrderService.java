@@ -1,5 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
+import java.time.LocalDateTime;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,5 +17,12 @@ public class RepOrderService {
     public RepOrderDTO getRepOrder(WorkflowRequest workflowRequest) {
         int repId = workflowRequest.getApplicationDTO().getRepId().intValue();
         return maatCourtDataService.findRepOrder(repId);
+    }
+
+    public void updateRepOrderDateModified(WorkflowRequest workflowRequest, LocalDateTime dateModified) {
+        int repId = workflowRequest.getApplicationDTO().getRepId().intValue();
+        Map<String, Object> fieldsToUpdate = Map.of("dateModified", dateModified);
+
+        maatCourtDataService.updateRepOrderDateModified(repId, fieldsToUpdate);
     }
 }

@@ -59,7 +59,7 @@ class CrownCourtControllerTest {
     void givenValidRequest_whenUpdateIsInvoked_thenOkResponseIsReturned() throws Exception {
         String requestBody = buildRequestBody();
 
-        when(orchestrationService.update(any(WorkflowRequest.class)))
+        when(orchestrationService.updateOutcome(any(WorkflowRequest.class)))
                 .thenReturn(new ApplicationDTO());
 
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
@@ -77,7 +77,7 @@ class CrownCourtControllerTest {
     void givenWebClientFailure_whenUpdateIsInvoked_thenInternalServerErrorResponseIsReturned() throws Exception {
         String requestBody = buildRequestBody();
 
-        when(orchestrationService.update(any(WorkflowRequest.class)))
+        when(orchestrationService.updateOutcome(any(WorkflowRequest.class)))
                 .thenThrow(new APIClientException());
 
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
