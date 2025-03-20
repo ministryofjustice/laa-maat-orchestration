@@ -157,7 +157,6 @@ public class MeansAssessmentMapper {
     }
 
     private ApiIncomeEvidence mapToApiIncomeEvidence(EvidenceDTO evidenceItem, int applicantId) {
-        IncomeEvidenceType evidenceType = IncomeEvidenceType.getFrom(evidenceItem.getEvidenceTypeDTO().getEvidence());
         return new ApiIncomeEvidence()
                 .withId(NumberUtils.toInteger(evidenceItem.getId()))
                 .withDateReceived(DateUtil.toLocalDateTime(evidenceItem.getDateReceived()))
