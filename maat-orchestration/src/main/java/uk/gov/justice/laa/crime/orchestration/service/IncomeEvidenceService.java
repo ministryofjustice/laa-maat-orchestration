@@ -35,7 +35,7 @@ public class IncomeEvidenceService {
                 evidenceApiService.createEvidence(evidenceRequest);
 
         MaatApiUpdateAssessment maatApiRequest =
-                incomeEvidenceMapper.mapToMaatApiUpdateAssessment(request, repOrder, evidenceResponse);
+                incomeEvidenceMapper.mapToMaatApiUpdateAssessment(request, repOrder, evidenceResponse, Boolean.TRUE);
         MaatApiAssessmentResponse maatApiResponse = maatCourtDataApiService.updateFinancialAssessment(maatApiRequest);
         incomeEvidenceMapper.maatApiAssessmentResponseToApplicationDTO(maatApiResponse, request.getApplicationDTO());
     }
