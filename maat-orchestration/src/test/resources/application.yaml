@@ -83,6 +83,7 @@ services:
     endpoints:
       update-application-url: ${services.crown-court-api.base-url}/api/internal/v1/proceedings
       update-crown-court-url: ${services.crown-court-api.base-url}/api/internal/v1/proceedings/update-crown-court
+      determine-mags-rep-decision-url: ${services.crown-court-api.base-url}/api/internal/v1/proceedings/determine-mags-rep-decision
 
   cma-api:
     base-url: http://localhost:${wiremock.server.port}
@@ -99,6 +100,7 @@ services:
       rep-order-url: ${services.maat-api.base-url}/api/internal/v1/assessment/rep-orders/{repId}
       update-send-to-cclf-url: ${services.maat-api.base-url}/api/internal/v1/application/applicant/update-cclf
       get-assessment-url: ${services.maat-api.base-url}/api/internal/v1/assessment/financial-assessments/{financialAssessmentId}
+      financial-assessment-url: ${services.maat-api.base-url}/api/internal/v1/assessment/financial-assessments
     user-domain: ${services.maat-api.base-url}/api/internal/v1/users
     user-endpoints:
       user-summary-url: ${services.maat-api.user-domain}/summary/{username}

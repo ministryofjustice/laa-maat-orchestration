@@ -9,12 +9,19 @@ import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceReq
 import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FullAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.IncomeEvidenceMapper;
 import uk.gov.justice.laa.crime.orchestration.service.api.EvidenceApiService;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
+import uk.gov.justice.laa.crime.orchestration.util.AssessmentTypeUtil;
+
+import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType.MEANS_FULL;
 
 @Slf4j
 @Service

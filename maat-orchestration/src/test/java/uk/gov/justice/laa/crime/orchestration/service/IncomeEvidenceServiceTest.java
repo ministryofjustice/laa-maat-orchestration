@@ -78,5 +78,8 @@ class IncomeEvidenceServiceTest {
         verify(maatCourtDataApiService).updateFinancialAssessment(any(MaatApiUpdateAssessment.class));
         verify(incomeEvidenceMapper).maatApiAssessmentResponseToApplicationDTO(any(MaatApiAssessmentResponse.class),
                 any(ApplicationDTO.class));
-    }}
+    }
+}
+
+
 
