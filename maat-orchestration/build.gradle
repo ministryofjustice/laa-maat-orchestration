@@ -20,7 +20,9 @@ def versions = [
 		commonsModSchemas       : "1.36.0",
 		crimeCommonsClasses     : "4.4.0",
 		commonsRestClient       : "3.20.0",
-		wmStubRunnerVersion    	: "4.2.0"
+		wmStubRunnerVersion    	: "4.2.0",
+		oauth2ResourceServer    : "3.4.1",
+		securityCrypto          : "6.4.4"
 ]
 
 configurations {
@@ -46,9 +48,10 @@ dependencies {
 	implementation "io.micrometer:micrometer-registry-prometheus"
 	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$versions.springdocVersion"
 
-	implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+	implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:$versions.oauth2ResourceServer"
 	implementation "org.springframework.boot:spring-boot-starter-security"
 	implementation "org.springframework.boot:spring-boot-starter-validation"
+	implementation "org.springframework.security:spring-security-crypto:$versions.securityCrypto"
 
 	compileOnly "org.projectlombok:lombok"
 	annotationProcessor "org.projectlombok:lombok"

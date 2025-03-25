@@ -21,7 +21,7 @@ public class CrownCourtOrchestrationService {
     private final MaatCourtDataService maatCourtDataService;
     private final MaatCourtDataApiService maatCourtDataApiService;
 
-    public ApplicationDTO update(WorkflowRequest request) {
+    public ApplicationDTO updateOutcome(WorkflowRequest request) {
 
         ApplicationDTO application = request.getApplicationDTO();
 

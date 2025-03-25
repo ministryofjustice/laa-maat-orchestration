@@ -27,7 +27,7 @@ import uk.gov.justice.laa.crime.orchestration.service.orchestration.CrownCourtOr
 @Tag(name = "Crown Court Orchestration", description = "API for orchestration of MAAT Crown Court flows.")
 public class CrownCourtController {
 
-    private final CrownCourtOrchestrationService orchestrationService;
+    private final CrownCourtOrchestrationService crownCourtOrchestrationService;
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Update Crown Court")
@@ -37,9 +37,9 @@ public class CrownCourtController {
             )
     )
     @DefaultHTTPErrorResponse
-    public ResponseEntity<ApplicationDTO> updateCrownCourt(
+    public ResponseEntity<ApplicationDTO> updateCrownCourtOutcome(
             @Valid @RequestBody WorkflowRequest workflowRequest) {
         log.info("Received request to update crown court");
-        return ResponseEntity.ok(orchestrationService.update(workflowRequest));
+        return ResponseEntity.ok(crownCourtOrchestrationService.updateOutcome(workflowRequest));
     }
 }
