@@ -103,7 +103,7 @@ class IncomeEvidenceMapperTest {
                 .thenReturn(List.of(TestModelDataBuilder.getAssessmentChildWeighting()));
 
         MaatApiUpdateAssessment maatApiUpdateAssessment =
-                incomeEvidenceMapper.mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, apiCreateIncomeEvidenceResponse, Boolean.TRUE);
+                incomeEvidenceMapper.mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, apiCreateIncomeEvidenceResponse);
 
         softly.assertThat(maatApiUpdateAssessment)
                 .usingRecursiveComparison()
@@ -125,7 +125,7 @@ class IncomeEvidenceMapperTest {
                 .thenReturn(List.of(TestModelDataBuilder.getAssessmentChildWeighting()));
 
         MaatApiUpdateAssessment maatApiUpdateAssessment =
-                incomeEvidenceMapper.mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, apiCreateIncomeEvidenceResponse, Boolean.TRUE);
+                incomeEvidenceMapper.mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, apiCreateIncomeEvidenceResponse);
 
         softly.assertThat(maatApiUpdateAssessment)
                 .usingRecursiveComparison()
@@ -169,7 +169,7 @@ class IncomeEvidenceMapperTest {
                 .thenReturn(List.of(TestModelDataBuilder.getAssessmentChildWeighting()));
 
         MaatApiUpdateAssessment maatApiUpdateAssessment =
-                incomeEvidenceMapper.mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, apiCreateIncomeEvidenceResponse, Boolean.TRUE);
+                incomeEvidenceMapper.mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, apiCreateIncomeEvidenceResponse);
 
         softly.assertThat(maatApiUpdateAssessment)
                 .usingRecursiveComparison()

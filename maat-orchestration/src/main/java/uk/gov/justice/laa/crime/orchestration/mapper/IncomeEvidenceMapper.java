@@ -60,8 +60,7 @@ public class IncomeEvidenceMapper {
 
     public MaatApiUpdateAssessment mapToMaatApiUpdateAssessment(WorkflowRequest workflowRequest,
                                                                 RepOrderDTO repOrder,
-                                                                ApiCreateIncomeEvidenceResponse evidenceResponse,
-                                                                boolean isDefaultIncomeEvidence) {
+                                                                ApiCreateIncomeEvidenceResponse evidenceResponse) {
         ApplicationDTO application = workflowRequest.getApplicationDTO();
         AssessmentType assessmentType = Boolean.TRUE.equals(application.getAssessmentDTO().getFinancialAssessmentDTO().getFullAvailable())
                 ? AssessmentType.FULL : AssessmentType.INIT;
@@ -74,7 +73,7 @@ public class IncomeEvidenceMapper {
         MaatApiUpdateAssessment updateAssessment = new MaatApiUpdateAssessment()
                 .withFinancialAssessmentId(NumberUtils.toInteger(application.getAssessmentDTO().getFinancialAssessmentDTO().getId()))
                 .withUserModified(workflowRequest.getUserDTO().getUserName())
-                .withFinAssIncomeEvidences(getIncomeEvidences(workflowRequest, repOrder, evidenceResponse, isDefaultIncomeEvidence))
+                .withFinAssIncomeEvidences(getIncomeEvidences(workflowRequest, repOrder, evidenceResponse))
                 .withLaaTransactionId(UUID.randomUUID().toString())
                 .withRepId(NumberUtils.toInteger(application.getRepId()))
                 .withAssessmentType(assessmentType.getType())
@@ -201,8 +200,7 @@ public class IncomeEvidenceMapper {
 
     private List<FinancialAssessmentIncomeEvidence> getIncomeEvidences(WorkflowRequest workflowRequest,
                                                                        RepOrderDTO repOrder,
-                                                                       ApiCreateIncomeEvidenceResponse evidenceResponse,
-                                                                       boolean isDefaultIncomeEvidence) {
+                                                                       ApiCreateIncomeEvidenceResponse evidenceResponse) {
         List<EvidenceDTO> existingEvidences = new ArrayList<>();
         repOrder.getFinancialAssessments()
                 .forEach(financialAssessmentDTO -> existingEvidences.addAll(financialAssessmentDTO.getFinAssIncomeEvidences()));
@@ -211,16 +209,15 @@ public class IncomeEvidenceMapper {
 
         UserDTO user = workflowRequest.getUserDTO();
 
-        return Stream.of(getEvidences(evidenceResponse.getApplicantEvidenceItems(), existingEvidences, user, isDefaultIncomeEvidence),
-                        getEvidences(evidenceResponse.getPartnerEvidenceItems(), existingEvidences, user, isDefaultIncomeEvidence))
+        return Stream.of(getEvidences(evidenceResponse.getApplicantEvidenceItems(), existingEvidences, user),
+                        getEvidences(evidenceResponse.getPartnerEvidenceItems(), existingEvidences, user))
                 .flatMap(List::stream)
                 .toList();
     }
 
     private List<FinancialAssessmentIncomeEvidence> getEvidences(ApiIncomeEvidenceItems evidenceItems,
                                                                  List<EvidenceDTO> existingEvidences,
-                                                                 UserDTO user,
-                                                                 boolean isDefaultIncomeEvidence) {
+                                                                 UserDTO user) {
         if (null !=evidenceItems) {
             Integer applicantId = evidenceItems.getApplicantDetails().getId();
 
@@ -228,8 +225,8 @@ public class IncomeEvidenceMapper {
                     .stream()
                     .map(evidence -> new FinancialAssessmentIncomeEvidence()
                             .withId(evidence.getId())
-                            .withDateReceived(isDefaultIncomeEvidence ? getDateReceived(applicantId, evidence, existingEvidences)
-                                    : DateUtil.convertDateToDateTime(evidence.getDateReceived()))
+                            .withDateReceived(evidence.getEvidenceType().isExtra() ? DateUtil.convertDateToDateTime(evidence.getDateReceived())
+                                    : getDateReceived(applicantId, evidence, existingEvidences))
                             .withActive("Y")
                             .withIncomeEvidence(evidence.getEvidenceType().getName())
                             .withMandatory(Boolean.TRUE.equals(evidence.getMandatory()) ? "Y" : "N")
@@ -314,7 +311,7 @@ public class IncomeEvidenceMapper {
                                                                               RepOrderDTO repOrderDTO,
                                                                               ApiUpdateIncomeEvidenceResponse evidenceResponse) {
 
-        MaatApiUpdateAssessment maatApiUpdateAssessment = mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, evidenceResponse, Boolean.FALSE);
+        MaatApiUpdateAssessment maatApiUpdateAssessment = mapToMaatApiUpdateAssessment(workflowRequest, repOrderDTO, evidenceResponse);
         maatApiUpdateAssessment.withIncomeEvidenceDueDate(DateUtil.convertDateToDateTime(evidenceResponse.getDueDate()));
         maatApiUpdateAssessment.withEvidenceReceivedDate(DateUtil.convertDateToDateTime(evidenceResponse.getAllEvidenceReceivedDate()));
         maatApiUpdateAssessment.withIncomeUpliftApplyDate(DateUtil.convertDateToDateTime(evidenceResponse.getUpliftAppliedDate()));

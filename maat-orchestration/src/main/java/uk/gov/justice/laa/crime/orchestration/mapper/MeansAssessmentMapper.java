@@ -165,7 +165,6 @@ public class MeansAssessmentMapper {
     }
 
     private ApiIncomeEvidence mapToExtraApiIncomeEvidence(ExtraEvidenceDTO evidenceItem, ApplicationDTO applicationDTO, Integer partnerId) {
-        IncomeEvidenceType evidenceType = IncomeEvidenceType.getFrom(evidenceItem.getEvidenceTypeDTO().getEvidence());
         Integer applicantId = evidenceItem.getAdhoc().equals("A") ?
                 NumberUtils.toInteger(applicationDTO.getApplicantDTO().getId()) : partnerId;
 

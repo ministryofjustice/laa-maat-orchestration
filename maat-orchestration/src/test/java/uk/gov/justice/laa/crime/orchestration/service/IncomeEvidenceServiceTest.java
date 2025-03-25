@@ -45,7 +45,7 @@ class IncomeEvidenceServiceTest {
                 .thenReturn(new ApiCreateIncomeEvidenceRequest());
         when(evidenceApiService.createEvidence(any(ApiCreateIncomeEvidenceRequest.class)))
                 .thenReturn(new ApiCreateIncomeEvidenceResponse());
-        when(incomeEvidenceMapper.mapToMaatApiUpdateAssessment(any(WorkflowRequest.class), any(RepOrderDTO.class), any(ApiCreateIncomeEvidenceResponse.class), any(Boolean.class)))
+        when(incomeEvidenceMapper.mapToMaatApiUpdateAssessment(any(WorkflowRequest.class), any(RepOrderDTO.class), any(ApiCreateIncomeEvidenceResponse.class)))
                 .thenReturn(new MaatApiUpdateAssessment());
         when(maatCourtDataApiService.updateFinancialAssessment(any(MaatApiUpdateAssessment.class)))
                 .thenReturn(new MaatApiAssessmentResponse());
