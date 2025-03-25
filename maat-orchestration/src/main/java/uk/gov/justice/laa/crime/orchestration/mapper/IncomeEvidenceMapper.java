@@ -209,29 +209,38 @@ public class IncomeEvidenceMapper {
 
         UserDTO user = workflowRequest.getUserDTO();
 
-        return Stream.of(getEvidences(evidenceResponse.getApplicantEvidenceItems(), existingEvidences, user),
-                        getEvidences(evidenceResponse.getPartnerEvidenceItems(), existingEvidences, user))
+        return Stream.of(getEvidences(evidenceResponse.getApplicantEvidenceItems(), existingEvidences, user, false),
+                        getEvidences(evidenceResponse.getPartnerEvidenceItems(), existingEvidences, user, true))
                 .flatMap(List::stream)
                 .toList();
     }
 
     private List<FinancialAssessmentIncomeEvidence> getEvidences(ApiIncomeEvidenceItems evidenceItems,
-                                                                 List<EvidenceDTO> existingEvidences,
-                                                                 UserDTO user) {
+            List<EvidenceDTO> existingEvidences, UserDTO user, boolean isPartner) {
         if (null !=evidenceItems) {
             Integer applicantId = evidenceItems.getApplicantDetails().getId();
 
             return evidenceItems.getIncomeEvidenceItems()
                     .stream()
-                    .map(evidence -> new FinancialAssessmentIncomeEvidence()
-                            .withId(evidence.getId())
-                            .withDateReceived(getDateReceived(applicantId, evidence, existingEvidences))
-                            .withActive("Y")
-                            .withIncomeEvidence(evidence.getEvidenceType().getName())
-                            .withMandatory(Boolean.TRUE.equals(evidence.getMandatory()) ? "Y" : "N")
-                            .withApplicant(applicantId)
-                            .withOtherText(evidence.getDescription())
-                            .withUserCreated(user.getUserName()))
+                    .map(evidence ->  {
+
+                        var incomeEvidence = new FinancialAssessmentIncomeEvidence()
+                                .withId(evidence.getId())
+                                .withDateReceived(
+                                        getDateReceived(applicantId, evidence, existingEvidences))
+                                .withActive("Y")
+                                .withIncomeEvidence(evidence.getEvidenceType().getName())
+                                .withMandatory(
+                                        Boolean.TRUE.equals(evidence.getMandatory()) ? "Y" : "N")
+                                .withApplicant(applicantId)
+                                .withOtherText(evidence.getDescription())
+                                .withUserCreated(user.getUserName());
+
+                        if (evidence.getEvidenceType().isExtra()) {
+                            incomeEvidence.withAdhoc(isPartner ? "P" : "A");
+                        }
+                        return incomeEvidence;
+                    })
                     .toList();
         }
         return Collections.emptyList();
