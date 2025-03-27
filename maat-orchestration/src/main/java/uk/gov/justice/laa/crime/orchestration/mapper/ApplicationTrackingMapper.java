@@ -2,18 +2,14 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
+import uk.gov.justice.laa.crime.common.model.tracking.*;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.CaseType;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
-import uk.gov.justice.laa.crime.common.model.tracking.Hardship;
 import uk.gov.justice.laa.crime.common.model.tracking.Hardship.HardshipResult;
 import uk.gov.justice.laa.crime.common.model.tracking.Hardship.HardshipType;
-import uk.gov.justice.laa.crime.common.model.tracking.Ioj;
 import uk.gov.justice.laa.crime.common.model.tracking.Ioj.IojAppealResult;
-import uk.gov.justice.laa.crime.common.model.tracking.MeansAssessment;
 import uk.gov.justice.laa.crime.common.model.tracking.MeansAssessment.MeansAssessmentResult;
-import uk.gov.justice.laa.crime.common.model.tracking.Passport;
 import uk.gov.justice.laa.crime.common.model.tracking.Passport.PassportResult;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
@@ -28,7 +24,8 @@ import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
 @Component
 public class ApplicationTrackingMapper {
 
-    public ApplicationTrackingOutputResult build(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {
+    public ApplicationTrackingOutputResult build(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO,
+                                                 AssessmentType assessmentType, RequestSource requestSource) {
 
         ApplicationTrackingOutputResult request = new ApplicationTrackingOutputResult();
         ApplicationDTO application = workflowRequest.getApplicationDTO();
@@ -45,12 +42,12 @@ public class ApplicationTrackingMapper {
         request.setCaseType(StringUtils.isBlank(application.getCaseDetailsDTO().getCaseType()) ? null :
                 CaseType.fromValue(application.getCaseDetailsDTO().getCaseType()));
         request.setAssessmentId(financialAssessmentDTO.getId().intValue());
-        request.setAssessmentType(AssessmentType.CCHARDSHIP);
+        request.setAssessmentType(assessmentType);
         request.setDwpResult(passportedDTO.getDwpResult());
         request.setRepDecision(repOrderDecisionDTO.getDescription() != null ? repOrderDecisionDTO.getDescription().getValue() : null);
         request.setCcRepDecision(crownCourtSummaryDTO.getRepOrderDecision() != null ? crownCourtSummaryDTO.getRepOrderDecision().getValue() : null);
         request.setMagsOutcome(application.getMagsOutcomeDTO().getOutcome());
-        request.setRequestSource(RequestSource.HARDSHIP);
+        request.setRequestSource(requestSource);
         request.setUserCreated(workflowRequest.getUserDTO().getUserName());
         request.setIoj(buildIOJ(workflowRequest, repOrderDTO));
         request.setPassport(buildPassport(workflowRequest, repOrderDTO));
