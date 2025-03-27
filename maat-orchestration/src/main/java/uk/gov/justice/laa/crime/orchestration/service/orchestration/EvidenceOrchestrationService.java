@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
+import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
@@ -42,7 +43,9 @@ public class EvidenceOrchestrationService {
             applicationDTO = contributionService.calculate(workflowRequest);
         }
 
-        repOrderService.updateRepOrderDateModified(workflowRequest, LocalDateTime.now());
+        LocalDateTime updatedDateModified = LocalDateTime.now();
+        repOrderService.updateRepOrderDateModified(workflowRequest, updatedDateModified);
+        applicationDTO.setTimestamp(updatedDateModified.atZone(ZoneOffset.UTC));
 
         return applicationDTO;
     }
