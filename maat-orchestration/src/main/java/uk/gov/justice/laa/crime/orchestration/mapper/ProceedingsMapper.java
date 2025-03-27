@@ -275,8 +275,10 @@ public class ProceedingsMapper extends CrownCourtMapper {
     }
 
     public void apiDetermineMagsRepDecisionResponseToApplicationDTO(ApplicationDTO application, ApiDetermineMagsRepDecisionResponse response) {
+        if (null != response.getDecisionResult()) {
             application.getRepOrderDecision().setCode(response.getDecisionResult().getDecisionReason().getCode());
             application.getRepOrderDecision().setDescription(
                     new SysGenString(response.getDecisionResult().getDecisionReason().getDescription()));
+        }
     }
 }

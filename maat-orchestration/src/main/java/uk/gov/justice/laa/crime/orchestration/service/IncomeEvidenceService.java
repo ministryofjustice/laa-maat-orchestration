@@ -11,15 +11,14 @@ import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAsse
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.FullAssessmentDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.IncomeEvidenceMapper;
 import uk.gov.justice.laa.crime.orchestration.service.api.EvidenceApiService;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 import uk.gov.justice.laa.crime.orchestration.util.AssessmentTypeUtil;
+
+import java.util.Collection;
 
 import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType.MEANS_FULL;
 
@@ -36,15 +35,17 @@ public class IncomeEvidenceService {
         log.debug("Creating evidence items for financialAssessmentId: {}",
                 request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getId());
 
-        ApiCreateIncomeEvidenceRequest evidenceRequest =
-                incomeEvidenceMapper.workflowRequestToApiCreateIncomeEvidenceRequest(request);
-        ApiCreateIncomeEvidenceResponse evidenceResponse =
-                evidenceApiService.createEvidence(evidenceRequest);
+        if (canCreateDefaultIncomeEvidence(request)) {
+            ApiCreateIncomeEvidenceRequest evidenceRequest =
+                    incomeEvidenceMapper.workflowRequestToApiCreateIncomeEvidenceRequest(request);
+            ApiCreateIncomeEvidenceResponse evidenceResponse =
+                    evidenceApiService.createEvidence(evidenceRequest);
 
-        MaatApiUpdateAssessment maatApiRequest =
-                incomeEvidenceMapper.mapToMaatApiUpdateAssessment(request, repOrder, evidenceResponse);
-        MaatApiAssessmentResponse maatApiResponse = maatCourtDataApiService.updateFinancialAssessment(maatApiRequest);
-        incomeEvidenceMapper.maatApiAssessmentResponseToApplicationDTO(maatApiResponse, request.getApplicationDTO());
+            MaatApiUpdateAssessment maatApiRequest =
+                    incomeEvidenceMapper.mapToMaatApiUpdateAssessment(request, repOrder, evidenceResponse);
+            MaatApiAssessmentResponse maatApiResponse = maatCourtDataApiService.updateFinancialAssessment(maatApiRequest);
+            incomeEvidenceMapper.maatApiAssessmentResponseToApplicationDTO(maatApiResponse, request.getApplicationDTO());
+        }
     }
 
     public ApplicationDTO updateEvidence(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {
@@ -63,5 +64,20 @@ public class IncomeEvidenceService {
 
         incomeEvidenceMapper.maatApiAssessmentResponseToApplicationDTO(maatApiResponse, applicationDTO);
         return applicationDTO;
+    }
+
+    private boolean canCreateDefaultIncomeEvidence(WorkflowRequest request) {
+
+        FinancialAssessmentDTO financialAssessmentDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO();
+        IncomeEvidenceSummaryDTO incomeEvidenceSummaryDTO = financialAssessmentDTO.getIncomeEvidence();
+        if (incomeEvidenceSummaryDTO !=null ) {
+            Collection<EvidenceDTO> partnerIncomeEvidenceList = incomeEvidenceSummaryDTO.getPartnerIncomeEvidenceList();
+            Collection<EvidenceDTO>  applicantIncomeEvidenceList = incomeEvidenceSummaryDTO.getApplicantIncomeEvidenceList();
+            if (partnerIncomeEvidenceList.isEmpty() && applicantIncomeEvidenceList.isEmpty()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

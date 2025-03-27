@@ -30,6 +30,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -282,6 +283,8 @@ class MeansAssessmentIntegrationTest {
         request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().setHardship(TestModelDataBuilder.getHardshipOverviewDTO());
         request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().
                 setStatus(EMPTY);
+        request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence().setApplicantIncomeEvidenceList(Collections.emptyList());
+        request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence().setPartnerIncomeEvidenceList(Collections.emptyList());
         request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().setAssessmentDate(null);
         String requestBody = objectMapper.writeValueAsString(request);
 

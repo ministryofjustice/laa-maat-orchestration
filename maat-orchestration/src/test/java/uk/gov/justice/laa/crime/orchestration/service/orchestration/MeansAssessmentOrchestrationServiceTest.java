@@ -382,27 +382,6 @@ class MeansAssessmentOrchestrationServiceTest {
     }
 
     @Test
-    void givenMattPostProcessIsEnabledAndAssessmentIsNotCompleted_whenCreateIsInvoked_thenPostProcessShouldNotCalled() {
-        when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
-                any(StoredProcedure.class)
-        )).thenReturn(workflowRequest.getApplicationDTO());
-
-        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
-        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest)).thenReturn(true);
-        when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
-        when(contributionService.calculate(any(WorkflowRequest.class))).thenReturn(workflowRequest.getApplicationDTO());
-        workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getInitial().getAssessmnentStatusDTO().
-                setStatus(CurrentStatus.IN_PROGRESS.getStatus());
-        workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().
-                setStatus(CurrentStatus.IN_PROGRESS.getStatus());
-        orchestrationService.create(workflowRequest);
-
-        verify(incomeEvidenceService, times(0)).createEvidence(workflowRequest, repOrderDTO);
-        verify(proceedingsService, times(0)).determineMagsRepDecision(workflowRequest);
-        verify(crimeApplicationTrackingService, atLeast(0)).sendApplicationTrackingData(any());
-    }
-
-    @Test
     void givenMattPostProcessIsEnabled_whenCreateIsInvoked_thenPostProcessShouldCalled() {
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
                 any(StoredProcedure.class)

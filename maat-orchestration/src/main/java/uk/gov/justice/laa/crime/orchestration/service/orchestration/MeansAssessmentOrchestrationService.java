@@ -178,15 +178,13 @@ public class MeansAssessmentOrchestrationService {
     private void postProcessAssessment(WorkflowRequest request) {
 
         RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());
+        incomeEvidenceService.createEvidence(request, repOrderDTO);
         if (AssessmentTypeUtil.isAssessmentCompleted(request)) {
-            if (AssessmentTypeUtil.isInitCompletedAndFullAssessmentNotStarted(request)) {
-                incomeEvidenceService.createEvidence(request, repOrderDTO);
-            }
             proceedingsService.determineMagsRepDecision(request);
             request.setApplicationDTO(contributionService.calculate(request));
-            ApplicationTrackingOutputResult trackingResult = applicationTrackingMapper.build(request, repOrderDTO,
-                    AssessmentTypeUtil.getAssessmentType(request), ApplicationTrackingOutputResult.RequestSource.MEANS_ASSESSMENT);
-            crimeApplicationTrackingService.sendApplicationTrackingData(trackingResult);
         }
+        ApplicationTrackingOutputResult trackingResult = applicationTrackingMapper.build(request, repOrderDTO,
+                AssessmentTypeUtil.getAssessmentType(request), ApplicationTrackingOutputResult.RequestSource.MEANS_ASSESSMENT);
+        crimeApplicationTrackingService.sendApplicationTrackingData(trackingResult);
     }
 }

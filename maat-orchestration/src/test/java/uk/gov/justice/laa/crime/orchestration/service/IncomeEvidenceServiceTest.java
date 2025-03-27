@@ -20,6 +20,8 @@ import uk.gov.justice.laa.crime.orchestration.mapper.IncomeEvidenceMapper;
 import uk.gov.justice.laa.crime.orchestration.service.api.EvidenceApiService;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
+import java.util.Collections;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,6 +41,8 @@ class IncomeEvidenceServiceTest {
     @Test
     void givenValidWorkflowRequestAndRepOrder_whenCreateEvidenceIsInvoked_thenApiServicesCalledAndResponseMapped() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence().setPartnerIncomeEvidenceList(Collections.emptyList());
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence().setApplicantIncomeEvidenceList(Collections.emptyList());
         RepOrderDTO repOrder = TestModelDataBuilder.buildRepOrderDTO("CURR");
 
         when(incomeEvidenceMapper.workflowRequestToApiCreateIncomeEvidenceRequest(any(WorkflowRequest.class)))
