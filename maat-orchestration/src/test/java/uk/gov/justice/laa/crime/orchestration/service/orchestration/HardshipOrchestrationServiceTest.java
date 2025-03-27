@@ -137,6 +137,7 @@ class HardshipOrchestrationServiceTest {
 
         verify(assessmentSummaryService)
                 .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -165,6 +166,7 @@ class HardshipOrchestrationServiceTest {
 
         verify(assessmentSummaryService)
                 .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -201,6 +203,7 @@ class HardshipOrchestrationServiceTest {
 
         verify(assessmentSummaryService)
                 .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -213,6 +216,7 @@ class HardshipOrchestrationServiceTest {
         expected.setAsessmentStatus(getAssessmentStatusDTO(CurrentStatus.IN_PROGRESS));
         assertThat(actual.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship())
                 .isEqualTo(expected);
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -225,6 +229,7 @@ class HardshipOrchestrationServiceTest {
         expected.setAsessmentStatus(null);
         assertThat(actual.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship())
                 .isEqualTo(expected);
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -237,6 +242,7 @@ class HardshipOrchestrationServiceTest {
         expected.setAsessmentStatus(getAssessmentStatusDTO(CurrentStatus.IN_PROGRESS));
         assertThat(actual.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getMagCourtHardship())
                 .isEqualTo(expected);
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -249,6 +255,7 @@ class HardshipOrchestrationServiceTest {
         expected.setAsessmentStatus(null);
         assertThat(actual.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getMagCourtHardship())
                 .isEqualTo(expected);
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -274,6 +281,7 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(MaatOrchestrationException.class);
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -292,6 +300,7 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(MaatOrchestrationException.class);
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -314,6 +323,7 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(MaatOrchestrationException.class);
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -340,6 +350,8 @@ class HardshipOrchestrationServiceTest {
 
         verify(assessmentSummaryService)
                 .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
+
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -373,6 +385,8 @@ class HardshipOrchestrationServiceTest {
 
         verify(assessmentSummaryService)
                 .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
+
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -416,6 +430,8 @@ class HardshipOrchestrationServiceTest {
 
         verify(assessmentSummaryService)
                 .updateApplication(applicationDTO, assessmentSummaryDTO);
+
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -437,6 +453,7 @@ class HardshipOrchestrationServiceTest {
         assertThat(actual.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship())
                 .isEqualTo(expected);
 
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -458,6 +475,7 @@ class HardshipOrchestrationServiceTest {
         assertThat(actual.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship())
                 .isEqualTo(expected);
 
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -479,6 +497,7 @@ class HardshipOrchestrationServiceTest {
         assertThat(actual.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getMagCourtHardship())
                 .isEqualTo(expected);
 
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -500,6 +519,7 @@ class HardshipOrchestrationServiceTest {
         assertThat(actual.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getMagCourtHardship())
                 .isEqualTo(expected);
 
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -522,6 +542,8 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(MaatOrchestrationException.class);
+
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -541,6 +563,8 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(MaatOrchestrationException.class);
+
+        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -553,6 +577,8 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(APIClientException.class);
+
+        verify(repOrderService, times(0)).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -564,6 +590,8 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
                 .isInstanceOf(APIClientException.class);
+
+        verify(repOrderService, times(0)).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -579,6 +607,7 @@ class HardshipOrchestrationServiceTest {
                 .isInstanceOf(CrimeValidationException.class);
 
         verify(workflowPreProcessorService).preProcessRequest(any(), any(), any());
+        verify(repOrderService, times(0)).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -594,5 +623,6 @@ class HardshipOrchestrationServiceTest {
                 .isInstanceOf(CrimeValidationException.class);
 
         verify(workflowPreProcessorService).preProcessRequest(any(), any(), any());
+        verify(repOrderService, times(0)).updateRepOrderDateModified(eq(workflowRequest), any());
     }
 }

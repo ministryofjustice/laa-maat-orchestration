@@ -39,10 +39,12 @@ public class EvidenceOrchestrationService {
         boolean isUpliftChanged = hasUpliftChanged(applicationDTO, repOrderDTO);
         if (isUpliftChanged) {
             workflowRequest.setApplicationDTO(applicationDTO);
-            return contributionService.calculate(workflowRequest);
-        } else {
-            return applicationDTO;
+            applicationDTO = contributionService.calculate(workflowRequest);
         }
+
+        repOrderService.updateRepOrderDateModified(workflowRequest, LocalDateTime.now());
+
+        return applicationDTO;
     }
 
     private static boolean hasUpliftChanged(ApplicationDTO applicationDTO, RepOrderDTO repOrderDTO) {
