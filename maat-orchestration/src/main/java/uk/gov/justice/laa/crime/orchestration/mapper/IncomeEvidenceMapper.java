@@ -122,7 +122,7 @@ public class IncomeEvidenceMapper {
         List<uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceDTO> partnerEvidence = new ArrayList<>();
 
         Integer applicantId = NumberUtils.toInteger(application.getApplicantDTO().getId());
-        for (uk.gov.justice.laa.crime.common.model.meansassessment.ApiIncomeEvidence evidence : assessmentResponse.getIncomeEvidence()) {
+        for (uk.gov.justice.laa.crime.common.model.meansassessment.ApiIncomeEvidence evidence : assessmentResponse.getFinAssIncomeEvidences()) {
 
             if (evidence.getApplicantId().equals(applicantId)) {
                 applicantEvidence.add(meansAssessmentMapper.getEvidenceDTO(evidence));
@@ -225,7 +225,8 @@ public class IncomeEvidenceMapper {
                     .stream()
                     .map(evidence -> new FinancialAssessmentIncomeEvidence()
                             .withId(evidence.getId())
-                            .withDateReceived(getDateReceived(applicantId, evidence, existingEvidences))
+                            .withDateReceived(evidence.getEvidenceType().isExtra() ? DateUtil.convertDateToDateTime(evidence.getDateReceived())
+                                    : getDateReceived(applicantId, evidence, existingEvidences))
                             .withActive("Y")
                             .withIncomeEvidence(evidence.getEvidenceType().getName())
                             .withMandatory(Boolean.TRUE.equals(evidence.getMandatory()) ? "Y" : "N")

@@ -948,8 +948,8 @@ public class TestModelDataBuilder {
                 .id(applicantId)
                 .build());
         finAssIncomeEvidenceDTO.setIncomeEvidence(IncomeEvidenceType.TAX_RETURN.getName());
-        finAssIncomeEvidenceDTO.setDateReceived(FINASS_INCOME_EVIDENCE_RECEIVED_DATE);
-        finAssIncomeEvidenceDTO.setDateCreated(FINASS_INCOME_EVIDENCE_RECEIVED_DATE);
+        finAssIncomeEvidenceDTO.setDateReceived(EVIDENCE_RECEIVED_DATE);
+        finAssIncomeEvidenceDTO.setDateCreated(EVIDENCE_RECEIVED_DATE);
         return finAssIncomeEvidenceDTO;
     }
 
@@ -1493,7 +1493,7 @@ public class TestModelDataBuilder {
     private static FinancialAssessmentIncomeEvidence getFinAssIncomeEvidence(Integer evidenceId, Integer applicantId) {
         return new FinancialAssessmentIncomeEvidence()
                 .withId(evidenceId)
-                .withDateReceived(FINASS_INCOME_EVIDENCE_RECEIVED_DATE)
+                .withDateReceived(EVIDENCE_RECEIVED_DATE)
                 .withActive("Y")
                 .withIncomeEvidence(IncomeEvidenceType.TAX_RETURN.getName())
                 .withMandatory("Y")

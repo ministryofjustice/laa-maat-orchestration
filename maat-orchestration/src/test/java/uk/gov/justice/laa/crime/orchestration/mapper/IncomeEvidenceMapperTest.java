@@ -138,7 +138,7 @@ class IncomeEvidenceMapperTest {
     void givenValidParams_whenMaatApiAssessmentResponseToApplicationDTOIsInvoked_thenApplicationDTOIsUpdated() {
         List<ApiIncomeEvidence> incomeEvidences = MeansAssessmentDataBuilder.getIncomeEvidence(false);
         MaatApiAssessmentResponse maatApiAssessmentResponse =
-                new MaatApiAssessmentResponse().withIncomeEvidence(incomeEvidences);
+                new MaatApiAssessmentResponse().withFinAssIncomeEvidences(incomeEvidences);
         ApplicationDTO applicationDTO = MeansAssessmentDataBuilder.getApplicationDTO();
 
         when(meansAssessmentMapper.getEvidenceDTO(incomeEvidences.get(0)))
@@ -186,8 +186,6 @@ class IncomeEvidenceMapperTest {
         noExistingEvidences.getFinAssIncomeEvidences().forEach(evidence -> evidence.setDateReceived(null));
 
         MaatApiUpdateAssessment existingEvidencesAssessment = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL, Boolean.TRUE);
-        existingEvidencesAssessment.getFinAssIncomeEvidences()
-                .forEach(evidence -> evidence.setDateReceived(TestModelDataBuilder.EVIDENCE_RECEIVED_DATE));
         RepOrderDTO existingEvidencesRepOrderDTO = RepOrderDTO.builder()
                 .passportAssessments(List.of(TestModelDataBuilder.getPassportAssessmentDTO()))
                 .build();
@@ -216,13 +214,16 @@ class IncomeEvidenceMapperTest {
 
         MaatApiUpdateAssessment noExistingEvidences = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL, Boolean.TRUE);
         noExistingEvidences.getFinAssIncomeEvidences().forEach(evidence -> evidence.setDateReceived(null));
+        ApiUpdateIncomeEvidenceResponse apiEmptyDateReceivedResponse = TestModelDataBuilder.getUpdateIncomeEvidenceResponse(Boolean.TRUE);
+        apiEmptyDateReceivedResponse.getApplicantEvidenceItems().getIncomeEvidenceItems().forEach(apiIncomeEvidence -> apiIncomeEvidence.setDateReceived(null));
+        apiEmptyDateReceivedResponse.getPartnerEvidenceItems().getIncomeEvidenceItems().forEach(apiIncomeEvidence -> apiIncomeEvidence.setDateReceived(null));
+
 
         MaatApiUpdateAssessment existingEvidencesAssessment = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL, Boolean.TRUE);
-        existingEvidencesAssessment.getFinAssIncomeEvidences()
-                .forEach(evidence -> evidence.setDateReceived(TestModelDataBuilder.EVIDENCE_RECEIVED_DATE));
         RepOrderDTO existingEvidencesRepOrderDTO = RepOrderDTO.builder()
                 .passportAssessments(List.of(TestModelDataBuilder.getPassportAssessmentDTO()))
                 .build();
+
 
         MaatApiUpdateAssessment existingFinEvidencesAssessment = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL, Boolean.TRUE);
         RepOrderDTO existingFinEvidenceRepOrderDTO = RepOrderDTO.builder()
@@ -234,7 +235,7 @@ class IncomeEvidenceMapperTest {
                 .build();
 
         return Stream.of(
-                Arguments.of(RepOrderDTO.builder().build(), noExistingEvidences,  apiUpdateIncomeEvidenceResponse),
+                Arguments.of(RepOrderDTO.builder().build(), noExistingEvidences,  apiEmptyDateReceivedResponse),
                 Arguments.of(existingEvidencesRepOrderDTO, existingEvidencesAssessment,  apiUpdateIncomeEvidenceResponse),
                 Arguments.of(existingFinEvidenceRepOrderDTO, existingFinEvidencesAssessment, apiUpdateIncomeEvidenceResponse),
                 Arguments.of(existingBothEvidencesRepOrderDTO, existingFinEvidencesAssessment, apiUpdateIncomeEvidenceResponse),
