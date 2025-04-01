@@ -209,15 +209,16 @@ public class IncomeEvidenceMapper {
 
         UserDTO user = workflowRequest.getUserDTO();
 
-        return Stream.of(getEvidences(evidenceResponse.getApplicantEvidenceItems(), existingEvidences, user),
-                        getEvidences(evidenceResponse.getPartnerEvidenceItems(), existingEvidences, user))
+        return Stream.of(getEvidences(evidenceResponse.getApplicantEvidenceItems(), existingEvidences, user, Boolean.FALSE),
+                        getEvidences(evidenceResponse.getPartnerEvidenceItems(), existingEvidences, user, Boolean.FALSE))
                 .flatMap(List::stream)
                 .toList();
     }
 
     private List<FinancialAssessmentIncomeEvidence> getEvidences(ApiIncomeEvidenceItems evidenceItems,
                                                                  List<EvidenceDTO> existingEvidences,
-                                                                 UserDTO user) {
+                                                                 UserDTO user,
+                                                                 boolean isPartner) {
         if (null !=evidenceItems) {
             Integer applicantId = evidenceItems.getApplicantDetails().getId();
 
@@ -232,6 +233,7 @@ public class IncomeEvidenceMapper {
                             .withMandatory(Boolean.TRUE.equals(evidence.getMandatory()) ? "Y" : "N")
                             .withApplicant(applicantId)
                             .withOtherText(evidence.getDescription())
+                            .withAdhoc(evidence.getEvidenceType().isExtra() ? isPartner ? "PARTNER" : "APPLICANT" : null)
                             .withUserCreated(user.getUserName()))
                     .toList();
         }
