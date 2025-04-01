@@ -12,6 +12,7 @@ import uk.gov.justice.laa.crime.enums.EmploymentStatus;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
 import uk.gov.justice.laa.crime.exception.ValidationException;
+import uk.gov.justice.laa.crime.orchestration.common.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.EvidenceDTO;
@@ -210,7 +211,7 @@ public class IncomeEvidenceMapper {
         UserDTO user = workflowRequest.getUserDTO();
 
         return Stream.of(getEvidences(evidenceResponse.getApplicantEvidenceItems(), existingEvidences, user, Boolean.FALSE),
-                        getEvidences(evidenceResponse.getPartnerEvidenceItems(), existingEvidences, user, Boolean.FALSE))
+                        getEvidences(evidenceResponse.getPartnerEvidenceItems(), existingEvidences, user, Boolean.TRUE))
                 .flatMap(List::stream)
                 .toList();
     }
@@ -233,11 +234,21 @@ public class IncomeEvidenceMapper {
                             .withMandatory(Boolean.TRUE.equals(evidence.getMandatory()) ? "Y" : "N")
                             .withApplicant(applicantId)
                             .withOtherText(evidence.getDescription())
-                            .withAdhoc(evidence.getEvidenceType().isExtra() ? isPartner ? "PARTNER" : "APPLICANT" : null)
+                            .withAdhoc(getAdhoc(isPartner, evidence))
                             .withUserCreated(user.getUserName()))
                     .toList();
         }
         return Collections.emptyList();
+    }
+
+    private static String getAdhoc(boolean isPartner, ApiIncomeEvidence evidence) {
+        
+        if (evidence.getEvidenceType().isExtra()) {
+            
+            return isPartner ? Constants.PARTNER : Constants.APPLICANT;
+        }
+
+        return null;
     }
 
     private LocalDateTime getDateReceived(Integer applicantId,
