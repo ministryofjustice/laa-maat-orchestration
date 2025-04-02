@@ -364,6 +364,7 @@ public class MeansAssessmentDataBuilder {
                 .catyCaseType(CaseType.EITHER_WAY.getCaseType())
                 .magsOutcome(MagCourtOutcome.COMMITTED.getOutcome())
                 .magsOutcomeDate("05-JUN-22")
+                .dateModified(LocalDateTime.of(2022, 6, 5, 12, 0))
                 .magsOutcomeDateSet(TEST_MAGS_OUTCOME_DATE)
                 .committalDate(TEST_MAGS_OUTCOME_DATE.toLocalDate())
                 .decisionReasonCode("rder-code")
