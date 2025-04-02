@@ -1404,22 +1404,22 @@ public class TestModelDataBuilder {
                 .withApplicantEvidenceItems(
                         new ApiIncomeEvidenceItems()
                                 .withApplicantDetails(getApplicantDetails(false))
-                                .withIncomeEvidenceItems(List.of(getIncomeEvidence(APPLICANT_EVIDENCE_ID)))
+                                .withIncomeEvidenceItems(List.of(getIncomeEvidence(APPLICANT_EVIDENCE_ID, IncomeEvidenceType.TAX_RETURN)))
                 )
                 .withPartnerEvidenceItems(
                         new ApiIncomeEvidenceItems()
                                 .withApplicantDetails(getApplicantDetails(true))
-                                .withIncomeEvidenceItems(List.of(getIncomeEvidence(PARTNER_EVIDENCE_ID)))
+                                .withIncomeEvidenceItems(List.of(getIncomeEvidence(PARTNER_EVIDENCE_ID, IncomeEvidenceType.TAX_RETURN)))
                 );
 
     }
 
-    public static ApiUpdateIncomeEvidenceResponse getUpdateIncomeEvidenceResponse(boolean hasPartnerIncome) {
+    public static ApiUpdateIncomeEvidenceResponse getUpdateIncomeEvidenceResponse(boolean hasPartnerIncome, IncomeEvidenceType incomeEvidence) {
        ApiUpdateIncomeEvidenceResponse response = new ApiUpdateIncomeEvidenceResponse()
                 .withApplicantEvidenceItems(
                         new ApiIncomeEvidenceItems()
                                 .withApplicantDetails(getApplicantDetails(false))
-                                .withIncomeEvidenceItems(List.of(getIncomeEvidence(APPLICANT_EVIDENCE_ID)))
+                                .withIncomeEvidenceItems(List.of(getIncomeEvidence(APPLICANT_EVIDENCE_ID, incomeEvidence)))
                 )
                 .withAllEvidenceReceivedDate(ALL_EVIDENCE_RECEIVED_DATE)
                 .withDueDate(EVIDENCE_DUE_DATE.toLocalDate())
@@ -1429,23 +1429,29 @@ public class TestModelDataBuilder {
        if (hasPartnerIncome) {
            response.setPartnerEvidenceItems(new ApiIncomeEvidenceItems()
                    .withApplicantDetails(getApplicantDetails(true))
-                   .withIncomeEvidenceItems(List.of(getIncomeEvidence(PARTNER_EVIDENCE_ID))));
+                   .withIncomeEvidenceItems(List.of(getIncomeEvidence(PARTNER_EVIDENCE_ID, incomeEvidence))));
        }
 
        return  response;
 
     }
 
-    private static ApiIncomeEvidence getIncomeEvidence(Integer id) {
+    private static ApiIncomeEvidence getIncomeEvidence(Integer id, IncomeEvidenceType incomeEvidence) {
         return new ApiIncomeEvidence()
                 .withId(id)
                 .withDateReceived(EVIDENCE_RECEIVED_DATE.toLocalDate())
-                .withEvidenceType(IncomeEvidenceType.TAX_RETURN)
+                .withEvidenceType(incomeEvidence)
                 .withMandatory(Boolean.TRUE)
-                .withDescription(INCOME_EVIDENCE_DESCRIPTION);
+                .withDescription(incomeEvidence.getDescription());
     }
 
     public static MaatApiUpdateAssessment getMaatApiUpdateAssessment(AssessmentType assessmentType, boolean hasPartnerIncome) {
+
+        return getMaatApiUpdateAssessment(assessmentType, hasPartnerIncome, IncomeEvidenceType.TAX_RETURN);
+    }
+
+    public static MaatApiUpdateAssessment getMaatApiUpdateAssessment(AssessmentType assessmentType, boolean hasPartnerIncome,
+                                                                     IncomeEvidenceType incomeEvidenceType) {
         MaatApiUpdateAssessment maatApiUpdateAssessment = new MaatApiUpdateAssessment()
                 .withFinancialAssessmentId(Constants.FINANCIAL_ASSESSMENT_ID)
                 .withUserModified(Constants.USERNAME)
@@ -1468,9 +1474,9 @@ public class TestModelDataBuilder {
                 .withDateCompleted(null);
 
         List incomeEvidenceList = new ArrayList();
-        incomeEvidenceList.add(getFinAssIncomeEvidence(APPLICANT_EVIDENCE_ID, NumberUtils.toInteger(APPLICANT_ID)));
+        incomeEvidenceList.add(getFinAssIncomeEvidence(APPLICANT_EVIDENCE_ID, NumberUtils.toInteger(APPLICANT_ID), incomeEvidenceType, false));
         if (hasPartnerIncome) {
-            incomeEvidenceList.add(getFinAssIncomeEvidence(PARTNER_EVIDENCE_ID, NumberUtils.toInteger(PARTNER_ID)));
+            incomeEvidenceList.add(getFinAssIncomeEvidence(PARTNER_EVIDENCE_ID, NumberUtils.toInteger(PARTNER_ID), incomeEvidenceType, true));
         }
         maatApiUpdateAssessment.setFinAssIncomeEvidences(incomeEvidenceList);
 
@@ -1490,16 +1496,28 @@ public class TestModelDataBuilder {
         return maatApiUpdateAssessment;
     }
 
-    private static FinancialAssessmentIncomeEvidence getFinAssIncomeEvidence(Integer evidenceId, Integer applicantId) {
+    private static FinancialAssessmentIncomeEvidence getFinAssIncomeEvidence(Integer evidenceId, Integer applicantId
+            , IncomeEvidenceType incomeEvidence, boolean isPartner) {
         return new FinancialAssessmentIncomeEvidence()
                 .withId(evidenceId)
                 .withDateReceived(EVIDENCE_RECEIVED_DATE)
                 .withActive("Y")
-                .withIncomeEvidence(IncomeEvidenceType.TAX_RETURN.getName())
+                .withIncomeEvidence(incomeEvidence.getName())
                 .withMandatory("Y")
                 .withApplicant(applicantId)
-                .withOtherText(INCOME_EVIDENCE_DESCRIPTION)
+                .withOtherText(incomeEvidence.getDescription())
+                .withAdhoc(getAdhoc(isPartner, incomeEvidence))
                 .withUserCreated(Constants.USERNAME);
+    }
+
+    private static String getAdhoc(boolean isPartner, IncomeEvidenceType incomeEvidence) {
+
+        if (incomeEvidence.isExtra()) {
+
+            return isPartner ? uk.gov.justice.laa.crime.orchestration.common.Constants.PARTNER : uk.gov.justice.laa.crime.orchestration.common.Constants.APPLICANT;
+        }
+
+        return null;
     }
 
     public static ApiAssessmentDetail getAssessmentDetail() {
