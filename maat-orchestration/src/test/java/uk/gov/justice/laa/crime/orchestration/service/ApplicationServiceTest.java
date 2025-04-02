@@ -2,7 +2,9 @@ package uk.gov.justice.laa.crime.orchestration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -15,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 
 @ExtendWith(MockitoExtension.class)
 class ApplicationServiceTest {
@@ -27,13 +30,17 @@ class ApplicationServiceTest {
     @Test
     void givenValidRequest_whenUpdateDateModifiedIsInvoked_thenDateModifiedIsUpdated() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
-        ZonedDateTime initialDateModified = LocalDateTime.MIN.atZone(ZoneOffset.UTC);
-
         ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
-        applicationDTO.setTimestamp(initialDateModified);
+        applicationDTO.setTimestamp(LocalDateTime.MIN.atZone(ZoneOffset.UTC));
+
+        ZonedDateTime updatedDateModified = LocalDateTime.MIN.atZone(ZoneOffset.UTC);
+        when(repOrderService.updateRepOrderDateModified(eq(workflowRequest), any())).thenReturn(
+            RepOrderDTO.builder()
+                .dateModified(updatedDateModified.toLocalDateTime())
+                .build());
 
         applicationService.updateDateModified(workflowRequest, workflowRequest.getApplicationDTO());
 
-        assertThat(applicationDTO.getTimestamp()).isNotEqualTo(initialDateModified);
+        assertThat(applicationDTO.getTimestamp()).isEqualTo(updatedDateModified);
     }
 }

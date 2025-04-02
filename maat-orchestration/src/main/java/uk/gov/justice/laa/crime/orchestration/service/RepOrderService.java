@@ -19,10 +19,12 @@ public class RepOrderService {
         return maatCourtDataService.findRepOrder(repId);
     }
 
-    public void updateRepOrderDateModified(WorkflowRequest workflowRequest, LocalDateTime dateModified) {
+    public RepOrderDTO updateRepOrderDateModified(WorkflowRequest workflowRequest, LocalDateTime dateModified) {
         int repId = workflowRequest.getApplicationDTO().getRepId().intValue();
         Map<String, Object> fieldsToUpdate = Map.of("dateModified", dateModified);
 
         maatCourtDataService.updateRepOrderDateModified(repId, fieldsToUpdate);
+
+        return getRepOrder(workflowRequest);
     }
 }
