@@ -9,6 +9,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDT
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.UserMapper;
+import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
 import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
 import uk.gov.justice.laa.crime.orchestration.service.IncomeEvidenceService;
 import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
@@ -25,6 +26,7 @@ public class EvidenceOrchestrationService {
 
     private final IncomeEvidenceService incomeEvidenceService;
     private final RepOrderService repOrderService;
+    private final ApplicationService applicationService;
     private final UserMapper userMapper;
     private final WorkflowPreProcessorService workflowPreProcessorService;
     private final ContributionService contributionService;
@@ -42,7 +44,7 @@ public class EvidenceOrchestrationService {
             applicationDTO = contributionService.calculate(workflowRequest);
         }
 
-        repOrderService.updateRepOrderDateModified(workflowRequest, LocalDateTime.now());
+        applicationService.updateDateModified(workflowRequest, applicationDTO);
 
         return applicationDTO;
     }

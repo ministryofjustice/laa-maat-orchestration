@@ -1,7 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import io.sentry.Sentry;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +18,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
+import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
 import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
 import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
 import uk.gov.justice.laa.crime.orchestration.service.FeatureDecisionService;
@@ -43,6 +43,7 @@ public class MeansAssessmentOrchestrationService {
     private final AssessmentSummaryService assessmentSummaryService;
     private final FeatureDecisionService featureDecisionService;
     private final RepOrderService repOrderService;
+    private final ApplicationService applicationService;
     private final WorkflowPreProcessorService workflowPreProcessorService;
     private final MeansAssessmentMapper meansAssessmentMapper;
     private final MaatCourtDataApiService maatCourtDataApiService;
@@ -60,7 +61,7 @@ public class MeansAssessmentOrchestrationService {
             preProcessRequest(request, Action.CREATE_ASSESSMENT);
             meansAssessmentService.create(request);
             application = processCrownCourtProceedings(request);
-            repOrderService.updateRepOrderDateModified(request, LocalDateTime.now());
+            applicationService.updateDateModified(request, application);
 
             log.debug("Created Means assessment for applicationId = {}", repId);
         } catch (ValidationException | CrimeValidationException exception) {
@@ -88,7 +89,7 @@ public class MeansAssessmentOrchestrationService {
             preProcessRequest(request, Action.UPDATE_ASSESSMENT);
             meansAssessmentService.update(request);
             application = processCrownCourtProceedings(request);
-            repOrderService.updateRepOrderDateModified(request, LocalDateTime.now());
+            applicationService.updateDateModified(request, application);
 
             log.debug("Updated Means assessment for applicationId = {}", repId);
         } catch (ValidationException | CrimeValidationException exception) {

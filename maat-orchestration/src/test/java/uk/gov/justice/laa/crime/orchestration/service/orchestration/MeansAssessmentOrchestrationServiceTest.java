@@ -61,8 +61,10 @@ class MeansAssessmentOrchestrationServiceTest {
     private RepOrderService repOrderService;
 
     @Mock
-    private WorkflowPreProcessorService workflowPreProcessorService;
+    private ApplicationService applicationService;
 
+    @Mock
+    private WorkflowPreProcessorService workflowPreProcessorService;
 
     @Mock
     private CCLFUpdateService cclfUpdateService;
@@ -118,7 +120,7 @@ class MeansAssessmentOrchestrationServiceTest {
                 StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
         );
         verify(assessmentSummaryService, times(1)).getSummary(any(FinancialAssessmentDTO.class));
-        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
+        verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -144,7 +146,7 @@ class MeansAssessmentOrchestrationServiceTest {
                 StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
         );
         verify(assessmentSummaryService, times(1)).getSummary(any());
-        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
+        verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -175,7 +177,7 @@ class MeansAssessmentOrchestrationServiceTest {
                 StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
         );
         verify(assessmentSummaryService, times(1)).getSummary(any());
-        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
+        verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -202,7 +204,7 @@ class MeansAssessmentOrchestrationServiceTest {
                 StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2
         );
         verify(assessmentSummaryService, times(1)).getSummary(any());
-        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
+        verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -223,7 +225,7 @@ class MeansAssessmentOrchestrationServiceTest {
                 StoredProcedure.PRE_UPDATE_CC_APPLICATION
         );
         verify(workflowPreProcessorService, times(0)).preProcessRequest(any(), any(), any());
-        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
+        verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -242,7 +244,7 @@ class MeansAssessmentOrchestrationServiceTest {
                 StoredProcedure.PRE_UPDATE_CC_APPLICATION
         );
         verify(workflowPreProcessorService).preProcessRequest(any(), any(), any());
-        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
+        verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -344,6 +346,6 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(proceedingsService, times(1)).updateApplication(workflowRequest,
                 repOrderDTO);
         verify(meansAssessmentService, times(0)).rollback(any());
-        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
+        verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 }
