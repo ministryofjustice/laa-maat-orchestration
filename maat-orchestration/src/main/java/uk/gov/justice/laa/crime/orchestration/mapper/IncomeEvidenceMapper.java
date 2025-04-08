@@ -13,7 +13,6 @@ import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
 import uk.gov.justice.laa.crime.evidence.staticdata.enums.ApplicantType;
 import uk.gov.justice.laa.crime.exception.ValidationException;
-import uk.gov.justice.laa.crime.orchestration.common.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.EvidenceDTO;
