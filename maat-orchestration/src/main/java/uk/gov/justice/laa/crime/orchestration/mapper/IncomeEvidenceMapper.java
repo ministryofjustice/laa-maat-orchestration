@@ -11,6 +11,7 @@ import uk.gov.justice.laa.crime.enums.AssessmentType;
 import uk.gov.justice.laa.crime.enums.EmploymentStatus;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
+import uk.gov.justice.laa.crime.evidence.staticdata.enums.ApplicantType;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.common.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -245,7 +246,7 @@ public class IncomeEvidenceMapper {
         
         if (evidence.getEvidenceType().isExtra()) {
             
-            return isPartner ? Constants.PARTNER : Constants.APPLICANT;
+            return isPartner ? ApplicantType.PARTNER.name() : ApplicantType.APPLICANT.name();
         }
 
         return null;

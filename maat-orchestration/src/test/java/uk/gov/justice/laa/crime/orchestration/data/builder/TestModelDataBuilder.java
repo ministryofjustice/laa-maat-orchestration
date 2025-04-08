@@ -22,6 +22,7 @@ import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
+import uk.gov.justice.laa.crime.evidence.staticdata.enums.ApplicantType;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
@@ -1514,7 +1515,7 @@ public class TestModelDataBuilder {
 
         if (incomeEvidence.isExtra()) {
 
-            return isPartner ? uk.gov.justice.laa.crime.orchestration.common.Constants.PARTNER : uk.gov.justice.laa.crime.orchestration.common.Constants.APPLICANT;
+            return isPartner ? ApplicantType.PARTNER.name() : ApplicantType.APPLICANT.name();
         }
 
         return null;
