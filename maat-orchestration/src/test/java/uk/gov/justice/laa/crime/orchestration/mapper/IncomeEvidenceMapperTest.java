@@ -20,6 +20,7 @@ import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAsse
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
 import uk.gov.justice.laa.crime.enums.AssessmentType;
 import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -210,11 +211,11 @@ class IncomeEvidenceMapperTest {
 
     private static Stream<Arguments> parameterizedUpdateIncomeEvidences() {
 
-        ApiUpdateIncomeEvidenceResponse apiUpdateIncomeEvidenceResponse = TestModelDataBuilder.getUpdateIncomeEvidenceResponse(Boolean.TRUE);
+        ApiUpdateIncomeEvidenceResponse apiUpdateIncomeEvidenceResponse = TestModelDataBuilder.getUpdateIncomeEvidenceResponse(Boolean.TRUE, IncomeEvidenceType.TAX_RETURN);
 
-        MaatApiUpdateAssessment noExistingEvidences = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL, Boolean.TRUE);
+        MaatApiUpdateAssessment noExistingEvidences = TestModelDataBuilder.getMaatApiUpdateAssessment(FULL, Boolean.TRUE, IncomeEvidenceType.CDS15);
         noExistingEvidences.getFinAssIncomeEvidences().forEach(evidence -> evidence.setDateReceived(null));
-        ApiUpdateIncomeEvidenceResponse apiEmptyDateReceivedResponse = TestModelDataBuilder.getUpdateIncomeEvidenceResponse(Boolean.TRUE);
+        ApiUpdateIncomeEvidenceResponse apiEmptyDateReceivedResponse = TestModelDataBuilder.getUpdateIncomeEvidenceResponse(Boolean.TRUE, IncomeEvidenceType.CDS15);
         apiEmptyDateReceivedResponse.getApplicantEvidenceItems().getIncomeEvidenceItems().forEach(apiIncomeEvidence -> apiIncomeEvidence.setDateReceived(null));
         apiEmptyDateReceivedResponse.getPartnerEvidenceItems().getIncomeEvidenceItems().forEach(apiIncomeEvidence -> apiIncomeEvidence.setDateReceived(null));
 
@@ -240,7 +241,7 @@ class IncomeEvidenceMapperTest {
                 Arguments.of(existingFinEvidenceRepOrderDTO, existingFinEvidencesAssessment, apiUpdateIncomeEvidenceResponse),
                 Arguments.of(existingBothEvidencesRepOrderDTO, existingFinEvidencesAssessment, apiUpdateIncomeEvidenceResponse),
                 Arguments.of(existingBothEvidencesRepOrderDTO, TestModelDataBuilder.getMaatApiUpdateAssessment(FULL, Boolean.FALSE),
-                        TestModelDataBuilder.getUpdateIncomeEvidenceResponse(Boolean.FALSE))
+                        TestModelDataBuilder.getUpdateIncomeEvidenceResponse(Boolean.FALSE, IncomeEvidenceType.TAX_RETURN))
         );
     }
 

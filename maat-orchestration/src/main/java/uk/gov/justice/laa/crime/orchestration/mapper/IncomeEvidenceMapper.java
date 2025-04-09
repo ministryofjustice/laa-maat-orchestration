@@ -11,6 +11,7 @@ import uk.gov.justice.laa.crime.enums.AssessmentType;
 import uk.gov.justice.laa.crime.enums.EmploymentStatus;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
+import uk.gov.justice.laa.crime.evidence.staticdata.enums.ApplicantType;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
@@ -209,15 +210,16 @@ public class IncomeEvidenceMapper {
 
         UserDTO user = workflowRequest.getUserDTO();
 
-        return Stream.of(getEvidences(evidenceResponse.getApplicantEvidenceItems(), existingEvidences, user),
-                        getEvidences(evidenceResponse.getPartnerEvidenceItems(), existingEvidences, user))
+        return Stream.of(getEvidences(evidenceResponse.getApplicantEvidenceItems(), existingEvidences, user, Boolean.FALSE),
+                        getEvidences(evidenceResponse.getPartnerEvidenceItems(), existingEvidences, user, Boolean.TRUE))
                 .flatMap(List::stream)
                 .toList();
     }
 
     private List<FinancialAssessmentIncomeEvidence> getEvidences(ApiIncomeEvidenceItems evidenceItems,
                                                                  List<EvidenceDTO> existingEvidences,
-                                                                 UserDTO user) {
+                                                                 UserDTO user,
+                                                                 boolean isPartner) {
         if (null !=evidenceItems) {
             Integer applicantId = evidenceItems.getApplicantDetails().getId();
 
@@ -232,10 +234,21 @@ public class IncomeEvidenceMapper {
                             .withMandatory(Boolean.TRUE.equals(evidence.getMandatory()) ? "Y" : "N")
                             .withApplicant(applicantId)
                             .withOtherText(evidence.getDescription())
+                            .withAdhoc(getAdhoc(isPartner, evidence))
                             .withUserCreated(user.getUserName()))
                     .toList();
         }
         return Collections.emptyList();
+    }
+
+    private static String getAdhoc(boolean isPartner, ApiIncomeEvidence evidence) {
+        
+        if (evidence.getEvidenceType().isExtra()) {
+            
+            return isPartner ? ApplicantType.PARTNER.name() : ApplicantType.APPLICANT.name();
+        }
+
+        return null;
     }
 
     private LocalDateTime getDateReceived(Integer applicantId,
