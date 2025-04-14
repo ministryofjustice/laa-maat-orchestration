@@ -19,7 +19,9 @@ import uk.gov.justice.laa.crime.util.DateUtil;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -420,4 +422,103 @@ class MeansAssessmentMapperTest {
         softly.assertThat(fullAssessmentDTO.getAssessmnentStatusDTO().getDescription())
                 .isEqualTo(apiRollbackMeansAssessmentResponse.getFassFullStatus().getDescription());
     }
+
+    @Test
+    void givenNullSectionSummaries_whenSectionSummariesBuilderIsInvoked_thenReturnsEmptyList() {
+        List<ApiAssessmentSectionSummary> result = meansAssessmentMapper.sectionSummariesBuilder(null);
+        softly.assertThat(result).isEmpty();
+    }
+
+    @Test
+    void givenEmptySectionSummaries_whenSectionSummariesBuilderIsInvoked_thenReturnsEmptyList() {
+        List<ApiAssessmentSectionSummary> result = meansAssessmentMapper.sectionSummariesBuilder(Collections.emptyList());
+        softly.assertThat(result).isEmpty();
+    }
+
+    @Test
+    void givenSectionSummariesContainingNullElements_whenSectionSummariesBuilderIsInvoked_thenSkipsNullElements() {
+        List<AssessmentSectionSummaryDTO> input = Arrays.asList(null, null);
+        List<ApiAssessmentSectionSummary> result = meansAssessmentMapper.sectionSummariesBuilder(input);
+        softly.assertThat(result).isEmpty();
+    }
+
+    @Test
+    void givenDtoWithAllNonNullValues_whenSectionSummariesBuilderIsInvoked_thenMapsAllFieldsCorrectly() {
+        AssessmentSectionSummaryDTO dto = new AssessmentSectionSummaryDTO();
+        dto.setAnnualTotal(1000.0);
+        dto.setApplicantAnnualTotal(600.0);
+        dto.setPartnerAnnualTotal(400.0);
+        dto.setSection("Section A");
+        dto.setAssessmentDetail(Collections.emptyList());
+
+        List<ApiAssessmentSectionSummary> result = meansAssessmentMapper.sectionSummariesBuilder(Collections.singletonList(dto));
+        softly.assertThat(result).hasSize(1);
+
+        ApiAssessmentSectionSummary apiDto = result.get(0);
+        softly.assertThat(apiDto.getAnnualTotal()).isEqualTo(BigDecimal.valueOf(1000.0));
+        softly.assertThat(apiDto.getApplicantAnnualTotal()).isEqualTo(BigDecimal.valueOf(600.0));
+        softly.assertThat(apiDto.getPartnerAnnualTotal()).isEqualTo(BigDecimal.valueOf(400.0));
+        softly.assertThat(apiDto.getSection()).isEqualTo("Section A");
+        softly.assertThat(apiDto.getAssessmentDetails()).isEmpty();
+    }
+
+    @Test
+    void givenDtoWithSomeNullNumericValues_whenSectionSummariesBuilderIsInvoked_thenMapsNonNullValuesAndPreservesNulls() {
+        AssessmentSectionSummaryDTO dto = new AssessmentSectionSummaryDTO();
+        // annualTotal is null
+        dto.setAnnualTotal(null);
+        // applicantAnnualTotal is non-null
+        dto.setApplicantAnnualTotal(500.0);
+        // partnerAnnualTotal is null
+        dto.setPartnerAnnualTotal(null);
+        dto.setSection("Section B");
+        dto.setAssessmentDetail(Collections.emptyList());
+
+        List<ApiAssessmentSectionSummary> result = meansAssessmentMapper.sectionSummariesBuilder(Collections.singletonList(dto));
+        softly.assertThat(result).hasSize(1);
+
+        ApiAssessmentSectionSummary apiDto = result.get(0);
+        softly.assertThat(apiDto.getAnnualTotal()).isNull();
+        softly.assertThat(apiDto.getApplicantAnnualTotal()).isEqualTo(BigDecimal.valueOf(500.0));
+        softly.assertThat(apiDto.getPartnerAnnualTotal()).isNull();
+        softly.assertThat(apiDto.getSection()).isEqualTo("Section B");
+        softly.assertThat(apiDto.getAssessmentDetails()).isEmpty();
+    }
+
+    @Test
+    void givenMultipleDtoElements_whenSectionSummariesBuilderIsInvoked_thenMapsEachElementCorrectly() {
+        AssessmentSectionSummaryDTO dto1 = new AssessmentSectionSummaryDTO();
+        dto1.setAnnualTotal(1500.0);
+        dto1.setApplicantAnnualTotal(800.0);
+        dto1.setPartnerAnnualTotal(700.0);
+        dto1.setSection("Section 1");
+        dto1.setAssessmentDetail(Collections.emptyList());
+
+        AssessmentSectionSummaryDTO dto2 = new AssessmentSectionSummaryDTO();
+        dto2.setAnnualTotal(null);
+        dto2.setApplicantAnnualTotal(null);
+        dto2.setPartnerAnnualTotal(300.0);
+        dto2.setSection("Section 2");
+        dto2.setAssessmentDetail(Collections.emptyList());
+
+        List<AssessmentSectionSummaryDTO> input = Arrays.asList(dto1, dto2);
+        List<ApiAssessmentSectionSummary> result = meansAssessmentMapper.sectionSummariesBuilder(input);
+
+        softly.assertThat(result).hasSize(2);
+
+        ApiAssessmentSectionSummary apiDto1 = result.get(0);
+        softly.assertThat(apiDto1.getAnnualTotal()).isEqualTo(BigDecimal.valueOf(1500.0));
+        softly.assertThat(apiDto1.getApplicantAnnualTotal()).isEqualTo(BigDecimal.valueOf(800.0));
+        softly.assertThat(apiDto1.getPartnerAnnualTotal()).isEqualTo(BigDecimal.valueOf(700.0));
+        softly.assertThat(apiDto1.getSection()).isEqualTo("Section 1");
+        softly.assertThat(apiDto1.getAssessmentDetails()).isEmpty();
+
+        ApiAssessmentSectionSummary apiDto2 = result.get(1);
+        softly.assertThat(apiDto2.getAnnualTotal()).isNull();
+        softly.assertThat(apiDto2.getApplicantAnnualTotal()).isNull();
+        softly.assertThat(apiDto2.getPartnerAnnualTotal()).isEqualTo(BigDecimal.valueOf(300.0));
+        softly.assertThat(apiDto2.getSection()).isEqualTo("Section 2");
+        softly.assertThat(apiDto2.getAssessmentDetails()).isEmpty();
+    }
+
 }
