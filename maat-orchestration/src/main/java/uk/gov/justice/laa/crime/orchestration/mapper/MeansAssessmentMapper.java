@@ -228,20 +228,31 @@ public class MeansAssessmentMapper {
                 );
     }
 
-    private List<ApiAssessmentSectionSummary> sectionSummariesBuilder(
+    List<ApiAssessmentSectionSummary> sectionSummariesBuilder(
             Collection<AssessmentSectionSummaryDTO> sectionSummaries) {
         List<ApiAssessmentSectionSummary> apiAssessmentSectionSummaries = new ArrayList<>();
         if (sectionSummaries != null) {
             for (AssessmentSectionSummaryDTO sectionSummaryDTO : sectionSummaries) {
+                if (sectionSummaryDTO == null) {
+                    continue;
+                }
+
+                // Use default null values if any of the numeric fields are null.
+                BigDecimal annualTotal = sectionSummaryDTO.getAnnualTotal() != null ?
+                        BigDecimal.valueOf(sectionSummaryDTO.getAnnualTotal()) : null;
+                BigDecimal applicantAnnualTotal = sectionSummaryDTO.getApplicantAnnualTotal() != null ?
+                        BigDecimal.valueOf(sectionSummaryDTO.getApplicantAnnualTotal()) : null;
+                BigDecimal partnerAnnualTotal = sectionSummaryDTO.getPartnerAnnualTotal() != null ?
+                        BigDecimal.valueOf(sectionSummaryDTO.getPartnerAnnualTotal()) : null;
+
                 apiAssessmentSectionSummaries.add(
                         new ApiAssessmentSectionSummary()
-                                .withAnnualTotal(BigDecimal.valueOf(sectionSummaryDTO.getAnnualTotal()))
+                                .withAnnualTotal(annualTotal)
                                 .withAssessmentDetails(
                                         assessmentDetailsBuilder(sectionSummaryDTO.getAssessmentDetail()))
                                 .withSection(sectionSummaryDTO.getSection())
-                                .withApplicantAnnualTotal(
-                                        BigDecimal.valueOf(sectionSummaryDTO.getApplicantAnnualTotal()))
-                                .withPartnerAnnualTotal(BigDecimal.valueOf(sectionSummaryDTO.getPartnerAnnualTotal()))
+                                .withApplicantAnnualTotal(applicantAnnualTotal)
+                                .withPartnerAnnualTotal(partnerAnnualTotal)
                 );
             }
         }
