@@ -17,8 +17,8 @@ java {
 def versions = [
 		pitest                  : "1.16.1",
 		springdocVersion        : "2.5.0",
-		commonsModSchemas       : "1.32.0",
-		crimeCommonsClasses     : "4.5.0",
+		commonsModSchemas       : "1.36.0",
+		crimeCommonsClasses     : "4.6.0",
 		commonsRestClient       : "3.20.0",
 		wmStubRunnerVersion    	: "4.2.0",
 		oauth2ResourceServer    : "3.4.1",

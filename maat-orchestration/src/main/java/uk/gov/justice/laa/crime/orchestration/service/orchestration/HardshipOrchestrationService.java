@@ -1,7 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import io.sentry.Sentry;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,6 +33,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     private final HardshipMapper hardshipMapper;
     private final WorkflowPreProcessorService workflowPreProcessorService;
     private final RepOrderService repOrderService;
+    private final ApplicationService applicationService;
 
     private final ApplicationTrackingMapper applicationTrackingMapper;
 
@@ -55,7 +55,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         ApplicationDTO application = request.getApplicationDTO();
 
         ApiPerformHardshipResponse performHardshipResponse = hardshipService.create(request);
-        repOrderService.updateRepOrderDateModified(request, LocalDateTime.now());
+        applicationService.updateDateModified(request, application);
         try {
             // Need to refresh from DB as HardshipDetail ids may have changed
             HardshipReviewDTO newHardship = hardshipService.find(performHardshipResponse.getHardshipReviewId());
@@ -99,7 +99,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         validate(request, action, repOrderDTO);
 
         hardshipService.update(request);
-        repOrderService.updateRepOrderDateModified(request, LocalDateTime.now());
+        applicationService.updateDateModified(request, request.getApplicationDTO());
         try {
             HardshipOverviewDTO hardshipOverviewDTO = request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO()
                     .getHardship();
@@ -181,5 +181,4 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
 
         return request.getApplicationDTO();
     }
-
 }

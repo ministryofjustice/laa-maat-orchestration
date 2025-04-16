@@ -15,6 +15,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDT
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.UserMapper;
+import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
 import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
 import uk.gov.justice.laa.crime.orchestration.service.IncomeEvidenceService;
 import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
@@ -39,6 +40,8 @@ class EvidenceOrchestrationServiceTest {
     private IncomeEvidenceService incomeEvidenceService;
     @Mock
     private RepOrderService repOrderService;
+    @Mock
+    private ApplicationService applicationService;
     @Mock
     private UserMapper userMapper;
     @Mock
@@ -65,7 +68,7 @@ class EvidenceOrchestrationServiceTest {
         ApplicationDTO actual = evidenceOrchestrationService.updateIncomeEvidence(workflowRequest);
 
         assertThat(actual).isEqualTo(expected);
-        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
+        verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 
     @ParameterizedTest
@@ -81,7 +84,7 @@ class EvidenceOrchestrationServiceTest {
 
         ApplicationDTO actual = evidenceOrchestrationService.updateIncomeEvidence(workflowRequest);
         assertThat(actual).isEqualTo(expected);
-        verify(repOrderService).updateRepOrderDateModified(eq(workflowRequest), any());
+        verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 
     private static Stream<Arguments> upliftChangeSet() {
