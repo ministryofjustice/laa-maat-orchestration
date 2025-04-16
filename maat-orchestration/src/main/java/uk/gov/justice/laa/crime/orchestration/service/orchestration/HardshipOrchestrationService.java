@@ -4,7 +4,6 @@ import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
@@ -18,6 +17,9 @@ import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationExcepti
 import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.service.*;
+import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource.HARDSHIP;
+import static uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType.CCHARDSHIP;
+
 
 @Slf4j
 @Service
@@ -34,7 +36,8 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     private final ApplicationService applicationService;
 
     private final ApplicationTrackingMapper applicationTrackingMapper;
-    private final CATDataService catDataService;
+
+    private final CrimeApplicationTrackingService crimeApplicationTrackingService;
 
     public HardshipReviewDTO find(int hardshipReviewId) {
         return hardshipService.find(hardshipReviewId);
@@ -167,10 +170,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         proceedingsService.updateApplication(request, repOrderDTO);
 
         // Call application.handle_eform_result stored procedure OR Equivalent ATS service endpoint
-        ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(request, repOrderDTO);
-        if (null != applicationTrackingOutputResult.getUsn()) {
-            catDataService.handleEformResult(applicationTrackingOutputResult);
-        }
+        crimeApplicationTrackingService.sendApplicationTrackingData(applicationTrackingMapper.build(request, repOrderDTO, CCHARDSHIP, HARDSHIP));
         // Call crown_court.xx_process_activity_and_get_correspondence stored procedure
         request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
                 request.getApplicationDTO(), request.getUserDTO(),

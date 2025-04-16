@@ -55,7 +55,7 @@ class HardshipOrchestrationServiceTest {
     private HardshipMapper hardshipMapper;
 
     @Mock
-    private CATDataService catDataService;
+    private CrimeApplicationTrackingService crimeApplicationTrackingService;
 
     @Mock
     private ApplicationTrackingMapper applicationTrackingMapper;
@@ -71,6 +71,9 @@ class HardshipOrchestrationServiceTest {
 
     @Mock
     private CCLFUpdateService cclfUpdateService;
+
+    @Mock
+    private FeatureDecisionService featureDecisionService;
 
     @InjectMocks
     private HardshipOrchestrationService orchestrationService;
@@ -187,7 +190,8 @@ class HardshipOrchestrationServiceTest {
         ))
                 .thenReturn(applicationDTO);
 
-        when(applicationTrackingMapper.build(any(), any())).thenReturn(new ApplicationTrackingOutputResult().withUsn(12345));
+        when(applicationTrackingMapper.build(any(), any(), any(ApplicationTrackingOutputResult.AssessmentType.class),
+                any(ApplicationTrackingOutputResult.RequestSource.class))).thenReturn(new ApplicationTrackingOutputResult().withUsn(12345));
         when(repOrderService.getRepOrder(any())).thenReturn(repOrderDTO);
 
         ApplicationDTO expected = orchestrationService.create(workflowRequest);
@@ -411,7 +415,10 @@ class HardshipOrchestrationServiceTest {
                 .thenReturn(assessmentSummaryDTO);
         when(hardshipMapper.getUserActionDTO(any(), any()))
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
-        when(applicationTrackingMapper.build(any(), any())).thenReturn(new ApplicationTrackingOutputResult().withUsn(12345));
+        when(applicationTrackingMapper.build(any(WorkflowRequest.class), any(RepOrderDTO.class),
+                any(ApplicationTrackingOutputResult.AssessmentType.class),
+                any(ApplicationTrackingOutputResult.RequestSource.class)))
+                .thenReturn(new ApplicationTrackingOutputResult().withUsn(USN));
         when(repOrderService.getRepOrder(any())).thenReturn(repOrderDTO);
 
         ApplicationDTO expected = orchestrationService.update(workflowRequest);

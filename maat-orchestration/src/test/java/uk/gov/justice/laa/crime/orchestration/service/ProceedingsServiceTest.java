@@ -5,21 +5,26 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.DecisionReason;
+import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.ProceedingsMapper;
-
 import uk.gov.justice.laa.crime.orchestration.service.api.ProceedingsApiService;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith({MockitoExtension.class})
 class ProceedingsServiceTest {
@@ -71,4 +76,26 @@ class ProceedingsServiceTest {
                                                           any(ApplicationDTO.class)
                 );
     }
+
+    @Test
+    void givenACaseTypeAsAppealToCC_whenCanInvokeMsgRepDecisionIsInvoked_thenApiServiceIsNotCalled() {
+        WorkflowRequest request = MeansAssessmentDataBuilder.buildWorkFlowRequest();
+        request.getApplicationDTO().getCaseDetailsDTO().setCaseType(CaseType.APPEAL_CC.getCaseType());
+        proceedingsService.determineMagsRepDecision(request);
+        verify(proceedingsApiService, times(0)).determineMagsRepDecision(any(ApiDetermineMagsRepDecisionRequest.class));
+    }
+
+    @Test
+    void givenAValidWorkflowRequest_whenCanInvokeMsgRepDecisionIsInvoked_thenCorrectResponseIsReturned() {
+
+        when(proceedingsApiService.determineMagsRepDecision(any(ApiDetermineMagsRepDecisionRequest.class)))
+                .thenReturn(TestModelDataBuilder.getApiDetermineMagsRepDecisionResponse());
+        when(proceedingsMapper.applicationDTOToApiDetermineMagsRepDecisionRequest(any(ApplicationDTO.class), any(UserDTO.class)))
+                .thenReturn(TestModelDataBuilder.getApiDetermineMagsRepDecisionRequest());
+        ApiDetermineMagsRepDecisionResponse response = proceedingsService.determineMagsRepDecision(MeansAssessmentDataBuilder.buildWorkFlowRequest());
+
+        verify(proceedingsApiService, times(1)).determineMagsRepDecision(any(ApiDetermineMagsRepDecisionRequest.class));
+        assertThat(response.getDecisionResult().getDecisionReason()).isEqualTo(DecisionReason.GRANTED);
+    }
+
 }

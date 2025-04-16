@@ -10,12 +10,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.common.model.common.ApiUserSession;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
+import uk.gov.justice.laa.crime.enums.DecisionReason;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
@@ -33,12 +35,10 @@ class ProceedingsMapperTest {
 
     @Mock
     UserMapper userMapper;
-
-    @InjectSoftAssertions
-    private SoftAssertions softly;
-
     @InjectMocks
     ProceedingsMapper proceedingsMapper;
+    @InjectSoftAssertions
+    private SoftAssertions softly;
 
     @Test
     void whenWorkflowRequestToUpdateApplicationRequestIsInvoked() {
@@ -179,5 +179,26 @@ class ProceedingsMapperTest {
     @Test
     void givenAEmptyStatus_whenGetCurrentStatusIsInvoked_thenCorrectStatusIsReturned() {
         assertThat(proceedingsMapper.getCurrentStatus("COMPLETE")).isEqualTo(CurrentStatus.COMPLETE);
+    }
+
+    @Test
+    void givenAValidWorkflowRequest_whenApplicationDTOToApiDetermineMagsRepDecisionRequestIsInvoked_thenReturnCorrectMapper() {
+        mockApiUserSession();
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
+        ApiDetermineMagsRepDecisionRequest apiDetermineMagsRepDecisionRequest =
+                proceedingsMapper.applicationDTOToApiDetermineMagsRepDecisionRequest(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
+        assertThat(apiDetermineMagsRepDecisionRequest).isEqualTo(TestModelDataBuilder.getApiDetermineMagsRepDecisionRequest());
+    }
+
+    @Test
+    void givenAValidDecisionResponse_ApiDetermineMagsRepDecisionResponseToApplicationDTOsInvoked_thenCorrectMappingReturned() {
+
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
+        proceedingsMapper.apiDetermineMagsRepDecisionResponseToApplicationDTO(workflowRequest.getApplicationDTO(),
+                TestModelDataBuilder.getApiDetermineMagsRepDecisionResponse());
+        assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getCode()).isEqualTo(DecisionReason.GRANTED.getCode());
+        assertThat(workflowRequest.getApplicationDTO().getRepOrderDecision().getDescription().getValue())
+                .isEqualTo(DecisionReason.GRANTED.getDescription());
+
     }
 }
