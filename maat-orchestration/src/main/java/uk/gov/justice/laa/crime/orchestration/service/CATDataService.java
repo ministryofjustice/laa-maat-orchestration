@@ -13,7 +13,7 @@ public class CATDataService {
 
     private final CATApiService service;
 
-    public void handleEformResult(ApplicationTrackingOutputResult request) {
-        service.handleEformResult(request);
+    public void handleCrimeApplyResult(ApplicationTrackingOutputResult request) {
+        service.handleCrimeApplyResult(request);
     }
 }

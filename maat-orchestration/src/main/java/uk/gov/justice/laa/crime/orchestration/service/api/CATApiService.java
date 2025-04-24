@@ -21,13 +21,13 @@ public class CATApiService {
     private final RestAPIClient catApiClient;
     private final ServicesConfiguration configuration;
 
-    public void handleEformResult(ApplicationTrackingOutputResult request) {
+    public void handleCrimeApplyResult(ApplicationTrackingOutputResult request) {
         log.debug(REQUEST_STRING, request);
         catApiClient.post(
                 request,
                 new ParameterizedTypeReference<>() {
                 },
-                configuration.getCatApi().getEndpoints().getHandleEformUrl(),
+                configuration.getCatApi().getEndpoints().getHandleCrimeApplyUrl(),
                 Collections.emptyMap()
         );
     }

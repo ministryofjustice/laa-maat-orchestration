@@ -30,8 +30,8 @@ class CATApiServiceTest {
     private CATApiService catApiService;
 
     @Test
-    void givenValidRequest_whenHandleEformResultIsInvoked_thenApplicationTrackingServiceIsCalled() {
-        catApiService.handleEformResult(new ApplicationTrackingOutputResult());
+    void givenValidRequest_whenHandleCrimeApplyResultIsInvoked_thenApplicationTrackingServiceIsCalled() {
+        catApiService.handleCrimeApplyResult(new ApplicationTrackingOutputResult());
         verify(catApiClient).post(any(ApplicationTrackingOutputResult.class), any(), anyString(), anyMap());
     }
 

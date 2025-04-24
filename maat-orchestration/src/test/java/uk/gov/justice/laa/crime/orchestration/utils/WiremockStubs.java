@@ -90,7 +90,7 @@ public class WiremockStubs {
         verify(exactly(times), getRequestedFor(urlPathMatching(CCC_URL + "/summaries")));
     }
 
-    public static void assertStubForHandleEformSerivce(int times) {
+    public static void assertStubForHandleCrimeApplyService(int times) {
         verify(exactly(times), postRequestedFor(urlPathMatching(CAT_URL)));
     }
 

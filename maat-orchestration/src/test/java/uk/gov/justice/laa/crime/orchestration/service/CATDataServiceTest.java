@@ -21,9 +21,9 @@ class CATDataServiceTest {
     private CATDataService catDataService;
 
     @Test
-    void givenAValidInput_whenHandleEformResultIsInvoked_thenCATServiceIsCalled() {
-        catDataService.handleEformResult(new ApplicationTrackingOutputResult());
-        verify(catApiService).handleEformResult(any(ApplicationTrackingOutputResult.class));
+    void givenAValidInput_whenHandleCrimeApplyResultIsInvoked_thenCATServiceIsCalled() {
+        catDataService.handleCrimeApplyResult(new ApplicationTrackingOutputResult());
+        verify(catApiService).handleCrimeApplyResult(any(ApplicationTrackingOutputResult.class));
     }
 
 }
