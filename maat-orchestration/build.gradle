@@ -3,7 +3,7 @@ plugins {
 	id "jacoco"
 	id "org.sonarqube" version "5.0.0.4638"
 	id "info.solidsoft.pitest" version "1.15.0"
-	id "org.springframework.boot" version "3.4.0"
+	id "org.springframework.boot" version "3.4.4"
 	id "io.spring.dependency-management" version "1.1.7"
 }
 
@@ -18,11 +18,9 @@ def versions = [
 		pitest                  : "1.16.1",
 		springdocVersion        : "2.5.0",
 		commonsModSchemas       : "1.36.0",
-		crimeCommonsClasses     : "4.6.0",
+		crimeCommonsClasses     : "4.7.1",
 		commonsRestClient       : "3.20.0",
-		wmStubRunnerVersion    	: "4.2.0",
-		oauth2ResourceServer    : "3.4.1",
-		securityCrypto          : "6.4.4"
+		wmStubRunnerVersion    	: "4.2.0"
 ]
 
 configurations {
@@ -44,14 +42,14 @@ dependencies {
 	implementation "uk.gov.justice.service.laa-crime:crime-commons-classes:$versions.crimeCommonsClasses"
 	implementation "uk.gov.justice.service.laa-crime:crime-commons-mod-schemas:$versions.commonsModSchemas"
 
-	implementation "org.apache.tomcat.embed:tomcat-embed-core:10.1.34"
+	implementation "org.apache.tomcat.embed:tomcat-embed-core"
 	implementation "io.micrometer:micrometer-registry-prometheus"
 	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$versions.springdocVersion"
 
-	implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:$versions.oauth2ResourceServer"
+	implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
 	implementation "org.springframework.boot:spring-boot-starter-security"
 	implementation "org.springframework.boot:spring-boot-starter-validation"
-	implementation "org.springframework.security:spring-security-crypto:$versions.securityCrypto"
+	implementation "org.springframework.security:spring-security-crypto"
 
 	compileOnly "org.projectlombok:lombok"
 	annotationProcessor "org.projectlombok:lombok"
