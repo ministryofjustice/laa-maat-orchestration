@@ -7,8 +7,6 @@ import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PatchExchange;
 import org.springframework.web.service.annotation.PostExchange;
 import org.springframework.web.service.annotation.PutExchange;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
-import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiCreateMeansAssessmentRequest;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiGetMeansAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiMeansAssessmentResponse;

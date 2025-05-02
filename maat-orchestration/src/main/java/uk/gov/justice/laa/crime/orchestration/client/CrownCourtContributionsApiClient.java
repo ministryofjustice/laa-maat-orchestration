@@ -10,8 +10,6 @@ import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContri
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 
 @HttpExchange
 public interface CrownCourtContributionsApiClient {
