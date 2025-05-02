@@ -4,14 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
-import uk.gov.justice.laa.crime.orchestration.service.api.CATApiService;
+import uk.gov.justice.laa.crime.orchestration.service.api.ApplicationTrackingApiService;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CATDataService {
+public class ApplicationTrackingDataService {
 
-    private final CATApiService service;
+    private final ApplicationTrackingApiService service;
 
     public void handleCrimeApplyResult(ApplicationTrackingOutputResult request) {
         service.handleCrimeApplyResult(request);

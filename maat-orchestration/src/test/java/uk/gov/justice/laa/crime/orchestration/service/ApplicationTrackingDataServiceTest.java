@@ -6,24 +6,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
-import uk.gov.justice.laa.crime.orchestration.service.api.CATApiService;
+import uk.gov.justice.laa.crime.orchestration.service.api.ApplicationTrackingApiService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith({MockitoExtension.class})
-class CATDataServiceTest {
+class ApplicationTrackingDataServiceTest {
 
     @Mock
-    private CATApiService catApiService;
+    private ApplicationTrackingApiService applicationTrackingApiService;
 
     @InjectMocks
-    private CATDataService catDataService;
+    private ApplicationTrackingDataService applicationTrackingDataService;
 
     @Test
     void givenAValidInput_whenHandleCrimeApplyResultIsInvoked_thenCATServiceIsCalled() {
-        catDataService.handleCrimeApplyResult(new ApplicationTrackingOutputResult());
-        verify(catApiService).handleCrimeApplyResult(any(ApplicationTrackingOutputResult.class));
+        applicationTrackingDataService.handleCrimeApplyResult(new ApplicationTrackingOutputResult());
+        verify(applicationTrackingApiService).handleCrimeApplyResult(any(ApplicationTrackingOutputResult.class));
     }
 
 }

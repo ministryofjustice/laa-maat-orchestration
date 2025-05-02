@@ -22,23 +22,23 @@ jwt:
   issuerUri: https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_ZaFnb3kFD
 
 maatApi:
-  baseUrl: https://maat-cd-api.legalservices.gov.uk
+  baseUrl: https://maat-cd-api.legalservices.gov.uk/api/internal/v1
   oauthUrl: https://maat-cd-api-prd.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 hardshipApi:
-  baseUrl: http://laa-crime-hardship.laa-crime-hardship-prod.svc.cluster.local
+  baseUrl: http://laa-crime-hardship.laa-crime-hardship-prod.svc.cluster.local/api/internal/v1
   oauthUrl: https://laa-crime-auth-hardship.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 cccApi:
-  baseUrl: http://laa-crown-court-contribution.laa-crown-court-contribution-prod.svc.cluster.local
+  baseUrl: http://laa-crown-court-contribution.laa-crown-court-contribution-prod.svc.cluster.local/api/internal/v1
   oauthUrl: https://laa-crime-auth-ccc.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 ccpApi:
-  baseUrl: http://laa-crown-court-proceeding.laa-crown-court-proceeding-prod.svc.cluster.local
+  baseUrl: http://laa-crown-court-proceeding.laa-crown-court-proceeding-prod.svc.cluster.local/api/internal/v1
   oauthUrl: https://laa-crime-auth-ccp.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 cmaApi:
-  baseUrl: http://laa-crime-means-assessment.laa-crime-means-assessment-prod.svc.cluster.local
+  baseUrl: http://laa-crime-means-assessment.laa-crime-means-assessment-prod.svc.cluster.local/api/internal/v1
   oauthUrl: https://laa-crime-auth-cma.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 validationApi:
@@ -46,11 +46,11 @@ validationApi:
   oauthUrl: https://laa-crime-auth-validation.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 catApi:
-  baseUrl: http://laa-crime-application-tracking-service.laa-crime-application-tracking-service-prod.svc.cluster.local
+  baseUrl: http://laa-crime-application-tracking-service.laa-crime-application-tracking-service-prod.svc.cluster.local/api/internal/v1
   oauthUrl: https://laa-crime-auth-ats.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 evidenceApi:
-  baseUrl: http://laa-crime-evidence.laa-crime-evidence-prod.svc.cluster.local
+  baseUrl: http://laa-crime-evidence.laa-crime-evidence-prod.svc.cluster.local/api/internal/v1
   oauthUrl: https://laa-crime-auth-evidence.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 serviceAccount:

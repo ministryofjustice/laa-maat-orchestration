@@ -21,6 +21,7 @@ public class WiremockStubs {
     private static final String MAAT_API_APPLICATION_URL = "/api/internal/v1/application";
     private static final String MAAT_API_ASSESSMENT_URL = "/api/internal/v1/assessment";
     private static final String CMA_ROLLBACK_URL = "/api/internal/v1/assessment/means/rollback/";
+    private static final String HARDSHIP_ROLLBACK_URL = "/api/internal/v1/hardship/";
     private static final String MAAT_API_USER_URL = "/api/internal/v1/users/summary/";
 
     private static final String CAT_URL = "/api/internal/v1/application-tracking-output-result";
@@ -87,7 +88,8 @@ public class WiremockStubs {
     }
 
     public static void assertStubForGetContributionsSummary(int times) {
-        verify(exactly(times), getRequestedFor(urlPathMatching(CCC_URL + "/summaries")));
+        verify(exactly(times), getRequestedFor(urlPathMatching(
+            CCC_URL + "/summaries/" + TestModelDataBuilder.REP_ID)));
     }
 
     public static void assertStubForHandleCrimeApplyService(int times) {

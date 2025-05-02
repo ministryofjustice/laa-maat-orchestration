@@ -34,7 +34,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     private final ApplicationService applicationService;
 
     private final ApplicationTrackingMapper applicationTrackingMapper;
-    private final CATDataService catDataService;
+    private final ApplicationTrackingDataService applicationTrackingDataService;
 
     public HardshipReviewDTO find(int hardshipReviewId) {
         return hardshipService.find(hardshipReviewId);
@@ -169,7 +169,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         // Call application.handle_eform_result stored procedure OR Equivalent ATS service endpoint
         ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(request, repOrderDTO);
         if (null != applicationTrackingOutputResult.getUsn()) {
-            catDataService.handleCrimeApplyResult(applicationTrackingOutputResult);
+            applicationTrackingDataService.handleCrimeApplyResult(applicationTrackingOutputResult);
         }
         // Call crown_court.xx_process_activity_and_get_correspondence stored procedure
         request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(

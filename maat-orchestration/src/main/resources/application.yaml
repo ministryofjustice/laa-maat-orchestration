@@ -79,58 +79,47 @@ spring:
 services:
   hardship-api:
     base-url: ${HARDSHIP_API_BASE_URL}
-    endpoints:
-      find-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/{hardshipReviewId}
-      create-url: ${services.hardship-api.base-url}/api/internal/v1/hardship
-      update-url: ${services.hardship-api.base-url}/api/internal/v1/hardship
-      rollback-url: ${services.hardship-api.base-url}/api/internal/v1/hardship/{hardshipReviewId}
+    registrationId: hardship
 
   contribution-api:
     base-url: ${CCC_API_BASE_URL}
-    endpoints:
-      calculate-contribution-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/calculate-contribution
-      check-contribution-rule-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/check-contribution-rule
-      contribution-summaries-url: ${services.contribution-api.base-url}/api/internal/v1/contribution/summaries/{repId}
+    registrationId: ccc
 
   crown-court-api:
     base-url: ${CCP_API_BASE_URL}
-    endpoints:
-      update-application-url: ${services.crown-court-api.base-url}/api/internal/v1/proceedings
-      update-crown-court-url: ${services.crown-court-api.base-url}/api/internal/v1/proceedings/update-crown-court
+    registrationId: ccp
 
   cma-api:
     base-url: ${CMA_API_BASE_URL}
-    endpoints:
-      find-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means/{financialAssessmentId}
-      create-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means
-      update-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means
-      rollback-url: ${services.cma-api.base-url}/api/internal/v1/assessment/means/rollback/{financialAssessmentId}
+    registrationId: cma
 
   maat-api:
     base-url: ${MAAT_API_BASE_URL}
-    endpoints:
-      call-stored-proc-url: ${services.maat-api.base-url}/api/internal/v1/assessment/execute-stored-procedure
-      rep-order-url: ${services.maat-api.base-url}/api/internal/v1/assessment/rep-orders/{repId}
-      update-send-to-cclf-url: ${services.maat-api.base-url}/api/internal/v1/application/applicant/update-cclf
-      financial-assessment-url: ${services.maat-api.base-url}/api/internal/v1/assessment/financial-assessments
-    user-domain: ${services.maat-api.base-url}/api/internal/v1/users
-    application-domain: ${services.maat-api.base-url}/api/internal/v1/application
-    user-endpoints:
-      user-summary-url: ${services.maat-api.user-domain}/summary/{username}
+    registrationId: maat-api
+
   cat-api:
     base-url: ${CAT_API_BASE_URL}
-    endpoints:
-      handle-eform-url: ${services.cat-api.base-url}/api/internal/v1/application-tracking-output-result
+    registrationId: cat
+
   evidence-api:
     base-url: ${EVIDENCE_API_BASE_URL}
-    endpoints:
-      income-evidence-url: ${services.evidence-api.base-url}/api/internal/v1/evidence
+    registrationId: evidence
 
-retry-config:
-  max-retries: 3
-  min-back-off-period: 5
-  jitter-value: 0.75
-
+resilience4j:
+  retry:
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 2s
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+        retry-exceptions:
+          - org.springframework.web.reactive.function.client.WebClientRequestException
+          - org.springframework.web.reactive.function.client.WebClientResponseException.BadGateway
+          - org.springframework.web.reactive.function.client.WebClientResponseException.TooManyRequests
+          - org.springframework.web.reactive.function.client.WebClientResponseException.ServiceUnavailable
+          - org.springframework.web.reactive.function.client.WebClientResponseException.GatewayTimeout
+        
 springdoc:
   packagesToScan: uk.gov.justice.laa.maat.orchestration
   api-docs:

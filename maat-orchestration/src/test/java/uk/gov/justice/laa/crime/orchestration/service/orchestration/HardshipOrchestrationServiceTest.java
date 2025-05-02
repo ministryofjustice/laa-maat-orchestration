@@ -6,9 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
-import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
@@ -55,7 +55,7 @@ class HardshipOrchestrationServiceTest {
     private HardshipMapper hardshipMapper;
 
     @Mock
-    private CATDataService catDataService;
+    private ApplicationTrackingDataService applicationTrackingDataService;
 
     @Mock
     private ApplicationTrackingMapper applicationTrackingMapper;
@@ -275,7 +275,10 @@ class HardshipOrchestrationServiceTest {
         when(hardshipMapper.getUserActionDTO(any(), any()))
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
-        doThrow(new APIClientException()).when(assessmentSummaryService)
+        WebClientResponseException webClientResponseException =
+            TestModelDataBuilder.buildInternalServerErrorWebClientResponseException();
+        
+        doThrow(webClientResponseException).when(assessmentSummaryService)
                 .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
@@ -292,8 +295,11 @@ class HardshipOrchestrationServiceTest {
         HardshipReviewDTO hardshipReviewDTO = getHardshipOverviewDTO(CourtType.MAGISTRATE).getMagCourtHardship();
         hardshipReviewDTO.setAsessmentStatus(null);
 
+        WebClientResponseException webClientResponseException =
+            TestModelDataBuilder.buildInternalServerErrorWebClientResponseException();
+        
         when(hardshipService.find(performHardshipResponse.getHardshipReviewId()))
-                .thenThrow(new APIClientException());
+                .thenThrow(webClientResponseException);
         when(hardshipMapper.getUserActionDTO(any(), any()))
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
@@ -314,8 +320,11 @@ class HardshipOrchestrationServiceTest {
         when(hardshipService.find(performHardshipResponse.getHardshipReviewId()))
                 .thenReturn(hardshipReviewDTO);
 
+        WebClientResponseException webClientResponseException =
+            TestModelDataBuilder.buildInternalServerErrorWebClientResponseException();
+        
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), eq(CourtType.MAGISTRATE)))
-                .thenThrow(new APIClientException());
+                .thenThrow(webClientResponseException);
 
         when(hardshipMapper.getUserActionDTO(any(), any()))
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
@@ -528,10 +537,14 @@ class HardshipOrchestrationServiceTest {
 
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship()
                 .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
+
+        WebClientResponseException webClientResponseException =
+            TestModelDataBuilder.buildInternalServerErrorWebClientResponseException();
+        
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
                 any(StoredProcedure.class)
         ))
-                .thenThrow(new APIClientException());
+                .thenThrow(webClientResponseException);
 
         when(hardshipMapper.getUserActionDTO(any(), any()))
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
@@ -552,8 +565,12 @@ class HardshipOrchestrationServiceTest {
 
         applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getHardship().getCrownCourtHardship()
                 .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
+
+        WebClientResponseException webClientResponseException =
+            TestModelDataBuilder.buildInternalServerErrorWebClientResponseException();
+        
         when(contributionService.calculate(workflowRequest))
-                .thenThrow(new APIClientException());
+                .thenThrow(webClientResponseException);
         when(hardshipMapper.getUserActionDTO(any(), any()))
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
@@ -567,12 +584,12 @@ class HardshipOrchestrationServiceTest {
     void givenExceptionThrownInCreateHardshipService_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
         when(hardshipService.create(any(WorkflowRequest.class)))
-                .thenThrow(new APIClientException());
+                .thenThrow(WebClientResponseException.class);
         when(hardshipMapper.getUserActionDTO(any(), any()))
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
-                .isInstanceOf(APIClientException.class);
+                .isInstanceOf(WebClientResponseException.class);
 
         verify(repOrderService, times(0)).updateRepOrderDateModified(eq(workflowRequest), any());
     }
@@ -580,12 +597,12 @@ class HardshipOrchestrationServiceTest {
     @Test
     void givenExceptionThrownInUpdateHardshipService_whenUpdateIsInvoked_thenRollbackIsNotInvoked() {
         WorkflowRequest workflowRequest = buildWorkflowRequestWithHardship(CourtType.MAGISTRATE);
-        doThrow(new APIClientException()).when(hardshipService).update(any(WorkflowRequest.class));
+        doThrow(WebClientResponseException.class).when(hardshipService).update(any(WorkflowRequest.class));
         when(hardshipMapper.getUserActionDTO(any(), any()))
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
         assertThatThrownBy(() -> orchestrationService.update(workflowRequest))
-                .isInstanceOf(APIClientException.class);
+                .isInstanceOf(WebClientResponseException.class);
 
         verify(repOrderService, times(0)).updateRepOrderDateModified(eq(workflowRequest), any());
     }

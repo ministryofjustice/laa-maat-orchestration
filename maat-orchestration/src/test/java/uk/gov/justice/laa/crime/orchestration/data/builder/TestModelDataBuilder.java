@@ -1,7 +1,10 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
-import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
@@ -512,6 +515,15 @@ public class TestModelDataBuilder {
                                         .build())
                                 .build())
                 .build();
+    }
+    
+    public static WebClientResponseException buildInternalServerErrorWebClientResponseException() {
+        String errorBody = "{\"message\": \"Error message\"}";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return new WebClientResponseException(
+            500, "Internal Server Error", headers, errorBody.getBytes(), null);
     }
 
 
@@ -1261,7 +1273,7 @@ public class TestModelDataBuilder {
                 .sessionId(null).build();
     }
 
-    @NotNull
+    @NonNull
     public static RepOrderDTO getTestRepOrderDTO(ApplicationDTO applicationDTO) {
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
         repOrderDTO.setArrestSummonsNo(applicationDTO.getArrestSummonsNo());
@@ -1282,7 +1294,7 @@ public class TestModelDataBuilder {
         return repOrderDTO;
     }
 
-    @NotNull
+    @NonNull
     public static ApplicationDTO getTestApplicationDTO(WorkflowRequest workflowRequest) {
         ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
         applicationDTO.setDateReceived(null);
@@ -1293,7 +1305,7 @@ public class TestModelDataBuilder {
         return applicationDTO;
     }
 
-    @NotNull
+    @NonNull
     public static RepOrderCCOutcomeDTO getRepOrderCCOutcomeDTO() {
         return RepOrderCCOutcomeDTO.builder()
                 .id(1)

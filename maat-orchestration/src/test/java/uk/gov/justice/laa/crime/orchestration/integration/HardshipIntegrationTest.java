@@ -106,7 +106,7 @@ class HardshipIntegrationTest {
         String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
                 .andExpect(status().is5xxServerError());
-        verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
+        verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/hardship")));
         verify(exactly(1), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
     }
 
@@ -178,7 +178,8 @@ class HardshipIntegrationTest {
                 .writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.CROWN_COURT));
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
                 .andExpect(status().is5xxServerError());
-        verify(exactly(1), putRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
+
+        verify(exactly(1), putRequestedFor(urlPathMatching("/api/internal/v1/hardship")));
         verify(exactly(1), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
     }
 
@@ -222,7 +223,7 @@ class HardshipIntegrationTest {
 
 
     private void stubForUpdateHardship() throws JsonProcessingException {
-        wiremock.stubFor(put(urlMatching("/api/internal/v1/hardship/.*"))
+        wiremock.stubFor(put(urlMatching("/api/internal/v1/hardship"))
                 .willReturn(
                         WireMock.ok()
                                 .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
@@ -252,7 +253,7 @@ class HardshipIntegrationTest {
     }
 
     private void stubForCreateHardship(CourtType courtType) throws JsonProcessingException {
-        wiremock.stubFor(post(urlMatching("/api/internal/v1/hardship/.*"))
+        wiremock.stubFor(post(urlMatching("/api/internal/v1/hardship"))
                 .willReturn(
                         WireMock.ok()
                                 .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
@@ -285,7 +286,7 @@ class HardshipIntegrationTest {
     }
 
     private static void verifyStubForCreateHardship(CourtType courtType) {
-        verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
+        verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/hardship")));
         verify(exactly(1), getRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1);
@@ -301,7 +302,7 @@ class HardshipIntegrationTest {
 
 
     private static void verifyStubForUpdateHardship(CourtType courtType) {
-        verify(exactly(1), putRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
+        verify(exactly(1), putRequestedFor(urlPathMatching("/api/internal/v1/hardship")));
         assertStubForInvokeStoredProcedure(2);
         assertStubForCheckContributionsRule(1);
         assertStubForCalculateContributions(1);
