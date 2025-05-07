@@ -24,7 +24,7 @@ class ContributionApiServiceTest {
     @Test
     void givenValidRequest_whenCalculateContributionIsInvoked_thenContributionServiceIsCalled() {
         contributionApiService.calculate(new ApiMaatCalculateContributionRequest());
-        verify(contributionApiClient).calculate(any(ApiMaatCalculateContributionRequest.class));
+        verify(contributionApiClient).calculateContribution(any(ApiMaatCalculateContributionRequest.class));
 
     }
 

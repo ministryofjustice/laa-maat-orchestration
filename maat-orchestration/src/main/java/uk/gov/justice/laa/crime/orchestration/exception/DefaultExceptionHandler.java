@@ -39,8 +39,7 @@ public class DefaultExceptionHandler {
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage(), traceIdHandler.getTraceId());
     }
 
-    private static ResponseEntity<ErrorDTO> buildErrorResponse(
-        HttpStatusCode status, String message, String traceId) {
+    private static ResponseEntity<ErrorDTO> buildErrorResponse(HttpStatusCode status, String message, String traceId) {
         log.error("Exception Occurred. Status - {}, Detail - {}, TraceId - {}", status, message, traceId);
         return new ResponseEntity<>(ErrorDTO.builder().traceId(traceId).code(status.toString()).message(message).build(), status);
     }

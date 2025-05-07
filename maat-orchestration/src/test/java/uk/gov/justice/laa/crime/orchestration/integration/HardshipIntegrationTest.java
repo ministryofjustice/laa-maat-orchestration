@@ -145,7 +145,7 @@ class HardshipIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.crownCourtOverviewDTO.contribution.monthlyContribs").value(150.0));
 
-        verifyStubForCreateHardship(CourtType.MAGISTRATE);
+        verifyStubForCreateHardship(CourtType.MAGISTRATE, TestModelDataBuilder.REP_ID);
 
     }
 
@@ -160,7 +160,7 @@ class HardshipIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.crownCourtOverviewDTO.contribution.monthlyContribs").value(150.0));
 
-        verifyStubForCreateHardship(CourtType.CROWN_COURT);
+        verifyStubForCreateHardship(CourtType.CROWN_COURT, TestModelDataBuilder.REP_ID);
 
     }
 
@@ -193,7 +193,7 @@ class HardshipIntegrationTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.crownCourtOverviewDTO.contribution.monthlyContribs").value(150.0));
 
-        verifyStubForUpdateHardship(CourtType.MAGISTRATE);
+        verifyStubForUpdateHardship(CourtType.MAGISTRATE, TestModelDataBuilder.REP_ID);
     }
 
     @Test
@@ -285,11 +285,11 @@ class HardshipIntegrationTest {
         }
     }
 
-    private static void verifyStubForCreateHardship(CourtType courtType) {
+    private static void verifyStubForCreateHardship(CourtType courtType, Integer repId) {
         verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/hardship")));
         verify(exactly(1), getRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
         assertStubForCalculateContributions(1);
-        assertStubForGetContributionsSummary(1);
+        assertStubForGetContributionsSummary(1, repId);
         if (CourtType.CROWN_COURT.equals(courtType)) {
             // TODO: Uncomment this assertion for application tracking before activating hardship orchestration
             // assertStubForHandleEformSerivce(1);
@@ -301,12 +301,12 @@ class HardshipIntegrationTest {
     }
 
 
-    private static void verifyStubForUpdateHardship(CourtType courtType) {
+    private static void verifyStubForUpdateHardship(CourtType courtType, Integer repId) {
         verify(exactly(1), putRequestedFor(urlPathMatching("/api/internal/v1/hardship")));
         assertStubForInvokeStoredProcedure(2);
         assertStubForCheckContributionsRule(1);
         assertStubForCalculateContributions(1);
-        assertStubForGetContributionsSummary(1);
+        assertStubForGetContributionsSummary(1, repId);
         if (CourtType.CROWN_COURT.equals(courtType)) {
             // TODO: Uncomment this assertion for application tracking before activating hardship orchestration
             // assertStubForHandleEformSerivce(1);

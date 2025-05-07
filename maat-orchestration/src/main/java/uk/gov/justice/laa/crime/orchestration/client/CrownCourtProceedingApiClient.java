@@ -11,9 +11,9 @@ import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownC
 @HttpExchange
 public interface CrownCourtProceedingApiClient {
 
-  @PutExchange("/proceedings")
+  @PutExchange()
   ApiUpdateApplicationResponse updateApplication(@RequestBody ApiUpdateApplicationRequest request);
 
-  @PutExchange("/proceedings/update-crown-court")
+  @PutExchange("/update-crown-court")
   ApiUpdateCrownCourtOutcomeResponse updateCrownCourt(@RequestBody ApiUpdateCrownCourtRequest request);
 }

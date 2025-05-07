@@ -22,7 +22,7 @@ public class ContributionApiService {
 
     public ApiMaatCalculateContributionResponse calculate(ApiMaatCalculateContributionRequest request) {
         log.debug(REQUEST_STRING, request);
-        ApiMaatCalculateContributionResponse response = contributionApiClient.calculate(request);
+        ApiMaatCalculateContributionResponse response = contributionApiClient.calculateContribution(request);
         log.debug(RESPONSE_STRING, response);
         return response;
     }

@@ -15,7 +15,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
-import uk.gov.justice.laa.crime.orchestration.exception.MAATServerException;
+import uk.gov.justice.laa.crime.orchestration.exception.StoredProcedureValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
@@ -66,7 +66,7 @@ public class MeansAssessmentOrchestrationService {
             log.debug("Created Means assessment for applicationId = {}", repId);
         } catch (ValidationException | CrimeValidationException exception) {
             throw exception;
-        } catch (MAATServerException exception) {
+        } catch (StoredProcedureValidationException exception) {
             meansAssessmentService.rollback(request);
             throw new ValidationException(exception.getMessage());
         } catch (Exception ex) {
@@ -94,7 +94,7 @@ public class MeansAssessmentOrchestrationService {
             log.debug("Updated Means assessment for applicationId = {}", repId);
         } catch (ValidationException | CrimeValidationException exception) {
             throw exception;
-        } catch (MAATServerException exception) {
+        } catch (StoredProcedureValidationException exception) {
             meansAssessmentService.rollback(request);
             throw new ValidationException(exception.getMessage());
         } catch (Exception ex) {
@@ -147,7 +147,7 @@ public class MeansAssessmentOrchestrationService {
         String alertMessage = request.getApplicationDTO().getAlertMessage();
         if (StringUtils.isNotBlank(alertMessage) &&
                 (alertMessage.contains(WRN_MSG_REASSESSMENT) || alertMessage.contains(WRN_MSG_INCOMPLETE_ASSESSMENT))) {
-            throw new MAATServerException(alertMessage);
+            throw new StoredProcedureValidationException(alertMessage);
         }
 
         RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(request.getApplicationDTO().getRepId().intValue());

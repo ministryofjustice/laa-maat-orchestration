@@ -14,8 +14,8 @@ public class ApplicationTrackingApiService {
     private static final String REQUEST_STRING = "Request to Application Tracking Service: {}";
     private final ApplicationTrackingApiClient applicationTrackingApiClient;
 
-    public void handleCrimeApplyResult(ApplicationTrackingOutputResult request) {
+    public void sendTrackingOutputResult(ApplicationTrackingOutputResult request) {
         log.debug(REQUEST_STRING, request);
-        applicationTrackingApiClient.handleCrimeApplyResult(request);
+        applicationTrackingApiClient.sendTrackingOutputResult(request);
     }
 }

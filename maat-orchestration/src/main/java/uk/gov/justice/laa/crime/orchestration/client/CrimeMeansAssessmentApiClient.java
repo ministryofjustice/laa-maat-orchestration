@@ -16,15 +16,15 @@ import uk.gov.justice.laa.crime.common.model.meansassessment.ApiUpdateMeansAsses
 @HttpExchange
 public interface CrimeMeansAssessmentApiClient {
   
-  @GetExchange("/assessment/means/{financialAssessmentId}")
+  @GetExchange("/{financialAssessmentId}")
   ApiGetMeansAssessmentResponse findMeansAssessment(@PathVariable Integer financialAssessmentId);
 
-  @PostExchange("/assessment/means")
+  @PostExchange()
   ApiMeansAssessmentResponse createMeansAssessment(@RequestBody ApiCreateMeansAssessmentRequest request);
 
-  @PutExchange("/assessment/means")
+  @PutExchange()
   ApiMeansAssessmentResponse updateMeansAssessment(@RequestBody ApiUpdateMeansAssessmentRequest request);
 
-  @PatchExchange("/assessment/means/rollback/{financialAssessmentId}")
+  @PatchExchange("/rollback/{financialAssessmentId}")
   ApiRollbackMeansAssessmentResponse rollback(@PathVariable Long financialAssessmentId);
 }

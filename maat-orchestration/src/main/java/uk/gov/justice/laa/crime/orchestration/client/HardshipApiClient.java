@@ -14,15 +14,15 @@ import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipResponse
 @HttpExchange
 public interface HardshipApiClient {
 
-  @GetExchange("/hardship/{hardshipReviewId}")
+  @GetExchange("/{hardshipReviewId}")
   ApiFindHardshipResponse getHardshipReview(@PathVariable Integer hardshipReviewId);
 
-  @PostExchange("/hardship")
+  @PostExchange("")
   ApiPerformHardshipResponse createHardshipReview(@RequestBody ApiPerformHardshipRequest request);
 
-  @PutExchange("/hardship")
+  @PutExchange("")
   ApiPerformHardshipResponse updateHardshipReview(@RequestBody ApiPerformHardshipRequest request);
 
-  @PatchExchange("/hardship/{hardshipReviewId}")
+  @PatchExchange("/{hardshipReviewId}")
   void rollback(@PathVariable Long hardshipReviewId);
 }

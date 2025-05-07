@@ -23,9 +23,9 @@ class ApplicationTrackingApiServiceTest {
 
     @Test
     void givenValidRequest_whenHandleCrimeApplyResultIsInvoked_thenApplicationTrackingServiceIsCalled() {
-        applicationTrackingApiService.handleCrimeApplyResult(new ApplicationTrackingOutputResult());
+        applicationTrackingApiService.sendTrackingOutputResult(new ApplicationTrackingOutputResult());
         verify(applicationTrackingApiClient)
-            .handleCrimeApplyResult(any(ApplicationTrackingOutputResult.class));
+            .sendTrackingOutputResult(any(ApplicationTrackingOutputResult.class));
     }
 
 }

@@ -23,8 +23,6 @@ public class WiremockStubs {
     private static final String CMA_ROLLBACK_URL = "/api/internal/v1/assessment/means/rollback/";
     private static final String MAAT_API_USER_URL = "/api/internal/v1/users/summary/";
 
-    private static final String CAT_URL = "/api/internal/v1/application-tracking-output-result";
-
     public static void stubForOAuth() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> token = Map.of(
@@ -53,13 +51,6 @@ public class WiremockStubs {
                 .withBody(response))));
     }
 
-    public static void stubForGetAssessment(int financialAssessmentId, String response) {
-        stubFor((get(urlMatching(MAAT_API_ASSESSMENT_URL + "/financial-assessments/" + financialAssessmentId))
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(response))));
-    }
-
     public static void assertStubForUpdateCrownCourtApplication(int times) {
         verify(exactly(times), putRequestedFor(urlPathMatching(CCP_URL)));
     }
@@ -86,13 +77,9 @@ public class WiremockStubs {
                     .withBody(response)));
     }
 
-    public static void assertStubForGetContributionsSummary(int times) {
+    public static void assertStubForGetContributionsSummary(int times, Integer repId) {
         verify(exactly(times), getRequestedFor(urlPathMatching(
-            CCC_URL + "/summaries/" + TestModelDataBuilder.REP_ID)));
-    }
-
-    public static void assertStubForHandleCrimeApplyService(int times) {
-        verify(exactly(times), postRequestedFor(urlPathMatching(CAT_URL)));
+            CCC_URL + "/summaries/" + repId)));
     }
 
     public static void stubForCheckContributionsRule() {

@@ -257,59 +257,59 @@ public class WebClientsConfiguration {
   }
 
   @Bean
-  HardshipApiClient hardshipApiClient(@Qualifier("hardshipWebClient") WebClient hardshipApiClient) {
+  HardshipApiClient hardshipApiClient(@Qualifier("hardshipWebClient") WebClient hardshipWebClient) {
     HttpServiceProxyFactory httpServiceProxyFactory =
         HttpServiceProxyFactory
-            .builderFor(WebClientAdapter.create(hardshipApiClient))
+            .builderFor(WebClientAdapter.create(hardshipWebClient))
             .build();
     return httpServiceProxyFactory.createClient(HardshipApiClient.class);
   }
 
   @Bean
-  EvidenceApiClient evidenceApiClient(@Qualifier("evidenceWebClient") WebClient evidenceApiClient) {
+  EvidenceApiClient evidenceApiClient(@Qualifier("evidenceWebClient") WebClient hardshipWebClient) {
     HttpServiceProxyFactory httpServiceProxyFactory =
         HttpServiceProxyFactory
-            .builderFor(WebClientAdapter.create(evidenceApiClient))
+            .builderFor(WebClientAdapter.create(hardshipWebClient))
             .build();
     return httpServiceProxyFactory.createClient(EvidenceApiClient.class);
   }
 
   @Bean
   CrownCourtContributionsApiClient crownCourtContributionsApiClient(
-      @Qualifier("crownCourtContributionsWebClient") WebClient crownCourtContributionsApiClient) {
+      @Qualifier("crownCourtContributionsWebClient") WebClient crownCourtContributionsWebClient) {
     HttpServiceProxyFactory httpServiceProxyFactory =
         HttpServiceProxyFactory
-            .builderFor(WebClientAdapter.create(crownCourtContributionsApiClient))
+            .builderFor(WebClientAdapter.create(crownCourtContributionsWebClient))
             .build();
     return httpServiceProxyFactory.createClient(CrownCourtContributionsApiClient.class);
   }
 
   @Bean
   CrownCourtProceedingApiClient crownCourtProceedingApiClient(
-      @Qualifier("crownCourtProceedingWebClient") WebClient crownCourtProceedingApiClient) {
+      @Qualifier("crownCourtProceedingWebClient") WebClient crownCourtProceedingWebClient) {
     HttpServiceProxyFactory httpServiceProxyFactory =
         HttpServiceProxyFactory
-            .builderFor(WebClientAdapter.create(crownCourtProceedingApiClient))
+            .builderFor(WebClientAdapter.create(crownCourtProceedingWebClient))
             .build();
     return httpServiceProxyFactory.createClient(CrownCourtProceedingApiClient.class);
   }
 
   @Bean
   CrimeMeansAssessmentApiClient crimeMeansAssessmentApiClient(
-      @Qualifier("crimeMeansAssessmentWebClient") WebClient crownCourtContributionsApiClient) {
+      @Qualifier("crimeMeansAssessmentWebClient") WebClient crimeMeansAssessmentWebClient) {
     HttpServiceProxyFactory httpServiceProxyFactory =
         HttpServiceProxyFactory
-            .builderFor(WebClientAdapter.create(crownCourtContributionsApiClient))
+            .builderFor(WebClientAdapter.create(crimeMeansAssessmentWebClient))
             .build();
     return httpServiceProxyFactory.createClient(CrimeMeansAssessmentApiClient.class);
   }
 
   @Bean
   ApplicationTrackingApiClient applicationTrackingApiClient(
-      @Qualifier("applicationTrackingWebClient") WebClient applicationTrackingApiClient) {
+      @Qualifier("applicationTrackingWebClient") WebClient applicationTrackingWebClient) {
     HttpServiceProxyFactory httpServiceProxyFactory =
         HttpServiceProxyFactory
-            .builderFor(WebClientAdapter.create(applicationTrackingApiClient))
+            .builderFor(WebClientAdapter.create(applicationTrackingWebClient))
             .build();
     return httpServiceProxyFactory.createClient(ApplicationTrackingApiClient.class);
   }

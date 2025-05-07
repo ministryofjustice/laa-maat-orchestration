@@ -13,7 +13,7 @@ public class ApplicationTrackingDataService {
 
     private final ApplicationTrackingApiService service;
 
-    public void handleCrimeApplyResult(ApplicationTrackingOutputResult request) {
-        service.handleCrimeApplyResult(request);
+    public void sendTrackingOutputResult(ApplicationTrackingOutputResult request) {
+        service.sendTrackingOutputResult(request);
     }
 }

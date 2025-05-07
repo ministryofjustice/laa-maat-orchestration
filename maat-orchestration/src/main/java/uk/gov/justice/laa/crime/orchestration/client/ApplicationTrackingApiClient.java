@@ -9,5 +9,5 @@ import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputR
 public interface ApplicationTrackingApiClient {
   
   @PostExchange("/application-tracking-output-result")
-  void handleCrimeApplyResult(@RequestBody ApplicationTrackingOutputResult request);
+  void sendTrackingOutputResult(@RequestBody ApplicationTrackingOutputResult request);
 }

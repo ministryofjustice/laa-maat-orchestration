@@ -14,12 +14,12 @@ import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContribution
 @HttpExchange
 public interface CrownCourtContributionsApiClient {
 
-  @PostExchange("/contribution/calculate-contribution")
-  ApiMaatCalculateContributionResponse calculate(@RequestBody ApiMaatCalculateContributionRequest request);
+  @PostExchange("/calculate-contribution")
+  ApiMaatCalculateContributionResponse calculateContribution(@RequestBody ApiMaatCalculateContributionRequest request);
 
-  @PostExchange("/contribution/check-contribution-rule")
+  @PostExchange("/check-contribution-rule")
   Boolean isContributionRule(@RequestBody ApiMaatCheckContributionRuleRequest request);
 
-  @GetExchange("/contribution/summaries/{repId}")
+  @GetExchange("/summaries/{repId}")
   List<ApiContributionSummary> getContributionSummary(@PathVariable Long repId);
 }

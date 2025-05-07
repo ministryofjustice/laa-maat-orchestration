@@ -12,9 +12,9 @@ import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceRes
 @HttpExchange
 public interface EvidenceApiClient {
 
-  @PostExchange("/evidence")
+  @PostExchange()
   ApiCreateIncomeEvidenceResponse createEvidence(@RequestBody ApiCreateIncomeEvidenceRequest request);
 
-  @PutExchange("/evidence")
+  @PutExchange("")
   ApiUpdateIncomeEvidenceResponse updateEvidence(@RequestBody ApiUpdateIncomeEvidenceRequest request);
 }
