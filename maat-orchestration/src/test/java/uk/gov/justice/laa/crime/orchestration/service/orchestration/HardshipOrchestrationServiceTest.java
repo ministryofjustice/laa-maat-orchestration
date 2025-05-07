@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
@@ -20,6 +21,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
+import uk.gov.justice.laa.crime.orchestration.filter.WebClientTestUtils;
 import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.service.*;
@@ -276,7 +278,7 @@ class HardshipOrchestrationServiceTest {
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
 
         WebClientResponseException webClientResponseException =
-            TestModelDataBuilder.buildInternalServerErrorWebClientResponseException();
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
         
         doThrow(webClientResponseException).when(assessmentSummaryService)
                 .updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
@@ -296,7 +298,7 @@ class HardshipOrchestrationServiceTest {
         hardshipReviewDTO.setAsessmentStatus(null);
 
         WebClientResponseException webClientResponseException =
-            TestModelDataBuilder.buildInternalServerErrorWebClientResponseException();
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
         
         when(hardshipService.find(performHardshipResponse.getHardshipReviewId()))
                 .thenThrow(webClientResponseException);
@@ -321,7 +323,7 @@ class HardshipOrchestrationServiceTest {
                 .thenReturn(hardshipReviewDTO);
 
         WebClientResponseException webClientResponseException =
-            TestModelDataBuilder.buildInternalServerErrorWebClientResponseException();
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
         
         when(assessmentSummaryService.getSummary(any(HardshipReviewDTO.class), eq(CourtType.MAGISTRATE)))
                 .thenThrow(webClientResponseException);
@@ -539,7 +541,7 @@ class HardshipOrchestrationServiceTest {
                 .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
 
         WebClientResponseException webClientResponseException =
-            TestModelDataBuilder.buildInternalServerErrorWebClientResponseException();
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
         
         when(maatCourtDataService.invokeStoredProcedure(any(ApplicationDTO.class), any(UserDTO.class),
                 any(StoredProcedure.class)
@@ -567,7 +569,7 @@ class HardshipOrchestrationServiceTest {
                 .setSolictorsCosts(TestModelDataBuilder.getHRSolicitorsCostsDTO());
 
         WebClientResponseException webClientResponseException =
-            TestModelDataBuilder.buildInternalServerErrorWebClientResponseException();
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
         
         when(contributionService.calculate(workflowRequest))
                 .thenThrow(webClientResponseException);

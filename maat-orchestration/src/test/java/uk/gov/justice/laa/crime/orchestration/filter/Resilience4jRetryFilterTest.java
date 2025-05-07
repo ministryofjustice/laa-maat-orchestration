@@ -58,9 +58,9 @@ class Resilience4jRetryFilterTest {
   void givenRetriesExhausted_whenRetryFilterIsInvoked_thenFinalExceptionIsThrown() {
     ClientRequest request = ClientRequest.create(HttpMethod.GET, DEFAULT_URL).build();
     LinkedList<RuntimeException> errors = new LinkedList<>(
-        Arrays.asList(getWebClientResponseException(HttpStatus.NOT_FOUND),
-            getWebClientResponseException(HttpStatus.TOO_MANY_REQUESTS),
-            getWebClientResponseException(HttpStatus.BAD_GATEWAY)
+        Arrays.asList(WebClientTestUtils.getWebClientResponseException(HttpStatus.NOT_FOUND),
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.TOO_MANY_REQUESTS),
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.BAD_GATEWAY)
         )
     );
     Mono<ClientResponse> errorMono = getClientResponseMono(errors);
@@ -104,8 +104,8 @@ class Resilience4jRetryFilterTest {
   void givenSuccessfulResponseFollowingRetry_whenRetryFilterIsInvoked_thenOkResponseIsReturned() {
     ClientRequest request = ClientRequest.create(HttpMethod.GET, DEFAULT_URL).build();
     LinkedList<RuntimeException> errors = new LinkedList<>(
-        Arrays.asList(getWebClientResponseException(HttpStatus.TOO_MANY_REQUESTS),
-            getWebClientResponseException(HttpStatus.BAD_GATEWAY)
+        Arrays.asList(WebClientTestUtils.getWebClientResponseException(HttpStatus.TOO_MANY_REQUESTS),
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.BAD_GATEWAY)
         )
     );
 
@@ -137,7 +137,7 @@ class Resilience4jRetryFilterTest {
     ClientRequest request = ClientRequest.create(HttpMethod.GET, DEFAULT_URL).build();
 
     when(exchangeFunction.exchange(request))
-        .thenReturn(Mono.error(getWebClientResponseException(HttpStatus.UNAUTHORIZED)));
+        .thenReturn(Mono.error(WebClientTestUtils.getWebClientResponseException(HttpStatus.UNAUTHORIZED)));
 
     Mono<ClientResponse> response =
         new Resilience4jRetryFilter(retryRegistry, DEFAULT_CONFIG_NAME)
@@ -164,9 +164,9 @@ class Resilience4jRetryFilterTest {
     ClientRequest request = ClientRequest.create(HttpMethod.GET, DEFAULT_URL).build();
 
     LinkedList<RuntimeException> errors = new LinkedList<>(
-        Arrays.asList(getWebClientResponseException(HttpStatus.CONFLICT),
-            getWebClientResponseException(HttpStatus.CONFLICT),
-            getWebClientResponseException(HttpStatus.CONFLICT)
+        Arrays.asList(WebClientTestUtils.getWebClientResponseException(HttpStatus.CONFLICT),
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.CONFLICT),
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.CONFLICT)
         )
     );
 
@@ -193,9 +193,9 @@ class Resilience4jRetryFilterTest {
     ClientRequest request = ClientRequest.create(HttpMethod.GET, DEFAULT_URL).build();
 
     LinkedList<RuntimeException> errors = new LinkedList<>(
-        Arrays.asList(getWebClientResponseException(HttpStatus.BAD_GATEWAY),
-            getWebClientResponseException(HttpStatus.CONFLICT),
-            getWebClientResponseException(HttpStatus.TOO_MANY_REQUESTS)
+        Arrays.asList(WebClientTestUtils.getWebClientResponseException(HttpStatus.BAD_GATEWAY),
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.CONFLICT),
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.TOO_MANY_REQUESTS)
         )
     );
 
@@ -217,7 +217,7 @@ class Resilience4jRetryFilterTest {
     softly.assertAll();
   }
 
-  private static WebClientResponseException getWebClientResponseException(HttpStatus status) {
+  /*private static WebClientResponseException getWebClientResponseException(HttpStatus status) {
     return WebClientResponseException.create(
         status.value(),
         status.getReasonPhrase(),
@@ -225,7 +225,7 @@ class Resilience4jRetryFilterTest {
         new byte[0],
         null
     );
-  }
+  }*/
 
   private static Mono<ClientResponse> getClientResponseMono(LinkedList<RuntimeException> errors) {
     return Mono.defer(

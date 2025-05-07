@@ -1,10 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
@@ -21,19 +18,19 @@ import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiRepOrderCrownC
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
-import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.evidence.staticdata.enums.ApplicantType;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicantDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.*;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
@@ -42,20 +39,8 @@ import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.time.*;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -68,6 +53,18 @@ public class TestModelDataBuilder {
     public static final Integer REP_ID = 200;
     public static final Action TEST_ACTION = Action.CREATE_ASSESSMENT;
     public static final String RT_CODE_ER = "ER";
+    public static final Integer PASSPORTED_ID = 777;
+    public static final String TEST_USER_SESSION = "sessionId_e5712593c198";
+    public static final LocalDateTime EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 10, 0, 0, 0);
+    public static final long APPLICANT_ID = 1000L;
+    public static final long PARTNER_ID = 1234L;
+    public static final String EMST_CODE = "EMPLOY";
+    public static final LocalDateTime FINASS_INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 11, 0, 0, 0);
+    public static final LocalDateTime EVIDENCE_DUE_DATE = LocalDateTime.of(2023, 3, 18, 0, 0, 0);
+    public static final LocalDateTime INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 2, 18, 0, 0, 0);
+    public static final LocalDate ALL_EVIDENCE_RECEIVED_DATE = LocalDate.of(2024, 12, 18);
+    public static final LocalDate UPLIFT_APPLIED_DATE = LocalDate.of(2025, 1, 18);
+    public static final LocalDate UPLIFT_REMOVED_DATE = LocalDate.of(2025, 1, 21);
     private static final Integer APPLICANT_EVIDENCE_ID = 9552473;
     private static final Integer PARTNER_EVIDENCE_ID = 9552474;
     private static final Integer EXTRA_EVIDENCE_ID = 9552475;
@@ -75,7 +72,6 @@ public class TestModelDataBuilder {
     private static final String INCOME_EVIDENCE = "TAX RETURN";
     private static final String INCOME_EVIDENCE_NOTES = "Income evidence notes";
     private static final String EVIDENCE_FEE_LEVEL_1 = "LEVEL1";
-    public static final Integer PASSPORTED_ID = 777;
     private static final Integer APPLICANT_HISTORY_ID = 666;
     private static final String RESULT_FAIL = "FAIL";
     private static final String RESULT_PASS = "PASS";
@@ -110,7 +106,7 @@ public class TestModelDataBuilder {
     private static final BigDecimal SOLICITOR_RATE = BigDecimal.valueOf(200);
     // Solicitors Costs
     private static final BigDecimal SOLICITOR_HOURS = BigDecimal.valueOf(52.45)
-        .setScale(2, RoundingMode.DOWN);
+            .setScale(2, RoundingMode.DOWN);
     private static final LocalDateTime DATE_REVIEWED_DATETIME = LocalDateTime.of(2022, 11, 12, 0, 0, 0);
     private static final Date DATE_REVIEWED =
             Date.from(Instant.ofEpochSecond(DATE_REVIEWED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
@@ -128,20 +124,8 @@ public class TestModelDataBuilder {
     private static final List<String> TEST_ROLE_ACTIONS = List.of("CREATE_ASSESSMENT");
     private static final NewWorkReason TEST_NEW_WORK_REASON = NewWorkReason.NEW;
     private static final List<String> TEST_NEW_WORK_REASONS = List.of(NEW_WORK_REASON_STRING);
-    public static final String TEST_USER_SESSION = "sessionId_e5712593c198";
     private static final Integer TEST_RECORD_ID = 100;
     private static final LocalDateTime RESERVATION_DATE = LocalDateTime.of(2022, 12, 14, 0, 0, 0);
-    public static final LocalDateTime EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 10, 0, 0, 0);
-    public static final long APPLICANT_ID = 1000L;
-    public static final long PARTNER_ID = 1234L;
-    public static final String EMST_CODE ="EMPLOY";
-    public static final LocalDateTime FINASS_INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 11, 11, 0, 0, 0);
-    public static final LocalDateTime EVIDENCE_DUE_DATE = LocalDateTime.of(2023, 3, 18, 0, 0, 0);
-    public static final LocalDateTime INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2023, 2, 18, 0, 0, 0);
-    public static final LocalDate ALL_EVIDENCE_RECEIVED_DATE = LocalDate.of(2024, 12, 18);
-    public static final LocalDate UPLIFT_APPLIED_DATE = LocalDate.of(2025, 1, 18);
-    public static final LocalDate UPLIFT_REMOVED_DATE = LocalDate.of(2025, 1, 21);
-
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
         return new ApiFindHardshipResponse()
@@ -516,16 +500,6 @@ public class TestModelDataBuilder {
                                 .build())
                 .build();
     }
-    
-    public static WebClientResponseException buildInternalServerErrorWebClientResponseException() {
-        String errorBody = "{\"message\": \"Error message\"}";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        return new WebClientResponseException(
-            500, "Internal Server Error", headers, errorBody.getBytes(), null);
-    }
-
 
     public static ApplicationDTO getApplicationDTO(CourtType courtType) {
         return ApplicationDTO.builder()
@@ -1389,10 +1363,10 @@ public class TestModelDataBuilder {
                         .withEvidenceType(IncomeEvidenceType.TAX_RETURN)
                         .withMandatory(true));
         List<ApiIncomeEvidence> partnerIncomeEvidenceItems = List.of(new ApiIncomeEvidence()
-                        .withId(PARTNER_EVIDENCE_ID)
-                        .withDateReceived(EVIDENCE_RECEIVED_DATE.toLocalDate())
-                        .withEvidenceType(IncomeEvidenceType.TAX_RETURN)
-                        .withMandatory(true));
+                .withId(PARTNER_EVIDENCE_ID)
+                .withDateReceived(EVIDENCE_RECEIVED_DATE.toLocalDate())
+                .withEvidenceType(IncomeEvidenceType.TAX_RETURN)
+                .withMandatory(true));
         return new ApiIncomeEvidenceItems()
                 .withIncomeEvidenceItems(isPartner ? partnerIncomeEvidenceItems : incomeEvidenceItems)
                 .withApplicantDetails(getApplicantDetails(isPartner));
@@ -1428,7 +1402,7 @@ public class TestModelDataBuilder {
     }
 
     public static ApiUpdateIncomeEvidenceResponse getUpdateIncomeEvidenceResponse(boolean hasPartnerIncome, IncomeEvidenceType incomeEvidence) {
-       ApiUpdateIncomeEvidenceResponse response = new ApiUpdateIncomeEvidenceResponse()
+        ApiUpdateIncomeEvidenceResponse response = new ApiUpdateIncomeEvidenceResponse()
                 .withApplicantEvidenceItems(
                         new ApiIncomeEvidenceItems()
                                 .withApplicantDetails(getApplicantDetails(false))
@@ -1439,13 +1413,13 @@ public class TestModelDataBuilder {
                 .withUpliftAppliedDate(UPLIFT_APPLIED_DATE)
                 .withUpliftRemovedDate(UPLIFT_REMOVED_DATE);
 
-       if (hasPartnerIncome) {
-           response.setPartnerEvidenceItems(new ApiIncomeEvidenceItems()
-                   .withApplicantDetails(getApplicantDetails(true))
-                   .withIncomeEvidenceItems(List.of(getIncomeEvidence(PARTNER_EVIDENCE_ID, incomeEvidence))));
-       }
+        if (hasPartnerIncome) {
+            response.setPartnerEvidenceItems(new ApiIncomeEvidenceItems()
+                    .withApplicantDetails(getApplicantDetails(true))
+                    .withIncomeEvidenceItems(List.of(getIncomeEvidence(PARTNER_EVIDENCE_ID, incomeEvidence))));
+        }
 
-       return  response;
+        return response;
 
     }
 

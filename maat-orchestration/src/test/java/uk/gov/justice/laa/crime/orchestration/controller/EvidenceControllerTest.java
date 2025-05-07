@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -16,6 +17,7 @@ import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfigurat
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.filter.WebClientTestUtils;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.EvidenceOrchestrationService;
 import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
 
@@ -63,9 +65,9 @@ class EvidenceControllerTest {
     @Test
     void givenWebClientFailure_whenUpdateIsInvoked_thenInternalServerErrorResponseIsReturned() throws Exception {
 
-        WebClientResponseException webClientResponseException = 
-            TestModelDataBuilder.buildInternalServerErrorWebClientResponseException();
-        
+        WebClientResponseException webClientResponseException =
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
+
         when(evidenceOrchestrationService.updateIncomeEvidence(any(WorkflowRequest.class)))
                 .thenThrow(webClientResponseException);
 

@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -17,6 +18,7 @@ import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.filter.WebClientTestUtils;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.MeansAssessmentOrchestrationService;
 import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
 
@@ -71,7 +73,7 @@ class MeansAssessmentControllerTest {
     void givenWebClientFailure_whenFindIsInvoked_thenInternalServerErrorResponseIsReturned() throws Exception {
         
         WebClientResponseException webClientResponseException =
-            TestModelDataBuilder.buildInternalServerErrorWebClientResponseException();
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
         
         when(orchestrationService.find(anyInt(), anyInt()))
                 .thenThrow(webClientResponseException);
@@ -104,7 +106,7 @@ class MeansAssessmentControllerTest {
     void givenWebClientFailure_whenCreateIsInvoked_thenInternalServerErrorResponseIsReturned() throws Exception {
 
         WebClientResponseException webClientResponseException =
-            TestModelDataBuilder.buildInternalServerErrorWebClientResponseException();
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
         
         when(orchestrationService.create(any(WorkflowRequest.class)))
                 .thenThrow(webClientResponseException);
@@ -139,7 +141,7 @@ class MeansAssessmentControllerTest {
     void givenWebClientFailure_whenUpdateIsInvoked_thenInternalServerErrorResponseIsReturned() throws Exception {
 
         WebClientResponseException webClientResponseException =
-            TestModelDataBuilder.buildInternalServerErrorWebClientResponseException();
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
         
         when(orchestrationService.update(any(WorkflowRequest.class)))
                 .thenThrow(webClientResponseException);
