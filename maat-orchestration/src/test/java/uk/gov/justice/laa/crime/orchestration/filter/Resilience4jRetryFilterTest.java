@@ -217,16 +217,6 @@ class Resilience4jRetryFilterTest {
     softly.assertAll();
   }
 
-  /*private static WebClientResponseException getWebClientResponseException(HttpStatus status) {
-    return WebClientResponseException.create(
-        status.value(),
-        status.getReasonPhrase(),
-        new HttpHeaders(),
-        new byte[0],
-        null
-    );
-  }*/
-
   private static Mono<ClientResponse> getClientResponseMono(LinkedList<RuntimeException> errors) {
     return Mono.defer(
         () -> {
