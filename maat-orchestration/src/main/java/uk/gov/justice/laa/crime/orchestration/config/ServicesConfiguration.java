@@ -41,24 +41,7 @@ public class ServicesConfiguration {
         private String baseUrl;
 
         @NotNull
-        private Endpoints endpoints;
-
-        @Data
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class Endpoints {
-            @NotNull
-            private String findUrl;
-
-            @NotNull
-            private String createUrl;
-
-            @NotNull
-            private String updateUrl;
-
-            @NotNull
-            private String rollbackUrl;
-        }
+        private String registrationId;
     }
 
     @Data
@@ -69,22 +52,7 @@ public class ServicesConfiguration {
         private String baseUrl;
 
         @NotNull
-        private Endpoints endpoints;
-
-        @Data
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class Endpoints {
-
-            @NotNull
-            private String calculateContributionUrl;
-
-            @NotNull
-            private String checkContributionRuleUrl;
-
-            @NotNull
-            private String contributionSummariesUrl;
-        }
+        private String registrationId;
     }
 
     @Data
@@ -95,20 +63,7 @@ public class ServicesConfiguration {
         private String baseUrl;
 
         @NotNull
-        private Endpoints endpoints;
-
-        @Data
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class Endpoints {
-
-            @NotNull
-            private String updateApplicationUrl;
-
-            @NotNull
-            private String updateCrownCourtUrl;
-
-        }
+        private String registrationId;
     }
 
     @Data
@@ -119,24 +74,7 @@ public class ServicesConfiguration {
         private String baseUrl;
 
         @NotNull
-        private Endpoints endpoints;
-
-        @Data
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class Endpoints {
-            @NotNull
-            private String findUrl;
-
-            @NotNull
-            private String createUrl;
-
-            @NotNull
-            private String updateUrl;
-
-            @NotNull
-            private String rollbackUrl;
-        }
+        private String registrationId;
     }
 
     @Data
@@ -147,33 +85,7 @@ public class ServicesConfiguration {
         private String baseUrl;
 
         @NotNull
-        private Endpoints endpoints;
-
-        @NotNull
-        private UserEndpoints userEndpoints;
-
-        @Data
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class Endpoints {
-            @NotNull
-            private String callStoredProcUrl;
-            @NotNull
-            private String repOrderUrl;
-            @NotNull
-            private String updateSendToCCLFUrl;
-            @NotNull
-            private String financialAssessmentUrl;
-        }
-
-        @Data
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class UserEndpoints {
-            @NotNull
-            private String userSummaryUrl;
-        }
-
+        private String registrationId;
     }
 
     @Data
@@ -185,16 +97,7 @@ public class ServicesConfiguration {
         private String baseUrl;
 
         @NotNull
-        private Endpoints endpoints;
-
-        @Data
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class Endpoints {
-            @NotNull
-            private String handleEformUrl;
-
-        }
+        private String registrationId;
     }
 
     @Data
@@ -206,15 +109,6 @@ public class ServicesConfiguration {
         private String baseUrl;
 
         @NotNull
-        private Endpoints endpoints;
-
-        @Data
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class Endpoints {
-
-            @NotNull
-            private String incomeEvidenceUrl;
-        }
+        private String registrationId;
     }
 }

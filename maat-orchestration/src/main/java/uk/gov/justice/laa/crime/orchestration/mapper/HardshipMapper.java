@@ -49,10 +49,8 @@ public class HardshipMapper {
                 .withReviewReason(NewWorkReason.getFrom(current.getNewWorkReason().getCode()))
                 .withNotes(current.getNotes())
                 .withDecisionNotes(current.getDecisionNotes())
-                .withFinancialAssessmentId(
-                        NumberUtils.toInteger(application.getAssessmentDTO().getFinancialAssessmentDTO().getId())
-                )
-                .withHardshipReviewId(NumberUtils.toInteger(current.getId()));
+                .withFinancialAssessmentId(application.getAssessmentDTO().getFinancialAssessmentDTO().getId())
+                .withHardshipReviewId(current.getId());
 
         return new ApiPerformHardshipRequest()
                 .withHardship(hardship)
@@ -133,7 +131,7 @@ public class HardshipMapper {
         } else {
             current = hardshipOverview.getCrownCourtHardship();
         }
-        current.setId(response.getHardshipReviewId().longValue());
+        current.setId(response.getHardshipReviewId());
         current.setReviewResult(response.getReviewResult().name());
         current.setDisposableIncomeAfterHardship(response.getPostHardshipDisposableIncome());
         current.setDisposableIncome(response.getDisposableIncome());
@@ -141,7 +139,7 @@ public class HardshipMapper {
 
     public HardshipReviewDTO findHardshipResponseToHardshipDto(ApiFindHardshipResponse response) {
         return HardshipReviewDTO.builder()
-                .id(response.getId().longValue())
+                .id(response.getId())
                 .reviewResult(response.getReviewResult().toString())
                 .cmuId(response.getCmuId().longValue())
                 .notes(response.getNotes())

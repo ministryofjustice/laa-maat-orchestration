@@ -156,7 +156,7 @@ class MeansAssessmentIntegrationTest {
                 .andExpect(status().isOk());
         assertStubForUpdateCrownCourtApplication(1);
         assertStubForCalculateContributions(1);
-        assertStubForGetContributionsSummary(1);
+        assertStubForGetContributionsSummary(1, TestModelDataBuilder.REP_ID);
         assertStubForInvokeStoredProcedure(4);
     }
 
@@ -227,7 +227,7 @@ class MeansAssessmentIntegrationTest {
                 .andExpect(status().isOk());
         assertStubForUpdateCrownCourtApplication(1);
         assertStubForCalculateContributions(1);
-        assertStubForGetContributionsSummary(1);
+        assertStubForGetContributionsSummary(1, TestModelDataBuilder.REP_ID);
         assertStubForInvokeStoredProcedure(4);
     }
 

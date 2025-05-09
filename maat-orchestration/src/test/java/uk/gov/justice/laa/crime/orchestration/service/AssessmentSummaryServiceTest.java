@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,7 +27,7 @@ class AssessmentSummaryServiceTest {
 
     private HardshipReviewDTO buildHardshipDTO() {
         HardshipReviewDTO hardshipReviewDTO = TestModelDataBuilder.getHardshipReviewDTO();
-        hardshipReviewDTO.setId(Constants.ASSESSMENT_SUMMARY_ID.longValue());
+        hardshipReviewDTO.setId(Constants.ASSESSMENT_SUMMARY_ID);
         hardshipReviewDTO.setReviewDate(Constants.ASSESSMENT_SUMMARY_DATE);
         return hardshipReviewDTO;
     }
@@ -54,14 +55,14 @@ class AssessmentSummaryServiceTest {
         AssessmentSummaryDTO updatedSummary = TestModelDataBuilder.getAssessmentSummaryDTO();
         ApplicationDTO applicationDTO = ApplicationDTO.builder()
                 .assessmentSummary(List.of(AssessmentSummaryDTO.builder()
-                                .id(Constants.ASSESSMENT_SUMMARY_ID.longValue())
+                                .id(Constants.ASSESSMENT_SUMMARY_ID)
                                 .build()
                         )
                 ).build();
         assessmentSummaryService.updateApplication(applicationDTO, updatedSummary);
 
         assertThat(applicationDTO.getAssessmentSummary())
-                .asList()
+                .asInstanceOf(InstanceOfAssertFactories.LIST)
                 .hasSize(1);
 
         assertThat(applicationDTO.getAssessmentSummary().stream().toList().get(0))
@@ -78,7 +79,7 @@ class AssessmentSummaryServiceTest {
         assessmentSummaryService.updateApplication(applicationDTO, newSummary);
 
         assertThat(applicationDTO.getAssessmentSummary())
-                .asList()
+                .asInstanceOf(InstanceOfAssertFactories.LIST)
                 .hasSize(1);
 
         assertThat(applicationDTO.getAssessmentSummary().stream().toList().get(0))

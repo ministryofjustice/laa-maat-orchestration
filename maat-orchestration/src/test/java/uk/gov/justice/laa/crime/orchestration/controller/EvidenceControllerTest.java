@@ -5,19 +5,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.justice.laa.crime.commons.exception.APIClientException;
-import uk.gov.justice.laa.crime.commons.tracing.TraceIdHandler;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.filter.WebClientTestUtils;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.EvidenceOrchestrationService;
+import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -31,7 +33,7 @@ import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWith
 class EvidenceControllerTest {
     private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/evidence/income";
 
-    @MockBean
+    @MockitoBean
     private EvidenceOrchestrationService evidenceOrchestrationService;
 
     @Autowired
@@ -40,7 +42,7 @@ class EvidenceControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private TraceIdHandler traceIdHandler;
 
     @Test
@@ -63,8 +65,11 @@ class EvidenceControllerTest {
     @Test
     void givenWebClientFailure_whenUpdateIsInvoked_thenInternalServerErrorResponseIsReturned() throws Exception {
 
+        WebClientResponseException webClientResponseException =
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
+
         when(evidenceOrchestrationService.updateIncomeEvidence(any(WorkflowRequest.class)))
-                .thenThrow(new APIClientException());
+                .thenThrow(webClientResponseException);
 
         String requestBody = objectMapper
                 .writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
