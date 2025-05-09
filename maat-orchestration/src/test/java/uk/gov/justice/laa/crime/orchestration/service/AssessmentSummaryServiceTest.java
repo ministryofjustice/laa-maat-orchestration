@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -61,7 +62,7 @@ class AssessmentSummaryServiceTest {
         assessmentSummaryService.updateApplication(applicationDTO, updatedSummary);
 
         assertThat(applicationDTO.getAssessmentSummary())
-                .asList()
+                .asInstanceOf(InstanceOfAssertFactories.LIST)
                 .hasSize(1);
 
         assertThat(applicationDTO.getAssessmentSummary().stream().toList().get(0))
@@ -78,7 +79,7 @@ class AssessmentSummaryServiceTest {
         assessmentSummaryService.updateApplication(applicationDTO, newSummary);
 
         assertThat(applicationDTO.getAssessmentSummary())
-                .asList()
+                .asInstanceOf(InstanceOfAssertFactories.LIST)
                 .hasSize(1);
 
         assertThat(applicationDTO.getAssessmentSummary().stream().toList().get(0))
