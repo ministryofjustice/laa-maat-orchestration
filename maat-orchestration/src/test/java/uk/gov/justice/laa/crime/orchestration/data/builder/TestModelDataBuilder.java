@@ -1460,7 +1460,7 @@ public class TestModelDataBuilder {
                 .withChildWeightings(List.of(getAssessmentChildWeighting()))
                 .withDateCompleted(null);
 
-        List incomeEvidenceList = new ArrayList();
+        List<FinancialAssessmentIncomeEvidence> incomeEvidenceList = new ArrayList<>();
         incomeEvidenceList.add(getFinAssIncomeEvidence(APPLICANT_EVIDENCE_ID, NumberUtils.toInteger(APPLICANT_ID), incomeEvidenceType, false));
         if (hasPartnerIncome) {
             incomeEvidenceList.add(getFinAssIncomeEvidence(PARTNER_EVIDENCE_ID, NumberUtils.toInteger(PARTNER_ID), incomeEvidenceType, true));
