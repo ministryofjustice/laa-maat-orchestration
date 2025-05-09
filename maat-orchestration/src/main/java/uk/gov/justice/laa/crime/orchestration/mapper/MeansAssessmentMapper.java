@@ -106,7 +106,7 @@ public class MeansAssessmentMapper {
                 .withIncomeEvidence(mapIncomeEvidence(application))
                 .withRepId(NumberUtils.toInteger(application.getRepId()))
                 .withUserSession(userMapper.userDtoToUserSession(request.getUserDTO()))
-                .withFinancialAssessmentId(NumberUtils.toInteger(financialAssessmentDTO.getId()))
+                .withFinancialAssessmentId(financialAssessmentDTO.getId())
                 .withFullAssessmentDate(toLocalDateTime(fullAssessmentDTO.getAssessmentDate()))
                 .withOtherHousingNote(fullAssessmentDTO.getOtherHousingNote())
                 .withInitTotalAggregatedIncome(BigDecimal.valueOf(initialAssessmentDTO.getTotalAggregatedIncome()))
@@ -280,7 +280,7 @@ public class MeansAssessmentMapper {
     public FinancialAssessmentDTO getMeansAssessmentResponseToFinancialAssessmentDto(
             ApiGetMeansAssessmentResponse apiResponse, int applicantId) {
         return FinancialAssessmentDTO.builder()
-                .id(ofNullable(apiResponse.getId()).map(Integer::longValue).orElse(0L))
+                .id(ofNullable(apiResponse.getId()).orElse(0))
                 .criteriaId(ofNullable(apiResponse.getCriteriaId()).map(Integer::longValue).orElse(0L))
                 .usn(ofNullable(apiResponse.getUsn()).map(Integer::longValue).orElse(0L))
                 .fullAvailable(apiResponse.getFullAvailable())
@@ -530,7 +530,7 @@ public class MeansAssessmentMapper {
             applicationDTO.setTimestamp(toZonedDateTime(apiResponse.getApplicationTimestamp()));
         }
         FinancialAssessmentDTO financialAssessmentDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO();
-        financialAssessmentDTO.setId(ofNullable(apiResponse.getAssessmentId()).map(Integer::longValue).orElse(0L));
+        financialAssessmentDTO.setId(ofNullable(apiResponse.getAssessmentId()).orElse(0));
         financialAssessmentDTO.setTimestamp(toZonedDateTime(apiResponse.getUpdated()));
         financialAssessmentDTO.setDateCompleted(apiResponse.getDateCompleted());
 

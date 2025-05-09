@@ -26,7 +26,7 @@ class AssessmentSummaryServiceTest {
 
     private HardshipReviewDTO buildHardshipDTO() {
         HardshipReviewDTO hardshipReviewDTO = TestModelDataBuilder.getHardshipReviewDTO();
-        hardshipReviewDTO.setId(Constants.ASSESSMENT_SUMMARY_ID.longValue());
+        hardshipReviewDTO.setId(Constants.ASSESSMENT_SUMMARY_ID);
         hardshipReviewDTO.setReviewDate(Constants.ASSESSMENT_SUMMARY_DATE);
         return hardshipReviewDTO;
     }
@@ -54,7 +54,7 @@ class AssessmentSummaryServiceTest {
         AssessmentSummaryDTO updatedSummary = TestModelDataBuilder.getAssessmentSummaryDTO();
         ApplicationDTO applicationDTO = ApplicationDTO.builder()
                 .assessmentSummary(List.of(AssessmentSummaryDTO.builder()
-                                .id(Constants.ASSESSMENT_SUMMARY_ID.longValue())
+                                .id(Constants.ASSESSMENT_SUMMARY_ID)
                                 .build()
                         )
                 ).build();

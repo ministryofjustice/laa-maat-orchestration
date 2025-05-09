@@ -24,5 +24,5 @@ public interface HardshipApiClient {
   ApiPerformHardshipResponse updateHardshipReview(@RequestBody ApiPerformHardshipRequest request);
 
   @PatchExchange("/{hardshipReviewId}")
-  void rollback(@PathVariable Long hardshipReviewId);
+  void rollback(@PathVariable Integer hardshipReviewId);
 }

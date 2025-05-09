@@ -38,7 +38,7 @@ public class HardshipApiService {
         return response;
     }
 
-    public void rollback(Long hardshipReviewId) {
+    public void rollback(Integer hardshipReviewId) {
         log.info(REQUEST_STRING, hardshipReviewId);
         hardshipApiClient.rollback(hardshipReviewId);
     }

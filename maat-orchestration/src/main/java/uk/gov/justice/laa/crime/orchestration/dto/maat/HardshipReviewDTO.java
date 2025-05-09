@@ -15,7 +15,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class HardshipReviewDTO extends GenericDTO {
 
-    private Long id;
+    private Integer id;
     private SupplierDTO supplier;
     private NewWorkReasonDTO newWorkReason;
     private Long cmuId;

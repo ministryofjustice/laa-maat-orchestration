@@ -21,7 +21,7 @@ class ApplicationTrackingDataServiceTest {
     private ApplicationTrackingDataService applicationTrackingDataService;
 
     @Test
-    void givenAValidInput_whenHandleCrimeApplyResultIsInvoked_thenApplicationTrackingApiServiceIsCalled() {
+    void givenAValidInput_whenSendTrackingOutputResultIsInvoked_thenApplicationTrackingApiServiceIsCalled() {
         applicationTrackingDataService.sendTrackingOutputResult(new ApplicationTrackingOutputResult());
         verify(applicationTrackingApiService).sendTrackingOutputResult(any(ApplicationTrackingOutputResult.class));
     }

@@ -46,7 +46,7 @@ class HardshipApiServiceTest {
 
     @Test
     void givenValidHardshipDto_whenRollbackIsInvoked_thenHardshipIsPersisted() {
-        hardshipApiService.rollback(Constants.HARDSHIP_REVIEW_ID.longValue());
-        verify(hardshipApiClient).rollback(anyLong());
+        hardshipApiService.rollback(Constants.HARDSHIP_REVIEW_ID);
+        verify(hardshipApiClient).rollback(anyInt());
     }
 }

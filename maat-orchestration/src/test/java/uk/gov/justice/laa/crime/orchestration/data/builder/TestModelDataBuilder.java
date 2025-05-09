@@ -412,7 +412,7 @@ public class TestModelDataBuilder {
 
     public static AssessmentSummaryDTO getAssessmentSummaryDTO() {
         return AssessmentSummaryDTO.builder()
-                .id(Constants.ASSESSMENT_SUMMARY_ID.longValue())
+                .id(Constants.ASSESSMENT_SUMMARY_ID)
                 .status(AssessmentStatusDTO.COMPLETE)
                 .result(ReviewResult.PASS.getResult())
                 .assessmentDate(Constants.ASSESSMENT_SUMMARY_DATE)
@@ -777,7 +777,7 @@ public class TestModelDataBuilder {
 
     private static FinancialAssessmentDTO getFinancialAssessmentDTO(CourtType courtType) {
         return FinancialAssessmentDTO.builder()
-                .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
+                .id(Constants.FINANCIAL_ASSESSMENT_ID)
                 .full(getFullAssessmentDTO())
                 .fullAvailable(Boolean.TRUE)
                 .initial(getInitialAssessmentDTO())
@@ -788,7 +788,7 @@ public class TestModelDataBuilder {
 
     public static FinancialAssessmentDTO getFinancialAssessmentDTO() {
         return FinancialAssessmentDTO.builder()
-                .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
+                .id(Constants.FINANCIAL_ASSESSMENT_ID)
                 .full(getFullAssessmentDTO())
                 .fullAvailable(Boolean.FALSE)
                 .initial(getInitialAssessmentDTO())
@@ -869,7 +869,7 @@ public class TestModelDataBuilder {
 
     public static HardshipReviewDTO getHardshipReviewDTO() {
         return HardshipReviewDTO.builder()
-                .id(Constants.HARDSHIP_REVIEW_ID.longValue())
+                .id(Constants.HARDSHIP_REVIEW_ID)
                 .cmuId(CMU_ID.longValue())
                 .disposableIncome(Constants.DISPOSABLE_INCOME)
                 .reviewResult(Constants.HARDSHIP_REVIEW_RESULT)
@@ -1310,7 +1310,7 @@ public class TestModelDataBuilder {
 
     public static AssessmentSummaryDTO getAssessmentSummaryDTOFromFullFinancialAssessment() {
         return AssessmentSummaryDTO.builder()
-                .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
+                .id(Constants.FINANCIAL_ASSESSMENT_ID)
                 .status(CurrentStatus.COMPLETE.getDescription())
                 .type("Full Means Test")
                 .result(RESULT_PASS)
@@ -1321,7 +1321,7 @@ public class TestModelDataBuilder {
 
     public static AssessmentSummaryDTO getAssessmentSummaryDTOFromInitFinancialAssessment() {
         return AssessmentSummaryDTO.builder()
-                .id(Constants.FINANCIAL_ASSESSMENT_ID.longValue())
+                .id(Constants.FINANCIAL_ASSESSMENT_ID)
                 .status(CurrentStatus.COMPLETE.getDescription())
                 .type("Initial Assessment")
                 .result(RESULT_FAIL)

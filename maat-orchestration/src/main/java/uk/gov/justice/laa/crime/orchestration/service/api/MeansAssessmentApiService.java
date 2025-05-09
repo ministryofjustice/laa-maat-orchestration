@@ -36,7 +36,7 @@ public class MeansAssessmentApiService {
         return response;
     }
 
-    public ApiRollbackMeansAssessmentResponse rollback(Long financialAssessmentId) {
+    public ApiRollbackMeansAssessmentResponse rollback(Integer financialAssessmentId) {
         log.info(REQUEST_STRING, financialAssessmentId);
         ApiRollbackMeansAssessmentResponse response = cmaApiClient.rollback(financialAssessmentId);
         log.info(RESPONSE_STRING, response);

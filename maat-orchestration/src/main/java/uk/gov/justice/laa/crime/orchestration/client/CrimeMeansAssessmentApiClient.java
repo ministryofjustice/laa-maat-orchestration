@@ -26,5 +26,5 @@ public interface CrimeMeansAssessmentApiClient {
   ApiMeansAssessmentResponse updateMeansAssessment(@RequestBody ApiUpdateMeansAssessmentRequest request);
 
   @PatchExchange("/rollback/{financialAssessmentId}")
-  ApiRollbackMeansAssessmentResponse rollback(@PathVariable Long financialAssessmentId);
+  ApiRollbackMeansAssessmentResponse rollback(@PathVariable Integer financialAssessmentId);
 }

@@ -72,7 +72,7 @@ public class IncomeEvidenceMapper {
                 : initialAssessment.getSectionSummaries().stream().flatMap(section -> section.getAssessmentDetail().stream()).toList();
 
         MaatApiUpdateAssessment updateAssessment = new MaatApiUpdateAssessment()
-                .withFinancialAssessmentId(NumberUtils.toInteger(application.getAssessmentDTO().getFinancialAssessmentDTO().getId()))
+                .withFinancialAssessmentId(application.getAssessmentDTO().getFinancialAssessmentDTO().getId())
                 .withUserModified(workflowRequest.getUserDTO().getUserName())
                 .withFinAssIncomeEvidences(getIncomeEvidences(workflowRequest, repOrder, evidenceResponse))
                 .withLaaTransactionId(UUID.randomUUID().toString())
