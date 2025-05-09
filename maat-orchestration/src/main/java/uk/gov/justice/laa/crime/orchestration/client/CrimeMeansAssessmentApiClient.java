@@ -19,10 +19,10 @@ public interface CrimeMeansAssessmentApiClient {
   @GetExchange("/{financialAssessmentId}")
   ApiGetMeansAssessmentResponse findMeansAssessment(@PathVariable Integer financialAssessmentId);
 
-  @PostExchange()
+  @PostExchange
   ApiMeansAssessmentResponse createMeansAssessment(@RequestBody ApiCreateMeansAssessmentRequest request);
 
-  @PutExchange()
+  @PutExchange
   ApiMeansAssessmentResponse updateMeansAssessment(@RequestBody ApiUpdateMeansAssessmentRequest request);
 
   @PatchExchange("/rollback/{financialAssessmentId}")

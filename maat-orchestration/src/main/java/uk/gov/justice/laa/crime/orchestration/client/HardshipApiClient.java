@@ -17,10 +17,10 @@ public interface HardshipApiClient {
   @GetExchange("/{hardshipReviewId}")
   ApiFindHardshipResponse getHardshipReview(@PathVariable Integer hardshipReviewId);
 
-  @PostExchange("")
+  @PostExchange
   ApiPerformHardshipResponse createHardshipReview(@RequestBody ApiPerformHardshipRequest request);
 
-  @PutExchange("")
+  @PutExchange
   ApiPerformHardshipResponse updateHardshipReview(@RequestBody ApiPerformHardshipRequest request);
 
   @PatchExchange("/{hardshipReviewId}")
