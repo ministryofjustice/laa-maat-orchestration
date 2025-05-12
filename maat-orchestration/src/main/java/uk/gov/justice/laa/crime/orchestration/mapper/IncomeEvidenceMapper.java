@@ -1,7 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.Nullable;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.evidence.*;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.FinancialAssessmentIncomeEvidence;
@@ -72,7 +72,7 @@ public class IncomeEvidenceMapper {
                 : initialAssessment.getSectionSummaries().stream().flatMap(section -> section.getAssessmentDetail().stream()).toList();
 
         MaatApiUpdateAssessment updateAssessment = new MaatApiUpdateAssessment()
-                .withFinancialAssessmentId(NumberUtils.toInteger(application.getAssessmentDTO().getFinancialAssessmentDTO().getId()))
+                .withFinancialAssessmentId(application.getAssessmentDTO().getFinancialAssessmentDTO().getId())
                 .withUserModified(workflowRequest.getUserDTO().getUserName())
                 .withFinAssIncomeEvidences(getIncomeEvidences(workflowRequest, repOrder, evidenceResponse))
                 .withLaaTransactionId(UUID.randomUUID().toString())

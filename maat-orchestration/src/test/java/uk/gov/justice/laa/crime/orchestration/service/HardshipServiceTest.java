@@ -69,8 +69,8 @@ class HardshipServiceTest {
         HardshipReviewDTO hardshipReviewDTO = TestModelDataBuilder.getHardshipReviewDTO();
         when(hardshipMapper.getHardshipReviewDTO(any(ApplicationDTO.class), any(CourtType.class)))
                 .thenReturn(hardshipReviewDTO);
-        doNothing().when(hardshipApiService).rollback(Constants.HARDSHIP_REVIEW_ID.longValue());
+        doNothing().when(hardshipApiService).rollback(Constants.HARDSHIP_REVIEW_ID);
         hardshipService.rollback(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
-        verify(hardshipApiService).rollback(Constants.HARDSHIP_REVIEW_ID.longValue());
+        verify(hardshipApiService).rollback(Constants.HARDSHIP_REVIEW_ID);
     }
 }

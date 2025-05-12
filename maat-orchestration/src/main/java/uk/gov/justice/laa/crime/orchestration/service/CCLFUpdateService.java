@@ -3,7 +3,6 @@ package uk.gov.justice.laa.crime.orchestration.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
@@ -11,8 +10,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.SendToCCLFDTO;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -74,15 +71,6 @@ public class CCLFUpdateService {
                     .applId(applicationDto.getApplicantDTO().getId())
                     .applHistoryId(applicationDto.getApplicantDTO().getApplicantHistoryId()).build();
             maatCourtDataApiService.updateSendToCCLF(sendToCCLFDTO);
-        }
-    }
-
-    public Date parseDate(String dateString) {
-        if (dateString == null) return null;
-        try {
-            return new SimpleDateFormat("yyyy-MM-dd").parse(dateString);
-        } catch (ParseException e) {
-            throw new APIClientException("Invalid date format");
         }
     }
 
