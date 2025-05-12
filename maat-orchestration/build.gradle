@@ -20,7 +20,7 @@ def versions = [
 		commonsModSchemas       : "1.36.0",
 		crimeCommonsClasses     : "4.9.0",
 		commonsRestClient       : "3.20.0",
-		wmStubRunnerVersion    	: "4.2.0",
+		wmStubRunnerVersion    	: "4.2.1",
 		oauth2ResourceServer    : "3.4.1",
 		securityCrypto          : "6.4.4",
 		resilience4jVersion     : "2.2.0",
