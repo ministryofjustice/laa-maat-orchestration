@@ -22,7 +22,7 @@ def versions = [
 		commonsRestClient       : "3.20.0",
 		wmStubRunnerVersion    	: "4.2.0",
 		oauth2ResourceServer    : "3.4.1",
-		securityCrypto          : "6.4.4",
+		securityCrypto          : "6.4.6",
 		resilience4jVersion     : "2.2.0",
 		commonsLang3Version		: "3.17.0"
 ]
