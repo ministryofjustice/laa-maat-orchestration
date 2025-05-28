@@ -68,6 +68,11 @@ ingress:
     external-dns.alpha.kubernetes.io/set-identifier: "laa-maat-orchestration-laa-maat-orchestration-prod-green"
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-max-age: "300"
+    nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+    nginx.ingress.kubernetes.io/modsecurity-snippet: |
+      SecAuditEngine On
+      SecRuleEngine DetectionOnly
+      SecDefaultAction "phase:2,pass,log,tag:github_team=laa-crime-apps-team,tag:namespace=laa-maat-orchestration-prod"
   externalAnnotations: {}
   internalHost:
     host: laa-maat-orchestration-prod.apps.live.cloud-platform.service.justice.gov.uk
@@ -78,7 +83,7 @@ ingress:
       swaggerPath: /open-api/swagger-ui
       openApiPath: /open-api/api-docs
   tls: []
-  className: default
+  className: modsec
 
 autoscaling:
   enabled: false
