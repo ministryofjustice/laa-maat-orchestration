@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class FinancialAssessmentDTO extends GenericDTO {
-    private Long id;
+    private Integer id;
     private Long criteriaId;
     private InitialAssessmentDTO initial;
     private FullAssessmentDTO full;

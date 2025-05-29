@@ -22,35 +22,31 @@ jwt:
   issuerUri: https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_ZaFnb3kFD
 
 maatApi:
-  baseUrl: https://maat-cd-api.uat.legalservices.gov.uk
+  baseUrl: https://maat-cd-api.uat.legalservices.gov.uk/api/internal/v1
   oauthUrl: https://maat-cd-api-uat.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 hardshipApi:
-  baseUrl: http://laa-crime-hardship.laa-crime-hardship-uat.svc.cluster.local
+  baseUrl: http://laa-crime-hardship.laa-crime-hardship-uat.svc.cluster.local/api/internal/v1/hardship
   oauthUrl: https://laa-crime-auth-hardship.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 cccApi:
-  baseUrl: http://laa-crown-court-contribution.laa-crown-court-contribution-uat.svc.cluster.local
+  baseUrl: http://laa-crown-court-contribution.laa-crown-court-contribution-uat.svc.cluster.local/api/internal/v1/contribution
   oauthUrl: https://laa-crime-auth-ccc.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 ccpApi:
-  baseUrl: http://laa-crown-court-proceeding.laa-crown-court-proceeding-uat.svc.cluster.local
+  baseUrl: http://laa-crown-court-proceeding.laa-crown-court-proceeding-uat.svc.cluster.local/api/internal/v1/proceedings
   oauthUrl: https://laa-crime-auth-ccp.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 cmaApi:
-  baseUrl: http://laa-crime-means-assessment.laa-crime-means-assessment-uat.svc.cluster.local
+  baseUrl: http://laa-crime-means-assessment.laa-crime-means-assessment-uat.svc.cluster.local/api/internal/v1/assessment/means
   oauthUrl: https://laa-crime-auth-cma.auth.eu-west-2.amazoncognito.com/oauth2/token
 
-validationApi:
-  baseUrl: https://laa-crime-validation-uat.apps.live.cloud-platform.service.justice.gov.uk
-  oauthUrl: https://laa-crime-auth-validation.auth.eu-west-2.amazoncognito.com/oauth2/token
-
 catApi:
-  baseUrl: http://laa-crime-application-tracking-service.laa-crime-application-tracking-service-uat.svc.cluster.local
+  baseUrl: http://laa-crime-application-tracking-service.laa-crime-application-tracking-service-uat.svc.cluster.local/api/internal/v1
   oauthUrl: https://laa-crime-auth-ats.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 evidenceApi:
-  baseUrl: http://laa-crime-evidence.laa-crime-evidence-uat.svc.cluster.local
+  baseUrl: http://laa-crime-evidence.laa-crime-evidence-uat.svc.cluster.local/api/internal/v1/evidence/evidence
   oauthUrl: https://laa-crime-auth-evidence.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 serviceAccount:
@@ -72,6 +68,11 @@ ingress:
     external-dns.alpha.kubernetes.io/set-identifier: "laa-maat-orchestration-laa-maat-orchestration-uat-green"
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-max-age: "300"
+    nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+    nginx.ingress.kubernetes.io/modsecurity-snippet: |
+      SecAuditEngine On
+      SecRuleEngine DetectionOnly
+      SecDefaultAction "phase:2,pass,log,tag:github_team=laa-crime-apps-team,tag:namespace=laa-maat-orchestration-uat"
   externalAnnotations: {}
   internalHost:
     host: laa-maat-orchestration-uat.apps.live.cloud-platform.service.justice.gov.uk
@@ -82,7 +83,7 @@ ingress:
       swaggerPath: /open-api/swagger-ui
       openApiPath: /open-api/api-docs
   tls: []
-  className: default
+  className: modsec-non-prod
 
 autoscaling:
   enabled: false

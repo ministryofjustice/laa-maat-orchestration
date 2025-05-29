@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.commons.exception.APIClientException;
 import uk.gov.justice.laa.crime.enums.AppealType;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.exception.ValidationException;
@@ -16,8 +15,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -182,25 +179,6 @@ class CCLFUpdateServiceTest {
         ApplicationDTO applicationDTO = TestModelDataBuilder.buildWorkFlowRequest().getApplicationDTO();
         applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().setCcRepOrderDate(null);
         assertThat(cclfUpdateService.getRepOrderDate(applicationDTO)).isNull();
-    }
-
-    @Test
-    void parseValidDate() throws ParseException {
-        String date = "2023-01-01";
-        Date result = cclfUpdateService.parseDate(date);
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        Date expected = format.parse(date);
-        assertThat(expected).isEqualTo(result);
-    }
-
-    @Test()
-    void parseInvalidFormat() {
-        assertThatThrownBy(() -> cclfUpdateService.parseDate("invalid")).isInstanceOf(APIClientException.class);
-    }
-
-    @Test()
-    void parseNullDate() {
-        assertThat(cclfUpdateService.parseDate(null)).isNull();
     }
 
     @Test

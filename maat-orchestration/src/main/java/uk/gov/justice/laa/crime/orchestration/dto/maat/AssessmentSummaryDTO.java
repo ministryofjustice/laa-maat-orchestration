@@ -12,7 +12,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class AssessmentSummaryDTO extends GenericDTO {
-    private Long id;
+    private Integer id;
     private Date assessmentDate;
     private String type;
     private String reviewType;

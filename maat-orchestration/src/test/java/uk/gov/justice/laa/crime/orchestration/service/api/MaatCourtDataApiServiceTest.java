@@ -6,12 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
-import uk.gov.justice.laa.crime.commons.client.RestAPIClient;
-import uk.gov.justice.laa.crime.orchestration.config.MockServicesConfiguration;
-import uk.gov.justice.laa.crime.orchestration.config.ServicesConfiguration;
+import uk.gov.justice.laa.crime.orchestration.client.MaatCourtDataApiClient;
 import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.SendToCCLFDTO;
 
@@ -22,53 +19,45 @@ import static org.mockito.Mockito.verify;
 class MaatCourtDataApiServiceTest {
 
     @Mock
-    private RestAPIClient cmaApiClient;
+    private MaatCourtDataApiClient maatCourtDataApiClient;
 
     @InjectMocks
     private MaatCourtDataApiService maatCourtDataApiService;
 
-    @Spy
-    private ServicesConfiguration configuration = MockServicesConfiguration.getConfiguration(1000);
-
     @Test
     void givenValidRequest_whenExecuteStoredProcedureIsInvoked_thenApplicationIsReturned() {
         maatCourtDataApiService.executeStoredProcedure(new StoredProcedureRequest());
-        verify(cmaApiClient)
-                .post(any(StoredProcedureRequest.class), any(), anyString(), anyMap());
+        verify(maatCourtDataApiClient).executeStoredProcedure(any(StoredProcedureRequest.class));
     }
 
     @Test
     void givenValidRequest_whenGetRepOrderByRepIdIsInvoked_thenRepOrderDTOIsReturned() {
         maatCourtDataApiService.getRepOrderByRepId(1000);
-        verify(cmaApiClient)
-                .get(any(), any(), anyInt());
+        verify(maatCourtDataApiClient).getRepOrderByRepId(anyInt());
     }
 
     @Test
     void givenValidRequest_whenGetUserSummaryIsInvoked_thenUserSummaryDTOIsReturned() {
         maatCourtDataApiService.getUserSummary("test");
-        verify(cmaApiClient)
-                .get(any(), any(), anyString());
+        verify(maatCourtDataApiClient).getUserSummary(anyString());
     }
 
     @Test
     void givenValidRequest_whenUpdateSendToCCLFIsInvoked_thenApplicationDTOIsReturned() {
         maatCourtDataApiService.updateSendToCCLF(SendToCCLFDTO.builder().build());
-        verify(cmaApiClient)
-                .put(any(), any(), anyString(), anyMap());
+        verify(maatCourtDataApiClient).updateSendToCCLF(any(SendToCCLFDTO.class));
     }
 
     @Test
     void givenValidRequest_whenGetFinancialAssessmentIsInvoked_thenFinancialAssessmentDTOIsReturned() {
         maatCourtDataApiService.getFinancialAssessment(1000);
-        verify(cmaApiClient)
-                .get(any(), any(), anyInt());
+        verify(maatCourtDataApiClient).getFinancialAssessment(anyInt());
     }
 
     @Test
     void givenValidRequest_whenUpdateFinancialAssessmentIsInvoked_thenMaatApiAssessmentResponseIsReturned() {
         maatCourtDataApiService.updateFinancialAssessment(new MaatApiUpdateAssessment());
-        verify(cmaApiClient).put(any(MaatApiUpdateAssessment.class), any(), any(), any());
+        verify(maatCourtDataApiClient).updateFinancialAssessment(any(MaatApiUpdateAssessment.class));
     }
 
     @Test
@@ -78,6 +67,6 @@ class MaatCourtDataApiServiceTest {
         Map<String, Object> fieldsToUpdate = Map.of("dateModified", dateModified);
 
         maatCourtDataApiService.patchRepOrder(1234, fieldsToUpdate);
-        verify(cmaApiClient).patch(eq(fieldsToUpdate), any(), anyString(), anyMap(), eq(repOrderId));
+        verify(maatCourtDataApiClient).patchRepOrder(eq(repOrderId), anyMap());
     }
 }

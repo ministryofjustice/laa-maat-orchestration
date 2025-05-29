@@ -709,7 +709,7 @@ public class MeansAssessmentDataBuilder {
 
     public static FinancialAssessmentDTO getFinancialAssessmentDto() {
         return FinancialAssessmentDTO.builder()
-                .id(FINANCIAL_ASSESSMENT_ID.longValue())
+                .id(FINANCIAL_ASSESSMENT_ID)
                 .criteriaId(CRITERIA_ID.longValue())
                 .usn(USN.longValue())
                 .fullAvailable(true)
