@@ -49,7 +49,7 @@ dependencies {
 	implementation "uk.gov.justice.service.laa-crime:crime-commons-mod-schemas:$versions.commonsModSchemas"
 
 	implementation "org.apache.tomcat.embed:tomcat-embed-core"
-	implementation "org.apache.commons:commons-lang3"
+	implementation "org.apache.commons:commons-lang3:$versions.commonsLang3Version"
 	implementation "io.micrometer:micrometer-registry-prometheus"
 	implementation 'io.micrometer:micrometer-tracing'
 	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
