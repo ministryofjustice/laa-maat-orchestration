@@ -49,6 +49,7 @@ dependencies {
 	implementation "uk.gov.justice.service.laa-crime:crime-commons-mod-schemas:$versions.commonsModSchemas"
 
 	implementation "org.apache.tomcat.embed:tomcat-embed-core"
+	implementation "org.apache.commons:commons-lang3"
 	implementation "io.micrometer:micrometer-registry-prometheus"
 	implementation 'io.micrometer:micrometer-tracing'
 	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
@@ -73,7 +74,6 @@ dependencies {
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
 	testImplementation "org.pitest:pitest:$versions.pitest"
-	testImplementation "org.springframework.security:spring-security-test"
 	testImplementation "org.springframework.cloud:spring-cloud-starter-contract-stub-runner:$versions.wmStubRunnerVersion"
 
 	testCompileOnly "org.projectlombok:lombok"
