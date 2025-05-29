@@ -21,7 +21,7 @@ def versions = [
 		crimeCommonsClasses     : "4.9.0",
 		commonsRestClient       : "3.20.0",
 		wmStubRunnerVersion    	: "4.2.0",
-		resilience4jVersion     : "2.2.0",
+		resilience4jVersion     : "2.3.0",
 		commonsLang3Version		: "3.17.0",
 		springSecurityCore      : "6.4.6"
 ]
