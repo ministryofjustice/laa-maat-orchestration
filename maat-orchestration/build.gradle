@@ -21,8 +21,6 @@ def versions = [
 		crimeCommonsClasses     : "4.9.0",
 		commonsRestClient       : "3.20.0",
 		wmStubRunnerVersion    	: "4.2.0",
-		oauth2ResourceServer    : "3.4.1",
-		securityCrypto          : "6.4.6",
 		resilience4jVersion     : "2.2.0",
 		commonsLang3Version		: "3.17.0",
 		springSecurityCore      : "6.4.6"
@@ -50,7 +48,7 @@ dependencies {
 	implementation "uk.gov.justice.service.laa-crime:crime-commons-classes:$versions.crimeCommonsClasses"
 	implementation "uk.gov.justice.service.laa-crime:crime-commons-mod-schemas:$versions.commonsModSchemas"
 
-	implementation "org.apache.tomcat.embed:tomcat-embed-core:11.0.7"
+	implementation "org.apache.tomcat.embed:tomcat-embed-core"
 	implementation "org.apache.commons:commons-lang3:$versions.commonsLang3Version"
 	implementation "io.micrometer:micrometer-registry-prometheus"
 	implementation 'io.micrometer:micrometer-tracing'
@@ -62,10 +60,10 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-web"
 	implementation "org.springframework.boot:spring-boot-starter-webflux"
 	implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
-	implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:$versions.oauth2ResourceServer"
+	implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
 	implementation "org.springframework.boot:spring-boot-starter-security"
 	implementation "org.springframework.boot:spring-boot-starter-validation"
-	implementation "org.springframework.security:spring-security-crypto:$versions.securityCrypto"
+	implementation "org.springframework.security:spring-security-crypto"
 	implementation "org.springframework.security:spring-security-core:$versions.springSecurityCore"
 
 	implementation "io.github.resilience4j:resilience4j-reactor:$versions.resilience4jVersion"
@@ -76,7 +74,6 @@ dependencies {
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
 	testImplementation "org.pitest:pitest:$versions.pitest"
-	testImplementation "org.springframework.security:spring-security-test"
 	testImplementation "org.springframework.cloud:spring-cloud-starter-contract-stub-runner:$versions.wmStubRunnerVersion"
 
 	testCompileOnly "org.projectlombok:lombok"
