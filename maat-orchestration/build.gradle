@@ -1,7 +1,7 @@
 plugins {
 	id "java"
 	id "jacoco"
-	id "org.sonarqube" version "5.0.0.4638"
+	id "org.sonarqube" version "6.2.0.5505"
 	id "info.solidsoft.pitest" version "1.15.0"
 	id "org.springframework.boot" version "3.4.6"
 	id "io.spring.dependency-management" version "1.1.7"
@@ -16,12 +16,12 @@ java {
 
 def versions = [
 		pitest                  : "1.16.1",
-		springdocVersion        : "2.5.0",
+		springdocVersion        : "2.8.8",
 		commonsModSchemas       : "1.36.0",
 		crimeCommonsClasses     : "4.9.0",
 		commonsRestClient       : "3.20.0",
-		wmStubRunnerVersion    	: "4.2.0",
-		resilience4jVersion     : "2.2.0",
+		wmStubRunnerVersion    	: "4.2.1",
+		resilience4jVersion     : "2.3.0",
 		commonsLang3Version		: "3.17.0",
 		springSecurityCore      : "6.4.6"
 ]
