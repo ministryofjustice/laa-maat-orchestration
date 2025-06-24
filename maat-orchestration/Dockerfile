@@ -1,4 +1,4 @@
-FROM amazoncorretto:17-alpine
+FROM amazoncorretto:21-alpine
 RUN mkdir -p /opt/laa-maat-orchestration/
 WORKDIR /opt/laa-maat-orchestration/
 COPY ./build/libs/maat-orchestration.jar /opt/laa-maat-orchestration/app.jar
