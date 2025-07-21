@@ -23,7 +23,7 @@ def versions = [
 		wmStubRunnerVersion    	: "4.2.1",
 		resilience4jVersion     : "2.3.0",
 		commonsLang3Version		: "3.17.0",
-		springSecurityCore      : "6.4.6"
+		springSecurityCore      : "6.5.2"
 ]
 
 configurations {
