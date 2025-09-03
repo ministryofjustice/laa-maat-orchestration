@@ -112,3 +112,11 @@ actuator:
 
 logging:
   level: DEBUG
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
