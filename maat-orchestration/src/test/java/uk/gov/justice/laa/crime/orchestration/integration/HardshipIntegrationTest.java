@@ -1,50 +1,53 @@
 package uk.gov.justice.laa.crime.orchestration.integration;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.patchRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForCalculateContributions;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForCheckContributionsRule;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForGetContributionsSummary;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForInvokeStoredProcedure;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCalculateContributions;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCheckContributionsRule;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetContributionsSummary;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetRepOrders;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
+import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
+import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.web.FilterChainProxy;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
-import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 
-import java.util.List;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.*;
-import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
-import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
-
-@DirtiesContext
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Import(OrchestrationTestConfiguration.class)
-@SpringBootTest(classes = OrchestrationTestConfiguration.class, webEnvironment = DEFINED_PORT)
-@AutoConfigureWireMock(port = 9999)
-@AutoConfigureObservability
-class HardshipIntegrationTest {
+class HardshipIntegrationTest extends WiremockIntegrationTest {
     private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/hardship";
     private static final List<String> UPDATE_ROLE_ACTIONS = List.of(Action.UPDATE_MAGS_HARDSHIP.getCode(), Action.UPDATE_CROWN_HARDSHIP.getCode());
     private static final List<String> CREATE_ROLE_ACTIONS = List.of(Action.CREATE_CROWN_HARDSHIP.getCode(), Action.CREATE_MAGS_HARDSHIP.getCode());
@@ -60,16 +63,13 @@ class HardshipIntegrationTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @Autowired
-    private WireMockServer wiremock;
-
     @AfterEach
     void clean() {
         wiremock.resetAll();
     }
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.mvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
                 .addFilter(springSecurityFilterChain).build();
     }

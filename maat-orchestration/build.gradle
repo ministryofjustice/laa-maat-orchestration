@@ -73,8 +73,9 @@ dependencies {
 	annotationProcessor "org.projectlombok:lombok"
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
-	testImplementation "org.pitest:pitest:$versions.pitest"
-	testImplementation "org.springframework.cloud:spring-cloud-starter-contract-stub-runner:$versions.wmStubRunnerVersion"
+	// ---- Testing ----
+	testImplementation "org.springframework.boot:spring-boot-starter-test"
+	testImplementation "org.wiremock.integrations:wiremock-spring-boot:$versions.wiremock"
 
 	testCompileOnly "org.projectlombok:lombok"
 	testAnnotationProcessor "org.projectlombok:lombok"
