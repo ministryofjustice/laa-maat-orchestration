@@ -132,7 +132,7 @@ sonar {
 	properties {
 		property "sonar.exclusions", "**/dto/**.java , **/model/**.java, **/config/**.java, **/enums/**.java, **/exception/**.java"
 		property "sonar.coverage.exclusions", "**/MAATOrchestrationApplication.java, **/model/**.java"
-		property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+		property layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml").get().asFile.absolutePath
 		property "sonar.projectKey", "ministryofjustice_laa-maat-orchestration"
 		property "sonar.organization", "ministryofjustice"
 		property "sonar.host.url", "https://sonarcloud.io"
