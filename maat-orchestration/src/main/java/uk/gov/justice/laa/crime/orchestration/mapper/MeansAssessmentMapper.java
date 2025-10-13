@@ -3,6 +3,7 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.meansassessment.*;
 import uk.gov.justice.laa.crime.enums.*;
@@ -221,7 +222,7 @@ public class MeansAssessmentMapper {
 
     private boolean isPartnerContraryInterest(ApplicationDTO application) {
         return application.getPartnerContraryInterestDTO() != null &&
-                !StringUtils.equals(ContraryInterestDTO.NO_CONTRARY_INTEREST,
+                !Strings.CI.equals(ContraryInterestDTO.NO_CONTRARY_INTEREST,
                                     application.getPartnerContraryInterestDTO().getCode()
                 );
     }
