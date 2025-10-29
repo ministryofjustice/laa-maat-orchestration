@@ -28,6 +28,7 @@ import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 
 import java.util.List;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.*;
+import static uk.gov.justice.laa.crime.util.FileUtils.readFileToString;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
@@ -48,6 +50,7 @@ class HardshipIntegrationTest {
     private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/hardship";
     private static final List<String> UPDATE_ROLE_ACTIONS = List.of(Action.UPDATE_MAGS_HARDSHIP.getCode(), Action.UPDATE_CROWN_HARDSHIP.getCode());
     private static final List<String> CREATE_ROLE_ACTIONS = List.of(Action.CREATE_CROWN_HARDSHIP.getCode(), Action.CREATE_MAGS_HARDSHIP.getCode());
+    private static final String PATH_TO_HARDSHIP_VALIDATION_JSON = "response/hardship_400_validation_response.json";
 
     private MockMvc mvc;
 
@@ -220,6 +223,25 @@ class HardshipIntegrationTest {
         verify(exactly(0), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
     }
 
+    @Test
+    void givenInvalidHardshipData_whenCreateIsInvoked_thenResponseContainsValidationErrors() throws Exception {
+        String errorResponse = readFileToString(PATH_TO_HARDSHIP_VALIDATION_JSON);
+        stubForOAuth();
+        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTOWithAssessorName()));
+        stubForGetUserSummary(objectMapper.writeValueAsString(TestModelDataBuilder.getUserSummaryDTO(CREATE_ROLE_ACTIONS, NewWorkReason.NEW)));
+        wiremock.stubFor(post(urlMatching("/api/internal/v1/hardship"))
+            .willReturn(
+                aResponse().
+                    withStatus(400).withBody(errorResponse).withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+            ));
+        String requestBody = objectMapper
+            .writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithCCHardship(CourtType.CROWN_COURT));
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
+            .andExpect(status().is4xxClientError())
+            .andExpect(jsonPath("$.message")
+                .value(TestModelDataBuilder.getHardshipValidationMessage()));
+
+    }
 
 
     private void stubForUpdateHardship() throws JsonProcessingException {

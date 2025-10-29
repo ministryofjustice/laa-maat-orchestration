@@ -126,6 +126,8 @@ public class TestModelDataBuilder {
     private static final List<String> TEST_NEW_WORK_REASONS = List.of(NEW_WORK_REASON_STRING);
     private static final Integer TEST_RECORD_ID = 100;
     private static final LocalDateTime RESERVATION_DATE = LocalDateTime.of(2022, 12, 14, 0, 0, 0);
+    private static final String HARDSHIP_VALIDATION_MESSAGE =
+        "Amount, Frequency, and Reason must be entered for each detail in section Credit/Store Card Payment";
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
         return new ApiFindHardshipResponse()
@@ -1525,5 +1527,9 @@ public class TestModelDataBuilder {
                 .withId(1234)
                 .withChildWeightingId(37)
                 .withNoOfChildren(1);
+    }
+
+    public static String getHardshipValidationMessage() {
+        return HARDSHIP_VALIDATION_MESSAGE;
     }
 }
