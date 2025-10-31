@@ -1,39 +1,49 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
-import org.assertj.core.api.SoftAssertions;
-import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
-import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
+
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.enums.*;
+import uk.gov.justice.laa.crime.enums.AppealType;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AppealDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AppealTypeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CaseDetailDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtOverviewDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.OffenceDTO;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
-import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
-import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
+import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
+import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class ContributionMapperTest {
 
     ContributionMapper contributionMapper = new ContributionMapper();
+
     @InjectSoftAssertions
     private SoftAssertions softly;
 
     @Test
     void givenValidWorkflowRequest_whenContributionMapperIsInvoked_thenMappingIsCorrect() {
-        WorkflowRequest workflowRequest = TestModelDataBuilder
-                .buildWorkFlowRequest();
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
         CrownCourtOverviewDTO crownCourtOverviewDTO = applicationDTO.getCrownCourtOverviewDTO();
         ContributionsDTO contribution = crownCourtOverviewDTO.getContribution();
@@ -42,16 +52,18 @@ class ContributionMapperTest {
         AppealDTO appealDTO = crownCourtOverviewDTO.getAppealDTO();
         AppealTypeDTO appealTypeDTO = appealDTO.getAppealTypeDTO();
 
-        ApiMaatCalculateContributionRequest apiMaatCalculateContributionRequest = contributionMapper
-                .workflowRequestToMaatCalculateContributionRequest(workflowRequest);
+        ApiMaatCalculateContributionRequest apiMaatCalculateContributionRequest =
+                contributionMapper.workflowRequestToMaatCalculateContributionRequest(workflowRequest);
         softly.assertThat(apiMaatCalculateContributionRequest.getUserCreated())
                 .isEqualTo(workflowRequest.getUserDTO().getUserName());
         softly.assertThat(apiMaatCalculateContributionRequest.getRepId())
                 .isEqualTo(NumberUtils.toInteger(applicationDTO.getRepId()));
         softly.assertThat(apiMaatCalculateContributionRequest.getApplicantId())
-                .isEqualTo(NumberUtils.toInteger(applicationDTO.getApplicantDTO().getId()));
+                .isEqualTo(
+                        NumberUtils.toInteger(applicationDTO.getApplicantDTO().getId()));
         softly.assertThat(apiMaatCalculateContributionRequest.getMagCourtOutcome())
-                .isEqualTo(MagCourtOutcome.getFrom(applicationDTO.getMagsOutcomeDTO().getOutcome()));
+                .isEqualTo(MagCourtOutcome.getFrom(
+                        applicationDTO.getMagsOutcomeDTO().getOutcome()));
         softly.assertThat(apiMaatCalculateContributionRequest.getCommittalDate())
                 .isEqualTo(toLocalDateTime(applicationDTO.getCommittalDate()));
         softly.assertThat(apiMaatCalculateContributionRequest.getCaseType().getCaseType())
@@ -71,39 +83,43 @@ class ContributionMapperTest {
         softly.assertThat(apiMaatCalculateContributionRequest.getRemoveContributions())
                 .isEqualTo(applicationDTO.getStatusDTO().getRemoveContribs().toString());
         softly.assertThat(apiMaatCalculateContributionRequest.getMagCourtOutcome())
-                .isEqualTo(MagCourtOutcome.getFrom(applicationDTO.getMagsOutcomeDTO().getOutcome()));
+                .isEqualTo(MagCourtOutcome.getFrom(
+                        applicationDTO.getMagsOutcomeDTO().getOutcome()));
         softly.assertThat(apiMaatCalculateContributionRequest.getAppealType())
                 .isEqualTo(AppealType.getFrom(appealTypeDTO.getCode()));
-        softly.assertThat(apiMaatCalculateContributionRequest.getCrownCourtOutcome().size())
+        softly.assertThat(apiMaatCalculateContributionRequest
+                        .getCrownCourtOutcome()
+                        .size())
                 .isGreaterThan(0);
         softly.assertAll();
-
     }
 
     @Test
     void givenWorkflowRequestWithNoAppealOutcome_whenContributionMapperIsInvoked_thenMappingIsCorrect() {
-        WorkflowRequest workflowRequest = TestModelDataBuilder
-                .buildWorkFlowRequest();
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
         CrownCourtOverviewDTO crownCourtOverviewDTO = applicationDTO.getCrownCourtOverviewDTO();
-        crownCourtOverviewDTO.getCrownCourtSummaryDTO().setOutcomeDTOs(
-                List.of(TestModelDataBuilder.getOutcomeDTO(CourtType.CROWN_COURT)));
+        crownCourtOverviewDTO
+                .getCrownCourtSummaryDTO()
+                .setOutcomeDTOs(List.of(TestModelDataBuilder.getOutcomeDTO(CourtType.CROWN_COURT)));
         ContributionsDTO contribution = crownCourtOverviewDTO.getContribution();
         CaseDetailDTO caseDetailsDTO = applicationDTO.getCaseDetailsDTO();
         OffenceDTO offenceDTO = applicationDTO.getOffenceDTO();
         AppealDTO appealDTO = crownCourtOverviewDTO.getAppealDTO();
         AppealTypeDTO appealTypeDTO = appealDTO.getAppealTypeDTO();
 
-        ApiMaatCalculateContributionRequest apiMaatCalculateContributionRequest = contributionMapper
-                .workflowRequestToMaatCalculateContributionRequest(workflowRequest);
+        ApiMaatCalculateContributionRequest apiMaatCalculateContributionRequest =
+                contributionMapper.workflowRequestToMaatCalculateContributionRequest(workflowRequest);
         softly.assertThat(apiMaatCalculateContributionRequest.getUserCreated())
                 .isEqualTo(workflowRequest.getUserDTO().getUserName());
         softly.assertThat(apiMaatCalculateContributionRequest.getRepId())
                 .isEqualTo(NumberUtils.toInteger(applicationDTO.getRepId()));
         softly.assertThat(apiMaatCalculateContributionRequest.getApplicantId())
-                .isEqualTo(NumberUtils.toInteger(applicationDTO.getApplicantDTO().getId()));
+                .isEqualTo(
+                        NumberUtils.toInteger(applicationDTO.getApplicantDTO().getId()));
         softly.assertThat(apiMaatCalculateContributionRequest.getMagCourtOutcome())
-                .isEqualTo(MagCourtOutcome.getFrom(applicationDTO.getMagsOutcomeDTO().getOutcome()));
+                .isEqualTo(MagCourtOutcome.getFrom(
+                        applicationDTO.getMagsOutcomeDTO().getOutcome()));
         softly.assertThat(apiMaatCalculateContributionRequest.getCommittalDate())
                 .isEqualTo(toLocalDateTime(applicationDTO.getCommittalDate()));
         softly.assertThat(apiMaatCalculateContributionRequest.getCaseType().getCaseType())
@@ -123,36 +139,40 @@ class ContributionMapperTest {
         softly.assertThat(apiMaatCalculateContributionRequest.getRemoveContributions())
                 .isEqualTo(applicationDTO.getStatusDTO().getRemoveContribs().toString());
         softly.assertThat(apiMaatCalculateContributionRequest.getMagCourtOutcome())
-                .isEqualTo(MagCourtOutcome.getFrom(applicationDTO.getMagsOutcomeDTO().getOutcome()));
+                .isEqualTo(MagCourtOutcome.getFrom(
+                        applicationDTO.getMagsOutcomeDTO().getOutcome()));
         softly.assertThat(apiMaatCalculateContributionRequest.getAppealType())
                 .isEqualTo(AppealType.getFrom(appealTypeDTO.getCode()));
-        softly.assertThat(apiMaatCalculateContributionRequest.getCrownCourtOutcome().size())
+        softly.assertThat(apiMaatCalculateContributionRequest
+                        .getCrownCourtOutcome()
+                        .size())
                 .isGreaterThan(0);
         softly.assertAll();
-
     }
 
     @Test
     void givenValidApplicationDTO_whenContributionMapperIsInvoked_thenMappingIsCorrect() {
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO();
-        ApiMaatCheckContributionRuleRequest request = contributionMapper.applicationDtoToCheckContributionRuleRequest(applicationDTO);
+        ApiMaatCheckContributionRuleRequest request =
+                contributionMapper.applicationDtoToCheckContributionRuleRequest(applicationDTO);
         softly.assertThat(request.getCaseType())
                 .isEqualTo(CaseType.getFrom(applicationDTO.getCaseDetailsDTO().getCaseType()));
         softly.assertThat(request.getMagCourtOutcome())
-                .isEqualTo(MagCourtOutcome.getFrom(applicationDTO.getMagsOutcomeDTO().getOutcome()));
-        softly.assertThat(request.getCrownCourtOutcome().size())
-                .isGreaterThan(0);
+                .isEqualTo(MagCourtOutcome.getFrom(
+                        applicationDTO.getMagsOutcomeDTO().getOutcome()));
+        softly.assertThat(request.getCrownCourtOutcome().size()).isGreaterThan(0);
         softly.assertAll();
     }
 
     @Test
     void givenValidApiMaatCalculateContributionResponse_whenContributionMapperIsInvoked_thenMappingIsCorrect() {
-        ApiMaatCalculateContributionResponse apiMaatCalculateContributionResponse = TestModelDataBuilder.
-                getApiMaatCalculateContributionResponse();
-        ContributionsDTO contributionsDTO = contributionMapper
-                .maatCalculateContributionResponseToContributionsDto(apiMaatCalculateContributionResponse);
+        ApiMaatCalculateContributionResponse apiMaatCalculateContributionResponse =
+                TestModelDataBuilder.getApiMaatCalculateContributionResponse();
+        ContributionsDTO contributionsDTO = contributionMapper.maatCalculateContributionResponseToContributionsDto(
+                apiMaatCalculateContributionResponse);
         softly.assertThat(contributionsDTO.getId())
-                .isEqualTo(apiMaatCalculateContributionResponse.getContributionId().longValue());
+                .isEqualTo(
+                        apiMaatCalculateContributionResponse.getContributionId().longValue());
         softly.assertThat(contributionsDTO.getCapped())
                 .isEqualTo(apiMaatCalculateContributionResponse.getContributionCap());
         softly.assertThat(contributionsDTO.getCalcDate())
@@ -168,24 +188,23 @@ class ContributionMapperTest {
 
     @Test
     void givenValidContributionSummaries_whenContributionMapperIsInvoked_thenMappingIsCorrect() {
-        List<ApiContributionSummary> apiContributionSummaryList = List.of(TestModelDataBuilder.getApiContributionSummary());
+        List<ApiContributionSummary> apiContributionSummaryList =
+                List.of(TestModelDataBuilder.getApiContributionSummary());
         ApiContributionSummary apiContributionSummary = apiContributionSummaryList.get(0);
-        Collection<ContributionSummaryDTO> ContributionSummaryDTOs = contributionMapper
-                .contributionSummaryToDto(apiContributionSummaryList);
-        ContributionSummaryDTO contributionSummaryDTO = ContributionSummaryDTOs.iterator().next();
+        Collection<ContributionSummaryDTO> ContributionSummaryDTOs =
+                contributionMapper.contributionSummaryToDto(apiContributionSummaryList);
+        ContributionSummaryDTO contributionSummaryDTO =
+                ContributionSummaryDTOs.iterator().next();
 
-        softly.assertThat(ContributionSummaryDTOs.size())
-                .isEqualTo(1);
+        softly.assertThat(ContributionSummaryDTOs.size()).isEqualTo(1);
         softly.assertThat(contributionSummaryDTO.getId())
                 .isEqualTo(apiContributionSummary.getId().longValue());
         softly.assertThat(contributionSummaryDTO.getMonthlyContribs())
                 .isEqualTo(apiContributionSummary.getMonthlyContributions().doubleValue());
         softly.assertThat(contributionSummaryDTO.getUpfrontContribs())
                 .isEqualTo(apiContributionSummary.getUpfrontContributions().doubleValue());
-        softly.assertThat(contributionSummaryDTO.getBasedOn())
-                .isEqualTo(apiContributionSummary.getBasedOn());
-        softly.assertThat(contributionSummaryDTO.getUpliftApplied())
-                .isEqualTo(true);
+        softly.assertThat(contributionSummaryDTO.getBasedOn()).isEqualTo(apiContributionSummary.getBasedOn());
+        softly.assertThat(contributionSummaryDTO.getUpliftApplied()).isEqualTo(true);
         softly.assertThat(contributionSummaryDTO.getEffectiveDate())
                 .isEqualTo(toDate(apiContributionSummary.getEffectiveDate()));
         softly.assertAll();
@@ -193,8 +212,7 @@ class ContributionMapperTest {
 
     @Test
     void givenAEmptyContributionSummaries_whenContributionMapperIsInvoked_thenMappingIsCorrect() {
-        Collection<ContributionSummaryDTO> ContributionSummaryDTOs = contributionMapper
-                .contributionSummaryToDto(null);
+        Collection<ContributionSummaryDTO> ContributionSummaryDTOs = contributionMapper.contributionSummaryToDto(null);
         softly.assertThat(ContributionSummaryDTOs).isEmpty();
         softly.assertAll();
     }

@@ -15,6 +15,6 @@ import java.util.Date;
 public class JobSeekerDTO extends GenericDTO {
     @Builder.Default
     private Boolean isJobSeeker = false;
-    private Date lastSignedOn;
 
+    private Date lastSignedOn;
 }

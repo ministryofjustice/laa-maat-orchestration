@@ -19,5 +19,4 @@ public class CapitalPropertyDTO extends GenericDTO {
     private Date verifiedDate;
     private String verifiedBy;
     private Boolean undeclared;
-
 }

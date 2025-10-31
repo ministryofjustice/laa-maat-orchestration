@@ -23,10 +23,13 @@ public class PassportedDTO extends GenericDTO {
 
     @Builder.Default
     private AssessmentStatusDTO assessementStatusDTO = new AssessmentStatusDTO();
+
     @Builder.Default
     private PassportConfirmationDTO passportConfirmationDTO = new PassportConfirmationDTO();
+
     @Builder.Default
     private NewWorkReasonDTO newWorkReason = new NewWorkReasonDTO();
+
     @Builder.Default
     private ReviewTypeDTO reviewType = new ReviewTypeDTO();
 
@@ -34,27 +37,39 @@ public class PassportedDTO extends GenericDTO {
 
     @Builder.Default
     private Boolean benefitIncomeSupport = false;
+
     @Builder.Default
     private JobSeekerDTO benefitJobSeeker = new JobSeekerDTO();
+
     @Builder.Default
     private Boolean benefitGaurenteedStatePension = false;
+
     @Builder.Default
     private Boolean benefitClaimedByPartner = false;
+
     @Builder.Default
     private Boolean benefitEmploymentSupport = false;
+
     @Builder.Default
     private Boolean benefitUniversalCredit = false;
+
     @Builder.Default
     private PartnerDTO partnerDetails = new PartnerDTO();
+
     @Builder.Default
     private String notes = "";
+
     private String result;
+
     @Builder.Default
     private Boolean under18HeardYouthCourt = false;
+
     @Builder.Default
     private Boolean under18HeardMagsCourt = false;
+
     @Builder.Default
     private Boolean under18FullEducation = false;
+
     private Boolean under16;
     private Boolean between1617;
 
@@ -62,5 +77,4 @@ public class PassportedDTO extends GenericDTO {
     private IncomeEvidenceSummaryDTO passportSummaryEvidenceDTO = new IncomeEvidenceSummaryDTO();
 
     private String whoDwpChecked;
-
 }

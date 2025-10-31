@@ -25,5 +25,4 @@ public class FullAssessmentDTO extends GenericDTO {
     private String result;
     private String resultReason;
     private AssessmentStatusDTO assessmnentStatusDTO;
-
 }

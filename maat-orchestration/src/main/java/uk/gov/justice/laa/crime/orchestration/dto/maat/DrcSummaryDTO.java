@@ -15,5 +15,4 @@ public class DrcSummaryDTO extends GenericDTO {
 
     private long repId;
     private Collection<DrcConversationDTO> conversations;
-
 }

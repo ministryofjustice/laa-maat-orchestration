@@ -24,5 +24,4 @@ public class AreaTransferDetailsDTO extends GenericDTO {
     private Date dateHmcsReceived;
     private UserDTO hmcsSentBy;
     private UserDTO hmcsReceivedBy;
-
 }

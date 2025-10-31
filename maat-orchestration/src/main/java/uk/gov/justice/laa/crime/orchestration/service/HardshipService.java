@@ -2,15 +2,15 @@ package uk.gov.justice.laa.crime.orchestration.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.common.model.hardship.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipRequest;
 import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipResponse;
-import uk.gov.justice.laa.crime.common.model.hardship.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
-
 import uk.gov.justice.laa.crime.orchestration.service.api.HardshipApiService;
+
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -36,14 +36,12 @@ public class HardshipService {
                 hardshipMapper.workflowRequestToPerformHardshipRequest(request, false);
         ApiPerformHardshipResponse apiPerformHardshipResponse = hardshipApiService.update(performHardshipRequest);
         hardshipMapper.performHardshipResponseToApplicationDTO(
-                apiPerformHardshipResponse, request.getApplicationDTO(), request.getCourtType()
-        );
+                apiPerformHardshipResponse, request.getApplicationDTO(), request.getCourtType());
     }
 
     public void rollback(WorkflowRequest request) {
-        HardshipReviewDTO hardshipReviewDTO = hardshipMapper.getHardshipReviewDTO(
-                request.getApplicationDTO(), request.getCourtType()
-        );
+        HardshipReviewDTO hardshipReviewDTO =
+                hardshipMapper.getHardshipReviewDTO(request.getApplicationDTO(), request.getCourtType());
         hardshipApiService.rollback(hardshipReviewDTO.getId());
     }
 }

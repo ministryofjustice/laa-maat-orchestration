@@ -1,15 +1,16 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
+import uk.gov.justice.laa.crime.orchestration.service.api.ApplicationTrackingApiService;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
-import uk.gov.justice.laa.crime.orchestration.service.api.ApplicationTrackingApiService;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith({MockitoExtension.class})
 class ApplicationTrackingDataServiceTest {
@@ -25,5 +26,4 @@ class ApplicationTrackingDataServiceTest {
         applicationTrackingDataService.sendTrackingOutputResult(new ApplicationTrackingOutputResult());
         verify(applicationTrackingApiService).sendTrackingOutputResult(any(ApplicationTrackingOutputResult.class));
     }
-
 }

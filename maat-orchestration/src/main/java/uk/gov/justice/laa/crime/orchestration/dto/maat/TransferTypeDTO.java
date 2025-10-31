@@ -12,5 +12,4 @@ import lombok.experimental.SuperBuilder;
 public class TransferTypeDTO extends GenericDTO {
     private String type;
     private String description;
-
 }

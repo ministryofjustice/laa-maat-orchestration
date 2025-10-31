@@ -11,9 +11,7 @@ import java.util.Collection;
 @SuperBuilder
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DrcDTO extends GenericDTO 
-{
-	private	DrcSupplierDTO						drcSupplier;
-	private Collection<DrcSupplierContactDTO> contacts;
-
+public class DrcDTO extends GenericDTO {
+    private DrcSupplierDTO drcSupplier;
+    private Collection<DrcSupplierContactDTO> contacts;
 }

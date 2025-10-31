@@ -17,5 +17,4 @@ public class ApplicantLinkDTO extends GenericDTO {
     private Date linked;
     private Date unlinked;
     ApplicantDTO partnerDTO;
-
 }

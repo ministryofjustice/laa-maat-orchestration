@@ -16,5 +16,4 @@ public class ApplicantPaymentDetailsDTO extends GenericDTO {
     private String accountNumber;
     private String sortCode;
     private String accountName;
-
 }

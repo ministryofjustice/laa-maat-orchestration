@@ -2,16 +2,17 @@ package uk.gov.justice.laa.crime.orchestration.exception;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.justice.laa.crime.exception.ValidationException;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.ErrorDTO;
+import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
-import uk.gov.justice.laa.crime.exception.ValidationException;
-import uk.gov.justice.laa.crime.orchestration.dto.validation.ErrorDTO;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -21,16 +22,30 @@ public class CrimeValidationExceptionHandler {
     private final TraceIdHandler traceIdHandler;
 
     private static ResponseEntity<ErrorDTO> buildErrorResponse(HttpStatus status, List<String> errorMessage) {
-        return new ResponseEntity<>(ErrorDTO.builder().code(status.toString()).messageList(errorMessage).build(), status);
+        return new ResponseEntity<>(
+                ErrorDTO.builder()
+                        .code(status.toString())
+                        .messageList(errorMessage)
+                        .build(),
+                status);
     }
 
-    private static ResponseEntity<ErrorDTO> buildErrorResponseWithMessage(HttpStatus status, String message, String traceId) {
-        return new ResponseEntity<>(ErrorDTO.builder().traceId(traceId).code(status.toString()).message(message).build(), status);
+    private static ResponseEntity<ErrorDTO> buildErrorResponseWithMessage(
+            HttpStatus status, String message, String traceId) {
+        return new ResponseEntity<>(
+                ErrorDTO.builder()
+                        .traceId(traceId)
+                        .code(status.toString())
+                        .message(message)
+                        .build(),
+                status);
     }
+
     @ExceptionHandler(CrimeValidationException.class)
     public ResponseEntity<ErrorDTO> handleCrimeValidationException(CrimeValidationException ex) {
         log.error("CrimeValidationException: ", ex);
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getExceptionMessage().stream().collect(Collectors.toList()));
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST, ex.getExceptionMessage().stream().collect(Collectors.toList()));
     }
 
     @ExceptionHandler(ValidationException.class)
@@ -44,5 +59,4 @@ public class CrimeValidationExceptionHandler {
         log.error("IllegalArgumentException: ", ex);
         return buildErrorResponseWithMessage(HttpStatus.BAD_REQUEST, ex.getMessage(), traceIdHandler.getTraceId());
     }
-
 }

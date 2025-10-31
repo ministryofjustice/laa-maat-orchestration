@@ -2,7 +2,6 @@ package uk.gov.justice.laa.crime.orchestration.service.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
@@ -10,6 +9,8 @@ import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContribution
 import uk.gov.justice.laa.crime.orchestration.client.CrownCourtContributionsApiClient;
 
 import java.util.List;
+
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service

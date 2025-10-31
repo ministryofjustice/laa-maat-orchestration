@@ -16,7 +16,9 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 public class WorkflowRequest {
     @NotNull
     private UserDTO userDTO;
+
     @NotNull
     private ApplicationDTO applicationDTO;
+
     private CourtType courtType;
 }

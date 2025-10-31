@@ -1,9 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
-import org.assertj.core.api.InstanceOfAssertFactories;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
@@ -18,7 +16,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import org.assertj.core.api.InstanceOfAssertFactories;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith({MockitoExtension.class})
 class AssessmentSummaryServiceTest {
@@ -38,8 +39,6 @@ class AssessmentSummaryServiceTest {
         AssessmentSummaryDTO actual = assessmentSummaryService.getSummary(hardshipReviewDTO, CourtType.CROWN_COURT);
         AssessmentSummaryDTO expected = TestModelDataBuilder.getAssessmentSummaryDTOFromHardship(CourtType.CROWN_COURT);
         assertThat(actual).isEqualTo(expected);
-
-
     }
 
     @Test
@@ -55,10 +54,9 @@ class AssessmentSummaryServiceTest {
         AssessmentSummaryDTO updatedSummary = TestModelDataBuilder.getAssessmentSummaryDTO();
         ApplicationDTO applicationDTO = ApplicationDTO.builder()
                 .assessmentSummary(List.of(AssessmentSummaryDTO.builder()
-                                .id(Constants.ASSESSMENT_SUMMARY_ID)
-                                .build()
-                        )
-                ).build();
+                        .id(Constants.ASSESSMENT_SUMMARY_ID)
+                        .build()))
+                .build();
         assessmentSummaryService.updateApplication(applicationDTO, updatedSummary);
 
         assertThat(applicationDTO.getAssessmentSummary())
@@ -73,9 +71,8 @@ class AssessmentSummaryServiceTest {
     @Test
     void givenAssessmentSummaryWithIdDoesntExists_whenUpdateApplicationIsInvoked_thenAssessmentSummaryIsAdded() {
         AssessmentSummaryDTO newSummary = TestModelDataBuilder.getAssessmentSummaryDTO();
-        ApplicationDTO applicationDTO = ApplicationDTO.builder()
-                .assessmentSummary(new ArrayList<>())
-                .build();
+        ApplicationDTO applicationDTO =
+                ApplicationDTO.builder().assessmentSummary(new ArrayList<>()).build();
         assessmentSummaryService.updateApplication(applicationDTO, newSummary);
 
         assertThat(applicationDTO.getAssessmentSummary())
@@ -91,8 +88,10 @@ class AssessmentSummaryServiceTest {
     void givenFinancialAssessmentDTOWithFullAssessmentType_whenGetSummaryIsInvoked_thenAssessmentSummaryIsReturned() {
         FinancialAssessmentDTO financialAssessmentDTO = TestModelDataBuilder.getFinancialAssessmentDTO();
         financialAssessmentDTO.setFullAvailable(true);
-        financialAssessmentDTO.getFull().setAssessmentDate(Date.from(LocalDateTime.of(2022, 10, 15, 0, 0, 0)
-                .toInstant(ZoneOffset.UTC)));
+        financialAssessmentDTO
+                .getFull()
+                .setAssessmentDate(
+                        Date.from(LocalDateTime.of(2022, 10, 15, 0, 0, 0).toInstant(ZoneOffset.UTC)));
         AssessmentSummaryDTO actual = assessmentSummaryService.getSummary(financialAssessmentDTO);
         AssessmentSummaryDTO expected = TestModelDataBuilder.getAssessmentSummaryDTOFromFullFinancialAssessment();
         assertThat(actual).isEqualTo(expected);
@@ -108,7 +107,7 @@ class AssessmentSummaryServiceTest {
     }
 
     @Test
-    void givenFinancialAssessmentDTOWithEmptyFullAssessmentStatus_whenGetSummaryIsInvoked_thenAssessmentSummaryIsReturned() {
+    void givenFinAssessmentDTOWithEmptyFullAssessmentStatus_whenGetSummaryIsInvoked_thenAssessmentSummaryIsReturned() {
         FinancialAssessmentDTO financialAssessmentDTO = TestModelDataBuilder.getFinancialAssessmentDTO();
         financialAssessmentDTO.setFullAvailable(true);
         financialAssessmentDTO.getFull().getAssessmnentStatusDTO().setStatus("");

@@ -13,6 +13,4 @@ public class ThirdPartyTypeDTO extends GenericDTO {
 
     private String code;
     private String description;
-
 }
-
