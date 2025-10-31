@@ -114,7 +114,6 @@ Run the following command
 
 Make sure Remote Debug Option is set up on your preferred Editor.
 
-
 ## 🧹 Code formatting with Spotless
 
 This project uses [**Spotless**](https://github.com/diffplug/spotless) to enforce consistent Java code style across all modules.
