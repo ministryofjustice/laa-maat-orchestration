@@ -21,5 +21,4 @@ public class UserSummaryDTO {
     private String currentUserSession;
     private List<RoleDataItemDTO> roleDataItem;
     private List<FeatureToggleDTO> featureToggle;
-
 }

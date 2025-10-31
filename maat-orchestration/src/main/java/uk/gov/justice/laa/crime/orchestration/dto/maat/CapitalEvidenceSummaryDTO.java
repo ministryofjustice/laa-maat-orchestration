@@ -21,5 +21,4 @@ public class CapitalEvidenceSummaryDTO extends GenericDTO {
     private Date secondReminderDate;
     private Double capitalAllowance;
     private String capitalNote;
-
 }

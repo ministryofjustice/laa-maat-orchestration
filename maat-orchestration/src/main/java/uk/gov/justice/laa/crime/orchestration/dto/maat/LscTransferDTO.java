@@ -16,5 +16,4 @@ public class LscTransferDTO extends AreaTransferDetailsDTO {
     private Date dateLscReturned;
     private UserDTO lscReceivedBy;
     private UserDTO lscReturnedBy;
-
 }

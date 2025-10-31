@@ -20,7 +20,8 @@ public class ResourceServerConfiguration {
 
     @Bean
     protected BearerTokenAuthenticationEntryPoint bearerTokenAuthenticationEntryPoint() {
-        BearerTokenAuthenticationEntryPoint bearerTokenAuthenticationEntryPoint = new BearerTokenAuthenticationEntryPoint();
+        BearerTokenAuthenticationEntryPoint bearerTokenAuthenticationEntryPoint =
+                new BearerTokenAuthenticationEntryPoint();
         bearerTokenAuthenticationEntryPoint.setRealmName("Crime orchestration API");
         return bearerTokenAuthenticationEntryPoint;
     }
@@ -34,16 +35,18 @@ public class ResourceServerConfiguration {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/open-api/**").permitAll()
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/api/**").hasAuthority(SCOPE_ORCHESTRATION_STANDARD)
-                        .anyRequest().authenticated())
-                .oauth2ResourceServer((oauth2ResourceServer) ->
-                        oauth2ResourceServer
-                                .accessDeniedHandler(bearerTokenAccessDeniedHandler())
-                                .authenticationEntryPoint(bearerTokenAuthenticationEntryPoint())
-                                .jwt(Customizer.withDefaults()));
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/open-api/**")
+                        .permitAll()
+                        .requestMatchers("/actuator/**")
+                        .permitAll()
+                        .requestMatchers("/api/**")
+                        .hasAuthority(SCOPE_ORCHESTRATION_STANDARD)
+                        .anyRequest()
+                        .authenticated())
+                .oauth2ResourceServer((oauth2ResourceServer) -> oauth2ResourceServer
+                        .accessDeniedHandler(bearerTokenAccessDeniedHandler())
+                        .authenticationEntryPoint(bearerTokenAuthenticationEntryPoint())
+                        .jwt(Customizer.withDefaults()));
         return http.build();
     }
 }

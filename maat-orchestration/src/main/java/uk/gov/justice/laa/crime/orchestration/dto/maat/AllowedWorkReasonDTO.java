@@ -19,5 +19,4 @@ public class AllowedWorkReasonDTO extends GenericDTO {
     private Collection<NewWorkReasonDTO> crownCourtHardshipWorkReason;
     private Collection<NewWorkReasonDTO> eligibilityWorkReason;
     private Collection<NewWorkReasonDTO> iojAppealWorkReason;
-
 }

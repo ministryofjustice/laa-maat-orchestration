@@ -1,13 +1,9 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
-import org.assertj.core.api.SoftAssertions;
-import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
-import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import uk.gov.justice.laa.crime.common.model.common.ApiUserSession;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
@@ -18,14 +14,23 @@ import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.OutcomeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.util.DateUtil;
 
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
+import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SoftAssertionsExtension.class)
@@ -46,30 +51,31 @@ class ProceedingsMapperTest {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
         ApiUpdateApplicationRequest expectedApplicationRequest = TestModelDataBuilder.getUpdateApplicationRequest();
         ApiUpdateApplicationRequest actualApplicationRequest =
-                proceedingsMapper.workflowRequestToUpdateApplicationRequest(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
+                proceedingsMapper.workflowRequestToUpdateApplicationRequest(
+                        workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
 
-        softly.assertThat(actualApplicationRequest)
-                .usingRecursiveComparison()
-                .isEqualTo(expectedApplicationRequest);
+        softly.assertThat(actualApplicationRequest).usingRecursiveComparison().isEqualTo(expectedApplicationRequest);
     }
 
     @Test
     void givenAEmptyInitStatus_whenWorkflowRequestToUpdateCrownCourtRequestIsInvoked_thenReturnEmptyInitStatus() {
         mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
-        InitialAssessmentDTO initialAssessmentDTO =
-                workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO().getInitial();
+        InitialAssessmentDTO initialAssessmentDTO = workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .getInitial();
         initialAssessmentDTO.getAssessmnentStatusDTO().setStatus(null);
 
         ApiUpdateCrownCourtRequest expectedApplicationRequest = TestModelDataBuilder.getUpdateCrownCourtRequest();
         expectedApplicationRequest.getFinancialAssessment().setInitStatus(null);
 
         ApiUpdateCrownCourtRequest actualApplicationRequest =
-                proceedingsMapper.workflowRequestToUpdateCrownCourtRequest(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
+                proceedingsMapper.workflowRequestToUpdateCrownCourtRequest(
+                        workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
 
-        softly.assertThat(actualApplicationRequest)
-                .usingRecursiveComparison()
-                .isEqualTo(expectedApplicationRequest);
+        softly.assertThat(actualApplicationRequest).usingRecursiveComparison().isEqualTo(expectedApplicationRequest);
 
         softly.assertAll();
     }
@@ -80,11 +86,10 @@ class ProceedingsMapperTest {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
         ApiUpdateCrownCourtRequest expectedCrownCourtRequest = TestModelDataBuilder.getUpdateCrownCourtRequest();
         ApiUpdateCrownCourtRequest actualApplicationRequest =
-                proceedingsMapper.workflowRequestToUpdateCrownCourtRequest(workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
+                proceedingsMapper.workflowRequestToUpdateCrownCourtRequest(
+                        workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
 
-        softly.assertThat(actualApplicationRequest)
-                .usingRecursiveComparison()
-                .isEqualTo(expectedCrownCourtRequest);
+        softly.assertThat(actualApplicationRequest).usingRecursiveComparison().isEqualTo(expectedCrownCourtRequest);
     }
 
     @Test
@@ -92,8 +97,8 @@ class ProceedingsMapperTest {
         ApiUpdateApplicationResponse updateApplicationResponse = TestModelDataBuilder.getApiUpdateApplicationResponse();
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT);
 
-        ApplicationDTO updatedApplicationDTO = proceedingsMapper.updateApplicationResponseToApplicationDto(
-                updateApplicationResponse, applicationDTO);
+        ApplicationDTO updatedApplicationDTO =
+                proceedingsMapper.updateApplicationResponseToApplicationDto(updateApplicationResponse, applicationDTO);
 
         CrownCourtSummaryDTO updatedCrownCourtSummaryDTO =
                 updatedApplicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO();
@@ -113,16 +118,18 @@ class ProceedingsMapperTest {
 
     @Test
     void updateCrownCourtResponseToApplicationDtoIsInvoked() {
-        ApiUpdateCrownCourtOutcomeResponse updateCrownCourtResponse = TestModelDataBuilder.getApiUpdateCrownCourtResponse();
+        ApiUpdateCrownCourtOutcomeResponse updateCrownCourtResponse =
+                TestModelDataBuilder.getApiUpdateCrownCourtResponse();
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT);
 
-        updateCrownCourtResponse.getCrownCourtSummary().setRepOrderCrownCourtOutcome(
-                List.of(TestModelDataBuilder.getApiRepOrderCrownCourtOutcome()));
+        updateCrownCourtResponse
+                .getCrownCourtSummary()
+                .setRepOrderCrownCourtOutcome(List.of(TestModelDataBuilder.getApiRepOrderCrownCourtOutcome()));
 
         ApiCrownCourtSummary apiCrownCourtSummary = updateCrownCourtResponse.getCrownCourtSummary();
 
-        ApplicationDTO application = proceedingsMapper.updateCrownCourtResponseToApplicationDto(
-                updateCrownCourtResponse, applicationDTO);
+        ApplicationDTO application =
+                proceedingsMapper.updateCrownCourtResponseToApplicationDto(updateCrownCourtResponse, applicationDTO);
 
         CrownCourtSummaryDTO crownCourtSummaryDTO =
                 application.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO();
@@ -133,8 +140,7 @@ class ProceedingsMapperTest {
         softly.assertThat(crownCourtSummaryDTO.getCcRepId())
                 .isEqualTo(apiCrownCourtSummary.getRepId().longValue());
 
-        softly.assertThat(crownCourtSummaryDTO.getCcRepType().getValue())
-                .isEqualTo(apiCrownCourtSummary.getRepType());
+        softly.assertThat(crownCourtSummaryDTO.getCcRepType().getValue()).isEqualTo(apiCrownCourtSummary.getRepType());
 
         softly.assertThat(crownCourtSummaryDTO.getCcRepOrderDate())
                 .isEqualTo(DateUtil.toDate(apiCrownCourtSummary.getRepOrderDate()));
@@ -150,20 +156,19 @@ class ProceedingsMapperTest {
 
     void checkOutcomes(List<OutcomeDTO> outcomes, ApiCrownCourtSummary apiCrownCourtSummary) {
         var actualOutcome = outcomes.get(0);
-        var originalOutcome = apiCrownCourtSummary.getRepOrderCrownCourtOutcome().get(0);
+        var originalOutcome =
+                apiCrownCourtSummary.getRepOrderCrownCourtOutcome().get(0);
 
         softly.assertThat(actualOutcome.getOutcome())
                 .isEqualTo(originalOutcome.getOutcome().getCode());
         softly.assertThat(actualOutcome.getDescription())
                 .isEqualTo(originalOutcome.getOutcome().getDescription());
-        softly.assertThat(actualOutcome.getDateSet())
-                .isEqualTo(DateUtil.toDate(originalOutcome.getOutcomeDate()));
+        softly.assertThat(actualOutcome.getDateSet()).isEqualTo(DateUtil.toDate(originalOutcome.getOutcomeDate()));
     }
 
     private void mockApiUserSession() {
         ApiUserSession userSession = TestModelDataBuilder.getApiUserSession();
-        when(userMapper.userDtoToUserSession(any(UserDTO.class)))
-                .thenReturn(userSession);
+        when(userMapper.userDtoToUserSession(any(UserDTO.class))).thenReturn(userSession);
     }
 
     @Test

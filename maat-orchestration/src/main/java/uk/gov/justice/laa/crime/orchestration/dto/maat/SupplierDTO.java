@@ -13,5 +13,4 @@ public class SupplierDTO extends GenericDTO {
     private String accountNumber;
     private String name;
     private AddressDTO address;
-
 }

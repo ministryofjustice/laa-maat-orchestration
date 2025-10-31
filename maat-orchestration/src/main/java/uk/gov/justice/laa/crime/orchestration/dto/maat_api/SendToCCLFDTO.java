@@ -13,8 +13,10 @@ import lombok.NoArgsConstructor;
 public class SendToCCLFDTO {
     @NotNull
     private Integer repId;
+
     @NotNull
     private Long applId;
+
     @NotNull
     private Long applHistoryId;
 }

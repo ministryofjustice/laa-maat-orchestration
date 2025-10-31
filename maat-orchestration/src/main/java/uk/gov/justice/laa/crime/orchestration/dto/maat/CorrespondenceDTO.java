@@ -24,5 +24,4 @@ public class CorrespondenceDTO extends GenericDTO {
     private Date originalEmailDate; // MW - 30/03/2017 - FIP Changes
 
     private Collection<PrintDateDTO> printDateDTOs;
-
 }

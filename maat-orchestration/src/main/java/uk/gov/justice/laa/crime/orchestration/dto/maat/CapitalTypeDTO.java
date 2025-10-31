@@ -11,7 +11,6 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class CapitalTypeDTO extends GenericDTO {
 
-    private String capitalType;        // key field
+    private String capitalType; // key field
     private String description;
-
 }

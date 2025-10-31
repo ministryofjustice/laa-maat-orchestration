@@ -21,5 +21,4 @@ public class CommonPlatformDataDTO extends GenericDTO {
     private Timestamp dateModified;
     private String userModified;
     private String inCommonPlatform;
-
 }

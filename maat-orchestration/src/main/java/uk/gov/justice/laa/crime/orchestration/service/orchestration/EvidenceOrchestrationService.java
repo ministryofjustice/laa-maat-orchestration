@@ -1,7 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
@@ -19,6 +18,8 @@ import uk.gov.justice.laa.crime.util.DateUtil;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
+
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -52,22 +53,25 @@ public class EvidenceOrchestrationService {
     private static boolean hasUpliftChanged(ApplicationDTO applicationDTO, RepOrderDTO repOrderDTO) {
         LocalDateTime defaultDateTime = LocalDateTime.of(9999, 12, 31, 0, 0, 0);
         Date defaultDate = DateUtil.toDate(defaultDateTime);
-        var incomeEvidenceSummaryDTO = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence();
-        Date upliftAppliedDate = Objects.requireNonNullElse(incomeEvidenceSummaryDTO.getUpliftAppliedDate(), defaultDate);
-        Date upliftRemovedDate = Objects.requireNonNullElse(incomeEvidenceSummaryDTO.getUpliftRemovedDate(), defaultDate);
+        var incomeEvidenceSummaryDTO =
+                applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getIncomeEvidence();
+        Date upliftAppliedDate =
+                Objects.requireNonNullElse(incomeEvidenceSummaryDTO.getUpliftAppliedDate(), defaultDate);
+        Date upliftRemovedDate =
+                Objects.requireNonNullElse(incomeEvidenceSummaryDTO.getUpliftRemovedDate(), defaultDate);
 
-        Integer financialAssessmentId = applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getId().intValue();
-        FinancialAssessmentDTO financialAssessmentDTO = repOrderDTO.getFinancialAssessments()
-                .stream()
+        Integer financialAssessmentId =
+                applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getId();
+        FinancialAssessmentDTO financialAssessmentDTO = repOrderDTO.getFinancialAssessments().stream()
                 .filter(assessment -> assessment.getId().equals(financialAssessmentId))
-                .findFirst().orElse(FinancialAssessmentDTO.builder().build());
-        Date oldUpliftAppliedDate = DateUtil
-                .toDate(Objects.requireNonNullElse(financialAssessmentDTO.getIncomeUpliftApplyDate(), defaultDateTime));
-        Date oldUpliftRemovedDate = DateUtil
-                .toDate(Objects.requireNonNullElse(financialAssessmentDTO.getIncomeUpliftRemoveDate(), defaultDateTime));
+                .findFirst()
+                .orElse(FinancialAssessmentDTO.builder().build());
+        Date oldUpliftAppliedDate = DateUtil.toDate(
+                Objects.requireNonNullElse(financialAssessmentDTO.getIncomeUpliftApplyDate(), defaultDateTime));
+        Date oldUpliftRemovedDate = DateUtil.toDate(
+                Objects.requireNonNullElse(financialAssessmentDTO.getIncomeUpliftRemoveDate(), defaultDateTime));
 
-        return !upliftAppliedDate.equals(oldUpliftAppliedDate)
-                || !upliftRemovedDate.equals(oldUpliftRemovedDate);
+        return !upliftAppliedDate.equals(oldUpliftAppliedDate) || !upliftRemovedDate.equals(oldUpliftRemovedDate);
     }
 
     private void preProcessRequest(WorkflowRequest request, RepOrderDTO repOrderDTO) {

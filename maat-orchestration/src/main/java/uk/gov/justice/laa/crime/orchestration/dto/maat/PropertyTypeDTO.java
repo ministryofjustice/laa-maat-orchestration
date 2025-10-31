@@ -13,5 +13,4 @@ public class PropertyTypeDTO extends GenericDTO {
 
     private String type;
     private String description;
-
 }

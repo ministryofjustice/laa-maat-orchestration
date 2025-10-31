@@ -8,11 +8,6 @@ public class WebClientTestUtils {
 
     public static WebClientResponseException getWebClientResponseException(HttpStatus status) {
         return WebClientResponseException.create(
-                status.value(),
-                status.getReasonPhrase(),
-                new HttpHeaders(),
-                new byte[0],
-                null
-        );
+                status.value(), status.getReasonPhrase(), new HttpHeaders(), new byte[0], null);
     }
 }

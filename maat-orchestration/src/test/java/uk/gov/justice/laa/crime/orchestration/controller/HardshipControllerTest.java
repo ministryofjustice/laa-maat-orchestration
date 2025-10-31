@@ -1,6 +1,24 @@
 package uk.gov.justice.laa.crime.orchestration.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionId;
+import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionIdGivenContent;
+
+import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
+import uk.gov.justice.laa.crime.orchestration.data.Constants;
+import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
+import uk.gov.justice.laa.crime.orchestration.filter.WebClientTestUtils;
+import uk.gov.justice.laa.crime.orchestration.service.orchestration.HardshipOrchestrationService;
+import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,24 +30,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
-import uk.gov.justice.laa.crime.orchestration.data.Constants;
-import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
-import uk.gov.justice.laa.crime.orchestration.filter.WebClientTestUtils;
-import uk.gov.justice.laa.crime.orchestration.service.orchestration.HardshipOrchestrationService;
-import uk.gov.justice.laa.crime.enums.CourtType;
-import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionId;
-import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionIdGivenContent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(HardshipController.class)
 @Import(OrchestrationTestConfiguration.class)
@@ -53,10 +55,10 @@ class HardshipControllerTest {
     @Test
     void givenValidRequest_whenFindIsInvoked_thenOkResponseIsReturned() throws Exception {
 
-        when(orchestrationService.find(anyInt()))
-                .thenReturn(new HardshipReviewDTO());
+        when(orchestrationService.find(anyInt())).thenReturn(new HardshipReviewDTO());
 
-        mvc.perform(buildRequestWithTransactionId(HttpMethod.GET, ENDPOINT_URL + "/" + Constants.HARDSHIP_REVIEW_ID, true))
+        mvc.perform(buildRequestWithTransactionId(
+                        HttpMethod.GET, ENDPOINT_URL + "/" + Constants.HARDSHIP_REVIEW_ID, true))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
@@ -71,19 +73,18 @@ class HardshipControllerTest {
     void givenWebClientFailure_whenFindIsInvoked_thenInternalServerErrorResponseIsReturned() throws Exception {
         WebClientResponseException webClientResponseException =
                 WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
-        
-        when(orchestrationService.find(anyInt()))
-                .thenThrow(webClientResponseException);
 
-        mvc.perform(buildRequestWithTransactionId(HttpMethod.GET, ENDPOINT_URL + "/" + Constants.HARDSHIP_REVIEW_ID, true))
+        when(orchestrationService.find(anyInt())).thenThrow(webClientResponseException);
+
+        mvc.perform(buildRequestWithTransactionId(
+                        HttpMethod.GET, ENDPOINT_URL + "/" + Constants.HARDSHIP_REVIEW_ID, true))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     void givenValidRequest_whenCreateIsInvoked_thenOkResponseIsReturned() throws Exception {
 
-        when(orchestrationService.create(any(WorkflowRequest.class)))
-                .thenReturn(new ApplicationDTO());
+        when(orchestrationService.create(any(WorkflowRequest.class))).thenReturn(new ApplicationDTO());
 
         String requestBody = objectMapper.writeValueAsString(
                 TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
@@ -102,9 +103,8 @@ class HardshipControllerTest {
     void givenWebClientFailure_whenCreateIsInvoked_thenInternalServerErrorResponseIsReturned() throws Exception {
         WebClientResponseException webClientResponseException =
                 WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
-        
-        when(orchestrationService.create(any(WorkflowRequest.class)))
-                .thenThrow(webClientResponseException);
+
+        when(orchestrationService.create(any(WorkflowRequest.class))).thenThrow(webClientResponseException);
 
         String requestBody = objectMapper.writeValueAsString(
                 TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
@@ -116,8 +116,7 @@ class HardshipControllerTest {
     @Test
     void givenValidRequest_whenUpdateIsInvoked_thenOkResponseIsReturned() throws Exception {
 
-        when(orchestrationService.update(any(WorkflowRequest.class)))
-                .thenReturn(new ApplicationDTO());
+        when(orchestrationService.update(any(WorkflowRequest.class))).thenReturn(new ApplicationDTO());
 
         String requestBody = objectMapper.writeValueAsString(
                 TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
@@ -137,9 +136,8 @@ class HardshipControllerTest {
 
         WebClientResponseException webClientResponseException =
                 WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
-        
-        when(orchestrationService.update(any(WorkflowRequest.class)))
-                .thenThrow(webClientResponseException);
+
+        when(orchestrationService.update(any(WorkflowRequest.class))).thenThrow(webClientResponseException);
 
         String requestBody = objectMapper.writeValueAsString(
                 TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
@@ -147,5 +145,4 @@ class HardshipControllerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
-
 }

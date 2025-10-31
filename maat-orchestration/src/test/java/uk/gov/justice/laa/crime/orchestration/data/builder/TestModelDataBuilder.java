@@ -1,12 +1,34 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
-import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.ASSESSMENT_DESCRIPTION;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.CRITERIA_DETAIL_ID;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.SECTION;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.TOTAL_AGGREGATED_INCOME;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.getReviewTypeDTO;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.getSectionSummaryDTO;
+import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
+
 import uk.gov.justice.laa.crime.common.model.common.ApiCrownCourtOutcome;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
-import uk.gov.justice.laa.crime.common.model.evidence.*;
-import uk.gov.justice.laa.crime.common.model.hardship.*;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiApplicantDetails;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceResponse;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiIncomeEvidence;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiIncomeEvidenceItems;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiIncomeEvidenceMetadata;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceRequest;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceResponse;
+import uk.gov.justice.laa.crime.common.model.hardship.ApiFindHardshipResponse;
+import uk.gov.justice.laa.crime.common.model.hardship.ApiHardshipDetail;
+import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipRequest;
+import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipResponse;
+import uk.gov.justice.laa.crime.common.model.hardship.DeniedIncome;
+import uk.gov.justice.laa.crime.common.model.hardship.ExtraExpenditure;
+import uk.gov.justice.laa.crime.common.model.hardship.HardshipMetadata;
+import uk.gov.justice.laa.crime.common.model.hardship.HardshipReview;
+import uk.gov.justice.laa.crime.common.model.hardship.SolicitorCosts;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentChildWeighting;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentDetail;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.FinancialAssessmentIncomeEvidence;
@@ -18,20 +40,87 @@ import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiRepOrderCrownC
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
+import uk.gov.justice.laa.crime.enums.AppealType;
+import uk.gov.justice.laa.crime.enums.AssessmentType;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
+import uk.gov.justice.laa.crime.enums.DecisionReason;
+import uk.gov.justice.laa.crime.enums.DeniedIncomeDetailCode;
+import uk.gov.justice.laa.crime.enums.EmploymentStatus;
+import uk.gov.justice.laa.crime.enums.EvidenceFeeLevel;
+import uk.gov.justice.laa.crime.enums.ExtraExpenditureDetailCode;
+import uk.gov.justice.laa.crime.enums.Frequency;
+import uk.gov.justice.laa.crime.enums.HardshipReviewDetailCode;
+import uk.gov.justice.laa.crime.enums.HardshipReviewDetailReason;
+import uk.gov.justice.laa.crime.enums.HardshipReviewDetailType;
+import uk.gov.justice.laa.crime.enums.HardshipReviewResult;
+import uk.gov.justice.laa.crime.enums.HardshipReviewStatus;
+import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
-import uk.gov.justice.laa.crime.enums.*;
+import uk.gov.justice.laa.crime.enums.RepOrderStatus;
+import uk.gov.justice.laa.crime.enums.ReviewResult;
 import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.evidence.staticdata.enums.ApplicantType;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AppealDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AppealTypeDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicantDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicantLinkDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentDetailDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSectionSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentStatusDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CapitalEquityDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CapitalEvidenceSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CapitalOtherDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CaseDetailDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CaseManagementUnitDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ChildWeightingDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ContraryInterestDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtOverviewDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.EmploymentStatusDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceFeeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceTypeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ExtraEvidenceDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FrequenciesDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FullAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HRDetailDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HRDetailDescriptionDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HRDetailTypeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HRReasonDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HRSectionDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HRSolicitorsCostsDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipOverviewDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.orchestration.dto.maat_api.*;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.IncomeEvidenceSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.NewWorkReasonDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.OffenceDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.OutcomeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.RepOrderDecisionDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.RepStatusDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ReviewTypeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.SysGenDate;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.SysGenString;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinAssIncomeEvidenceDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.PassportAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.PassportAssessmentEvidenceDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderCCOutcomeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RoleDataItemDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
@@ -39,14 +128,24 @@ import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.*;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-import static uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder.*;
-import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
-import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 
 @Component
 public class TestModelDataBuilder {
@@ -105,8 +204,7 @@ public class TestModelDataBuilder {
     private static final BigDecimal SOLICITOR_DISBURSEMENTS = BigDecimal.valueOf(375);
     private static final BigDecimal SOLICITOR_RATE = BigDecimal.valueOf(200);
     // Solicitors Costs
-    private static final BigDecimal SOLICITOR_HOURS = BigDecimal.valueOf(52.45)
-            .setScale(2, RoundingMode.DOWN);
+    private static final BigDecimal SOLICITOR_HOURS = BigDecimal.valueOf(52.45).setScale(2, RoundingMode.DOWN);
     private static final LocalDateTime DATE_REVIEWED_DATETIME = LocalDateTime.of(2022, 11, 12, 0, 0, 0);
     private static final Date DATE_REVIEWED =
             Date.from(Instant.ofEpochSecond(DATE_REVIEWED_DATETIME.toEpochSecond(ZoneOffset.UTC)));
@@ -118,7 +216,8 @@ public class TestModelDataBuilder {
     private static final Integer CMU_ID = 50;
     private static final String OTHER_HOUSING_NOTES = "Other Housing Notes";
     private static final String ASSESSMENT_NOTES = "ASSESSMENT NOTES";
-    private static final ZonedDateTime APPLICATION_TIMESTAMP = toZonedDateTime(LocalDateTime.parse("2024-01-27T10:15:30.342"));
+    private static final ZonedDateTime APPLICATION_TIMESTAMP =
+            toZonedDateTime(LocalDateTime.parse("2024-01-27T10:15:30.342"));
     private static final LocalDateTime REP_ORDER_MODIFIED_TIMESTAMP = LocalDateTime.parse("2023-06-27T10:15:30");
     private static final LocalDate REP_ORDER_CREATED_TIMESTAMP = LocalDate.of(2024, Month.JANUARY, 8);
     private static final List<String> TEST_ROLE_ACTIONS = List.of("CREATE_ASSESSMENT");
@@ -140,15 +239,14 @@ public class TestModelDataBuilder {
                 .withNewWorkReason(NewWorkReason.NEW)
                 .withSolicitorCosts(getSolicitorsCosts())
                 .withStatus(HardshipReviewStatus.COMPLETE)
-                .withReviewDetails(
-                        Stream.concat(
-                                getApiHardshipReviewDetails(BigDecimal.valueOf(2000.00),
-                                        HardshipReviewDetailType.EXPENDITURE
-                                ).stream(),
-                                getApiHardshipReviewDetails(BigDecimal.valueOf(1500.00),
-                                        HardshipReviewDetailType.INCOME
-                                ).stream()
-                        ).toList());
+                .withReviewDetails(Stream.concat(
+                                getApiHardshipReviewDetails(
+                                        BigDecimal.valueOf(2000.00), HardshipReviewDetailType.EXPENDITURE)
+                                        .stream(),
+                                getApiHardshipReviewDetails(
+                                        BigDecimal.valueOf(1500.00), HardshipReviewDetailType.INCOME)
+                                        .stream())
+                        .toList());
     }
 
     public static ApiPerformHardshipResponse getApiPerformHardshipResponse() {
@@ -162,59 +260,44 @@ public class TestModelDataBuilder {
 
     public static ApiPerformHardshipRequest getApiPerformHardshipRequest() {
         return new ApiPerformHardshipRequest()
-                .withHardship(
-                        new HardshipReview()
-                                .withCourtType(CourtType.MAGISTRATE)
-                                .withDeniedIncome(
-                                        List.of(
-                                                new DeniedIncome()
-                                                        .withAmount(BigDecimal.valueOf(1500))
-                                                        .withFrequency(Frequency.MONTHLY)
-                                                        .withAccepted(true)
-                                                        .withDescription(
-                                                                HARDSHIP_OTHER_DESCRIPTION)
-                                                        .withItemCode(DeniedIncomeDetailCode.MEDICAL_GROUNDS)
-                                                        .withReasonNote(HARDSHIP_REASON_NOTE)
-                                        )
-                                )
-                                .withExtraExpenditure(
-                                        List.of(
-                                                new ExtraExpenditure()
-                                                        .withAmount(BigDecimal.valueOf(2000.00))
-                                                        .withFrequency(Frequency.ANNUALLY)
-                                                        .withAccepted(false)
-                                                        .withReasonCode(HardshipReviewDetailReason.EVIDENCE_SUPPLIED)
-                                                        .withDescription(
-                                                                HARDSHIP_OTHER_DESCRIPTION)
-                                                        .withItemCode(ExtraExpenditureDetailCode.CAR_LOAN)
-                                        )
-                                )
-                                .withReviewDate(DATE_REVIEWED_DATETIME)
-                                .withSolicitorCosts(
-                                        new SolicitorCosts()
-                                                .withVat(SOLICITOR_VAT)
-                                                .withRate(SOLICITOR_RATE)
-                                                .withHours(SOLICITOR_HOURS)
-                                                .withDisbursements(SOLICITOR_DISBURSEMENTS)
-                                                .withEstimatedTotal(SOLICITOR_ESTIMATED_COST)
-                                )
-                                .withTotalAnnualDisposableIncome(Constants.DISPOSABLE_INCOME)
-                )
-                .withHardshipMetadata(
-                        new HardshipMetadata()
-                                .withRepId(REP_ID)
-                                .withCmuId(CMU_ID)
-                                .withHardshipReviewId(Constants.HARDSHIP_REVIEW_ID)
-                                .withFinancialAssessmentId(Constants.FINANCIAL_ASSESSMENT_ID)
-                                .withReviewReason(NewWorkReason.getFrom(NEW_WORK_REASON_STRING))
-                                .withReviewStatus(HardshipReviewStatus.COMPLETE)
-                                .withNotes(CASEWORKER_NOTES)
-                                .withDecisionNotes(CASEWORKER_DECISION_NOTES)
-                                .withUserSession(getApiUserSession())
-                );
+                .withHardship(new HardshipReview()
+                        .withCourtType(CourtType.MAGISTRATE)
+                        .withDeniedIncome(List.of(new DeniedIncome()
+                                .withAmount(BigDecimal.valueOf(1500))
+                                .withFrequency(Frequency.MONTHLY)
+                                .withAccepted(true)
+                                .withDescription(HARDSHIP_OTHER_DESCRIPTION)
+                                .withItemCode(DeniedIncomeDetailCode.MEDICAL_GROUNDS)
+                                .withReasonNote(HARDSHIP_REASON_NOTE)))
+                        .withExtraExpenditure(List.of(new ExtraExpenditure()
+                                .withAmount(BigDecimal.valueOf(2000.00))
+                                .withFrequency(Frequency.ANNUALLY)
+                                .withAccepted(false)
+                                .withReasonCode(HardshipReviewDetailReason.EVIDENCE_SUPPLIED)
+                                .withDescription(HARDSHIP_OTHER_DESCRIPTION)
+                                .withItemCode(ExtraExpenditureDetailCode.CAR_LOAN)))
+                        .withReviewDate(DATE_REVIEWED_DATETIME)
+                        .withSolicitorCosts(new SolicitorCosts()
+                                .withVat(SOLICITOR_VAT)
+                                .withRate(SOLICITOR_RATE)
+                                .withHours(SOLICITOR_HOURS)
+                                .withDisbursements(SOLICITOR_DISBURSEMENTS)
+                                .withEstimatedTotal(SOLICITOR_ESTIMATED_COST))
+                        .withTotalAnnualDisposableIncome(Constants.DISPOSABLE_INCOME))
+                .withHardshipMetadata(new HardshipMetadata()
+                        .withRepId(REP_ID)
+                        .withCmuId(CMU_ID)
+                        .withHardshipReviewId(Constants.HARDSHIP_REVIEW_ID)
+                        .withFinancialAssessmentId(Constants.FINANCIAL_ASSESSMENT_ID)
+                        .withReviewReason(NewWorkReason.getFrom(NEW_WORK_REASON_STRING))
+                        .withReviewStatus(HardshipReviewStatus.COMPLETE)
+                        .withNotes(CASEWORKER_NOTES)
+                        .withDecisionNotes(CASEWORKER_DECISION_NOTES)
+                        .withUserSession(getApiUserSession()));
     }
 
-    public static uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest getUpdateApplicationRequest() {
+    public static uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest
+            getUpdateApplicationRequest() {
         return new uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest()
                 .withApplicantHistoryId(APPLICANT_HISTORY_ID)
                 .withCrownRepId(REP_ID)
@@ -285,12 +368,11 @@ public class TestModelDataBuilder {
     }
 
     public static ApiIOJSummary getApiIOJSummary() {
-        return new ApiIOJSummary()
-                .withIojResult(RESULT_PASS)
-                .withDecisionResult(RESULT_PASS);
+        return new ApiIOJSummary().withIojResult(RESULT_PASS).withDecisionResult(RESULT_PASS);
     }
 
-    public static uk.gov.justice.laa.crime.common.model.proceeding.common.ApiFinancialAssessment getApiFinancialAssessment() {
+    public static uk.gov.justice.laa.crime.common.model.proceeding.common.ApiFinancialAssessment
+            getApiFinancialAssessment() {
         return new uk.gov.justice.laa.crime.common.model.proceeding.common.ApiFinancialAssessment()
                 .withInitResult(RESULT_FAIL)
                 .withInitStatus(CurrentStatus.COMPLETE)
@@ -305,17 +387,16 @@ public class TestModelDataBuilder {
                 .withAssessmentStatus(CurrentStatus.COMPLETE);
     }
 
-    public static uk.gov.justice.laa.crime.common.model.proceeding.common.ApiPassportAssessment getApiPassportAssessment() {
+    public static uk.gov.justice.laa.crime.common.model.proceeding.common.ApiPassportAssessment
+            getApiPassportAssessment() {
         return new uk.gov.justice.laa.crime.common.model.proceeding.common.ApiPassportAssessment()
                 .withResult(RESULT_FAIL)
                 .withStatus(CurrentStatus.COMPLETE);
     }
 
     public static ApiCapitalEvidence getApiCapitalEvidence() {
-        return new ApiCapitalEvidence().withEvidenceType(INCOME_EVIDENCE)
-                .withDateReceived(EVIDENCE_RECEIVED_DATE);
+        return new ApiCapitalEvidence().withEvidenceType(INCOME_EVIDENCE).withDateReceived(EVIDENCE_RECEIVED_DATE);
     }
-
 
     public static uk.gov.justice.laa.crime.common.model.common.ApiUserSession getApiUserSession() {
         return new uk.gov.justice.laa.crime.common.model.common.ApiUserSession()
@@ -341,13 +422,15 @@ public class TestModelDataBuilder {
         ApplicationDTO applicationDTOWithHardship;
         if (courtType == CourtType.MAGISTRATE) {
             applicationDTOWithHardship = getApplicationDTOWithHardship(CourtType.MAGISTRATE);
-            applicationDTOWithHardship.getAssessmentDTO()
+            applicationDTOWithHardship
+                    .getAssessmentDTO()
                     .getFinancialAssessmentDTO()
                     .getHardship()
                     .setMagCourtHardship(HardshipReviewDTO.builder().build());
         } else {
             applicationDTOWithHardship = getApplicationDTOWithHardship(CourtType.CROWN_COURT);
-            applicationDTOWithHardship.getAssessmentDTO()
+            applicationDTOWithHardship
+                    .getAssessmentDTO()
                     .getFinancialAssessmentDTO()
                     .getHardship()
                     .setCrownCourtHardship(HardshipReviewDTO.builder().build());
@@ -364,47 +447,43 @@ public class TestModelDataBuilder {
                 .withEstimatedTotal(SOLICITOR_ESTIMATED_COST);
     }
 
-    public static List<ApiHardshipDetail> getApiHardshipReviewDetails(BigDecimal amount,
-                                                                      HardshipReviewDetailType... detailTypes) {
+    public static List<ApiHardshipDetail> getApiHardshipReviewDetails(
+            BigDecimal amount, HardshipReviewDetailType... detailTypes) {
         List<ApiHardshipDetail> details = new ArrayList<>();
 
         Arrays.stream(detailTypes).forEach(type -> {
             switch (type) {
-                case FUNDING -> details.add(
-                        new ApiHardshipDetail()
-                                .withDetailType(HardshipReviewDetailType.FUNDING)
-                                .withAmount(amount)
-                                .withDateDue(LocalDateTime.now())
-                );
-                case INCOME -> details.add(
-                        new ApiHardshipDetail()
-                                .withId(HARDSHIP_DETAIL_ID)
-                                .withDetailType(HardshipReviewDetailType.INCOME)
-                                .withAmount(amount)
-                                .withFrequency(Frequency.MONTHLY)
-                                .withAccepted("Y")
-                                .withOtherDescription(HARDSHIP_OTHER_DESCRIPTION)
-                                .withReasonNote(HARDSHIP_REASON_NOTE)
-                                .withDetailCode(HardshipReviewDetailCode.MEDICAL_GROUNDS)
-                );
-                case EXPENDITURE -> details.add(
-                        new ApiHardshipDetail()
-                                .withId(HARDSHIP_DETAIL_ID)
-                                .withDetailType(HardshipReviewDetailType.EXPENDITURE)
-                                .withAmount(amount)
-                                .withFrequency(Frequency.ANNUALLY)
-                                .withAccepted("F")
-                                .withDetailReason(HardshipReviewDetailReason.EVIDENCE_SUPPLIED)
-                                .withOtherDescription(HARDSHIP_OTHER_DESCRIPTION)
-                                .withDetailCode(HardshipReviewDetailCode.CAR_LOAN)
-                );
-                case SOL_COSTS -> details.add(
-                        new ApiHardshipDetail()
-                                .withDetailType(HardshipReviewDetailType.SOL_COSTS)
-                                .withAmount(amount)
-                                .withFrequency(Frequency.ANNUALLY)
-                                .withAccepted("Y")
-                );
+                case FUNDING ->
+                    details.add(new ApiHardshipDetail()
+                            .withDetailType(HardshipReviewDetailType.FUNDING)
+                            .withAmount(amount)
+                            .withDateDue(LocalDateTime.now()));
+                case INCOME ->
+                    details.add(new ApiHardshipDetail()
+                            .withId(HARDSHIP_DETAIL_ID)
+                            .withDetailType(HardshipReviewDetailType.INCOME)
+                            .withAmount(amount)
+                            .withFrequency(Frequency.MONTHLY)
+                            .withAccepted("Y")
+                            .withOtherDescription(HARDSHIP_OTHER_DESCRIPTION)
+                            .withReasonNote(HARDSHIP_REASON_NOTE)
+                            .withDetailCode(HardshipReviewDetailCode.MEDICAL_GROUNDS));
+                case EXPENDITURE ->
+                    details.add(new ApiHardshipDetail()
+                            .withId(HARDSHIP_DETAIL_ID)
+                            .withDetailType(HardshipReviewDetailType.EXPENDITURE)
+                            .withAmount(amount)
+                            .withFrequency(Frequency.ANNUALLY)
+                            .withAccepted("F")
+                            .withDetailReason(HardshipReviewDetailReason.EVIDENCE_SUPPLIED)
+                            .withOtherDescription(HARDSHIP_OTHER_DESCRIPTION)
+                            .withDetailCode(HardshipReviewDetailCode.CAR_LOAN));
+                case SOL_COSTS ->
+                    details.add(new ApiHardshipDetail()
+                            .withDetailType(HardshipReviewDetailType.SOL_COSTS)
+                            .withAmount(amount)
+                            .withFrequency(Frequency.ANNUALLY)
+                            .withAccepted("Y"));
             }
         });
         return details;
@@ -431,9 +510,8 @@ public class TestModelDataBuilder {
 
     public static List<HRSectionDTO> getHrSectionDtosWithMixedTypes() {
         return Stream.concat(
-                getHrSectionDtosWithExpenditureType().stream(),
-                getHrSectionDtosWithDeniedIncomeType().stream()
-        ).collect(Collectors.toList());
+                        getHrSectionDtosWithExpenditureType().stream(), getHrSectionDtosWithDeniedIncomeType().stream())
+                .toList();
     }
 
     public static WorkflowRequest buildWorkflowRequestWithHardship(CourtType courtType) {
@@ -452,7 +530,6 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-
     public static WorkflowRequest buildWorkFlowRequest(CourtType courtType) {
         return WorkflowRequest.builder()
                 .userDTO(getUserDTO())
@@ -469,44 +546,39 @@ public class TestModelDataBuilder {
     }
 
     public static WorkflowRequest buildWorkflowRequestForApplicationTimestampValidation(Optional<String> timestamp) {
-        ZonedDateTime timestampToUse = timestamp.isPresent() ? toZonedDateTime(LocalDateTime.parse(timestamp.get())) : APPLICATION_TIMESTAMP;
+        ZonedDateTime timestampToUse =
+                timestamp.isPresent() ? toZonedDateTime(LocalDateTime.parse(timestamp.get())) : APPLICATION_TIMESTAMP;
 
-        return WorkflowRequest
-                .builder()
-                .applicationDTO(
-                        ApplicationDTO
-                                .builder()
-                                .repId(123L)
-                                .timestamp(timestampToUse)
-                                .statusDTO(RepStatusDTO
-                                        .builder()
-                                        .updateAllowed(true)
-                                        .build())
-                                .build()).build();
+        return WorkflowRequest.builder()
+                .applicationDTO(ApplicationDTO.builder()
+                        .repId(123L)
+                        .timestamp(timestampToUse)
+                        .statusDTO(RepStatusDTO.builder().updateAllowed(true).build())
+                        .build())
+                .build();
     }
 
     public static WorkflowRequest buildWorkFlowRequest(boolean isUpdateAllowed) {
-        return WorkflowRequest
-                .builder()
-                .applicationDTO(
-                        ApplicationDTO
-                                .builder()
-                                .repId(123L)
-                                .timestamp(APPLICATION_TIMESTAMP)
-                                .statusDTO(RepStatusDTO
-                                        .builder()
-                                        .updateAllowed(isUpdateAllowed)
-                                        .build())
+        return WorkflowRequest.builder()
+                .applicationDTO(ApplicationDTO.builder()
+                        .repId(123L)
+                        .timestamp(APPLICATION_TIMESTAMP)
+                        .statusDTO(RepStatusDTO.builder()
+                                .updateAllowed(isUpdateAllowed)
                                 .build())
+                        .build())
                 .build();
     }
 
     public static ApplicationDTO getApplicationDTO(CourtType courtType) {
         return ApplicationDTO.builder()
                 .repId(REP_ID.longValue())
-                .dateReceived(Date.from(DATETIME_RECEIVED.atZone(ZoneId.systemDefault()).toInstant()))
-                .committalDate(Date.from(COMMITAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
-                .decisionDate(Date.from(DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .dateReceived(Date.from(
+                        DATETIME_RECEIVED.atZone(ZoneId.systemDefault()).toInstant()))
+                .committalDate(Date.from(
+                        COMMITAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .decisionDate(Date.from(
+                        DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .applicantDTO(getApplicantDTO())
                 .assessmentDTO(getAssessmentDTO(courtType))
                 .caseManagementUnitDTO(getCaseManagementUnitDTO())
@@ -527,9 +599,12 @@ public class TestModelDataBuilder {
     public static ApplicationDTO getApplicationDTO() {
         return ApplicationDTO.builder()
                 .repId(REP_ID.longValue())
-                .dateReceived(Date.from(DATETIME_RECEIVED.atZone(ZoneId.systemDefault()).toInstant()))
-                .committalDate(Date.from(COMMITAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
-                .decisionDate(Date.from(DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .dateReceived(Date.from(
+                        DATETIME_RECEIVED.atZone(ZoneId.systemDefault()).toInstant()))
+                .committalDate(Date.from(
+                        COMMITAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .decisionDate(Date.from(
+                        DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .applicantDTO(getApplicantDTO())
                 .assessmentDTO(getAssessmentDTO())
                 .caseManagementUnitDTO(getCaseManagementUnitDTO())
@@ -551,20 +626,16 @@ public class TestModelDataBuilder {
         ApplicantDTO applicantDTO = getApplicantDTO();
         ApplicantDTO partner = getApplicantDTO();
         partner.setId(PARTNER_ID);
-        return List.of(ApplicantLinkDTO.builder()
+        return List.of(
+                ApplicantLinkDTO.builder()
                         .partnerDTO(applicantDTO)
                         .unlinked(DATE_COMPLETED)
                         .build(),
-                ApplicantLinkDTO.builder()
-                        .partnerDTO(partner)
-                        .build());
+                ApplicantLinkDTO.builder().partnerDTO(partner).build());
     }
 
     public static ChildWeightingDTO getChildWeightingDTO() {
-        return ChildWeightingDTO.builder()
-                .weightingId(37L)
-                .noOfChildren(1)
-                .build();
+        return ChildWeightingDTO.builder().weightingId(37L).noOfChildren(1).build();
     }
 
     public static ContraryInterestDTO getContraryInterestDTO() {
@@ -616,9 +687,12 @@ public class TestModelDataBuilder {
         return CrownCourtSummaryDTO.builder()
                 .ccRepId(REP_ID.longValue())
                 .ccRepType(CC_REP_TYPE_THROUGH_ORDER)
-                .ccRepOrderDate(Date.from(CC_REP_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
-                .sentenceOrderDate(Date.from(SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
-                .ccWithDrawalDate(Date.from(CC_WITHDRAWAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .ccRepOrderDate(Date.from(
+                        CC_REP_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .sentenceOrderDate(Date.from(
+                        SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .ccWithDrawalDate(Date.from(
+                        CC_WITHDRAWAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .repOrderDecision(REP_ORDER_DECISION_GRANTED)
                 .inPrisoned(Boolean.TRUE)
                 .benchWarrantyIssued(Boolean.TRUE)
@@ -631,9 +705,12 @@ public class TestModelDataBuilder {
         return CrownCourtSummaryDTO.builder()
                 .ccRepId(REP_ID.longValue())
                 .ccRepType(CC_REP_TYPE_THROUGH_ORDER)
-                .ccRepOrderDate(Date.from(CC_REP_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
-                .ccWithDrawalDate(Date.from(CC_WITHDRAWAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
-                .sentenceOrderDate(Date.from(SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .ccRepOrderDate(Date.from(
+                        CC_REP_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .ccWithDrawalDate(Date.from(
+                        CC_WITHDRAWAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .sentenceOrderDate(Date.from(
+                        SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .repOrderDecision(REP_ORDER_DECISION_GRANTED)
                 .inPrisoned(Boolean.TRUE)
                 .evidenceProvisionFee(getEvidenceFeeDTO())
@@ -642,15 +719,11 @@ public class TestModelDataBuilder {
     }
 
     public static EvidenceFeeDTO getEvidenceFeeDTO() {
-        return EvidenceFeeDTO.builder()
-                .feeLevel(EVIDENCE_FEE_LEVEL_1)
-                .build();
+        return EvidenceFeeDTO.builder().feeLevel(EVIDENCE_FEE_LEVEL_1).build();
     }
 
     public static IOJAppealDTO getIOJAppealDTO() {
-        return IOJAppealDTO.builder()
-                .appealDecisionResult(RESULT_PASS)
-                .build();
+        return IOJAppealDTO.builder().appealDecisionResult(RESULT_PASS).build();
     }
 
     public static CaseDetailDTO getCaseDetailDTO() {
@@ -671,12 +744,12 @@ public class TestModelDataBuilder {
                     .outcome(MagCourtOutcome.SENT_FOR_TRIAL.getOutcome())
                     .build();
         }
-
     }
 
     public static OutcomeDTO getOutcomeDTO() {
         return OutcomeDTO.builder()
-                .dateSet(Date.from(SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .dateSet(Date.from(
+                        SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .description(CrownCourtOutcome.SUCCESSFUL.getDescription())
                 .outComeType(CrownCourtOutcome.SUCCESSFUL.getType())
                 .outcome(CrownCourtOutcome.SUCCESSFUL.toString())
@@ -708,7 +781,8 @@ public class TestModelDataBuilder {
 
     public static CapitalEvidenceSummaryDTO getCapitalEvidenceSummaryDTO() {
         return CapitalEvidenceSummaryDTO.builder()
-                .evidenceReceivedDate(Date.from(EVIDENCE_RECEIVED_DATE.atZone(ZoneId.systemDefault()).toInstant()))
+                .evidenceReceivedDate(Date.from(
+                        EVIDENCE_RECEIVED_DATE.atZone(ZoneId.systemDefault()).toInstant()))
                 .build();
     }
 
@@ -740,19 +814,21 @@ public class TestModelDataBuilder {
                 .magsOutcomeDTO(getOutcomeDTO(courtType))
                 .statusDTO(getRepStatusDTO())
                 .timestamp(APPLICATION_TIMESTAMP)
-                .assessmentDTO(
-                        AssessmentDTO.builder()
-                                .financialAssessmentDTO(getFinancialAssessmentDTO(courtType))
-                                .build()
-                ).build();
+                .assessmentDTO(AssessmentDTO.builder()
+                        .financialAssessmentDTO(getFinancialAssessmentDTO(courtType))
+                        .build())
+                .build();
     }
 
     public static ApplicationDTO getApplicationDTOWithCCHardship(CourtType courtType) {
         return ApplicationDTO.builder()
                 .repId(REP_ID.longValue())
-                .dateReceived(Date.from(DATETIME_RECEIVED.atZone(ZoneId.systemDefault()).toInstant()))
-                .committalDate(Date.from(COMMITAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
-                .decisionDate(Date.from(DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .dateReceived(Date.from(
+                        DATETIME_RECEIVED.atZone(ZoneId.systemDefault()).toInstant()))
+                .committalDate(Date.from(
+                        COMMITAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .decisionDate(Date.from(
+                        DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .applicantDTO(getApplicantDTO())
                 .crownCourtOverviewDTO(getCrownCourtOverviewDTO())
                 .caseManagementUnitDTO(getCaseManagementUnitDTO())
@@ -767,12 +843,11 @@ public class TestModelDataBuilder {
                 .assessmentSummary(Collections.emptyList())
                 .timestamp(APPLICATION_TIMESTAMP)
                 .statusDTO(getRepStatusDTO())
-                .assessmentDTO(
-                        AssessmentDTO.builder()
-                                .financialAssessmentDTO(getFinancialAssessmentDTO(courtType))
-                                .iojAppeal(getIOJAppealDTO())
-                                .build()
-                ).build();
+                .assessmentDTO(AssessmentDTO.builder()
+                        .financialAssessmentDTO(getFinancialAssessmentDTO(courtType))
+                        .iojAppeal(getIOJAppealDTO())
+                        .build())
+                .build();
     }
 
     private static FinancialAssessmentDTO getFinancialAssessmentDTO(CourtType courtType) {
@@ -797,17 +872,21 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-    public static uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO getMaatApiFinancialAssessmentDTO() {
+    public static uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO
+            getMaatApiFinancialAssessmentDTO() {
         return uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID)
-                .finAssIncomeEvidences(List.of(getFinAssIncomeEvidenceDTO(NumberUtils.toInteger(APPLICANT_ID)), getFinAssIncomeEvidenceDTO(NumberUtils.toInteger(PARTNER_ID))))
+                .finAssIncomeEvidences(List.of(
+                        getFinAssIncomeEvidenceDTO(NumberUtils.toInteger(APPLICANT_ID)),
+                        getFinAssIncomeEvidenceDTO(NumberUtils.toInteger(PARTNER_ID))))
                 .build();
     }
 
     public static PassportAssessmentDTO getPassportAssessmentDTO() {
         return PassportAssessmentDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID)
-                .passportAssessmentEvidences(List.of(getPassportAssessmentEvidenceDTO(NumberUtils.toInteger(APPLICANT_ID)),
+                .passportAssessmentEvidences(List.of(
+                        getPassportAssessmentEvidenceDTO(NumberUtils.toInteger(APPLICANT_ID)),
                         getPassportAssessmentEvidenceDTO(NumberUtils.toInteger(PARTNER_ID))))
                 .build();
     }
@@ -836,11 +915,8 @@ public class TestModelDataBuilder {
                 .build();
     }
 
-
     private static CaseManagementUnitDTO getCaseManagementUnitDTO() {
-        return CaseManagementUnitDTO.builder()
-                .cmuId(CMU_ID.longValue())
-                .build();
+        return CaseManagementUnitDTO.builder().cmuId(CMU_ID.longValue()).build();
     }
 
     public static HardshipOverviewDTO getHardshipOverviewDTO(CourtType courtType) {
@@ -856,7 +932,6 @@ public class TestModelDataBuilder {
             dtoBuilder.magCourtHardship(reviewDTO);
             reviewDTO.setSolictorsCosts(getHRSolicitorsCostsDTO());
         }
-//
         return dtoBuilder.build();
     }
 
@@ -942,9 +1017,10 @@ public class TestModelDataBuilder {
 
     private static PassportAssessmentEvidenceDTO getPassportAssessmentEvidenceDTO(Integer applicantId) {
         PassportAssessmentEvidenceDTO passportAssessmentEvidenceDTO = new PassportAssessmentEvidenceDTO();
-        passportAssessmentEvidenceDTO.setApplicant(uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO.builder()
-                .id(applicantId)
-                .build());
+        passportAssessmentEvidenceDTO.setApplicant(
+                uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO.builder()
+                        .id(applicantId)
+                        .build());
         passportAssessmentEvidenceDTO.setIncomeEvidence(IncomeEvidenceType.TAX_RETURN.getName());
         passportAssessmentEvidenceDTO.setDateReceived(EVIDENCE_RECEIVED_DATE);
         passportAssessmentEvidenceDTO.setDateCreated(EVIDENCE_RECEIVED_DATE);
@@ -1042,72 +1118,56 @@ public class TestModelDataBuilder {
     }
 
     public static List<HRSectionDTO> getHrSectionDtosWithExpenditureType() {
-        return List.of(
-                HRSectionDTO.builder()
-                        .detailType(HRDetailTypeDTO.builder()
-                                .type(HardshipReviewDetailType.EXPENDITURE.getType())
-                                .description(HardshipReviewDetailType.EXPENDITURE.getDescription())
+        return List.of(HRSectionDTO.builder()
+                .detailType(HRDetailTypeDTO.builder()
+                        .type(HardshipReviewDetailType.EXPENDITURE.getType())
+                        .description(HardshipReviewDetailType.EXPENDITURE.getDescription())
+                        .build())
+                .detail(List.of(HRDetailDTO.builder()
+                        .id(HARDSHIP_DETAIL_ID.longValue())
+                        .detailDescription(HRDetailDescriptionDTO.builder()
+                                .code(HardshipReviewDetailCode.CAR_LOAN.getCode())
+                                .description(HardshipReviewDetailCode.CAR_LOAN.getDescription())
                                 .build())
-                        .detail(List.of(
-                                        HRDetailDTO.builder()
-                                                .id(HARDSHIP_DETAIL_ID.longValue())
-                                                .detailDescription(
-                                                        HRDetailDescriptionDTO.builder()
-                                                                .code(HardshipReviewDetailCode.CAR_LOAN.getCode())
-                                                                .description(HardshipReviewDetailCode.CAR_LOAN.getDescription())
-                                                                .build())
-                                                .accepted(false)
-                                                .frequency(FrequenciesDTO.builder()
-                                                        .code(Frequency.ANNUALLY.getCode())
-                                                        .annualWeighting(
-                                                                (long) Frequency.ANNUALLY.getWeighting())
-                                                        .description(Frequency.ANNUALLY.getDescription())
-                                                        .build())
-                                                .amountNumber(BigDecimal.valueOf(2000.00))
-                                                .otherDescription(HARDSHIP_OTHER_DESCRIPTION)
-                                                .reason(
-                                                        HRReasonDTO.builder()
-                                                                .id((long) HardshipReviewDetailReason.EVIDENCE_SUPPLIED.getId())
-                                                                .build())
-                                                .build()
-                                )
-                        )
-                        .build()
-        );
+                        .accepted(false)
+                        .frequency(FrequenciesDTO.builder()
+                                .code(Frequency.ANNUALLY.getCode())
+                                .annualWeighting((long) Frequency.ANNUALLY.getWeighting())
+                                .description(Frequency.ANNUALLY.getDescription())
+                                .build())
+                        .amountNumber(BigDecimal.valueOf(2000.00))
+                        .otherDescription(HARDSHIP_OTHER_DESCRIPTION)
+                        .reason(HRReasonDTO.builder()
+                                .id((long) HardshipReviewDetailReason.EVIDENCE_SUPPLIED.getId())
+                                .build())
+                        .build()))
+                .build());
     }
 
     public static List<HRSectionDTO> getHrSectionDtosWithDeniedIncomeType() {
-        return List.of(
-                HRSectionDTO.builder()
-                        .detailType(HRDetailTypeDTO.builder()
-                                .type(HardshipReviewDetailType.INCOME.getType())
-                                .description(HardshipReviewDetailType.INCOME.getDescription())
+        return List.of(HRSectionDTO.builder()
+                .detailType(HRDetailTypeDTO.builder()
+                        .type(HardshipReviewDetailType.INCOME.getType())
+                        .description(HardshipReviewDetailType.INCOME.getDescription())
+                        .build())
+                .detail(List.of(HRDetailDTO.builder()
+                        .id(HARDSHIP_DETAIL_ID.longValue())
+                        .detailDescription(HRDetailDescriptionDTO.builder()
+                                .code(HardshipReviewDetailCode.MEDICAL_GROUNDS.getCode())
+                                .description(HardshipReviewDetailCode.MEDICAL_GROUNDS.getDescription())
                                 .build())
-                        .detail(List.of(
-                                        HRDetailDTO.builder()
-                                                .id(HARDSHIP_DETAIL_ID.longValue())
-                                                .detailDescription(
-                                                        HRDetailDescriptionDTO.builder()
-                                                                .code(HardshipReviewDetailCode.MEDICAL_GROUNDS.getCode())
-                                                                .description(
-                                                                        HardshipReviewDetailCode.MEDICAL_GROUNDS.getDescription())
-                                                                .build())
-                                                .accepted(true)
-                                                .frequency(FrequenciesDTO.builder()
-                                                        .code(Frequency.MONTHLY.getCode())
-                                                        .annualWeighting(
-                                                                (long) Frequency.MONTHLY.getWeighting())
-                                                        .description(Frequency.MONTHLY.getDescription())
-                                                        .build())
-                                                .amountNumber(BigDecimal.valueOf(1500.00))
-                                                .hrReasonNote(HARDSHIP_REASON_NOTE)
-                                                .otherDescription(HARDSHIP_OTHER_DESCRIPTION)
-                                                .reason(HRReasonDTO.builder().build())
-                                                .build()
-                                )
-                        )
-                        .build()
-        );
+                        .accepted(true)
+                        .frequency(FrequenciesDTO.builder()
+                                .code(Frequency.MONTHLY.getCode())
+                                .annualWeighting((long) Frequency.MONTHLY.getWeighting())
+                                .description(Frequency.MONTHLY.getDescription())
+                                .build())
+                        .amountNumber(BigDecimal.valueOf(1500.00))
+                        .hrReasonNote(HARDSHIP_REASON_NOTE)
+                        .otherDescription(HARDSHIP_OTHER_DESCRIPTION)
+                        .reason(HRReasonDTO.builder().build())
+                        .build()))
+                .build());
     }
 
     public static AssessmentStatusDTO getAssessmentStatusDTO(CurrentStatus status) {
@@ -1127,14 +1187,16 @@ public class TestModelDataBuilder {
     public static ApplicationDTO getApplicationDTOForMeansAssessmentMapper(Boolean isFullAssessmentAvailable) {
         ApplicationDTO applicationDTO = new ApplicationDTO();
         AssessmentDTO assessmentDTO = new AssessmentDTO();
-        FinancialAssessmentDTO financialAssessmentDTO = getFinancialAssessmentDTOForMeansAssessmentMapper(isFullAssessmentAvailable);
+        FinancialAssessmentDTO financialAssessmentDTO =
+                getFinancialAssessmentDTOForMeansAssessmentMapper(isFullAssessmentAvailable);
         assessmentDTO.setFinancialAssessmentDTO(financialAssessmentDTO);
         assessmentDTO.getFinancialAssessmentDTO().setIncomeEvidence(new IncomeEvidenceSummaryDTO());
         applicationDTO.setAssessmentDTO(assessmentDTO);
         return applicationDTO;
     }
 
-    private static FinancialAssessmentDTO getFinancialAssessmentDTOForMeansAssessmentMapper(Boolean isFullAssessmentAvailable) {
+    private static FinancialAssessmentDTO getFinancialAssessmentDTOForMeansAssessmentMapper(
+            Boolean isFullAssessmentAvailable) {
         FinancialAssessmentDTO financialAssessmentDTO = new FinancialAssessmentDTO();
         InitialAssessmentDTO initialAssessmentDTO = getInitialAssessmentDTOForMeansAssessmentMapper();
         FullAssessmentDTO fullAssessmentDTO = getFullAssessmentDTOForMeansAssessmentMapper();
@@ -1176,31 +1238,44 @@ public class TestModelDataBuilder {
     public static RepOrderDTO buildRepOrderDTOWithModifiedDateOf(String dateModifiedTimestamp) {
         LocalDateTime dateModified = LocalDateTime.parse(dateModifiedTimestamp);
 
-        return RepOrderDTO.builder().dateModified(dateModified).rorsStatus(RepOrderStatus.CURR.getCode()).build();
+        return RepOrderDTO.builder()
+                .dateModified(dateModified)
+                .rorsStatus(RepOrderStatus.CURR.getCode())
+                .build();
     }
 
     public static RepOrderDTO buildRepOrderDTOWithCreatedDateAndNoModifiedDate() {
-        return RepOrderDTO.builder().dateCreated(REP_ORDER_CREATED_TIMESTAMP).dateModified(null).build();
+        return RepOrderDTO.builder()
+                .dateCreated(REP_ORDER_CREATED_TIMESTAMP)
+                .dateModified(null)
+                .build();
     }
 
     public static RepOrderDTO buildRepOrderDTO(String rorsStatus) {
-        return RepOrderDTO.builder().id(1000).dateModified(APPLICATION_TIMESTAMP.toLocalDateTime()).rorsStatus(rorsStatus).build();
+        return RepOrderDTO.builder()
+                .id(1000)
+                .dateModified(APPLICATION_TIMESTAMP.toLocalDateTime())
+                .rorsStatus(rorsStatus)
+                .build();
     }
 
     public static RepOrderDTO buildRepOrderDTOWithAssessorName() {
-        UserDTO userDTO = UserDTO.builder().firstName("FIRSTNAME").surname("SURNAME").build();
+        UserDTO userDTO =
+                UserDTO.builder().firstName("FIRSTNAME").surname("SURNAME").build();
         return RepOrderDTO.builder()
                 .id(1000)
                 .userCreatedEntity(userDTO)
-                .passportAssessments(
-                        List.of(PassportAssessmentDTO.builder()
-                                .id(PASSPORTED_ID)
-                                .userCreatedEntity(userDTO).build()))
+                .passportAssessments(List.of(PassportAssessmentDTO.builder()
+                        .id(PASSPORTED_ID)
+                        .userCreatedEntity(userDTO)
+                        .build()))
                 .financialAssessments(
                         List.of(uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO.builder()
                                 .id(Constants.FINANCIAL_ASSESSMENT_ID)
-                                .userCreatedEntity(userDTO).build()))
-                .dateModified(APPLICATION_TIMESTAMP.toLocalDateTime()).build();
+                                .userCreatedEntity(userDTO)
+                                .build()))
+                .dateModified(APPLICATION_TIMESTAMP.toLocalDateTime())
+                .build();
     }
 
     public static UserSummaryDTO getUserSummaryDTO() {
@@ -1228,7 +1303,8 @@ public class TestModelDataBuilder {
                 .username(Constants.USERNAME)
                 .action(TEST_ACTION)
                 .newWorkReason(TEST_NEW_WORK_REASON)
-                .sessionId(USER_SESSION).build();
+                .sessionId(USER_SESSION)
+                .build();
     }
 
     public static UserActionDTO getUserActionDTOWithReservation() {
@@ -1236,7 +1312,8 @@ public class TestModelDataBuilder {
                 .username(Constants.USERNAME)
                 .action(TEST_ACTION)
                 .newWorkReason(TEST_NEW_WORK_REASON)
-                .sessionId(TEST_USER_SESSION).build();
+                .sessionId(TEST_USER_SESSION)
+                .build();
     }
 
     public static UserActionDTO getUserActionDTOInvalidValidRequest() {
@@ -1244,7 +1321,8 @@ public class TestModelDataBuilder {
                 .username(Constants.USERNAME)
                 .action(null)
                 .newWorkReason(null)
-                .sessionId(null).build();
+                .sessionId(null)
+                .build();
     }
 
     @NonNull
@@ -1252,7 +1330,11 @@ public class TestModelDataBuilder {
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
         repOrderDTO.setArrestSummonsNo(applicationDTO.getArrestSummonsNo());
         repOrderDTO.setSuppAccountCode(applicationDTO.getArrestSummonsNo());
-        repOrderDTO.setEvidenceFeeLevel(applicationDTO.getCrownCourtOverviewDTO().getCrownCourtSummaryDTO().getEvidenceProvisionFee().getFeeLevel());
+        repOrderDTO.setEvidenceFeeLevel(applicationDTO
+                .getCrownCourtOverviewDTO()
+                .getCrownCourtSummaryDTO()
+                .getEvidenceProvisionFee()
+                .getFeeLevel());
         repOrderDTO.setMacoCourt(null);
         repOrderDTO.setMagsOutcome(applicationDTO.getMagsOutcomeDTO().getOutcome());
         repOrderDTO.setDateReceived(null);
@@ -1264,7 +1346,11 @@ public class TestModelDataBuilder {
         repOrderDTO.setApplicantHistoryId(null);
         repOrderDTO.setRorsStatus(applicationDTO.getStatusDTO().getStatus());
         repOrderDTO.setRepOrderCCOutcome(null);
-        repOrderDTO.setAppealTypeCode(applicationDTO.getCrownCourtOverviewDTO().getAppealDTO().getAppealTypeDTO().getCode());
+        repOrderDTO.setAppealTypeCode(applicationDTO
+                .getCrownCourtOverviewDTO()
+                .getAppealDTO()
+                .getAppealTypeDTO()
+                .getCode());
         return repOrderDTO;
     }
 
@@ -1335,7 +1421,8 @@ public class TestModelDataBuilder {
                 .withApplicantDetails(getApplicantDetails(false))
                 .withPartnerDetails(isPartner ? getApplicantDetails(true) : null)
                 .withApplicantPensionAmount(BigDecimal.valueOf(1000.0 * Frequency.MONTHLY.getWeighting()))
-                .withPartnerPensionAmount(isPartner ? BigDecimal.valueOf(2000.0 * Frequency.TWO_WEEKLY.getWeighting()) : null)
+                .withPartnerPensionAmount(
+                        isPartner ? BigDecimal.valueOf(2000.0 * Frequency.TWO_WEEKLY.getWeighting()) : null)
                 .withMetadata(getMetadata());
     }
 
@@ -1345,14 +1432,16 @@ public class TestModelDataBuilder {
                 .withApplicantEvidenceItems(getApiIncomeEvidenceItems(false))
                 .withPartnerEvidenceItems(isPartner ? getApiIncomeEvidenceItems(true) : null)
                 .withApplicantPensionAmount(BigDecimal.valueOf(1000.0 * Frequency.MONTHLY.getWeighting()))
-                .withPartnerPensionAmount(isPartner ? BigDecimal.valueOf(2000.0 * Frequency.TWO_WEEKLY.getWeighting()) : null)
+                .withPartnerPensionAmount(
+                        isPartner ? BigDecimal.valueOf(2000.0 * Frequency.TWO_WEEKLY.getWeighting()) : null)
                 .withEvidenceDueDate(EVIDENCE_DUE_DATE)
                 .withEvidenceReceivedDate(INCOME_EVIDENCE_RECEIVED_DATE)
                 .withMetadata(getMetadata());
     }
 
     private static ApiIncomeEvidenceItems getApiIncomeEvidenceItems(boolean isPartner) {
-        List<ApiIncomeEvidence> incomeEvidenceItems = List.of(new ApiIncomeEvidence()
+        List<ApiIncomeEvidence> incomeEvidenceItems = List.of(
+                new ApiIncomeEvidence()
                         .withId(APPLICANT_EVIDENCE_ID)
                         .withDateReceived(EVIDENCE_RECEIVED_DATE.toLocalDate())
                         .withEvidenceType(IncomeEvidenceType.TAX_RETURN)
@@ -1388,26 +1477,22 @@ public class TestModelDataBuilder {
 
     public static ApiCreateIncomeEvidenceResponse getCreateIncomeEvidenceResponse() {
         return new ApiCreateIncomeEvidenceResponse()
-                .withApplicantEvidenceItems(
-                        new ApiIncomeEvidenceItems()
-                                .withApplicantDetails(getApplicantDetails(false))
-                                .withIncomeEvidenceItems(List.of(getIncomeEvidence(APPLICANT_EVIDENCE_ID, IncomeEvidenceType.TAX_RETURN)))
-                )
-                .withPartnerEvidenceItems(
-                        new ApiIncomeEvidenceItems()
-                                .withApplicantDetails(getApplicantDetails(true))
-                                .withIncomeEvidenceItems(List.of(getIncomeEvidence(PARTNER_EVIDENCE_ID, IncomeEvidenceType.TAX_RETURN)))
-                );
-
+                .withApplicantEvidenceItems(new ApiIncomeEvidenceItems()
+                        .withApplicantDetails(getApplicantDetails(false))
+                        .withIncomeEvidenceItems(
+                                List.of(getIncomeEvidence(APPLICANT_EVIDENCE_ID, IncomeEvidenceType.TAX_RETURN))))
+                .withPartnerEvidenceItems(new ApiIncomeEvidenceItems()
+                        .withApplicantDetails(getApplicantDetails(true))
+                        .withIncomeEvidenceItems(
+                                List.of(getIncomeEvidence(PARTNER_EVIDENCE_ID, IncomeEvidenceType.TAX_RETURN))));
     }
 
-    public static ApiUpdateIncomeEvidenceResponse getUpdateIncomeEvidenceResponse(boolean hasPartnerIncome, IncomeEvidenceType incomeEvidence) {
+    public static ApiUpdateIncomeEvidenceResponse getUpdateIncomeEvidenceResponse(
+            boolean hasPartnerIncome, IncomeEvidenceType incomeEvidence) {
         ApiUpdateIncomeEvidenceResponse response = new ApiUpdateIncomeEvidenceResponse()
-                .withApplicantEvidenceItems(
-                        new ApiIncomeEvidenceItems()
-                                .withApplicantDetails(getApplicantDetails(false))
-                                .withIncomeEvidenceItems(List.of(getIncomeEvidence(APPLICANT_EVIDENCE_ID, incomeEvidence)))
-                )
+                .withApplicantEvidenceItems(new ApiIncomeEvidenceItems()
+                        .withApplicantDetails(getApplicantDetails(false))
+                        .withIncomeEvidenceItems(List.of(getIncomeEvidence(APPLICANT_EVIDENCE_ID, incomeEvidence))))
                 .withAllEvidenceReceivedDate(ALL_EVIDENCE_RECEIVED_DATE)
                 .withDueDate(EVIDENCE_DUE_DATE.toLocalDate())
                 .withUpliftAppliedDate(UPLIFT_APPLIED_DATE)
@@ -1420,7 +1505,6 @@ public class TestModelDataBuilder {
         }
 
         return response;
-
     }
 
     private static ApiIncomeEvidence getIncomeEvidence(Integer id, IncomeEvidenceType incomeEvidence) {
@@ -1432,13 +1516,14 @@ public class TestModelDataBuilder {
                 .withDescription(incomeEvidence.getDescription());
     }
 
-    public static MaatApiUpdateAssessment getMaatApiUpdateAssessment(AssessmentType assessmentType, boolean hasPartnerIncome) {
+    public static MaatApiUpdateAssessment getMaatApiUpdateAssessment(
+            AssessmentType assessmentType, boolean hasPartnerIncome) {
 
         return getMaatApiUpdateAssessment(assessmentType, hasPartnerIncome, IncomeEvidenceType.TAX_RETURN);
     }
 
-    public static MaatApiUpdateAssessment getMaatApiUpdateAssessment(AssessmentType assessmentType, boolean hasPartnerIncome,
-                                                                     IncomeEvidenceType incomeEvidenceType) {
+    public static MaatApiUpdateAssessment getMaatApiUpdateAssessment(
+            AssessmentType assessmentType, boolean hasPartnerIncome, IncomeEvidenceType incomeEvidenceType) {
         MaatApiUpdateAssessment maatApiUpdateAssessment = new MaatApiUpdateAssessment()
                 .withFinancialAssessmentId(Constants.FINANCIAL_ASSESSMENT_ID)
                 .withUserModified(Constants.USERNAME)
@@ -1461,15 +1546,18 @@ public class TestModelDataBuilder {
                 .withDateCompleted(null);
 
         List<FinancialAssessmentIncomeEvidence> incomeEvidenceList = new ArrayList<>();
-        incomeEvidenceList.add(getFinAssIncomeEvidence(APPLICANT_EVIDENCE_ID, NumberUtils.toInteger(APPLICANT_ID), incomeEvidenceType, false));
+        incomeEvidenceList.add(getFinAssIncomeEvidence(
+                APPLICANT_EVIDENCE_ID, NumberUtils.toInteger(APPLICANT_ID), incomeEvidenceType, false));
         if (hasPartnerIncome) {
-            incomeEvidenceList.add(getFinAssIncomeEvidence(PARTNER_EVIDENCE_ID, NumberUtils.toInteger(PARTNER_ID), incomeEvidenceType, true));
+            incomeEvidenceList.add(getFinAssIncomeEvidence(
+                    PARTNER_EVIDENCE_ID, NumberUtils.toInteger(PARTNER_ID), incomeEvidenceType, true));
         }
         maatApiUpdateAssessment.setFinAssIncomeEvidences(incomeEvidenceList);
 
         if (AssessmentType.FULL.equals(assessmentType)) {
             maatApiUpdateAssessment.setFassFullStatus(AssessmentStatusDTO.COMPLETE);
-            maatApiUpdateAssessment.setFullAssessmentDate(LocalDateTime.ofInstant(ASSESSMENT_DATE.toInstant(), ZoneId.systemDefault()));
+            maatApiUpdateAssessment.setFullAssessmentDate(
+                    LocalDateTime.ofInstant(ASSESSMENT_DATE.toInstant(), ZoneId.systemDefault()));
             maatApiUpdateAssessment.setFullResult(RESULT_PASS);
             maatApiUpdateAssessment.setFullResultReason(null);
             maatApiUpdateAssessment.setFullAssessmentNotes(ASSESSMENT_NOTES);
@@ -1483,8 +1571,8 @@ public class TestModelDataBuilder {
         return maatApiUpdateAssessment;
     }
 
-    private static FinancialAssessmentIncomeEvidence getFinAssIncomeEvidence(Integer evidenceId, Integer applicantId
-            , IncomeEvidenceType incomeEvidence, boolean isPartner) {
+    private static FinancialAssessmentIncomeEvidence getFinAssIncomeEvidence(
+            Integer evidenceId, Integer applicantId, IncomeEvidenceType incomeEvidence, boolean isPartner) {
         return new FinancialAssessmentIncomeEvidence()
                 .withId(evidenceId)
                 .withDateReceived(EVIDENCE_RECEIVED_DATE)

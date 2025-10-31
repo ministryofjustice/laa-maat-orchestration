@@ -1,26 +1,99 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
-import org.springframework.stereotype.Component;
+import static uk.gov.justice.laa.crime.orchestration.data.Constants.FINANCIAL_ASSESSMENT_ID;
+import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
+import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
+
 import uk.gov.justice.laa.crime.common.model.common.ApiUserSession;
-import uk.gov.justice.laa.crime.common.model.meansassessment.*;
-import uk.gov.justice.laa.crime.enums.*;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentChildWeighting;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentDetail;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentSectionSummary;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentStatus;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentSummary;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiCreateMeansAssessmentRequest;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiCrownCourtOverview;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiFullMeansAssessment;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiGetMeansAssessmentResponse;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiIncomeEvidence;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiIncomeEvidenceSummary;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiInitialMeansAssessment;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiMeansAssessmentResponse;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiNewWorkReason;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiReviewType;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiRollbackMeansAssessmentResponse;
+import uk.gov.justice.laa.crime.common.model.meansassessment.ApiUpdateMeansAssessmentRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
+import uk.gov.justice.laa.crime.enums.AppealType;
+import uk.gov.justice.laa.crime.enums.AssessmentResult;
+import uk.gov.justice.laa.crime.enums.AssessmentType;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
+import uk.gov.justice.laa.crime.enums.DecisionReason;
+import uk.gov.justice.laa.crime.enums.Frequency;
+import uk.gov.justice.laa.crime.enums.InitAssessmentResult;
+import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
+import uk.gov.justice.laa.crime.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.enums.ReviewType;
+import uk.gov.justice.laa.crime.enums.WorkType;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
-import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
-
-import java.math.BigDecimal;
-import java.time.*;
-import java.util.*;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AppealDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AppealTypeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicantDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentDetailDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSectionSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentStatusDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CaseDetailDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CaseManagementUnitDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ChildWeightingDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtOverviewDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.EmploymentStatusDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceFeeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceTypeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ExtraEvidenceDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FrequenciesDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FullAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.IncomeEvidenceSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.NewWorkReasonDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.OffenceDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.OutcomeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.RepOrderDecisionDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.RepStatusDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ReviewTypeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.SysGenDate;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.SysGenString;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FeatureToggleDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggle;
 import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggleAction;
 
-import static uk.gov.justice.laa.crime.orchestration.data.Constants.FINANCIAL_ASSESSMENT_ID;
-import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
-import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+
+import org.springframework.stereotype.Component;
 
 @Component
 public class MeansAssessmentDataBuilder {
@@ -56,18 +129,12 @@ public class MeansAssessmentDataBuilder {
     private static final BigDecimal ANNUAL_TOTAL = APPLICANT_ANNUAL_TOTAL.add(PARTNER_ANNUAL_TOTAL);
     private static final String EMPLOYMENT_STATUS = "EMPLOY";
     private static final String INCOME_EVIDENCE_NOTES = "Mock Income evidence notes";
-    private static final LocalDateTime INCOME_UPLIFT_APPLY_DATE =
-            LocalDateTime.of(2021, 12, 12, 0, 0, 0);
-    private static final LocalDateTime INCOME_UPLIFT_REMOVE_DATE =
-            INCOME_UPLIFT_APPLY_DATE.plusDays(10);
-    private static final LocalDateTime INCOME_EVIDENCE_DUE_DATE =
-            LocalDateTime.of(2020, 10, 5, 0, 0, 0);
-    private static final LocalDateTime INCOME_EVIDENCE_RECEIVED_DATE =
-            LocalDateTime.of(2020, 10, 1, 0, 0, 0);
-    private static final LocalDateTime FIRST_REMINDER_DATE =
-            LocalDateTime.of(2020, 10, 2, 0, 0, 0);
-    private static final LocalDateTime SECOND_REMINDER_DATE =
-            LocalDateTime.of(2020, 10, 2, 0, 0, 0);
+    private static final LocalDateTime INCOME_UPLIFT_APPLY_DATE = LocalDateTime.of(2021, 12, 12, 0, 0, 0);
+    private static final LocalDateTime INCOME_UPLIFT_REMOVE_DATE = INCOME_UPLIFT_APPLY_DATE.plusDays(10);
+    private static final LocalDateTime INCOME_EVIDENCE_DUE_DATE = LocalDateTime.of(2020, 10, 5, 0, 0, 0);
+    private static final LocalDateTime INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2020, 10, 1, 0, 0, 0);
+    private static final LocalDateTime FIRST_REMINDER_DATE = LocalDateTime.of(2020, 10, 2, 0, 0, 0);
+    private static final LocalDateTime SECOND_REMINDER_DATE = LocalDateTime.of(2020, 10, 2, 0, 0, 0);
     private static final String TRANSACTION_ID = "7c49ebfe-fe3a-4f2f-8dad-f7b8f03b8327";
     private static final BigDecimal THRESHOLD = BigDecimal.valueOf(5000.00);
     private static final BigDecimal AGGREGATED_EXPENSE = BigDecimal.valueOf(22000.00);
@@ -101,7 +168,7 @@ public class MeansAssessmentDataBuilder {
     public static final String ASSESSMENT_DESCRIPTION = "Income from Private Pension(s)";
     public static final BigDecimal PARTNER_AMOUNT = BigDecimal.valueOf(2000);
     private static final LocalDateTime DATE_MODIFIED = LocalDateTime.of(2023, 10, 13, 10, 15, 30);
-    private static final ZonedDateTime TIME_STAMP =  toZonedDateTime(DATE_MODIFIED);
+    private static final ZonedDateTime TIME_STAMP = toZonedDateTime(DATE_MODIFIED);
     public static final String SECTION = "INITA";
     public static final Integer INIT_MEANS_ID = 90;
     private static final LocalDateTime PARTNER_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2020, 9, 13, 0, 0, 0);
@@ -110,16 +177,13 @@ public class MeansAssessmentDataBuilder {
     public static final Integer TEST_REP_ID = 42312;
     public static final LocalDateTime TEST_MAGS_OUTCOME_DATE = LocalDateTime.of(2022, 6, 5, 0, 0);
 
-
     private static final LocalDateTime APPLICATION_TIMESTAMP = LocalDateTime.of(2022, 10, 1, 0, 0, 0);
     public static final Date APPEAL_SENTENCE_ORDER_DATE = new GregorianCalendar(2023, Calendar.AUGUST, 3).getTime();
     public static final String OTHER_DESCRIPTION = "OTHER DESCRIPTION";
     private static final Integer EXTRA_EVIDENCE_ID = 52473;
 
     public static ApiUserSession getApiUserSession() {
-        return new ApiUserSession()
-                .withUserName(USERNAME)
-                .withSessionId(USER_SESSION);
+        return new ApiUserSession().withUserName(USERNAME).withSessionId(USER_SESSION);
     }
 
     public static WorkflowRequest buildWorkFlowRequest() {
@@ -132,9 +196,12 @@ public class MeansAssessmentDataBuilder {
     public static ApplicationDTO getApplicationDTO() {
         return ApplicationDTO.builder()
                 .repId(REP_ID.longValue())
-                .dateReceived(Date.from(DATETIME_RECEIVED.atZone(ZoneId.systemDefault()).toInstant()))
-                .committalDate(Date.from(COMMITTAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
-                .decisionDate(Date.from(DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .dateReceived(Date.from(
+                        DATETIME_RECEIVED.atZone(ZoneId.systemDefault()).toInstant()))
+                .committalDate(Date.from(
+                        COMMITTAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .decisionDate(Date.from(
+                        DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .applicantDTO(getApplicantDTO())
                 .assessmentDTO(getAssessmentDTO())
                 .crownCourtOverviewDTO(getCrownCourtOverviewDTOForContribution())
@@ -183,8 +250,10 @@ public class MeansAssessmentDataBuilder {
         return CrownCourtSummaryDTO.builder()
                 .ccRepId(REP_ID.longValue())
                 .ccRepType(CC_REP_TYPE_THROUGH_ORDER)
-                .ccRepOrderDate(Date.from(CC_REP_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
-                .sentenceOrderDate(Date.from(SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .ccRepOrderDate(Date.from(
+                        CC_REP_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .sentenceOrderDate(Date.from(
+                        SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .repOrderDecision(REP_ORDER_DECISION_GRANTED)
                 .inPrisoned(Boolean.TRUE)
                 .evidenceProvisionFee(getEvidenceFeeDTO())
@@ -193,15 +262,11 @@ public class MeansAssessmentDataBuilder {
     }
 
     public static EvidenceFeeDTO getEvidenceFeeDTO() {
-        return EvidenceFeeDTO.builder()
-                .feeLevel(EVIDENCE_FEE_LEVEL_1)
-                .build();
+        return EvidenceFeeDTO.builder().feeLevel(EVIDENCE_FEE_LEVEL_1).build();
     }
 
     public static IOJAppealDTO getIOJAppealDTO() {
-        return IOJAppealDTO.builder()
-                .appealDecisionResult(RESULT_PASS)
-                .build();
+        return IOJAppealDTO.builder().appealDecisionResult(RESULT_PASS).build();
     }
 
     public static CaseDetailDTO getCaseDetailDTO() {
@@ -211,15 +276,15 @@ public class MeansAssessmentDataBuilder {
     }
 
     private static CaseManagementUnitDTO getCaseManagementUnitDTO() {
-        return CaseManagementUnitDTO.builder()
-                .cmuId(CMU_ID.longValue())
-                .build();
+        return CaseManagementUnitDTO.builder().cmuId(CMU_ID.longValue()).build();
     }
 
     public static OutcomeDTO getOutcomeDTO(CourtType courtType) {
         if (courtType.equals(CourtType.CROWN_COURT)) {
             return OutcomeDTO.builder()
-                    .dateSet(Date.from(SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                    .dateSet(Date.from(SENTENCE_ORDER_DATETIME
+                            .atZone(ZoneId.systemDefault())
+                            .toInstant()))
                     .description(CrownCourtOutcome.CONVICTED.getDescription())
                     .outComeType(CrownCourtOutcome.CONVICTED.getType())
                     .outcome(CrownCourtOutcome.CONVICTED.toString())
@@ -229,12 +294,12 @@ public class MeansAssessmentDataBuilder {
                     .outcome(MagCourtOutcome.SENT_FOR_TRIAL.getOutcome())
                     .build();
         }
-
     }
 
     public static OutcomeDTO getOutcomeDTO() {
         return OutcomeDTO.builder()
-                .dateSet(Date.from(SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .dateSet(Date.from(
+                        SENTENCE_ORDER_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
                 .description(CrownCourtOutcome.SUCCESSFUL.getDescription())
                 .outComeType(CrownCourtOutcome.SUCCESSFUL.getType())
                 .outcome(CrownCourtOutcome.SUCCESSFUL.toString())
@@ -267,7 +332,6 @@ public class MeansAssessmentDataBuilder {
                 .upfrontContribs(UPFRONT_CONTRIBUTION_AMOUNT)
                 .build();
     }
-
 
     public static FullAssessmentDTO getFullAssessmentDTO() {
         return FullAssessmentDTO.builder()
@@ -348,14 +412,12 @@ public class MeansAssessmentDataBuilder {
 
     public static UserSummaryDTO getUserSummaryDTO() {
         return UserSummaryDTO.builder()
-            .featureToggle(List.of(
-                FeatureToggleDTO.builder()
-                    .featureName(FeatureToggle.CALCULATE_CONTRIBUTION.getName())
-                    .action(FeatureToggleAction.CREATE.getName())
-                    .isEnabled("Y")
-                    .build()
-            ))
-            .build();
+                .featureToggle(List.of(FeatureToggleDTO.builder()
+                        .featureName(FeatureToggle.CALCULATE_CONTRIBUTION.getName())
+                        .action(FeatureToggleAction.CREATE.getName())
+                        .isEnabled("Y")
+                        .build()))
+                .build();
     }
 
     public static RepOrderDTO getRepOrderDTO() {
@@ -386,8 +448,7 @@ public class MeansAssessmentDataBuilder {
                         .weightingId(38L)
                         .noOfChildren(2)
                         .weightingFactor(0.0)
-                        .build()
-        );
+                        .build());
     }
 
     private static NewWorkReasonDTO getNewWorkReasonDTO() {
@@ -399,10 +460,7 @@ public class MeansAssessmentDataBuilder {
     }
 
     private static UserDTO getUserDTO() {
-        return UserDTO.builder()
-                .userName(USERNAME)
-                .userSession(USER_SESSION)
-                .build();
+        return UserDTO.builder().userName(USERNAME).userSession(USER_SESSION).build();
     }
 
     public static IncomeEvidenceSummaryDTO getIncomeEvidenceSummaryDTO() {
@@ -442,7 +500,7 @@ public class MeansAssessmentDataBuilder {
                 .build();
     }
 
-   public static EvidenceDTO getPartnerEvidenceDTO() {
+    public static EvidenceDTO getPartnerEvidenceDTO() {
         return EvidenceDTO.builder()
                 .id(PARTNER_EVIDENCE_ID.longValue())
                 .evidenceTypeDTO(getEvidenceTypeDTO())
@@ -482,10 +540,7 @@ public class MeansAssessmentDataBuilder {
     }
 
     private static RepStatusDTO getRepStatusDTO() {
-        return RepStatusDTO.builder()
-                .status("RepStatus")
-                .removeContribs(true)
-                .build();
+        return RepStatusDTO.builder().status("RepStatus").removeContribs(true).build();
     }
 
     public static ApiGetMeansAssessmentResponse getApiGetMeansAssessmentResponse() {
@@ -495,12 +550,13 @@ public class MeansAssessmentDataBuilder {
                 .withFullAvailable(true)
                 .withUsn(USN)
                 .withFullAssessment(getApiFullAssessment(CurrentStatus.COMPLETE))
-                .withInitialAssessment(getApiInitialMeansAssessment(CurrentStatus.COMPLETE, NewWorkReason.NEW, ReviewType.ER))
+                .withInitialAssessment(
+                        getApiInitialMeansAssessment(CurrentStatus.COMPLETE, NewWorkReason.NEW, ReviewType.ER))
                 .withIncomeEvidenceSummary(getApiIncomeEvidenceSummary());
     }
 
-    public static ApiInitialMeansAssessment getApiInitialMeansAssessment(CurrentStatus currentStatus, NewWorkReason newWorkReason,
-                                                                         ReviewType reviewType) {
+    public static ApiInitialMeansAssessment getApiInitialMeansAssessment(
+            CurrentStatus currentStatus, NewWorkReason newWorkReason, ReviewType reviewType) {
         ApiInitialMeansAssessment apiInitialMeansAssessment = new ApiInitialMeansAssessment();
         apiInitialMeansAssessment.setId(INIT_MEANS_ID);
         apiInitialMeansAssessment.setAssessmentDate(INITIAL_ASSESSMENT_DATE);
@@ -583,10 +639,7 @@ public class MeansAssessmentDataBuilder {
                 .withCrownCourtOverview(new ApiCrownCourtOverview()
                         .withAvailable(true)
                         .withCrownCourtSummary(
-                                new ApiCrownCourtSummary()
-                                        .withRepOrderDecision("MOCK_REP_ORDER_DECISION")
-                        )
-                )
+                                new ApiCrownCourtSummary().withRepOrderDecision("MOCK_REP_ORDER_DECISION")))
                 .withSectionSummaries(List.of(getApiAssessmentSectionSummary()));
     }
 
@@ -638,13 +691,11 @@ public class MeansAssessmentDataBuilder {
                 new ApiAssessmentChildWeighting()
                         .withId(1234)
                         .withChildWeightingId(37)
-                        .withNoOfChildren(1)
-                ,
+                        .withNoOfChildren(1),
                 new ApiAssessmentChildWeighting()
                         .withId(2345)
                         .withChildWeightingId(38)
-                        .withNoOfChildren(2)
-        );
+                        .withNoOfChildren(2));
     }
 
     public static ApiAssessmentSectionSummary getApiAssessmentSectionSummary() {
@@ -653,22 +704,16 @@ public class MeansAssessmentDataBuilder {
                 .withAnnualTotal(ANNUAL_TOTAL)
                 .withPartnerAnnualTotal(PARTNER_ANNUAL_TOTAL)
                 .withSection(SECTION)
-                .withAssessmentDetails(
-                        new ArrayList<>(
-                                List.of(
-                                        new ApiAssessmentDetail()
-                                                .withId(ASSESSMENT_DETAIL_ID)
-                                                .withCriteriaDetailId(CRITERIA_DETAIL_ID)
-                                                .withApplicantAmount(APPLICANT_VALUE)
-                                                .withApplicantFrequency(FREQUENCY)
-                                                .withAssessmentDetailCode(CRITERIA_DETAIL_CODE)
-                                                .withAssessmentDescription(ASSESSMENT_DESCRIPTION)
-                                                .withPartnerAmount(PARTNER_AMOUNT)
-                                                .withPartnerFrequency(PARTNER_FREQUENCY)
-                                                .withDateModified(DATE_MODIFIED)
-                                )
-                        )
-                );
+                .withAssessmentDetails(new ArrayList<>(List.of(new ApiAssessmentDetail()
+                        .withId(ASSESSMENT_DETAIL_ID)
+                        .withCriteriaDetailId(CRITERIA_DETAIL_ID)
+                        .withApplicantAmount(APPLICANT_VALUE)
+                        .withApplicantFrequency(FREQUENCY)
+                        .withAssessmentDetailCode(CRITERIA_DETAIL_CODE)
+                        .withAssessmentDescription(ASSESSMENT_DESCRIPTION)
+                        .withPartnerAmount(PARTNER_AMOUNT)
+                        .withPartnerFrequency(PARTNER_FREQUENCY)
+                        .withDateModified(DATE_MODIFIED))));
     }
 
     public static ApiUpdateMeansAssessmentRequest getApiUpdateMeansAssessmentRequest() {
@@ -693,10 +738,7 @@ public class MeansAssessmentDataBuilder {
                 .withCrownCourtOverview(new ApiCrownCourtOverview()
                         .withAvailable(true)
                         .withCrownCourtSummary(
-                                new ApiCrownCourtSummary()
-                                        .withRepOrderDecision("MOCK_REP_ORDER_DECISION")
-                        )
-                )
+                                new ApiCrownCourtSummary().withRepOrderDecision("MOCK_REP_ORDER_DECISION")))
                 .withSectionSummaries(List.of(getApiAssessmentSectionSummary()));
     }
 
@@ -751,39 +793,35 @@ public class MeansAssessmentDataBuilder {
                 .withUpdated(APPLICATION_TIMESTAMP)
                 .withUpperThreshold(UPPER_THRESHOLD)
                 .withDateCompleted(DATE_MODIFIED);
-
     }
 
     private static List<ApiAssessmentSectionSummary> getAssessmentSectionSummary() {
-        return List.of(
-                new ApiAssessmentSectionSummary()
-                        .withAssessmentType(AssessmentType.HARDSHIP)
-                        .withAnnualTotal(ANNUAL_TOTAL)
-                        .withAssessmentDetails(List.of(new ApiAssessmentDetail()
-                                .withId(ASSESSMENT_DETAIL_ID)
-                                .withAssessmentDetailCode(CRITERIA_DETAIL_CODE)
-                                .withApplicantAmount(APPLICANT_VALUE)
-                                .withAssessmentDescription(ASSESSMENT_DESCRIPTION)
-                                .withCriteriaDetailId(CRITERIA_DETAIL_ID)
-                                .withApplicantFrequency(FREQUENCY)
-                                .withPartnerAmount(PARTNER_AMOUNT)
-                                .withPartnerFrequency(PARTNER_FREQUENCY)
-                                .withDateModified(DATE_MODIFIED)))
-                        .withApplicantAnnualTotal(APPLICANT_ANNUAL_TOTAL)
-                        .withPartnerAnnualTotal(PARTNER_ANNUAL_TOTAL)
-                        .withSection(SECTION));
+        return List.of(new ApiAssessmentSectionSummary()
+                .withAssessmentType(AssessmentType.HARDSHIP)
+                .withAnnualTotal(ANNUAL_TOTAL)
+                .withAssessmentDetails(List.of(new ApiAssessmentDetail()
+                        .withId(ASSESSMENT_DETAIL_ID)
+                        .withAssessmentDetailCode(CRITERIA_DETAIL_CODE)
+                        .withApplicantAmount(APPLICANT_VALUE)
+                        .withAssessmentDescription(ASSESSMENT_DESCRIPTION)
+                        .withCriteriaDetailId(CRITERIA_DETAIL_ID)
+                        .withApplicantFrequency(FREQUENCY)
+                        .withPartnerAmount(PARTNER_AMOUNT)
+                        .withPartnerFrequency(PARTNER_FREQUENCY)
+                        .withDateModified(DATE_MODIFIED)))
+                .withApplicantAnnualTotal(APPLICANT_ANNUAL_TOTAL)
+                .withPartnerAnnualTotal(PARTNER_ANNUAL_TOTAL)
+                .withSection(SECTION));
     }
 
     private static List<ApiAssessmentSummary> getAssessmentSummary() {
-        return List.of(
-                new ApiAssessmentSummary()
-                        .withId(ASSESSMENT_DETAIL_ID)
-                        .withAssessmentDate(FULL_ASSESSMENT_DATE)
-                        .withType(WorkType.INITIAL_ASSESSMENT)
-                        .withResult(RESULT_PASS)
-                        .withReviewType(ReviewType.ER.getCode())
-                        .withStatus(CurrentStatus.IN_PROGRESS.getStatus())
-        );
+        return List.of(new ApiAssessmentSummary()
+                .withId(ASSESSMENT_DETAIL_ID)
+                .withAssessmentDate(FULL_ASSESSMENT_DATE)
+                .withType(WorkType.INITIAL_ASSESSMENT)
+                .withResult(RESULT_PASS)
+                .withReviewType(ReviewType.ER.getCode())
+                .withStatus(CurrentStatus.IN_PROGRESS.getStatus()));
     }
 
     public static ApiUpdateApplicationResponse getApiUpdateApplicationResponse() {
@@ -793,6 +831,7 @@ public class MeansAssessmentDataBuilder {
                 .withCrownRepOrderType(CC_REP_TYPE_THROUGH_ORDER.getValue())
                 .withCrownRepOrderDate(CC_REP_ORDER_DATETIME);
     }
+
     public static ApiRollbackMeansAssessmentResponse getApiRollbackMeansAssessmentResponse(String assessmentType) {
         return new ApiRollbackMeansAssessmentResponse()
                 .withAssessmentType(assessmentType)

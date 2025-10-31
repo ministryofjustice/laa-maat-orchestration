@@ -8,8 +8,7 @@ public class SysGenString implements Comparable<SysGenString>, Serializable {
 
     private String value;
 
-    public SysGenString() {
-    }
+    public SysGenString() {}
 
     public SysGenString(String value) {
         setValue(value);

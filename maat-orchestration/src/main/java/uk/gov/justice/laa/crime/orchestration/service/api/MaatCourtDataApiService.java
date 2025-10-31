@@ -2,7 +2,6 @@ package uk.gov.justice.laa.crime.orchestration.service.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
 import uk.gov.justice.laa.crime.orchestration.client.MaatCourtDataApiClient;
@@ -14,6 +13,8 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.SendToCCLFDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 
 import java.util.Map;
+
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -59,7 +60,8 @@ public class MaatCourtDataApiService {
 
     public MaatApiAssessmentResponse updateFinancialAssessment(MaatApiUpdateAssessment maatApiUpdateAssessment) {
         log.debug(REQUEST_STRING, maatApiUpdateAssessment);
-        MaatApiAssessmentResponse financialAssessmentDTO = maatApiClient.updateFinancialAssessment(maatApiUpdateAssessment);
+        MaatApiAssessmentResponse financialAssessmentDTO =
+                maatApiClient.updateFinancialAssessment(maatApiUpdateAssessment);
         log.debug(RESPONSE_STRING, financialAssessmentDTO);
         return financialAssessmentDTO;
     }

@@ -1,16 +1,17 @@
 package uk.gov.justice.laa.crime.orchestration.service.api;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
+import uk.gov.justice.laa.crime.orchestration.client.CrownCourtProceedingApiClient;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
-import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
-import uk.gov.justice.laa.crime.orchestration.client.CrownCourtProceedingApiClient;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ProceedingsApiServiceTest {

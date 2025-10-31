@@ -10,6 +10,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class CaseDetailDTO extends GenericDTO {
-	private String 	caseType;
-    private String 	description;
+    private String caseType;
+    private String description;
 }

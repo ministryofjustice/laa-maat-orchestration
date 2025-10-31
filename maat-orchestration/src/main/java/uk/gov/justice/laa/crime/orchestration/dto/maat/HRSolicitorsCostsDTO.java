@@ -18,5 +18,4 @@ public class HRSolicitorsCostsDTO extends GenericDTO {
     private BigDecimal solicitorVat;
     private BigDecimal solicitorDisb;
     private BigDecimal solicitorEstimatedTotalCost;
-
 }

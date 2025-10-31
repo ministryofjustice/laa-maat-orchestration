@@ -12,5 +12,4 @@ import lombok.experimental.SuperBuilder;
 public class ResidentialStatusDTO extends GenericDTO {
     private String status;
     private String description;
-
 }

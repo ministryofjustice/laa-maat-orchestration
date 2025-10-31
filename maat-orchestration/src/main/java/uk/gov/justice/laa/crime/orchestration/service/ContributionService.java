@@ -1,8 +1,9 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
+import static uk.gov.justice.laa.crime.enums.CurrentStatus.COMPLETE;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
@@ -22,7 +23,7 @@ import uk.gov.justice.laa.crime.orchestration.service.api.ContributionApiService
 
 import java.util.List;
 
-import static uk.gov.justice.laa.crime.enums.CurrentStatus.COMPLETE;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -46,23 +47,22 @@ public class ContributionService {
 
             if (calculateContributionResponse != null && null != calculateContributionResponse.getContributionId()) {
                 if (calculateContributionResponse.getContributionId() != null) {
-                    application.getCrownCourtOverviewDTO().setContribution(
-                            contributionMapper.maatCalculateContributionResponseToContributionsDto(
-                                    calculateContributionResponse)
-                    );
+                    application
+                            .getCrownCourtOverviewDTO()
+                            .setContribution(contributionMapper.maatCalculateContributionResponseToContributionsDto(
+                                    calculateContributionResponse));
                 }
 
                 if (Boolean.TRUE.equals(calculateContributionResponse.getProcessActivity())) {
                     // invoke MATRIX stored procedure
                     application = maatCourtDataService.invokeStoredProcedure(
-                            application, request.getUserDTO(), StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE
-                    );
+                            application, request.getUserDTO(), StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE);
                 }
                 List<ApiContributionSummary> contributionSummaries =
                         contributionApiService.getContributionSummary(application.getRepId());
-                application.getCrownCourtOverviewDTO().setContributionSummary(
-                        contributionMapper.contributionSummaryToDto(contributionSummaries)
-                );
+                application
+                        .getCrownCourtOverviewDTO()
+                        .setContributionSummary(contributionMapper.contributionSummaryToDto(contributionSummaries));
             }
         }
 
@@ -71,8 +71,10 @@ public class ContributionService {
 
     protected boolean isRecalculationRequired(final ApplicationDTO applicationDTO) {
         PassportedDTO passportedDTO = applicationDTO.getPassportedDTO();
-        if (passportedDTO != null && passportedDTO.getAssessementStatusDTO() != null &&
-                COMPLETE.getStatus().equals(passportedDTO.getAssessementStatusDTO().getStatus())) {
+        if (passportedDTO != null
+                && passportedDTO.getAssessementStatusDTO() != null
+                && COMPLETE.getStatus()
+                        .equals(passportedDTO.getAssessementStatusDTO().getStatus())) {
             return true;
         }
 
@@ -81,17 +83,26 @@ public class ContributionService {
             FinancialAssessmentDTO financialAssessmentDTO = assessmentDTO.getFinancialAssessmentDTO();
             if (financialAssessmentDTO != null) {
                 InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
-                if (initialAssessmentDTO != null && initialAssessmentDTO.getAssessmnentStatusDTO() != null &&
-                        COMPLETE.getStatus().equals(initialAssessmentDTO.getAssessmnentStatusDTO().getStatus())) {
+                if (initialAssessmentDTO != null
+                        && initialAssessmentDTO.getAssessmnentStatusDTO() != null
+                        && COMPLETE.getStatus()
+                                .equals(initialAssessmentDTO
+                                        .getAssessmnentStatusDTO()
+                                        .getStatus())) {
                     CaseDetailDTO caseDetailsDTO = applicationDTO.getCaseDetailsDTO();
                     String initResult = initialAssessmentDTO.getResult();
-                    boolean isFullComplete = financialAssessmentDTO.getFull() != null &&
-                            financialAssessmentDTO.getFull().getAssessmnentStatusDTO() != null &&
-                            COMPLETE.getStatus().equals(financialAssessmentDTO.getFull().getAssessmnentStatusDTO().getStatus());
-                    return isFullComplete || InitAssessmentResult.PASS.getResult().equals(initResult) ||
-                            (caseDetailsDTO != null && CaseType.APPEAL_CC.getCaseType()
-                                    .equals(caseDetailsDTO.getCaseType()) &&
-                                    InitAssessmentResult.FAIL.getResult().equals(initResult));
+                    boolean isFullComplete = financialAssessmentDTO.getFull() != null
+                            && financialAssessmentDTO.getFull().getAssessmnentStatusDTO() != null
+                            && COMPLETE.getStatus()
+                                    .equals(financialAssessmentDTO
+                                            .getFull()
+                                            .getAssessmnentStatusDTO()
+                                            .getStatus());
+                    return isFullComplete
+                            || InitAssessmentResult.PASS.getResult().equals(initResult)
+                            || (caseDetailsDTO != null
+                                    && CaseType.APPEAL_CC.getCaseType().equals(caseDetailsDTO.getCaseType())
+                                    && InitAssessmentResult.FAIL.getResult().equals(initResult));
                 }
             }
         }

@@ -1,6 +1,20 @@
 package uk.gov.justice.laa.crime.orchestration.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionIdGivenContent;
+
+import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
+import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.filter.WebClientTestUtils;
+import uk.gov.justice.laa.crime.orchestration.service.orchestration.EvidenceOrchestrationService;
+import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,20 +26,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import uk.gov.justice.laa.crime.enums.CourtType;
-import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
-import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.filter.WebClientTestUtils;
-import uk.gov.justice.laa.crime.orchestration.service.orchestration.EvidenceOrchestrationService;
-import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionIdGivenContent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(controllers = EvidenceController.class)
 @Import(OrchestrationTestConfiguration.class)
@@ -49,8 +51,8 @@ class EvidenceControllerTest {
     void givenValidRequest_whenUpdateIsInvoked_thenOkResponseIsReturned() throws Exception {
         when(evidenceOrchestrationService.updateIncomeEvidence(any(WorkflowRequest.class)))
                 .thenReturn(new ApplicationDTO());
-        String requestBody = objectMapper
-                .writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
+        String requestBody = objectMapper.writeValueAsString(
+                TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         mockMvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
@@ -71,8 +73,8 @@ class EvidenceControllerTest {
         when(evidenceOrchestrationService.updateIncomeEvidence(any(WorkflowRequest.class)))
                 .thenThrow(webClientResponseException);
 
-        String requestBody = objectMapper
-                .writeValueAsString(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
+        String requestBody = objectMapper.writeValueAsString(
+                TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         mockMvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));

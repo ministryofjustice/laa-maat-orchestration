@@ -1,10 +1,12 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -19,9 +21,11 @@ import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiServic
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith({MockitoExtension.class})
 class CrownCourtOrchestrationServiceTest {
@@ -45,8 +49,8 @@ class CrownCourtOrchestrationServiceTest {
 
     void setupStubs(ApplicationDTO applicationDTO) {
         when(maatCourtDataService.invokeStoredProcedure(
-                any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)
-        )).thenReturn(applicationDTO);
+                        any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
+                .thenReturn(applicationDTO);
 
         when(proceedingsService.updateCrownCourt(any(WorkflowRequest.class), any(RepOrderDTO.class)))
                 .thenReturn(applicationDTO);
@@ -56,17 +60,16 @@ class CrownCourtOrchestrationServiceTest {
     void checkStoredProcedureInvocations(WorkflowRequest request) {
         ApplicationDTO applicationDTO = request.getApplicationDTO();
 
-        verify(maatCourtDataService).invokeStoredProcedure(
-                applicationDTO, request.getUserDTO(), StoredProcedure.UPDATE_DBMS_TRANSACTION_ID
-        );
+        verify(maatCourtDataService)
+                .invokeStoredProcedure(
+                        applicationDTO, request.getUserDTO(), StoredProcedure.UPDATE_DBMS_TRANSACTION_ID);
 
-        verify(maatCourtDataService).invokeStoredProcedure(
-                applicationDTO, request.getUserDTO(), StoredProcedure.PRE_UPDATE_CHECKS
-        );
+        verify(maatCourtDataService)
+                .invokeStoredProcedure(applicationDTO, request.getUserDTO(), StoredProcedure.PRE_UPDATE_CHECKS);
 
-        verify(maatCourtDataService).invokeStoredProcedure(
-                applicationDTO, request.getUserDTO(), StoredProcedure.UPDATE_CC_APPLICANT_AND_APPLICATION
-        );
+        verify(maatCourtDataService)
+                .invokeStoredProcedure(
+                        applicationDTO, request.getUserDTO(), StoredProcedure.UPDATE_CC_APPLICANT_AND_APPLICATION);
     }
 
     @Test
@@ -104,13 +107,13 @@ class CrownCourtOrchestrationServiceTest {
         orchestrationService.updateOutcome(request);
         checkStoredProcedureInvocations(request);
 
-        verify(maatCourtDataService).invokeStoredProcedure(
-                applicationDTO, request.getUserDTO(), StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE
-        );
+        verify(maatCourtDataService)
+                .invokeStoredProcedure(
+                        applicationDTO, request.getUserDTO(), StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE);
     }
 
     @Test
-    void givenNoCrownCourtSummary_whenUpdateOutcomeIsInvoked_thenApplicationIsUpdatedAndCorrectStoredProceduresAreInvoked() {
+    void givenNoCrownCourtSummary_whenUpdateOutcomeIsInvoked_thenApplIsUpdatedAndCorrectStoredProceduresInvoked() {
         WorkflowRequest request = TestModelDataBuilder.buildWorkFlowRequest();
         ApplicationDTO applicationDTO = request.getApplicationDTO();
 
@@ -120,9 +123,9 @@ class CrownCourtOrchestrationServiceTest {
         orchestrationService.updateOutcome(request);
         checkStoredProcedureInvocations(request);
 
-        verify(maatCourtDataService, never()).invokeStoredProcedure(
-                applicationDTO, request.getUserDTO(), StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE
-        );
+        verify(maatCourtDataService, never())
+                .invokeStoredProcedure(
+                        applicationDTO, request.getUserDTO(), StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE);
     }
 
     @Test
@@ -136,9 +139,8 @@ class CrownCourtOrchestrationServiceTest {
         orchestrationService.updateOutcome(request);
         checkStoredProcedureInvocations(request);
 
-        verify(maatCourtDataService, never()).invokeStoredProcedure(
-                applicationDTO, request.getUserDTO(), StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE
-        );
+        verify(maatCourtDataService, never())
+                .invokeStoredProcedure(
+                        applicationDTO, request.getUserDTO(), StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE);
     }
-
 }

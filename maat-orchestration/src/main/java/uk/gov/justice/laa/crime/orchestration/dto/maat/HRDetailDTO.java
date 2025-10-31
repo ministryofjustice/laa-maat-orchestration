@@ -26,5 +26,4 @@ public class HRDetailDTO extends GenericDTO {
     private HRReasonDTO reason;
     private Timestamp timeStamp;
     private String hrReasonNote;
-
 }

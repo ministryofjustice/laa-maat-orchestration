@@ -2,18 +2,19 @@ package uk.gov.justice.laa.crime.orchestration.service.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.orchestration.client.CrownCourtProceedingApiClient;
 
+import org.springframework.stereotype.Service;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProceedingsApiService {
-    
+
     private final CrownCourtProceedingApiClient crownCourtProceedingApiClient;
     private static final String RESPONSE_STRING = "Response from Proceedings Service: {}";
     private static final String REQUEST_STRING = "Request to Proceedings Service: {}";

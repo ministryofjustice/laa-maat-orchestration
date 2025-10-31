@@ -17,5 +17,4 @@ public class DigitisedMeansAssessmentDTO extends GenericDTO {
     private Long maatId;
     private Date dateCreated;
     private Date originalEmailDate;
-
 }

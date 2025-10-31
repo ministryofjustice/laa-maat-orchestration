@@ -9,8 +9,7 @@ public class SysGenDate implements Comparable<SysGenDate>, Serializable {
 
     private Date value;
 
-    public SysGenDate() {
-    }
+    public SysGenDate() {}
 
     public SysGenDate(Date value) {
         setValue(value);

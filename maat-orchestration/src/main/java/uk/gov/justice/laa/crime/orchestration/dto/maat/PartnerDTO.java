@@ -1,6 +1,5 @@
 package uk.gov.justice.laa.crime.orchestration.dto.maat;
 
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -17,5 +16,4 @@ public class PartnerDTO extends GenericDTO {
     private String surname;
     private String nationaInsuranceNumber;
     private Date dateOfBirth;
-
 }

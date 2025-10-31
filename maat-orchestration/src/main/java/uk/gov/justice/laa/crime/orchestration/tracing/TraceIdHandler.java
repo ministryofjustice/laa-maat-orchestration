@@ -3,8 +3,10 @@ package uk.gov.justice.laa.crime.orchestration.tracing;
 import io.micrometer.tracing.CurrentTraceContext;
 import io.micrometer.tracing.TraceContext;
 import io.micrometer.tracing.Tracer;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Optional;
+
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,13 +16,13 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TraceIdHandler {
 
-  private final Tracer tracer;
+    private final Tracer tracer;
 
-  public String getTraceId() {
-    return Optional.of(tracer).
-        map(Tracer::currentTraceContext).
-        map(CurrentTraceContext::context).
-        map(TraceContext::traceId).
-        orElse("");
-  }
+    public String getTraceId() {
+        return Optional.of(tracer)
+                .map(Tracer::currentTraceContext)
+                .map(CurrentTraceContext::context)
+                .map(TraceContext::traceId)
+                .orElse("");
+    }
 }
