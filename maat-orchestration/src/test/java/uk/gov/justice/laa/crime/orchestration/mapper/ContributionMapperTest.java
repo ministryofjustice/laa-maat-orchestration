@@ -191,12 +191,12 @@ class ContributionMapperTest {
         List<ApiContributionSummary> apiContributionSummaryList =
                 List.of(TestModelDataBuilder.getApiContributionSummary());
         ApiContributionSummary apiContributionSummary = apiContributionSummaryList.get(0);
-        Collection<ContributionSummaryDTO> ContributionSummaryDTOs =
+        Collection<ContributionSummaryDTO> contributionSummaryDTOS =
                 contributionMapper.contributionSummaryToDto(apiContributionSummaryList);
         ContributionSummaryDTO contributionSummaryDTO =
-                ContributionSummaryDTOs.iterator().next();
+                contributionSummaryDTOS.iterator().next();
 
-        softly.assertThat(ContributionSummaryDTOs.size()).isEqualTo(1);
+        softly.assertThat(contributionSummaryDTOS.size()).isEqualTo(1);
         softly.assertThat(contributionSummaryDTO.getId())
                 .isEqualTo(apiContributionSummary.getId().longValue());
         softly.assertThat(contributionSummaryDTO.getMonthlyContribs())
@@ -212,8 +212,8 @@ class ContributionMapperTest {
 
     @Test
     void givenAEmptyContributionSummaries_whenContributionMapperIsInvoked_thenMappingIsCorrect() {
-        Collection<ContributionSummaryDTO> ContributionSummaryDTOs = contributionMapper.contributionSummaryToDto(null);
-        softly.assertThat(ContributionSummaryDTOs).isEmpty();
+        Collection<ContributionSummaryDTO> contributionSummaryDTOS = contributionMapper.contributionSummaryToDto(null);
+        softly.assertThat(contributionSummaryDTOS).isEmpty();
         softly.assertAll();
     }
 }

@@ -142,7 +142,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.lang.NonNull;
@@ -512,7 +511,7 @@ public class TestModelDataBuilder {
     public static List<HRSectionDTO> getHrSectionDtosWithMixedTypes() {
         return Stream.concat(
                         getHrSectionDtosWithExpenditureType().stream(), getHrSectionDtosWithDeniedIncomeType().stream())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public static WorkflowRequest buildWorkflowRequestWithHardship(CourtType courtType) {

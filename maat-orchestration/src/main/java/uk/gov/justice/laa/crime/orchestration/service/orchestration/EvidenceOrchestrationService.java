@@ -60,11 +60,8 @@ public class EvidenceOrchestrationService {
         Date upliftRemovedDate =
                 Objects.requireNonNullElse(incomeEvidenceSummaryDTO.getUpliftRemovedDate(), defaultDate);
 
-        Integer financialAssessmentId = applicationDTO
-                .getAssessmentDTO()
-                .getFinancialAssessmentDTO()
-                .getId()
-                .intValue();
+        Integer financialAssessmentId =
+                applicationDTO.getAssessmentDTO().getFinancialAssessmentDTO().getId();
         FinancialAssessmentDTO financialAssessmentDTO = repOrderDTO.getFinancialAssessments().stream()
                 .filter(assessment -> assessment.getId().equals(financialAssessmentId))
                 .findFirst()
