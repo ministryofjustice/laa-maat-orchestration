@@ -18,6 +18,7 @@ import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiRepOrderCrownC
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
+import uk.gov.justice.laa.crime.dto.ErrorDTO;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
@@ -126,8 +127,7 @@ public class TestModelDataBuilder {
     private static final List<String> TEST_NEW_WORK_REASONS = List.of(NEW_WORK_REASON_STRING);
     private static final Integer TEST_RECORD_ID = 100;
     private static final LocalDateTime RESERVATION_DATE = LocalDateTime.of(2022, 12, 14, 0, 0, 0);
-    private static final String HARDSHIP_VALIDATION_MESSAGE =
-        "Amount, Frequency, and Reason must be entered for each detail in section Credit/Store Card Payment";
+    private static final String ERROR_TRACE_ID = "68f61b79083a976d1c1949f68c5fd05d";
 
     public static ApiFindHardshipResponse getApiFindHardshipResponse() {
         return new ApiFindHardshipResponse()
@@ -1529,7 +1529,7 @@ public class TestModelDataBuilder {
                 .withNoOfChildren(1);
     }
 
-    public static String getHardshipValidationMessage() {
-        return HARDSHIP_VALIDATION_MESSAGE;
+    public static ErrorDTO getErrorDTO(String code, String message) {
+        return ErrorDTO.builder().traceId(ERROR_TRACE_ID).code(code).message(message).build();
     }
 }

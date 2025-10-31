@@ -1,5 +1,0 @@
-{
-  "traceId": "68f61b79083a976d1c1949f68c5fd05d",
-  "code": "400 BAD_REQUEST",
-  "message": "Amount, Frequency, and Reason must be entered for each detail in section Credit/Store Card Payment"
-}
