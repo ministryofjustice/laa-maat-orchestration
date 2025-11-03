@@ -35,7 +35,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.*;
-import static uk.gov.justice.laa.crime.util.FileUtils.readFileToString;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
@@ -49,7 +48,6 @@ class HardshipIntegrationTest {
     private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/hardship";
     private static final List<String> UPDATE_ROLE_ACTIONS = List.of(Action.UPDATE_MAGS_HARDSHIP.getCode(), Action.UPDATE_CROWN_HARDSHIP.getCode());
     private static final List<String> CREATE_ROLE_ACTIONS = List.of(Action.CREATE_CROWN_HARDSHIP.getCode(), Action.CREATE_MAGS_HARDSHIP.getCode());
-    private static final String PATH_TO_HARDSHIP_VALIDATION_JSON = "response/hardship_400_validation_response.json";
     private static final String HARDSHIP_VALIDATION_MESSAGE =
         "Amount, Frequency, and Reason must be entered for each detail in section Credit/Store Card Payment";
 
