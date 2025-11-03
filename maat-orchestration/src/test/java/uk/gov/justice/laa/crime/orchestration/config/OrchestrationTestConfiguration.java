@@ -1,13 +1,13 @@
 package uk.gov.justice.laa.crime.orchestration.config;
 
+import java.time.Instant;
+import java.util.Map;
+
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-
-import java.time.Instant;
-import java.util.Map;
 
 @TestConfiguration
 @ComponentScan(basePackages = {"uk.gov.justice.laa.crime.commons.tracing"})
@@ -23,17 +23,8 @@ public class OrchestrationTestConfiguration {
     }
 
     public Jwt jwt() {
-        Map<String, Object> claims = Map.of(
-                SUB, AUTH_ID,
-                "scope", "orchestration/standard"
-        );
+        Map<String, Object> claims = Map.of(SUB, AUTH_ID, "scope", "orchestration/standard");
 
-        return new Jwt(
-                AUTH0_TOKEN,
-                Instant.now(),
-                Instant.now().plusSeconds(30),
-                Map.of("alg", "none"),
-                claims
-        );
+        return new Jwt(AUTH0_TOKEN, Instant.now(), Instant.now().plusSeconds(30), Map.of("alg", "none"), claims);
     }
 }

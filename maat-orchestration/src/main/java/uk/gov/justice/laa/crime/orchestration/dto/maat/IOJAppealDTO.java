@@ -23,5 +23,4 @@ public class IOJAppealDTO extends GenericDTO {
     private IOJDecisionReasonDTO appealReason;
     private AssessmentStatusDTO assessmentStatusDTO;
     private NewWorkReasonDTO newWorkReasonDTO;
-
 }

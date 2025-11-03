@@ -1,15 +1,17 @@
 package uk.gov.justice.laa.crime.orchestration.jackson;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.commons.lang3.StringUtils;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.SysGenDate;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class SysGenDateDeserializer extends JsonDeserializer<SysGenDate> {
 
@@ -19,9 +21,7 @@ public class SysGenDateDeserializer extends JsonDeserializer<SysGenDate> {
     public SysGenDate deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
             throws IOException {
 
-        JsonNode node = jsonParser
-                .getCodec()
-                .readTree(jsonParser);
+        JsonNode node = jsonParser.getCodec().readTree(jsonParser);
 
         String value = node.get("value").asText();
         try {

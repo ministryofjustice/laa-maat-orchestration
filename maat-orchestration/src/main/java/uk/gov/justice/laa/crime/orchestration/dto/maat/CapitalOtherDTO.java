@@ -1,6 +1,5 @@
 package uk.gov.justice.laa.crime.orchestration.dto.maat;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -9,6 +8,8 @@ import uk.gov.justice.laa.crime.orchestration.jackson.SysGenDateDeserializer;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @Data
 @SuperBuilder
@@ -23,10 +24,13 @@ public class CapitalOtherDTO extends GenericDTO {
     private String otherDescription;
     private BigDecimal assetAmount;
     private BigDecimal verifiedAmount;
+
     @JsonDeserialize(using = SysGenDateDeserializer.class)
     private SysGenDate dateEntered;
+
     @JsonDeserialize(using = SysGenDateDeserializer.class)
     private SysGenDate verifiedDate;
+
     private SysGenString verifiedBy;
     private AssessmentStatusDTO assessmentStatus;
     private Collection<EvidenceDTO> capitalEvidence;
@@ -35,5 +39,4 @@ public class CapitalOtherDTO extends GenericDTO {
     private String bankName;
     private String branchSortCode;
     private String accountOwner;
-
 }

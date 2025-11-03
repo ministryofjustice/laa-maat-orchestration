@@ -19,5 +19,4 @@ public class HRSectionDTO extends GenericDTO {
     private BigDecimal applicantAnnualTotal;
     private BigDecimal partnerAnnualTotal;
     private BigDecimal annualTotal;
-
 }

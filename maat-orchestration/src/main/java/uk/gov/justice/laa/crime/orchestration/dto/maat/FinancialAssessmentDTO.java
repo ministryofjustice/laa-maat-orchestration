@@ -21,5 +21,4 @@ public class FinancialAssessmentDTO extends GenericDTO {
     private Boolean fullAvailable;
     private Long usn;
     private LocalDateTime dateCompleted;
-
 }

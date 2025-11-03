@@ -1,11 +1,12 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggle;
 import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggleAction;
+
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -38,18 +39,19 @@ public class FeatureDecisionService {
      * invoked for the user's request.
      */
     public boolean isMaatPostAssessmentProcessingEnabled(WorkflowRequest workflowRequest) {
-        return isFeatureEnabled(workflowRequest, FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING, FeatureToggleAction.READ);
+        return isFeatureEnabled(
+                workflowRequest, FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING, FeatureToggleAction.READ);
     }
 
-    private boolean isFeatureEnabled(WorkflowRequest workflowRequest,
-                                     FeatureToggle featureToggle,
-                                     FeatureToggleAction featureToggleAction) {
-        UserSummaryDTO userSummaryDTO = maatCourtDataService.getUserSummary(
-                workflowRequest.getUserDTO().getUserName());
+    private boolean isFeatureEnabled(
+            WorkflowRequest workflowRequest, FeatureToggle featureToggle, FeatureToggleAction featureToggleAction) {
+        UserSummaryDTO userSummaryDTO =
+                maatCourtDataService.getUserSummary(workflowRequest.getUserDTO().getUserName());
 
-        return userSummaryDTO.getFeatureToggle() != null && userSummaryDTO.getFeatureToggle().stream().anyMatch(
-                featureToggleDTO -> featureToggle.getName().equals(featureToggleDTO.getFeatureName())
-                        && featureToggleAction.getName().equals(featureToggleDTO.getAction())
-                        && "Y".equals(featureToggleDTO.getIsEnabled()));
+        return userSummaryDTO.getFeatureToggle() != null
+                && userSummaryDTO.getFeatureToggle().stream()
+                        .anyMatch(featureToggleDTO -> featureToggle.getName().equals(featureToggleDTO.getFeatureName())
+                                && featureToggleAction.getName().equals(featureToggleDTO.getAction())
+                                && "Y".equals(featureToggleDTO.getIsEnabled()));
     }
 }

@@ -1,7 +1,19 @@
 package uk.gov.justice.laa.crime.orchestration.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionIdGivenContent;
+
+import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
+import uk.gov.justice.laa.crime.orchestration.filter.WebClientTestUtils;
+import uk.gov.justice.laa.crime.orchestration.service.orchestration.CrownCourtOrchestrationService;
+import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,19 +25,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
-import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
-import uk.gov.justice.laa.crime.orchestration.filter.WebClientTestUtils;
-import uk.gov.justice.laa.crime.orchestration.service.orchestration.CrownCourtOrchestrationService;
-import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionIdGivenContent;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(CrownCourtController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -47,22 +49,17 @@ class CrownCourtControllerTest {
     private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/crown-court";
 
     private String buildRequestBody() throws JsonProcessingException {
-        return objectMapper.writeValueAsString(
-                WorkflowRequest.builder()
-                        .userDTO(UserDTO.builder().build())
-                        .applicationDTO(
-                                ApplicationDTO.builder()
-                                        .build()
-                        ).build()
-        );
+        return objectMapper.writeValueAsString(WorkflowRequest.builder()
+                .userDTO(UserDTO.builder().build())
+                .applicationDTO(ApplicationDTO.builder().build())
+                .build());
     }
 
     @Test
     void givenValidRequest_whenUpdateIsInvoked_thenOkResponseIsReturned() throws Exception {
         String requestBody = buildRequestBody();
 
-        when(orchestrationService.updateOutcome(any(WorkflowRequest.class)))
-                .thenReturn(new ApplicationDTO());
+        when(orchestrationService.updateOutcome(any(WorkflowRequest.class))).thenReturn(new ApplicationDTO());
 
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isOk())
@@ -81,9 +78,8 @@ class CrownCourtControllerTest {
 
         WebClientResponseException webClientResponseException =
                 WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
-        
-        when(orchestrationService.updateOutcome(any(WorkflowRequest.class)))
-                .thenThrow(webClientResponseException);
+
+        when(orchestrationService.updateOutcome(any(WorkflowRequest.class))).thenThrow(webClientResponseException);
 
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isInternalServerError());

@@ -1,10 +1,11 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import uk.gov.justice.laa.crime.common.model.hardship.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipRequest;
 import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipResponse;
@@ -17,11 +18,11 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.service.api.HardshipApiService;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.anyBoolean;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith({MockitoExtension.class})
 class HardshipServiceTest {
@@ -59,9 +60,9 @@ class HardshipServiceTest {
                 .thenReturn(new ApiPerformHardshipResponse());
         hardshipService.update(TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         verify(hardshipApiService).update(any(ApiPerformHardshipRequest.class));
-        verify(hardshipMapper).performHardshipResponseToApplicationDTO(
-                any(ApiPerformHardshipResponse.class), any(ApplicationDTO.class), any(CourtType.class)
-        );
+        verify(hardshipMapper)
+                .performHardshipResponseToApplicationDTO(
+                        any(ApiPerformHardshipResponse.class), any(ApplicationDTO.class), any(CourtType.class));
     }
 
     @Test

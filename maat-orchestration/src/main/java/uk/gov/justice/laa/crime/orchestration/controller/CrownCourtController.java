@@ -8,17 +8,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.justice.laa.crime.annotation.DefaultHTTPErrorResponse;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.service.orchestration.CrownCourtOrchestrationService;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.justice.laa.crime.annotation.DefaultHTTPErrorResponse;
-import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.service.orchestration.CrownCourtOrchestrationService;
 
 @Slf4j
 @RestController
@@ -31,14 +32,14 @@ public class CrownCourtController {
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Update Crown Court")
-    @ApiResponse(responseCode = "200",
-            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ApiUpdateApplicationRequest.class)
-            )
-    )
+    @ApiResponse(
+            responseCode = "200",
+            content =
+                    @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiUpdateApplicationRequest.class)))
     @DefaultHTTPErrorResponse
-    public ResponseEntity<ApplicationDTO> updateCrownCourtOutcome(
-            @Valid @RequestBody WorkflowRequest workflowRequest) {
+    public ResponseEntity<ApplicationDTO> updateCrownCourtOutcome(@Valid @RequestBody WorkflowRequest workflowRequest) {
         log.info("Received request to update crown court");
         return ResponseEntity.ok(crownCourtOrchestrationService.updateOutcome(workflowRequest));
     }
