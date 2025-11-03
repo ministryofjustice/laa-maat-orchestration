@@ -18,5 +18,4 @@ public class AppealDTO extends GenericDTO {
     private Date appealSentenceOrderDate;
     private Date appealSentOrderDateSet;
     private AppealTypeDTO appealTypeDTO;
-
 }

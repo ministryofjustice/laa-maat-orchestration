@@ -1,6 +1,5 @@
 package uk.gov.justice.laa.crime.orchestration.exception;
 
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,5 +14,4 @@ public class CrimeValidationException extends RuntimeException {
     public CrimeValidationException(List<String> exceptionMessage) {
         this.exceptionMessage = exceptionMessage;
     }
-
 }

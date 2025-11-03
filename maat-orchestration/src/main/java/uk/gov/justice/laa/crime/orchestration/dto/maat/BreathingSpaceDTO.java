@@ -15,8 +15,8 @@ import java.util.Date;
 public class BreathingSpaceDTO extends GenericDTO {
 
     private Long id;
-    private String active;  //yes or no
-    private String type; //mental health or standard
+    private String active; // yes or no
+    private String type; // mental health or standard
     private Long repOrderId;
     private Date startDate;
     private Date endDate;
@@ -27,5 +27,4 @@ public class BreathingSpaceDTO extends GenericDTO {
     private String userCreated;
     private Timestamp dateModified;
     private String userModified;
-
 }

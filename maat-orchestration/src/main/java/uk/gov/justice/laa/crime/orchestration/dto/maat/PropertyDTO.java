@@ -29,5 +29,4 @@ public class PropertyDTO extends GenericDTO {
     private BigDecimal verifiedEquityAmount;
     private BigDecimal declaredEquityAmount;
     private Collection<ThirdPartyOwnerDTO> thirdPartyOwners;
-
 }

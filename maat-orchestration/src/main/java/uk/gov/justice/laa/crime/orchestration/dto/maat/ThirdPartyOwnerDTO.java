@@ -18,5 +18,4 @@ public class ThirdPartyOwnerDTO extends GenericDTO {
     private String otherRelation;
 
     private ThirdPartyTypeDTO thirdPartyType;
-
 }

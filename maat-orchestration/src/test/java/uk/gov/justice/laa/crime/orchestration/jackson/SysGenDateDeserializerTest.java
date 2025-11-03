@@ -1,18 +1,20 @@
 package uk.gov.justice.laa.crime.orchestration.jackson;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import uk.gov.justice.laa.crime.orchestration.dto.maat.SysGenDate;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 class SysGenDateDeserializerTest {
 
@@ -32,8 +34,7 @@ class SysGenDateDeserializerTest {
         DeserializationContext deserializationContext = mapper.getDeserializationContext();
         SysGenDate result = deserializer.deserialize(parser, deserializationContext);
 
-        assertThat(result.getValue())
-                .isEqualTo(Date.from(Instant.ofEpochMilli(EPOCH_DATE)));
+        assertThat(result.getValue()).isEqualTo(Date.from(Instant.ofEpochMilli(EPOCH_DATE)));
     }
 
     @Test
@@ -46,6 +47,7 @@ class SysGenDateDeserializerTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Invalid date value:");
     }
+
     @Test
     void givenANullDate_whenDeserializeIsInvoked_thenNullIsReturned() throws IOException {
         JsonParser parser = factory.createParser("{\"value\":\"\"}");
@@ -61,5 +63,4 @@ class SysGenDateDeserializerTest {
         DeserializationContext deserializationContext = mapper.getDeserializationContext();
         assertThat(deserializer.deserialize(parser, deserializationContext)).isNull();
     }
-
 }

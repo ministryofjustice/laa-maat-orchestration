@@ -2,8 +2,9 @@ plugins {
 	id "java"
 	id "jacoco"
 	id "org.sonarqube" version "6.2.0.5505"
+	id "com.diffplug.spotless" version "8.0.0"
 	id "info.solidsoft.pitest" version "1.15.0"
-	id "org.springframework.boot" version "3.4.6"
+	id "org.springframework.boot" version "3.5.6"
 	id "io.spring.dependency-management" version "1.1.7"
 }
 
@@ -15,15 +16,15 @@ java {
 }
 
 def versions = [
-		pitest                  : "1.16.1",
+		pitest                  : "1.21.0",
 		springdocVersion        : "2.8.8",
 		commonsModSchemas       : "1.36.0",
-		crimeCommonsClasses     : "4.9.0",
+		crimeCommonsClasses     : "4.11.1",
 		commonsRestClient       : "3.20.0",
-		wmStubRunnerVersion    	: "4.2.1",
+		wmStubRunnerVersion    	: "4.3.0",
 		resilience4jVersion     : "2.3.0",
 		commonsLang3Version		: "3.17.0",
-		springSecurityCore      : "6.4.6"
+		springSecurityCore      : "6.5.6"
 ]
 
 configurations {
@@ -83,6 +84,33 @@ dependencies {
 jacoco {
 	toolVersion = "0.8.13"
 }
+
+spotless {
+	java {
+		target 'src/*/java/**/*.java'
+		targetExclude '**/generated/**', '**/build/**'
+
+		formatAnnotations()
+		palantirJavaFormat()
+		importOrder('', 'java', 'javax', 'org', 'com')
+
+		endWithNewline()
+		trimTrailingWhitespace()
+		removeUnusedImports()
+		forbidWildcardImports()
+
+		// Custom rule: Disallow JUnit assertions
+		custom("Refuse JUnit assertions", { text ->
+			if (text =~ /\bassert(?:Equals|True|False|Null|NotNull|Same|NotSame|ArrayEquals)\b/) {
+				throw new IllegalStateException(
+						"Use AssertJ (assertThat(...)) instead of JUnit assertions."
+				)
+			}
+			text
+		} as Closure<String>)
+	}
+}
+
 
 test {
 	useJUnitPlatform()

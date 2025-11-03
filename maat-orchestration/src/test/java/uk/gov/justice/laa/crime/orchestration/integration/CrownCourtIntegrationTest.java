@@ -17,10 +17,18 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubFor
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForUpdateSendToCCLF;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.WireMock;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
+import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
+import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FeatureToggleDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggle;
+import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggleAction;
+
 import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,15 +44,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
-import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
-import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FeatureToggleDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggle;
-import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggleAction;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 
 @DirtiesContext
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -73,7 +76,8 @@ class CrownCourtIntegrationTest {
     @BeforeEach
     void setUp() {
         this.mvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
-            .addFilter(springSecurityFilterChain).build();
+                .addFilter(springSecurityFilterChain)
+                .build();
     }
 
     @AfterEach
@@ -84,7 +88,7 @@ class CrownCourtIntegrationTest {
     @Test
     void givenNoOAuthToken_whenUpdateIsInvoked_thenUnauthorisedResponseIsReturned() throws Exception {
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, "{}", ENDPOINT_URL, false))
-            .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -96,7 +100,7 @@ class CrownCourtIntegrationTest {
         stubForOAuth();
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
-            .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -108,23 +112,24 @@ class CrownCourtIntegrationTest {
 
         stubForOAuth();
         stubFor(post(urlMatching(MAAT_API_ASSESSMENT_URL + "/execute-stored-procedure"))
-            .willReturn(WireMock.serverError()));
+                .willReturn(WireMock.serverError()));
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
-            .andExpect(status().isInternalServerError());
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
     void givenValidRequest_whenUpdateIsInvoked_thenCrownCourtIsUpdated() throws Exception {
         WorkflowRequest request = TestModelDataBuilder.buildWorkFlowRequest();
-        ApiUpdateCrownCourtOutcomeResponse updateCrownCourtOutcomeResponse = TestModelDataBuilder.getApiUpdateCrownCourtResponse();
+        ApiUpdateCrownCourtOutcomeResponse updateCrownCourtOutcomeResponse =
+                TestModelDataBuilder.getApiUpdateCrownCourtResponse();
         ApplicationDTO applicationDTO = getApplicationDTO();
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
         userSummaryDTO.setFeatureToggle(List.of(FeatureToggleDTO.builder()
-            .featureName(FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING.getName())
-            .action(FeatureToggleAction.READ.getName())
-            .isEnabled("Y")
-            .build()));
+                .featureName(FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING.getName())
+                .action(FeatureToggleAction.READ.getName())
+                .isEnabled("Y")
+                .build()));
 
         request.setApplicationDTO(applicationDTO);
 
@@ -138,7 +143,7 @@ class CrownCourtIntegrationTest {
         stubForUpdateSendToCCLF();
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
 
         assertStubForUpdateCrownCourtOutcome(1);
         assertStubForUpdateSendToCCLF(1);

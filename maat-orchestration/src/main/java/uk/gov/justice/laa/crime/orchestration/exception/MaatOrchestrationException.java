@@ -1,11 +1,8 @@
 package uk.gov.justice.laa.crime.orchestration.exception;
 
-
 import lombok.Getter;
 import lombok.Setter;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -16,5 +13,4 @@ public class MaatOrchestrationException extends RuntimeException {
     public MaatOrchestrationException(ApplicationDTO applicationDTO) {
         this.applicationDTO = applicationDTO;
     }
-
 }

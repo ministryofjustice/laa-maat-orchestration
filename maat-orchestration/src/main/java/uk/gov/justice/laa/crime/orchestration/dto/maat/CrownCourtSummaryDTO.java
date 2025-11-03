@@ -28,5 +28,4 @@ public class CrownCourtSummaryDTO extends GenericDTO {
     private Boolean benchWarrantyIssued;
     private EvidenceFeeDTO evidenceProvisionFee;
     private Collection<OutcomeDTO> outcomeDTOs;
-
 }

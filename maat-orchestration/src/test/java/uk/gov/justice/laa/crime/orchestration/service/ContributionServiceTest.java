@@ -1,10 +1,11 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.justice.laa.crime.orchestration.data.Constants.CONTRIBUTIONS_ID;
+
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContributionResponse;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CourtType;
@@ -12,15 +13,23 @@ import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.enums.InitAssessmentResult;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.*;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentStatusDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.CaseDetailDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.FullAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.ContributionMapper;
 import uk.gov.justice.laa.crime.orchestration.service.api.ContributionApiService;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.justice.laa.crime.orchestration.data.Constants.CONTRIBUTIONS_ID;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith({MockitoExtension.class})
 class ContributionServiceTest {
@@ -97,7 +106,9 @@ class ContributionServiceTest {
     }
 
     @Test
-    void givenApplicationDTOWithInProgressFullAndPassedInitAssessment_whenIsRecalculationRequiredIsInvoked_thenTrueIsReturned() {
+    @DisplayName(
+            "Application DTO With In Progress Full And Passed Init Assessment - isRecalculationRequired returns True")
+    void givenApplicationDTOWithFullAndInitAssessment_whenIsRecalculationRequiredIsInvoked_thenTrueIsReturned() {
         ApplicationDTO applicationDTO = ApplicationDTO.builder()
                 .assessmentDTO(AssessmentDTO.builder()
                         .financialAssessmentDTO(FinancialAssessmentDTO.builder()
