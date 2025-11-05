@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.integration;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
@@ -72,6 +73,8 @@ class HardshipIntegrationTest {
             List.of(Action.UPDATE_MAGS_HARDSHIP.getCode(), Action.UPDATE_CROWN_HARDSHIP.getCode());
     private static final List<String> CREATE_ROLE_ACTIONS =
             List.of(Action.CREATE_CROWN_HARDSHIP.getCode(), Action.CREATE_MAGS_HARDSHIP.getCode());
+    private static final String HARDSHIP_VALIDATION_MESSAGE =
+            "Amount, Frequency, and Reason must be entered for each detail in section Credit/Store Card Payment";
 
     private MockMvc mvc;
 
@@ -259,6 +262,16 @@ class HardshipIntegrationTest {
         verify(exactly(0), patchRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
     }
 
+    @Test
+    void givenInvalidHardshipData_whenCreateIsInvoked_thenResponseContainsValidationErrors() throws Exception {
+        stubForCreateInvalidHardship();
+        String requestBody = objectMapper.writeValueAsString(
+                TestModelDataBuilder.buildWorkflowRequestWithCCHardship(CourtType.CROWN_COURT));
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.message").value(HARDSHIP_VALIDATION_MESSAGE));
+    }
+
     private void stubForUpdateHardship() throws JsonProcessingException {
         wiremock.stubFor(put(urlMatching("/api/internal/v1/hardship"))
                 .willReturn(WireMock.ok()
@@ -314,6 +327,20 @@ class HardshipIntegrationTest {
                             .withBody(objectMapper.writeValueAsString(
                                     TestModelDataBuilder.getApiUpdateApplicationResponse()))));
         }
+    }
+
+    private void stubForCreateInvalidHardship() throws Exception {
+        stubForOAuth();
+        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTOWithAssessorName()));
+        stubForGetUserSummary(objectMapper.writeValueAsString(
+                TestModelDataBuilder.getUserSummaryDTO(CREATE_ROLE_ACTIONS, NewWorkReason.NEW)));
+        String errorResponse =
+                objectMapper.writeValueAsString(TestModelDataBuilder.getErrorDTO("400", HARDSHIP_VALIDATION_MESSAGE));
+        wiremock.stubFor(post(urlMatching("/api/internal/v1/hardship"))
+                .willReturn(aResponse()
+                        .withStatus(400)
+                        .withBody(errorResponse)
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))));
     }
 
     private static void verifyStubForCreateHardship(CourtType courtType, Integer repId) {
