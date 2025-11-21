@@ -34,6 +34,9 @@ public class ServicesConfiguration {
     @NotNull
     private EvidenceApi evidenceApi;
 
+    @NotNull
+    private CasApi casApi;
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -106,6 +109,17 @@ public class ServicesConfiguration {
     @NoArgsConstructor
     public static class EvidenceApi {
 
+        @NotNull
+        private String baseUrl;
+
+        @NotNull
+        private String registrationId;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CasApi {
         @NotNull
         private String baseUrl;
 

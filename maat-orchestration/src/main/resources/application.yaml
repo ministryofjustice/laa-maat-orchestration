@@ -39,6 +39,8 @@ spring:
             token-uri: ${CAT_API_OAUTH_URL}
           evidence:
             token-uri: ${EVIDENCE_API_OAUTH_URL}
+          cas:
+            token-uri: ${CAS_API_OAUTH_URL}
         registration:
           hardship:
             client-id: ${HARDSHIP_API_OAUTH_CLIENT_ID}
@@ -72,6 +74,10 @@ spring:
             client-id: ${EVIDENCE_API_OAUTH_CLIENT_ID}
             client-secret: ${EVIDENCE_API_OAUTH_CLIENT_SECRET}
             authorization-grant-type: client_credentials
+          cas:
+            client-id: ${CAS_API_OAUTH_CLIENT_ID}
+            client-secret: ${CAS_API_OAUTH_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
       resource-server:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI}
@@ -104,6 +110,10 @@ services:
   evidence-api:
     base-url: ${EVIDENCE_API_BASE_URL}
     registrationId: evidence
+    
+  cas-api:
+    base-url: ${CAS_API_BASE_URL}
+    registrationId: cas
 
 resilience4j:
   retry:

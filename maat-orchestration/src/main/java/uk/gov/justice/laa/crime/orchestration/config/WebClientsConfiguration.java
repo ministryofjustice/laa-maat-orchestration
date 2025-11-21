@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 import uk.gov.justice.laa.crime.orchestration.client.ApplicationTrackingApiClient;
+import uk.gov.justice.laa.crime.orchestration.client.CrimeAssessmentApiClient;
 import uk.gov.justice.laa.crime.orchestration.client.CrimeMeansAssessmentApiClient;
 import uk.gov.justice.laa.crime.orchestration.client.CrownCourtContributionsApiClient;
 import uk.gov.justice.laa.crime.orchestration.client.CrownCourtProceedingApiClient;
@@ -50,6 +51,7 @@ public class WebClientsConfiguration {
     public static final String CROWN_COURT_CONTRIBUTIONS_WEB_CLIENT_NAME = "crownCourtContributionsWebClient";
     public static final String CRIME_MEANS_ASSESSMENT_WEB_CLIENT_NAME = "crimeMeansAssessmentWebClient";
     public static final String APPLICATION_TRACKING_WEB_CLIENT_NAME = "applicationTrackingWebClient";
+    public static final String CRIME_ASSESSMENT_WEB_CLIENT_NAME = "crimeAssessmentWebClient";
 
     @Bean
     WebClientCustomizer webClientCustomizer() {
@@ -239,6 +241,30 @@ public class WebClientsConfiguration {
                 .build();
     }
 
+    @Bean(CRIME_ASSESSMENT_WEB_CLIENT_NAME)
+    WebClient crimeAssessmentWebClient(
+        WebClient.Builder webClientBuilder,
+        ServicesConfiguration servicesConfiguration,
+        ClientRegistrationRepository clientRegistrations,
+        OAuth2AuthorizedClientRepository authorizedClients,
+        RetryRegistry retryRegistry) {
+
+        ServletOAuth2AuthorizedClientExchangeFilterFunction oauthFilter =
+            new ServletOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrations, authorizedClients);
+
+        String registrationId = servicesConfiguration.getCasApi().getRegistrationId();
+        Assert.notNull(registrationId, MISSING_REGISTRATION_ID);
+        oauthFilter.setDefaultClientRegistrationId(registrationId);
+
+        Resilience4jRetryFilter retryFilter =
+            new Resilience4jRetryFilter(retryRegistry, CRIME_ASSESSMENT_WEB_CLIENT_NAME);
+
+        return webClientBuilder
+            .baseUrl(servicesConfiguration.getCasApi().getBaseUrl())
+            .filters(filters -> configureFilters(filters, oauthFilter, retryFilter))
+            .build();
+    }
+
     @Bean
     MaatCourtDataApiClient maatCourtDataApiClient(
             @Qualifier("maatCourtDataWebClient") WebClient maatCourtDataWebClient) {
@@ -298,6 +324,15 @@ public class WebClientsConfiguration {
                         WebClientAdapter.create(applicationTrackingWebClient))
                 .build();
         return httpServiceProxyFactory.createClient(ApplicationTrackingApiClient.class);
+    }
+
+    @Bean
+    CrimeAssessmentApiClient crimeAssessmentApiClient(
+        @Qualifier("crimeAssessmentWebClient") WebClient crimeAssessmentWebClient) {
+        HttpServiceProxyFactory httpServiceProxyFactory = HttpServiceProxyFactory.builderFor(
+                WebClientAdapter.create(crimeAssessmentWebClient))
+            .build();
+        return httpServiceProxyFactory.createClient(CrimeAssessmentApiClient.class);
     }
 
     private void configureFilters(
