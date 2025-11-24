@@ -48,7 +48,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 @AutoConfigureObservability
 class IojAppealIntegrationTest {
 
-    private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/appeals";
+    private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/ioj-appeals";
 
     private MockMvc mvc;
 
@@ -113,6 +113,7 @@ class IojAppealIntegrationTest {
 
         verify(
                 exactly(1),
-                getRequestedFor(urlPathMatching("/api/internal/v1/ioj-appeals/lookup-by-legacy-id/" + LEGACY_APPEAL_ID)));
+                getRequestedFor(
+                        urlPathMatching("/api/internal/v1/ioj-appeals/lookup-by-legacy-id/" + LEGACY_APPEAL_ID)));
     }
 }

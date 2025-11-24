@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/internal/v1/orchestration/appeals")
+@RequestMapping("api/internal/v1/orchestration/ioj-appeals")
 @Tag(name = "IoJ Appeal Orchestration", description = "Rest API for orchestrating IoJ Appeal flows.")
 public class IojAppealController {
 
