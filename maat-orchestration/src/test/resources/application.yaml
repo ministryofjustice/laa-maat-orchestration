@@ -96,7 +96,7 @@ services:
   evidence-api:
     base-url: http://localhost:${wiremock.server.port}/api/internal/v1/evidence
     registrationId: evidence
-    
+
   cas-api:
     base-url: http://localhost:${wiremock.server.port}/api/internal/v1/
     registrationId: cas

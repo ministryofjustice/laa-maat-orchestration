@@ -110,7 +110,7 @@ services:
   evidence-api:
     base-url: ${EVIDENCE_API_BASE_URL}
     registrationId: evidence
-    
+
   cas-api:
     base-url: ${CAS_API_BASE_URL}
     registrationId: cas
