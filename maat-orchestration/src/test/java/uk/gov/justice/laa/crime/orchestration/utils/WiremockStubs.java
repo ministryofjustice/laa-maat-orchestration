@@ -166,7 +166,7 @@ public class WiremockStubs {
     }
 
     public static void stubForFindIojAppeal(String response) {
-        stubFor(get(urlMatching("/api/internal/v1/iojappeal/lookup-by-legacy-id/" + LEGACY_APPEAL_ID))
+        stubFor(get(urlMatching("/api/internal/v1/ioj-appeals/lookup-by-legacy-id/" + LEGACY_APPEAL_ID))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response)));

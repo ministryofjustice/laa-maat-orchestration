@@ -9,6 +9,6 @@ import org.springframework.web.service.annotation.HttpExchange;
 @HttpExchange
 public interface CrimeAssessmentApiClient {
 
-    @GetExchange("/iojappeal/lookup-by-legacy-id/{legacyAppealId}")
+    @GetExchange("/ioj-appeals/lookup-by-legacy-id/{legacyAppealId}")
     ApiGetIojAppealResponse getIojAppeal(@PathVariable Integer legacyAppealId);
 }

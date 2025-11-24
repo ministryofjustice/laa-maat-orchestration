@@ -113,6 +113,6 @@ class IojAppealIntegrationTest {
 
         verify(
                 exactly(1),
-                getRequestedFor(urlPathMatching("/api/internal/v1/iojappeal/lookup-by-legacy-id/" + LEGACY_APPEAL_ID)));
+                getRequestedFor(urlPathMatching("/api/internal/v1/ioj-appeals/lookup-by-legacy-id/" + LEGACY_APPEAL_ID)));
     }
 }
