@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(SoftAssertionsExtension.class)
-public class IojAppealMapperTest {
+class IojAppealMapperTest {
 
     IojAppealMapper iojAppealMapper = new IojAppealMapper();
 

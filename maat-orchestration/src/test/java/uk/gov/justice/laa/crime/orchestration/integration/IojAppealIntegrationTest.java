@@ -70,7 +70,7 @@ class IojAppealIntegrationTest {
     }
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.mvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
                 .addFilter(springSecurityFilterChain)
                 .build();

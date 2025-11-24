@@ -19,7 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @ExtendWith({MockitoExtension.class})
-public class IojAppealServiceTest {
+class IojAppealServiceTest {
 
     private static final Integer EXISTING_APPEAL_ID = 1;
 
