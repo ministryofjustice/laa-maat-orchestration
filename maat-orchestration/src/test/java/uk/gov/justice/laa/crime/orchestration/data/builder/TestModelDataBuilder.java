@@ -29,6 +29,7 @@ import uk.gov.justice.laa.crime.common.model.hardship.ExtraExpenditure;
 import uk.gov.justice.laa.crime.common.model.hardship.HardshipMetadata;
 import uk.gov.justice.laa.crime.common.model.hardship.HardshipReview;
 import uk.gov.justice.laa.crime.common.model.hardship.SolicitorCosts;
+import uk.gov.justice.laa.crime.common.model.ioj.ApiGetIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentChildWeighting;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentDetail;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.FinancialAssessmentIncomeEvidence;
@@ -58,6 +59,9 @@ import uk.gov.justice.laa.crime.enums.HardshipReviewDetailReason;
 import uk.gov.justice.laa.crime.enums.HardshipReviewDetailType;
 import uk.gov.justice.laa.crime.enums.HardshipReviewResult;
 import uk.gov.justice.laa.crime.enums.HardshipReviewStatus;
+import uk.gov.justice.laa.crime.enums.IojAppealAssessor;
+import uk.gov.justice.laa.crime.enums.IojAppealDecision;
+import uk.gov.justice.laa.crime.enums.IojAppealDecisionReason;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.RepOrderStatus;
@@ -104,6 +108,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.HRSolicitorsCostsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipOverviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJDecisionReasonDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IncomeEvidenceSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.NewWorkReasonDTO;
@@ -151,6 +156,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestModelDataBuilder {
     public static final Integer REP_ID = 200;
+    public static final String APPEAL_ID = "b394e066-fd58-42a5-b8b3-34e09428739c";
+    public static final Integer LEGACY_APPEAL_ID = 1;
     public static final Action TEST_ACTION = Action.CREATE_ASSESSMENT;
     public static final String RT_CODE_ER = "ER";
     public static final Integer PASSPORTED_ID = 777;
@@ -175,6 +182,7 @@ public class TestModelDataBuilder {
     private static final Integer APPLICANT_HISTORY_ID = 666;
     private static final String RESULT_FAIL = "FAIL";
     private static final String RESULT_PASS = "PASS";
+    private static final String SETUP_RESULT_GRANT = "GRANT";
     private static final SysGenString REP_ORDER_DECISION_GRANTED = new SysGenString("Granted");
     private static final SysGenString CC_REP_TYPE_THROUGH_ORDER = new SysGenString("Through Order");
     private static final LocalDateTime CC_REP_ORDER_DATETIME = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
@@ -199,6 +207,7 @@ public class TestModelDataBuilder {
     private static final String CASEWORKER_DECISION_NOTES = "Mock caseworker decision notes";
     private static final String CASEWORKER_NOTES = "Mock caseworker notes";
     private static final String NEW_WORK_REASON_STRING = NewWorkReason.NEW.getCode();
+    private static final String NEW_WORK_REASON_TYPE = NewWorkReason.NEW.getType();
     private static final String USER_SESSION = "8ab0bab5-c27e-471a-babf-c3992c7a4471";
     private static final BigDecimal SOLICITOR_ESTIMATED_COST = BigDecimal.valueOf(2500);
     private static final BigDecimal SOLICITOR_VAT = BigDecimal.valueOf(250);
@@ -371,6 +380,20 @@ public class TestModelDataBuilder {
 
     public static ApiIOJSummary getApiIOJSummary() {
         return new ApiIOJSummary().withIojResult(RESULT_PASS).withDecisionResult(RESULT_PASS);
+    }
+
+    public static ApiGetIojAppealResponse getIojAppealResponse() {
+        return new ApiGetIojAppealResponse()
+                .withAppealId(APPEAL_ID)
+                .withLegacyAppealId(LEGACY_APPEAL_ID)
+                .withCaseManagementUnitId(CMU_ID)
+                .withReceivedDate(LocalDateTime.of(2025, 10, 01, 13, 0))
+                .withAppealReason(NewWorkReason.NEW)
+                .withAppealAssessor(IojAppealAssessor.CASEWORKER)
+                .withAppealDecision(IojAppealDecision.PASS)
+                .withDecisionReason(IojAppealDecisionReason.DAMAGE_TO_REPUTATION)
+                .withNotes(CASEWORKER_NOTES)
+                .withDecisionDate(LocalDateTime.of(2025, 12, 01, 10, 15));
     }
 
     public static uk.gov.justice.laa.crime.common.model.proceeding.common.ApiFinancialAssessment
@@ -724,8 +747,37 @@ public class TestModelDataBuilder {
         return EvidenceFeeDTO.builder().feeLevel(EVIDENCE_FEE_LEVEL_1).build();
     }
 
+    public static IOJDecisionReasonDTO getIojDecisionReasonDTO() {
+        return IOJDecisionReasonDTO.builder()
+                .code(IojAppealDecisionReason.DAMAGE_TO_REPUTATION.getCode())
+                .description(IojAppealDecisionReason.DAMAGE_TO_REPUTATION.getDescription())
+                .build();
+    }
+
     public static IOJAppealDTO getIOJAppealDTO() {
-        return IOJAppealDTO.builder().appealDecisionResult(RESULT_PASS).build();
+        NewWorkReasonDTO newWorkReasonDTO = getNewWorkReasonDTO();
+        newWorkReasonDTO.setType(NEW_WORK_REASON_TYPE);
+
+        Date receivedDate = Date.from(LocalDateTime.of(2025, 10, 01, 13, 0)
+                .atZone(ZoneId.systemDefault())
+                .toInstant());
+        Date decisionDate = Date.from(LocalDateTime.of(2025, 12, 01, 10, 15)
+                .atZone(ZoneId.systemDefault())
+                .toInstant());
+
+        return IOJAppealDTO.builder()
+                .iojId(Long.valueOf(LEGACY_APPEAL_ID))
+                .cmuId(Long.valueOf(CMU_ID))
+                .appealDecisionResult(RESULT_PASS)
+                .receivedDate(receivedDate)
+                .decisionDate(decisionDate)
+                .appealSetUpResult(SETUP_RESULT_GRANT)
+                .appealDecisionResult(RESULT_PASS)
+                .notes(CASEWORKER_NOTES)
+                .appealReason(getIojDecisionReasonDTO())
+                .assessmentStatusDTO(getAssessmentStatusDTO(CurrentStatus.COMPLETE))
+                .newWorkReasonDTO(newWorkReasonDTO)
+                .build();
     }
 
     public static CaseDetailDTO getCaseDetailDTO() {

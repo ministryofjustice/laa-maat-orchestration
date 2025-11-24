@@ -243,26 +243,26 @@ public class WebClientsConfiguration {
 
     @Bean(CRIME_ASSESSMENT_WEB_CLIENT_NAME)
     WebClient crimeAssessmentWebClient(
-        WebClient.Builder webClientBuilder,
-        ServicesConfiguration servicesConfiguration,
-        ClientRegistrationRepository clientRegistrations,
-        OAuth2AuthorizedClientRepository authorizedClients,
-        RetryRegistry retryRegistry) {
+            WebClient.Builder webClientBuilder,
+            ServicesConfiguration servicesConfiguration,
+            ClientRegistrationRepository clientRegistrations,
+            OAuth2AuthorizedClientRepository authorizedClients,
+            RetryRegistry retryRegistry) {
 
         ServletOAuth2AuthorizedClientExchangeFilterFunction oauthFilter =
-            new ServletOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrations, authorizedClients);
+                new ServletOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrations, authorizedClients);
 
         String registrationId = servicesConfiguration.getCasApi().getRegistrationId();
         Assert.notNull(registrationId, MISSING_REGISTRATION_ID);
         oauthFilter.setDefaultClientRegistrationId(registrationId);
 
         Resilience4jRetryFilter retryFilter =
-            new Resilience4jRetryFilter(retryRegistry, CRIME_ASSESSMENT_WEB_CLIENT_NAME);
+                new Resilience4jRetryFilter(retryRegistry, CRIME_ASSESSMENT_WEB_CLIENT_NAME);
 
         return webClientBuilder
-            .baseUrl(servicesConfiguration.getCasApi().getBaseUrl())
-            .filters(filters -> configureFilters(filters, oauthFilter, retryFilter))
-            .build();
+                .baseUrl(servicesConfiguration.getCasApi().getBaseUrl())
+                .filters(filters -> configureFilters(filters, oauthFilter, retryFilter))
+                .build();
     }
 
     @Bean
@@ -328,10 +328,10 @@ public class WebClientsConfiguration {
 
     @Bean
     CrimeAssessmentApiClient crimeAssessmentApiClient(
-        @Qualifier("crimeAssessmentWebClient") WebClient crimeAssessmentWebClient) {
+            @Qualifier("crimeAssessmentWebClient") WebClient crimeAssessmentWebClient) {
         HttpServiceProxyFactory httpServiceProxyFactory = HttpServiceProxyFactory.builderFor(
-                WebClientAdapter.create(crimeAssessmentWebClient))
-            .build();
+                        WebClientAdapter.create(crimeAssessmentWebClient))
+                .build();
         return httpServiceProxyFactory.createClient(CrimeAssessmentApiClient.class);
     }
 
