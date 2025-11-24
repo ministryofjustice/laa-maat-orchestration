@@ -45,6 +45,10 @@ env:
     value: {{ .Values.evidenceApi.baseUrl }}
   - name: EVIDENCE_API_OAUTH_URL
     value: {{ .Values.evidenceApi.oauthUrl }}
+  - name: CAS_API_BASE_URL
+    value: {{ .Values.casApi.baseUrl }}
+  - name: CAS_API_OAUTH_URL
+    value: {{ .Values.casApi.oauthUrl }}
   - name: JWT_ISSUER_URI
     value: {{ .Values.jwt.issuerUri }}
   - name: HARDSHIP_API_OAUTH_CLIENT_ID
@@ -127,4 +131,14 @@ env:
         secretKeyRef:
             name: evidence-api-oauth-client-secret
             key: EVIDENCE_API_OAUTH_CLIENT_SECRET
+  - name: CAS_API_OAUTH_CLIENT_ID
+    valueFrom:
+        secretKeyRef:
+            name: cas-api-oauth-client-id
+            key: CRIME_ASSESSMENT_SERVICE_OAUTH_CLIENT_ID
+  - name: CAS_API_OAUTH_CLIENT_SECRET
+    valueFrom:
+        secretKeyRef:
+            name: cas-api-oauth-client-secret
+            key: CRIME_ASSESSMENT_SERVICE_OAUTH_CLIENT_SECRET
 {{- end -}}
