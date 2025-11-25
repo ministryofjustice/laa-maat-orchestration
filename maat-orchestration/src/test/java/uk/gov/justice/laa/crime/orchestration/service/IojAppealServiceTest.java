@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import uk.gov.justice.laa.crime.orchestration.service.api.AssessmentApiService;
 
 @ExtendWith({MockitoExtension.class})
 class IojAppealServiceTest {
@@ -27,7 +28,7 @@ class IojAppealServiceTest {
     private IojAppealMapper iojAppealMapper;
 
     @Mock
-    private CrimeAssessmentApiClient assessmentServiceApi;
+    private AssessmentApiService assessmentApiService;
 
     @InjectMocks
     private IojAppealService iojAppealService;
@@ -35,7 +36,7 @@ class IojAppealServiceTest {
     @Test
     void givenAppealId_whenFindIsInvoked_thenApiServiceIsCalledAndResponseMapped() {
         ApiGetIojAppealResponse response = TestModelDataBuilder.getIojAppealResponse();
-        when(assessmentServiceApi.getIojAppeal(EXISTING_APPEAL_ID)).thenReturn(response);
+        when(assessmentApiService.find(EXISTING_APPEAL_ID)).thenReturn(response);
 
         iojAppealService.find(EXISTING_APPEAL_ID);
 
@@ -44,7 +45,7 @@ class IojAppealServiceTest {
 
     @Test
     void givenNullResponse_whenFindIsInvoked_thenExceptionThrownAndMapperNotCalled() {
-        when(assessmentServiceApi.getIojAppeal(any())).thenReturn(null);
+        when(assessmentApiService.find(EXISTING_APPEAL_ID)).thenReturn(null);
 
         assertThatThrownBy(() -> iojAppealService.find(any())).isInstanceOf(WebClientResponseException.class);
 
