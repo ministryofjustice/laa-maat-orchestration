@@ -23,7 +23,7 @@ def versions = [
 		commonsRestClient       : "3.20.0",
 		wmStubRunnerVersion    	: "4.3.0",
 		resilience4jVersion     : "2.3.0",
-		commonsLang3Version		: "3.17.0",
+		commonsLang3Version		: "3.19.0",
 		springSecurityCore      : "6.5.6"
 ]
 
