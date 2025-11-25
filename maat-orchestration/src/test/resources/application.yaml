@@ -24,6 +24,8 @@ spring:
             token-uri: http://localhost:${wiremock.server.port}/oauth2/token
           evidence:
             token-uri: http://localhost:${wiremock.server.port}/oauth2/token
+          cas:
+            token-uri: http://localhost:${wiremock.server.port}/oauth2/token
         registration:
           hardship:
             client-id: dummy-client
@@ -56,6 +58,10 @@ spring:
           evidence:
             client-id: dummy-client
             client-secret: dummy-client
+            authorization-grant-type: client_credentials
+          cas:
+            client-id: dummy-client
+            client-secret: dummy-secret
             authorization-grant-type: client_credentials
 
       resource-server:
@@ -90,6 +96,10 @@ services:
   evidence-api:
     base-url: http://localhost:${wiremock.server.port}/api/internal/v1/evidence
     registrationId: evidence
+
+  cas-api:
+    base-url: http://localhost:${wiremock.server.port}/api/internal/v1/
+    registrationId: cas
 
 resilience4j:
   retry:

@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import static uk.gov.justice.laa.crime.orchestration.data.Constants.ASSESSMENT_SUMMARY_ID;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.LEGACY_APPEAL_ID;
 
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
@@ -144,7 +145,7 @@ class ApplicationTrackingMapperTest {
 
         Ioj ioj = mapper.buildIOJ(workflowRequest, repOrderDTO);
 
-        softly.assertThat(ioj.getIojId()).isNull();
+        softly.assertThat(ioj.getIojId()).isEqualTo(LEGACY_APPEAL_ID);
         softly.assertThat(ioj.getIojResult()).isEqualTo(MeansAssessmentResult.PASS.toString());
         softly.assertThat(ioj.getIojReason()).isNull();
         softly.assertThat(ioj.getIojAppealResult()).isEqualTo(IojAppealResult.PASS);
