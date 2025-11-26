@@ -4,6 +4,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealRequest;
+import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiGetIojAppealResponse;
 import uk.gov.justice.laa.crime.orchestration.client.CrimeAssessmentApiClient;
 
@@ -39,5 +41,15 @@ class AssessmentApiServiceTest {
 
         assertThatThrownBy(() -> assessmentApiService.find(EXISTING_APPEAL_ID))
                 .isInstanceOf(WebClientResponseException.class);
+    }
+
+    @Test
+    void givenCreateIojAppealRequest_whenCreateIsInvoked_thenApiClientReturnsResponse() {
+        ApiCreateIojAppealRequest request = new ApiCreateIojAppealRequest();
+        when(assessmentApiClient.createIojAppeal(request)).thenReturn(new ApiCreateIojAppealResponse());
+
+        assessmentApiService.create(request);
+
+        verify(assessmentApiClient).createIojAppeal(request);
     }
 }
