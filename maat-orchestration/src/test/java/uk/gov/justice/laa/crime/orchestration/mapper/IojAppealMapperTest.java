@@ -12,7 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(SoftAssertionsExtension.class)
 class IojAppealMapperTest {
 
-    IojAppealMapper iojAppealMapper = new IojAppealMapper();
+    UserMapper userMapper = new UserMapper();
+    IojAppealMapper iojAppealMapper = new IojAppealMapper(userMapper);
 
     @InjectSoftAssertions
     private SoftAssertions softly;

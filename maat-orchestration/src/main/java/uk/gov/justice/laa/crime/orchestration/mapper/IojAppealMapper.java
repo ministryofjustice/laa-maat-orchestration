@@ -1,14 +1,21 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import lombok.RequiredArgsConstructor;
+import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealRequest;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiGetIojAppealResponse;
+import uk.gov.justice.laa.crime.common.model.ioj.IojAppeal;
+import uk.gov.justice.laa.crime.common.model.ioj.IojAppealMetadata;
 import uk.gov.justice.laa.crime.enums.IojAppealAssessor;
 import uk.gov.justice.laa.crime.enums.IojAppealDecision;
+import uk.gov.justice.laa.crime.enums.IojAppealDecisionReason;
+import uk.gov.justice.laa.crime.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentStatusDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJDecisionReasonDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.NewWorkReasonDTO;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
@@ -22,6 +29,7 @@ public class IojAppealMapper {
     private static final String SET_UP_RESULT_CASEWORKER_FAIL = "REFUSED";
     private static final String SET_UP_RESULT_JUDGE = "REFER";
     private static final String ASSESSMENT_STATUS_DESCRIPTION = "Complete";
+    private final UserMapper userMapper;
 
     public IOJAppealDTO apiGetIojAppealResponseToIojAppealDTO(ApiGetIojAppealResponse response) {
 
@@ -71,5 +79,33 @@ public class IojAppealMapper {
                 .assessmentStatusDTO(assessmentStatusDTO)
                 .newWorkReasonDTO(newWorkReasonDTO)
                 .build();
+    }
+
+    public ApiCreateIojAppealRequest mapIojAppealDtoToApiCreateIojAppealRequest(WorkflowRequest request) {
+
+        IOJAppealDTO iojAppealDto =
+                request.getApplicationDTO().getAssessmentDTO().getIojAppeal();
+
+        boolean judicialReview = iojAppealDto.getAppealReason().getCode().equals(NewWorkReason.JR.getCode());
+
+        IojAppeal iojAppeal = new IojAppeal()
+                .withReceivedDate(
+                        LocalDateTime.from(iojAppealDto.getReceivedDate().toInstant()))
+                .withAppealReason(
+                        NewWorkReason.getFrom(iojAppealDto.getNewWorkReasonDTO().getCode()))
+                .withAppealAssessor(judicialReview ? IojAppealAssessor.JUDGE : IojAppealAssessor.CASEWORKER)
+                .withAppealDecision(Enum.valueOf(IojAppealDecision.class, iojAppealDto.getAppealDecisionResult()))
+                .withDecisionReason(IojAppealDecisionReason.getFrom(
+                        iojAppealDto.getAppealReason().getCode()))
+                .withNotes(iojAppealDto.getNotes())
+                .withDecisionDate(
+                        LocalDateTime.from(iojAppealDto.getDecisionDate().toInstant()));
+
+        IojAppealMetadata iojAppealMetadata = new IojAppealMetadata()
+                .withLegacyApplicationId(request.getApplicationDTO().getRepId().intValue())
+                .withCaseManagementUnitId(iojAppealDto.getCmuId().intValue())
+                .withUserSession(userMapper.userDtoToUserSession(request.getUserDTO()));
+
+        return new ApiCreateIojAppealRequest(iojAppeal, iojAppealMetadata);
     }
 }
