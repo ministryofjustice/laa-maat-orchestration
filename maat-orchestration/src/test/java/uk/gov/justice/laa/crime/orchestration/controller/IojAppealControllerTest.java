@@ -9,7 +9,6 @@ import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataB
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionId;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionIdGivenContent;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -30,6 +29,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(IojAppealController.class)
 @Import(OrchestrationTestConfiguration.class)
@@ -96,13 +97,13 @@ class IojAppealControllerTest {
 
         String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkFlowRequest());
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
     void givenInvalidRequest_whenCreateIsInvoked_thenBadRequestResponseIsReturned() throws Exception {
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, "", ENDPOINT_URL, true))
-            .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 }
