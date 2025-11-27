@@ -7,6 +7,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 
 import java.util.Collection;
 
@@ -30,6 +31,16 @@ public class AssessmentSummaryService {
                                 : "Hardship Review - Magistrate")
                 .result(hardshipReviewDTO.getReviewResult())
                 .assessmentDate(hardshipReviewDTO.getReviewDate())
+                .build();
+    }
+
+    public AssessmentSummaryDTO getSummary(IOJAppealDTO iojAppealDTO) {
+        return AssessmentSummaryDTO.builder()
+                .id(iojAppealDTO.getIojId().intValue())
+                .status(iojAppealDTO.getAssessmentStatusDTO().getStatus())
+                .type("IoJ Appeal")
+                .result(iojAppealDTO.getAppealDecisionResult())
+                .assessmentDate(iojAppealDTO.getReceivedDate())
                 .build();
     }
 

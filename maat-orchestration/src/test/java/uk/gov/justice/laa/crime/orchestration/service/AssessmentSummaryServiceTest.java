@@ -9,6 +9,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -113,6 +114,16 @@ class AssessmentSummaryServiceTest {
         financialAssessmentDTO.getFull().getAssessmnentStatusDTO().setStatus("");
         AssessmentSummaryDTO actual = assessmentSummaryService.getSummary(financialAssessmentDTO);
         AssessmentSummaryDTO expected = TestModelDataBuilder.getAssessmentSummaryDTOFromInitFinancialAssessment();
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void givenIojAppealDTOIsProvided_whenGetSummaryIsInvoked_thenAssessmentSummaryIsReturned() {
+        IOJAppealDTO iojAppealDTO = TestModelDataBuilder.getIOJAppealDTO();
+
+        AssessmentSummaryDTO expected = TestModelDataBuilder.getAssessmentSummaryDTOFromIojAppealDTO();
+        AssessmentSummaryDTO actual = assessmentSummaryService.getSummary(iojAppealDTO);
+
         assertThat(actual).isEqualTo(expected);
     }
 }
