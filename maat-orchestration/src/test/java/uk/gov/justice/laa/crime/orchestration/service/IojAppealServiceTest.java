@@ -22,7 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith({MockitoExtension.class})
 class IojAppealServiceTest {
 
-    private static final int EXISTING_APPEAL_ID = 1;
+    private static final int EXISTING_APPEAL_ID = 44;
 
     @Mock
     private IojAppealMapper iojAppealMapper;
@@ -44,7 +44,9 @@ class IojAppealServiceTest {
     }
 
     @Test
-    void givenIojAppealWorkflowRequest_whenCreateIsInvoked_thenApiServiceIsCalledAndLegacyAppealIdMapped() {
+    void givenWorkflowRequest_whenCreateIsInvoked_thenApiServiceIsCalledAndLegacyAppealIdMapped() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+
         ApiCreateIojAppealRequest request = new ApiCreateIojAppealRequest();
         ApiCreateIojAppealResponse response = new ApiCreateIojAppealResponse().withLegacyAppealId(EXISTING_APPEAL_ID);
 
