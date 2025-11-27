@@ -780,6 +780,20 @@ public class TestModelDataBuilder {
                 .build();
     }
 
+    public static AssessmentSummaryDTO getAssessmentSummaryDTOFromIojAppealDTO() {
+        Date receivedDate = Date.from(LocalDateTime.of(2025, 10, 01, 13, 0)
+                .atZone(ZoneId.systemDefault())
+                .toInstant());
+
+        return AssessmentSummaryDTO.builder()
+                .id(LEGACY_APPEAL_ID)
+                .status(CurrentStatus.COMPLETE.getStatus())
+                .type("IoJ Appeal")
+                .result(RESULT_PASS)
+                .assessmentDate(receivedDate)
+                .build();
+    }
+
     public static CaseDetailDTO getCaseDetailDTO() {
         return CaseDetailDTO.builder()
                 .caseType(CaseType.EITHER_WAY.getCaseType())
