@@ -27,7 +27,11 @@ public class IojAppealsOrchestrationService {
     public ApplicationDTO create(WorkflowRequest request) {
         iojAppealService.create(request);
 
-        // TODO: Call the CCP service here or the handle_ioj_result stored procedure?
+        // Call CCP determine-mags-rep-decision endpoint
+        // Call CCC to calculate contributions - maybe call existing svc inside this repo?
+        // Call the pre_update_cc_application stored procedure
+        // Call CCP updateApplication crown court endpoint
+        // Invoke matrix and correspondence SPs crown_court.xx_process_activity_and_get_correspondence
 
         AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(
                 request.getApplicationDTO().getAssessmentDTO().getIojAppeal());

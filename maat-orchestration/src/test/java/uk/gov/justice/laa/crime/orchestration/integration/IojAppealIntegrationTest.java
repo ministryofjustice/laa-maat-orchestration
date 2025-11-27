@@ -2,6 +2,7 @@ package uk.gov.justice.laa.crime.orchestration.integration;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
@@ -9,12 +10,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.LEGACY_APPEAL_ID;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCreateIojAppeal;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindIojAppeal;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForOAuth;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 
 import java.time.ZoneOffset;
@@ -83,7 +87,6 @@ class IojAppealIntegrationTest {
 
     @Test
     void givenAValidAppealId_whenFindIsInvoked_thenShouldReturnIojAppeal() throws Exception {
-
         stubForOAuth();
         stubForFindIojAppeal(objectMapper.writeValueAsString(TestModelDataBuilder.getIojAppealResponse()));
 
@@ -115,5 +118,37 @@ class IojAppealIntegrationTest {
                 exactly(1),
                 getRequestedFor(
                         urlPathMatching("/api/internal/v1/ioj-appeals/lookup-by-legacy-id/" + LEGACY_APPEAL_ID)));
+    }
+
+    @Test
+    void givenValidContent_whenCreateIsInvoked_thenShouldReturnSuccessResponse() throws Exception {
+        stubForOAuth();
+        stubForCreateIojAppeal(objectMapper.writeValueAsString(TestModelDataBuilder.getApiCreateIojAppealResponse()));
+
+        IOJAppealDTO expected = TestModelDataBuilder.getIOJAppealDTO();
+
+        DateTimeFormatter expectedDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'+00:00'");
+
+        String expectedReceivedDate =
+            expected.getReceivedDate().toInstant().atOffset(ZoneOffset.UTC).format(expectedDateFormat);
+
+        String expectedDecisionDate =
+            expected.getDecisionDate().toInstant().atOffset(ZoneOffset.UTC).format(expectedDateFormat);
+
+        mvc.perform(buildRequest(HttpMethod.POST, ENDPOINT_URL))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.iojId").value(expected.getIojId()))
+            .andExpect(jsonPath("$.cmuId").value(expected.getCmuId()))
+            .andExpect(jsonPath("$.receivedDate").value(expectedReceivedDate))
+            .andExpect(jsonPath("$.decisionDate").value(expectedDecisionDate))
+            .andExpect(jsonPath("$.appealSetUpResult").value(expected.getAppealSetUpResult()))
+            .andExpect(jsonPath("$.appealDecisionResult").value(expected.getAppealDecisionResult()))
+            .andExpect(jsonPath("$.notes").value(expected.getNotes()))
+            .andExpect(jsonPath("$.appealReason").value(expected.getAppealReason()))
+            .andExpect(jsonPath("$.assessmentStatusDTO").value(expected.getAssessmentStatusDTO()))
+            .andExpect(jsonPath("$.newWorkReasonDTO").value(expected.getNewWorkReasonDTO()));
+
+        verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/ioj-appeals")));
     }
 }
