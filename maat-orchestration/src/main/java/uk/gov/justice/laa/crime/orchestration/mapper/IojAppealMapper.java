@@ -88,9 +88,19 @@ public class IojAppealMapper {
 
         boolean judicialReview = iojAppealDto.getAppealReason().getCode().equals(NewWorkReason.JR.getCode());
 
+        LocalDateTime receivedDate = iojAppealDto
+                .getReceivedDate()
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        LocalDateTime decisionDate = iojAppealDto
+                .getDecisionDate()
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+
         IojAppeal iojAppeal = new IojAppeal()
-                .withReceivedDate(
-                        LocalDateTime.from(iojAppealDto.getReceivedDate().toInstant()))
+                .withReceivedDate(receivedDate)
                 .withAppealReason(
                         NewWorkReason.getFrom(iojAppealDto.getNewWorkReasonDTO().getCode()))
                 .withAppealAssessor(judicialReview ? IojAppealAssessor.JUDGE : IojAppealAssessor.CASEWORKER)
@@ -98,8 +108,7 @@ public class IojAppealMapper {
                 .withDecisionReason(IojAppealDecisionReason.getFrom(
                         iojAppealDto.getAppealReason().getCode()))
                 .withNotes(iojAppealDto.getNotes())
-                .withDecisionDate(
-                        LocalDateTime.from(iojAppealDto.getDecisionDate().toInstant()));
+                .withDecisionDate(decisionDate);
 
         IojAppealMetadata iojAppealMetadata = new IojAppealMetadata()
                 .withLegacyApplicationId(request.getApplicationDTO().getRepId().intValue())

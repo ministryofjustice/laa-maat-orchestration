@@ -4,10 +4,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
+import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
@@ -38,6 +41,29 @@ class ProceedingsServiceTest {
 
     @Mock
     private CCLFUpdateService cclfUpdateService;
+
+    @Test
+    void
+            givenWorkflowRequest_whenDetermineMagsRepDecisionResultIsInvoked_whenApiServiceIsCalledAndApplicationUpdated() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+
+        ApiDetermineMagsRepDecisionRequest request = TestModelDataBuilder.getDetermineMagsRepDecisionRequest();
+        ApiDetermineMagsRepDecisionResponse response = TestModelDataBuilder.getDetermineMagsRepDecisionResponse();
+
+        when(proceedingsMapper.workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest))
+                .thenReturn(request);
+        when(proceedingsApiService.determineMagsRepDecision(request)).thenReturn(response);
+        when(proceedingsMapper.determineMagsRepDecisionResponseToApplicationDto(
+                        response, workflowRequest.getApplicationDTO()))
+                .thenReturn(workflowRequest.getApplicationDTO());
+
+        proceedingsService.determineMagsRepDecisionResult(workflowRequest);
+
+        verify(proceedingsMapper).workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest);
+        verify(proceedingsApiService).determineMagsRepDecision(request);
+        verify(proceedingsMapper)
+                .determineMagsRepDecisionResponseToApplicationDto(response, workflowRequest.getApplicationDTO());
+    }
 
     @Test
     void givenWorkflowRequest_whenUpdateApplicationIsInvoked_thenApiServiceIsCalledAndApplicationUpdated() {

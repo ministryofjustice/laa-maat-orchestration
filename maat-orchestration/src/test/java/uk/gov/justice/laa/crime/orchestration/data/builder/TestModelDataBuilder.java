@@ -29,6 +29,7 @@ import uk.gov.justice.laa.crime.common.model.hardship.ExtraExpenditure;
 import uk.gov.justice.laa.crime.common.model.hardship.HardshipMetadata;
 import uk.gov.justice.laa.crime.common.model.hardship.HardshipReview;
 import uk.gov.justice.laa.crime.common.model.hardship.SolicitorCosts;
+import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiGetIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentChildWeighting;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentDetail;
@@ -38,7 +39,9 @@ import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCapitalEvidenc
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiIOJSummary;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiRepOrderCrownCourtOutcome;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.dto.ErrorDTO;
@@ -130,6 +133,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RoleDataItemDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
+import uk.gov.justice.laa.crime.proceeding.MagsDecisionResult;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
@@ -307,6 +311,24 @@ public class TestModelDataBuilder {
                         .withUserSession(getApiUserSession()));
     }
 
+    public static ApiDetermineMagsRepDecisionRequest getDetermineMagsRepDecisionRequest() {
+        return new ApiDetermineMagsRepDecisionRequest()
+                .withRepId(REP_ID)
+                .withCaseType(CaseType.EITHER_WAY)
+                .withPassportAssessment(getApiPassportAssessment())
+                .withIojAppeal(getApiIOJSummary())
+                .withFinancialAssessment(getApiFinancialAssessment())
+                .withUserSession(getApiUserSession());
+    }
+
+    public static ApiDetermineMagsRepDecisionResponse getDetermineMagsRepDecisionResponse() {
+        MagsDecisionResult magsDecisionResult = new MagsDecisionResult();
+        magsDecisionResult.setDecisionDate(LocalDate.now());
+        magsDecisionResult.setDecisionReason(DecisionReason.GRANTED);
+
+        return new ApiDetermineMagsRepDecisionResponse().withDecisionResult(magsDecisionResult);
+    }
+
     public static uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest
             getUpdateApplicationRequest() {
         return new uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest()
@@ -394,6 +416,10 @@ public class TestModelDataBuilder {
                 .withDecisionReason(IojAppealDecisionReason.DAMAGE_TO_REPUTATION)
                 .withNotes(CASEWORKER_NOTES)
                 .withDecisionDate(LocalDateTime.of(2025, 12, 01, 10, 15));
+    }
+
+    public static ApiCreateIojAppealResponse getApiCreateIojAppealResponse() {
+        return new ApiCreateIojAppealResponse().withAppealId(APPEAL_ID).withLegacyAppealId(LEGACY_APPEAL_ID);
     }
 
     public static uk.gov.justice.laa.crime.common.model.proceeding.common.ApiFinancialAssessment

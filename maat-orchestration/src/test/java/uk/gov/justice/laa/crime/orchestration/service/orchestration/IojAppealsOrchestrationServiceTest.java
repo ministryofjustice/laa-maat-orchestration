@@ -1,15 +1,22 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
+import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
 import uk.gov.justice.laa.crime.orchestration.service.IojAppealService;
+import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
+import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
+import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +32,19 @@ public class IojAppealsOrchestrationServiceTest {
     private AssessmentSummaryService assessmentSummaryService;
 
     @Mock
+    private ContributionService contributionService;
+
+    @Mock
     private IojAppealService iojAppealService;
+
+    @Mock
+    private MaatCourtDataService maatCourtDataService;
+
+    @Mock
+    private ProceedingsService proceedingsService;
+
+    @Mock
+    private RepOrderService repOrderService;
 
     @InjectMocks
     private IojAppealsOrchestrationService iojAppealsOrchestrationService;
@@ -44,6 +63,14 @@ public class IojAppealsOrchestrationServiceTest {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         IOJAppealDTO iojAppealDTO =
                 workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal();
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO());
+
+        when(repOrderService.getRepOrder(workflowRequest)).thenReturn(repOrderDTO);
+        when(proceedingsService.determineMagsRepDecisionResult(workflowRequest))
+                .thenReturn(workflowRequest.getApplicationDTO());
+        when(contributionService.calculate(workflowRequest)).thenReturn(workflowRequest.getApplicationDTO());
+        when(maatCourtDataService.invokeStoredProcedure(any(), any(), any()))
+                .thenReturn(workflowRequest.getApplicationDTO());
 
         AssessmentSummaryDTO assessmentSummaryDTO = TestModelDataBuilder.getAssessmentSummaryDTOFromIojAppealDTO();
         when(assessmentSummaryService.getSummary(iojAppealDTO)).thenReturn(assessmentSummaryDTO);
@@ -51,6 +78,21 @@ public class IojAppealsOrchestrationServiceTest {
         iojAppealsOrchestrationService.create(workflowRequest);
 
         verify(iojAppealService).create(workflowRequest);
+
+        verify(proceedingsService).determineMagsRepDecisionResult(workflowRequest);
+        verify(contributionService).calculate(workflowRequest);
+        verify(maatCourtDataService)
+                .invokeStoredProcedure(
+                        workflowRequest.getApplicationDTO(),
+                        workflowRequest.getUserDTO(),
+                        StoredProcedure.PRE_UPDATE_CC_APPLICATION);
+        verify(proceedingsService).updateApplication(workflowRequest, repOrderDTO);
+        verify(maatCourtDataService)
+                .invokeStoredProcedure(
+                        workflowRequest.getApplicationDTO(),
+                        workflowRequest.getUserDTO(),
+                        StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE);
+
         verify(assessmentSummaryService, times(1)).getSummary(iojAppealDTO);
         verify(assessmentSummaryService).updateApplication(workflowRequest.getApplicationDTO(), assessmentSummaryDTO);
     }

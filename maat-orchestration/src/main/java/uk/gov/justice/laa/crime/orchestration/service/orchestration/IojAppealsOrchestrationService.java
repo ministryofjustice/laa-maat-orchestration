@@ -2,12 +2,19 @@ package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
+import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
 import uk.gov.justice.laa.crime.orchestration.service.IojAppealService;
+import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
+import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
+import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
 
 import org.springframework.stereotype.Service;
 
@@ -17,17 +24,44 @@ import org.springframework.stereotype.Service;
 public class IojAppealsOrchestrationService {
 
     private final AssessmentSummaryService assessmentSummaryService;
-
     private final IojAppealService iojAppealService;
+    private final MaatCourtDataService maatCourtDataService;
+    private final ContributionService contributionService;
+    private final ProceedingsService proceedingsService;
+    private final RepOrderService repOrderService;
 
     public IOJAppealDTO find(int appealId) {
         return iojAppealService.find(appealId);
     }
 
     public ApplicationDTO create(WorkflowRequest request) {
+        RepOrderDTO repOrderDto = repOrderService.getRepOrder(request);
+
+        if (repOrderDto == null) {
+            log.error("Could not find rep order for request {}", request);
+            throw new MaatOrchestrationException(request.getApplicationDTO());
+        }
+
         iojAppealService.create(request);
 
-        // TODO: Call the CCP service here or the handle_ioj_result stored procedure?
+        // Call CCP determine-mags-rep-decision endpoint
+        request.setApplicationDTO(proceedingsService.determineMagsRepDecisionResult(request));
+
+        // Call CCC to calculate contributions - maybe call existing svc inside this repo?
+        request.setApplicationDTO(contributionService.calculate(request));
+
+        // Call the pre_update_cc_application stored procedure
+        request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                request.getApplicationDTO(), request.getUserDTO(), StoredProcedure.PRE_UPDATE_CC_APPLICATION));
+
+        // Call CCP updateApplication crown court endpoint
+        proceedingsService.updateApplication(request, repOrderDto);
+
+        // Invoke matrix and correspondence SPs crown_court.xx_process_activity_and_get_correspondence
+        request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                request.getApplicationDTO(),
+                request.getUserDTO(),
+                StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE));
 
         AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(
                 request.getApplicationDTO().getAssessmentDTO().getIojAppeal());

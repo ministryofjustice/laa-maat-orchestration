@@ -2,8 +2,10 @@ package uk.gov.justice.laa.crime.orchestration.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -23,6 +25,18 @@ public class ProceedingsService {
     private final ProceedingsApiService proceedingsApiService;
     private final FeatureDecisionService featureDecisionService;
     private final CCLFUpdateService cclfUpdateService;
+
+    public ApplicationDTO determineMagsRepDecisionResult(WorkflowRequest workflowRequest) {
+        ApiDetermineMagsRepDecisionRequest apiDetermineMagsRepDecisionRequest =
+                proceedingsMapper.workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest);
+        ApiDetermineMagsRepDecisionResponse determineMagsRepDecisionResponse =
+                proceedingsApiService.determineMagsRepDecision(apiDetermineMagsRepDecisionRequest);
+
+        workflowRequest.setApplicationDTO(proceedingsMapper.determineMagsRepDecisionResponseToApplicationDto(
+                determineMagsRepDecisionResponse, workflowRequest.getApplicationDTO()));
+
+        return workflowRequest.getApplicationDTO();
+    }
 
     public void updateApplication(WorkflowRequest request, RepOrderDTO repOrderDTO) {
         ApiUpdateApplicationRequest apiUpdateApplicationRequest =

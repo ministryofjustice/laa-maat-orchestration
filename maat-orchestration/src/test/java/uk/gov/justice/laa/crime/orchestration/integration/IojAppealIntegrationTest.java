@@ -2,6 +2,7 @@ package uk.gov.justice.laa.crime.orchestration.integration;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
@@ -9,16 +10,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.LEGACY_APPEAL_ID;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCalculateContributions;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCreateIojAppeal;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForDetermineMagsRepDecision;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindIojAppeal;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindRepOrder;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetContributionsSummary;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForOAuth;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForUpdateCrownCourtApplication;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
+import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
+import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +52,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.stubbing.Scenario;
 
 @DirtiesContext
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -83,7 +97,6 @@ class IojAppealIntegrationTest {
 
     @Test
     void givenAValidAppealId_whenFindIsInvoked_thenShouldReturnIojAppeal() throws Exception {
-
         stubForOAuth();
         stubForFindIojAppeal(objectMapper.writeValueAsString(TestModelDataBuilder.getIojAppealResponse()));
 
@@ -115,5 +128,65 @@ class IojAppealIntegrationTest {
                 exactly(1),
                 getRequestedFor(
                         urlPathMatching("/api/internal/v1/ioj-appeals/lookup-by-legacy-id/" + LEGACY_APPEAL_ID)));
+    }
+
+    @Test
+    void givenValidContent_whenCreateIsInvoked_thenShouldReturnSuccessResponse() throws Exception {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+
+        stubForOAuth();
+        stubForCreateIojAppeal(objectMapper.writeValueAsString(TestModelDataBuilder.getApiCreateIojAppealResponse()));
+        stubForFindRepOrder(objectMapper.writeValueAsString(
+                TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO())));
+        stubForDetermineMagsRepDecision(
+                objectMapper.writeValueAsString(TestModelDataBuilder.getDetermineMagsRepDecisionResponse()));
+        stubForCalculateContributions(
+                objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
+        stubForGetContributionsSummary(
+                workflowRequest.getApplicationDTO().getRepId().intValue(),
+                objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary())));
+        stubForInvokeStoredProcedure(
+                Scenario.STARTED,
+                "PRE_UPDATE_CC_APPLICATION",
+                objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO()));
+        stubForInvokeStoredProcedure(
+                "PRE_UPDATE_CC_APPLICATION",
+                "PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE",
+                objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO()));
+        stubForInvokeStoredProcedure(objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO()));
+        stubForUpdateCrownCourtApplication(
+                objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse()));
+        stubForGetUserSummary(objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getUserSummaryDTO()));
+
+        IOJAppealDTO expected = TestModelDataBuilder.getIOJAppealDTO();
+        String requestBody = objectMapper.writeValueAsString(workflowRequest);
+
+        DateTimeFormatter expectedDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'+00:00'");
+
+        String expectedReceivedDate =
+                expected.getReceivedDate().toInstant().atOffset(ZoneOffset.UTC).format(expectedDateFormat);
+
+        String expectedDecisionDate =
+                expected.getDecisionDate().toInstant().atOffset(ZoneOffset.UTC).format(expectedDateFormat);
+
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.assessmentDTO.iojAppeal.iojId").value(expected.getIojId()))
+                .andExpect(jsonPath("$.assessmentDTO.iojAppeal.cmuId").value(expected.getCmuId()))
+                .andExpect(jsonPath("$.assessmentDTO.iojAppeal.receivedDate").value(expectedReceivedDate))
+                .andExpect(jsonPath("$.assessmentDTO.iojAppeal.decisionDate").value(expectedDecisionDate))
+                .andExpect(
+                        jsonPath("$.assessmentDTO.iojAppeal.appealSetUpResult").value(expected.getAppealSetUpResult()))
+                .andExpect(jsonPath("$.assessmentDTO.iojAppeal.appealDecisionResult")
+                        .value(expected.getAppealDecisionResult()))
+                .andExpect(jsonPath("$.assessmentDTO.iojAppeal.notes").value(expected.getNotes()))
+                .andExpect(jsonPath("$.assessmentDTO.iojAppeal.appealReason").value(expected.getAppealReason()))
+                .andExpect(jsonPath("$.assessmentDTO.iojAppeal.assessmentStatusDTO")
+                        .value(expected.getAssessmentStatusDTO()))
+                .andExpect(
+                        jsonPath("$.assessmentDTO.iojAppeal.newWorkReasonDTO").value(expected.getNewWorkReasonDTO()));
+
+        verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/ioj-appeals")));
     }
 }

@@ -6,8 +6,10 @@ import static org.mockito.Mockito.when;
 
 import uk.gov.justice.laa.crime.common.model.common.ApiUserSession;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.CourtType;
@@ -18,9 +20,11 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.OutcomeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.SysGenString;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.util.DateUtil;
 
+import java.time.ZoneId;
 import java.util.List;
 
 import org.assertj.core.api.SoftAssertions;
@@ -44,6 +48,50 @@ class ProceedingsMapperTest {
 
     @InjectMocks
     ProceedingsMapper proceedingsMapper;
+
+    @Test
+    void givenWorkflowRequest_workflowRequestToDetermineMagsRepDecisionRequestIsInvoked_thenReturnsApiRequest() {
+        mockApiUserSession();
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+
+        ApiDetermineMagsRepDecisionRequest expectedRequest = TestModelDataBuilder.getDetermineMagsRepDecisionRequest();
+        ApiDetermineMagsRepDecisionRequest actualRequest =
+                proceedingsMapper.workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest);
+
+        softly.assertThat(actualRequest.getRepId()).isEqualTo(expectedRequest.getRepId());
+        softly.assertThat(actualRequest.getCaseType()).isEqualTo(expectedRequest.getCaseType());
+        softly.assertThat(actualRequest.getPassportAssessment()).isEqualTo(expectedRequest.getPassportAssessment());
+        softly.assertThat(actualRequest.getIojAppeal()).isEqualTo(expectedRequest.getIojAppeal());
+        softly.assertThat(actualRequest.getFinancialAssessment()).isEqualTo(expectedRequest.getFinancialAssessment());
+        softly.assertThat(actualRequest.getUserSession()).isEqualTo(expectedRequest.getUserSession());
+    }
+
+    @Test
+    void
+            givenApiDetermineMagsRepDecisionResponse_whenDetermineMagsRepDecisionResponseToApplicationDtoIsInvoked_thenReturnsApplicationDto() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+
+        ApiDetermineMagsRepDecisionResponse expectedResponse =
+                TestModelDataBuilder.getDetermineMagsRepDecisionResponse();
+        ApplicationDTO actualResponse = proceedingsMapper.determineMagsRepDecisionResponseToApplicationDto(
+                expectedResponse, workflowRequest.getApplicationDTO());
+
+        softly.assertThat(actualResponse.getRepOrderDecision().getCode())
+                .isEqualTo(
+                        expectedResponse.getDecisionResult().getDecisionReason().getCode());
+        softly.assertThat(actualResponse.getRepOrderDecision().getDescription())
+                .isEqualTo(new SysGenString(expectedResponse
+                                .getDecisionResult()
+                                .getDecisionReason()
+                                .getDescription())
+                        .getValue());
+        softly.assertThat(actualResponse.getDecisionDate())
+                .isEqualTo(expectedResponse
+                        .getDecisionResult()
+                        .getDecisionDate()
+                        .atStartOfDay(ZoneId.systemDefault())
+                        .toInstant());
+    }
 
     @Test
     void whenWorkflowRequestToUpdateApplicationRequestIsInvoked() {
