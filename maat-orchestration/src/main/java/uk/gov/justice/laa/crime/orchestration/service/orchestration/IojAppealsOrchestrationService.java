@@ -8,6 +8,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
 import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
 import uk.gov.justice.laa.crime.orchestration.service.IojAppealService;
@@ -36,7 +37,10 @@ public class IojAppealsOrchestrationService {
     public ApplicationDTO create(WorkflowRequest request) {
         RepOrderDTO repOrderDto = repOrderService.getRepOrder(request);
 
-        // TODO: validate here
+        if (repOrderDto == null) {
+            log.error("Could not find rep order for request {}", request);
+            throw new MaatOrchestrationException(request.getApplicationDTO());
+        }
 
         iojAppealService.create(request);
 

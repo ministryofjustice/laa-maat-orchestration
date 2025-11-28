@@ -13,6 +13,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.LEGACY_APPEAL_ID;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.REP_ID;
 
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
@@ -177,5 +178,19 @@ public class WiremockStubs {
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response)));
+    }
+
+    public static void stubForFindRepOrder(String response) {
+        stubFor(get(urlMatching(MAAT_API_ASSESSMENT_URL + "/rep-orders/" + REP_ID))
+            .willReturn(WireMock.ok()
+                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                .withBody(response)));
+    }
+
+    public static void stubForDetermineMagsRepDecision(String response) {
+        stubFor(post(urlMatching(CCP_URL + "/determine-mags-rep-decision"))
+            .willReturn(WireMock.ok()
+                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                .withBody(response)));
     }
 }

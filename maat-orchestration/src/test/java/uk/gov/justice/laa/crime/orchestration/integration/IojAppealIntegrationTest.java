@@ -10,13 +10,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.LEGACY_APPEAL_ID;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCalculateContributions;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCreateIojAppeal;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForDetermineMagsRepDecision;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindIojAppeal;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindRepOrder;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForOAuth;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
+import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
+import com.github.tomakehurst.wiremock.stubbing.Scenario;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 
 import java.time.ZoneOffset;
@@ -120,10 +127,20 @@ class IojAppealIntegrationTest {
 
     @Test
     void givenValidContent_whenCreateIsInvoked_thenShouldReturnSuccessResponse() throws Exception {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+
         stubForOAuth();
         stubForCreateIojAppeal(objectMapper.writeValueAsString(TestModelDataBuilder.getApiCreateIojAppealResponse()));
+        stubForFindRepOrder(objectMapper.writeValueAsString(TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO())));
+        stubForDetermineMagsRepDecision(objectMapper.writeValueAsString(TestModelDataBuilder.getDetermineMagsRepDecisionResponse()));
+        stubForCalculateContributions(objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
+        stubForInvokeStoredProcedure(
+            Scenario.STARTED, "PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE", objectMapper.writeValueAsString(TestModelDataBuilder.getApplicantDTO()));
+        stubForInvokeStoredProcedure(
+            "PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE", objectMapper.writeValueAsString(TestModelDataBuilder.getApplicantDTO()));
 
         IOJAppealDTO expected = TestModelDataBuilder.getIOJAppealDTO();
+        String requestBody = objectMapper.writeValueAsString(workflowRequest);
 
         DateTimeFormatter expectedDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'+00:00'");
 
@@ -133,7 +150,7 @@ class IojAppealIntegrationTest {
         String expectedDecisionDate =
                 expected.getDecisionDate().toInstant().atOffset(ZoneOffset.UTC).format(expectedDateFormat);
 
-        mvc.perform(buildRequest(HttpMethod.POST, ENDPOINT_URL))
+        mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.iojId").value(expected.getIojId()))
