@@ -174,8 +174,8 @@ public class WiremockStubs {
 
     public static void stubForCreateIojAppeal(String response) {
         stubFor(post(urlMatching("/api/internal/v1/ioj-appeals"))
-            .willReturn(WireMock.ok()
-                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                .withBody(response)));
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
     }
 }

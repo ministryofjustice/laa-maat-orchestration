@@ -15,10 +15,8 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubFor
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForOAuth;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 
 import java.time.ZoneOffset;
@@ -130,24 +128,24 @@ class IojAppealIntegrationTest {
         DateTimeFormatter expectedDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'+00:00'");
 
         String expectedReceivedDate =
-            expected.getReceivedDate().toInstant().atOffset(ZoneOffset.UTC).format(expectedDateFormat);
+                expected.getReceivedDate().toInstant().atOffset(ZoneOffset.UTC).format(expectedDateFormat);
 
         String expectedDecisionDate =
-            expected.getDecisionDate().toInstant().atOffset(ZoneOffset.UTC).format(expectedDateFormat);
+                expected.getDecisionDate().toInstant().atOffset(ZoneOffset.UTC).format(expectedDateFormat);
 
         mvc.perform(buildRequest(HttpMethod.POST, ENDPOINT_URL))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.iojId").value(expected.getIojId()))
-            .andExpect(jsonPath("$.cmuId").value(expected.getCmuId()))
-            .andExpect(jsonPath("$.receivedDate").value(expectedReceivedDate))
-            .andExpect(jsonPath("$.decisionDate").value(expectedDecisionDate))
-            .andExpect(jsonPath("$.appealSetUpResult").value(expected.getAppealSetUpResult()))
-            .andExpect(jsonPath("$.appealDecisionResult").value(expected.getAppealDecisionResult()))
-            .andExpect(jsonPath("$.notes").value(expected.getNotes()))
-            .andExpect(jsonPath("$.appealReason").value(expected.getAppealReason()))
-            .andExpect(jsonPath("$.assessmentStatusDTO").value(expected.getAssessmentStatusDTO()))
-            .andExpect(jsonPath("$.newWorkReasonDTO").value(expected.getNewWorkReasonDTO()));
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.iojId").value(expected.getIojId()))
+                .andExpect(jsonPath("$.cmuId").value(expected.getCmuId()))
+                .andExpect(jsonPath("$.receivedDate").value(expectedReceivedDate))
+                .andExpect(jsonPath("$.decisionDate").value(expectedDecisionDate))
+                .andExpect(jsonPath("$.appealSetUpResult").value(expected.getAppealSetUpResult()))
+                .andExpect(jsonPath("$.appealDecisionResult").value(expected.getAppealDecisionResult()))
+                .andExpect(jsonPath("$.notes").value(expected.getNotes()))
+                .andExpect(jsonPath("$.appealReason").value(expected.getAppealReason()))
+                .andExpect(jsonPath("$.assessmentStatusDTO").value(expected.getAssessmentStatusDTO()))
+                .andExpect(jsonPath("$.newWorkReasonDTO").value(expected.getNewWorkReasonDTO()));
 
         verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/ioj-appeals")));
     }
