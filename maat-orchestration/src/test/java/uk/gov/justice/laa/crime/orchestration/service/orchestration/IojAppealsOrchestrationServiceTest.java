@@ -25,7 +25,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith({MockitoExtension.class})
-public class IojAppealsOrchestrationServiceTest {
+class IojAppealsOrchestrationServiceTest {
     private static final int EXISTING_APPEAL_ID = 1;
 
     @Mock

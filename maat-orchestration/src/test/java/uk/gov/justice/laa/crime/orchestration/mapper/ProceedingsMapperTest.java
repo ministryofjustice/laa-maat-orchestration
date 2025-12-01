@@ -64,6 +64,8 @@ class ProceedingsMapperTest {
         softly.assertThat(actualRequest.getIojAppeal()).isEqualTo(expectedRequest.getIojAppeal());
         softly.assertThat(actualRequest.getFinancialAssessment()).isEqualTo(expectedRequest.getFinancialAssessment());
         softly.assertThat(actualRequest.getUserSession()).isEqualTo(expectedRequest.getUserSession());
+
+        softly.assertAll();
     }
 
     @Test
@@ -91,6 +93,8 @@ class ProceedingsMapperTest {
                         .getDecisionDate()
                         .atStartOfDay(ZoneId.systemDefault())
                         .toInstant());
+
+        softly.assertAll();
     }
 
     @Test

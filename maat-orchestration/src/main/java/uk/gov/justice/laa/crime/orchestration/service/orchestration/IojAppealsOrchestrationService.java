@@ -44,20 +44,13 @@ public class IojAppealsOrchestrationService {
 
         iojAppealService.create(request);
 
-        // Call CCP determine-mags-rep-decision endpoint
         request.setApplicationDTO(proceedingsService.determineMagsRepDecisionResult(request));
-
-        // Call CCC to calculate contributions - maybe call existing svc inside this repo?
         request.setApplicationDTO(contributionService.calculate(request));
-
-        // Call the pre_update_cc_application stored procedure
         request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
                 request.getApplicationDTO(), request.getUserDTO(), StoredProcedure.PRE_UPDATE_CC_APPLICATION));
 
-        // Call CCP updateApplication crown court endpoint
         proceedingsService.updateApplication(request, repOrderDto);
 
-        // Invoke matrix and correspondence SPs crown_court.xx_process_activity_and_get_correspondence
         request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
                 request.getApplicationDTO(),
                 request.getUserDTO(),
