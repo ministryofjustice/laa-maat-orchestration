@@ -321,6 +321,10 @@ public class TestModelDataBuilder {
                 .withUserSession(getApiUserSession());
     }
 
+    public static ApiDetermineMagsRepDecisionResponse getDetermineEmptyMagsRepDecisionResponse() {
+        return new ApiDetermineMagsRepDecisionResponse().withDecisionResult(null);
+    }
+
     public static ApiDetermineMagsRepDecisionResponse getDetermineMagsRepDecisionResponse() {
         MagsDecisionResult magsDecisionResult = new MagsDecisionResult();
         magsDecisionResult.setDecisionDate(LocalDate.now());

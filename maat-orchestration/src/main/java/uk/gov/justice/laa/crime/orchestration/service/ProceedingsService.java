@@ -32,8 +32,14 @@ public class ProceedingsService {
         ApiDetermineMagsRepDecisionResponse determineMagsRepDecisionResponse =
                 proceedingsApiService.determineMagsRepDecision(apiDetermineMagsRepDecisionRequest);
 
-        workflowRequest.setApplicationDTO(proceedingsMapper.determineMagsRepDecisionResponseToApplicationDto(
-                determineMagsRepDecisionResponse, workflowRequest.getApplicationDTO()));
+        /*
+        If CCP validation on the case type and assessment status fails then it will return null,
+        so do not update anything in this case in line with the old stored procedure.
+         */
+        if (determineMagsRepDecisionResponse.getDecisionResult() != null) {
+            workflowRequest.setApplicationDTO(proceedingsMapper.determineMagsRepDecisionResponseToApplicationDto(
+                    determineMagsRepDecisionResponse, workflowRequest.getApplicationDTO()));
+        }
 
         return workflowRequest.getApplicationDTO();
     }

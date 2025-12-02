@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,7 +45,27 @@ class ProceedingsServiceTest {
 
     @Test
     void
-            givenWorkflowRequest_whenDetermineMagsRepDecisionResultIsInvoked_whenApiServiceIsCalledAndApplicationUpdated() {
+            givenWorkflowRequest_whenDetermineMagsRepDecisionResultIsInvoked_thenApiServiceIsCalledAndApplicationNotUpdated() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+
+        ApiDetermineMagsRepDecisionRequest request = TestModelDataBuilder.getDetermineMagsRepDecisionRequest();
+        ApiDetermineMagsRepDecisionResponse response = TestModelDataBuilder.getDetermineEmptyMagsRepDecisionResponse();
+
+        when(proceedingsMapper.workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest))
+                .thenReturn(request);
+        when(proceedingsApiService.determineMagsRepDecision(request)).thenReturn(response);
+
+        proceedingsService.determineMagsRepDecisionResult(workflowRequest);
+
+        verify(proceedingsMapper).workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest);
+        verify(proceedingsApiService).determineMagsRepDecision(request);
+        verify(proceedingsMapper, never())
+                .determineMagsRepDecisionResponseToApplicationDto(response, workflowRequest.getApplicationDTO());
+    }
+
+    @Test
+    void
+            givenWorkflowRequest_whenDetermineMagsRepDecisionResultIsInvoked_thenApiServiceIsCalledAndApplicationUpdated() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
 
         ApiDetermineMagsRepDecisionRequest request = TestModelDataBuilder.getDetermineMagsRepDecisionRequest();
