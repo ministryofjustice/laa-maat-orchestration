@@ -106,4 +106,16 @@ class IojAppealControllerTest {
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, "", ENDPOINT_URL, true))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void givenWebClientInternalServerErrorStatus_whenCreateIsInvoked_thenInternalServerErrorResponseIsReturned()
+        throws Exception {
+        WebClientResponseException webClientResponseException =
+            WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
+        when(orchestrationService.create(any(WorkflowRequest.class))).thenThrow(webClientResponseException);
+
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkFlowRequest());
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
+            .andExpect(status().isInternalServerError());
+    }
 }
