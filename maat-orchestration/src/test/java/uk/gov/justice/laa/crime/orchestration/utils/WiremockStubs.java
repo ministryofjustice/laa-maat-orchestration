@@ -88,13 +88,6 @@ public class WiremockStubs {
                         .withBody(response)));
     }
 
-    public static void stubForGetContributionsSummary(int repId, String response) {
-        stubFor(get(urlMatching(CCC_URL + "/summaries/" + repId))
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(response)));
-    }
-
     public static void assertStubForGetContributionsSummary(int times, Integer repId) {
         verify(exactly(times), getRequestedFor(urlPathMatching(CCC_URL + "/summaries/" + repId)));
     }

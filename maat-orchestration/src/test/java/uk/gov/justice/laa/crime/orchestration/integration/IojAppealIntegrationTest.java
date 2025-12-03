@@ -15,7 +15,7 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubFor
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForDetermineMagsRepDecision;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindIojAppeal;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindRepOrder;
-import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetContributionsSummary;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetContributionsSummaries;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForOAuth;
@@ -147,8 +147,7 @@ class IojAppealIntegrationTest {
                 objectMapper.writeValueAsString(TestModelDataBuilder.getDetermineMagsRepDecisionResponse()));
         stubForCalculateContributions(
                 objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
-        stubForGetContributionsSummary(
-                workflowRequest.getApplicationDTO().getRepId().intValue(),
+        stubForGetContributionsSummaries(
                 objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary())));
         stubForInvokeStoredProcedure(
                 Scenario.STARTED,
