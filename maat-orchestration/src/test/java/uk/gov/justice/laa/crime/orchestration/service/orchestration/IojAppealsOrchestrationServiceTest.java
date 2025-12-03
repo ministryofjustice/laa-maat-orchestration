@@ -11,12 +11,15 @@ import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
+import uk.gov.justice.laa.crime.orchestration.mapper.IojAppealMapper;
 import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
 import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
 import uk.gov.justice.laa.crime.orchestration.service.IojAppealService;
 import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
 import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
+import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +41,9 @@ class IojAppealsOrchestrationServiceTest {
     private IojAppealService iojAppealService;
 
     @Mock
+    private IojAppealMapper iojAppealMapper;
+
+    @Mock
     private MaatCourtDataService maatCourtDataService;
 
     @Mock
@@ -45,6 +51,9 @@ class IojAppealsOrchestrationServiceTest {
 
     @Mock
     private RepOrderService repOrderService;
+
+    @Mock
+    private WorkflowPreProcessorService workflowPreProcessorService;
 
     @InjectMocks
     private IojAppealsOrchestrationService iojAppealsOrchestrationService;
@@ -64,8 +73,10 @@ class IojAppealsOrchestrationServiceTest {
         IOJAppealDTO iojAppealDTO =
                 workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO());
+        UserActionDTO userActionDTO = TestModelDataBuilder.getUserActionDTO();
 
         when(repOrderService.getRepOrder(workflowRequest)).thenReturn(repOrderDTO);
+        when(iojAppealMapper.getUserActionDTO(workflowRequest)).thenReturn(userActionDTO);
         when(proceedingsService.determineMagsRepDecisionResult(workflowRequest))
                 .thenReturn(workflowRequest.getApplicationDTO());
         when(contributionService.calculate(workflowRequest)).thenReturn(workflowRequest.getApplicationDTO());
@@ -79,6 +90,7 @@ class IojAppealsOrchestrationServiceTest {
 
         verify(iojAppealService).create(workflowRequest);
 
+        verify(workflowPreProcessorService).preProcessRequest(workflowRequest, repOrderDTO, userActionDTO);
         verify(proceedingsService).determineMagsRepDecisionResult(workflowRequest);
         verify(contributionService).calculate(workflowRequest);
         verify(maatCourtDataService)

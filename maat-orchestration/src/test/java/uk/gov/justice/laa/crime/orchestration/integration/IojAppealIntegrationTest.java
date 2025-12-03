@@ -23,11 +23,15 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubFor
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
+import uk.gov.justice.laa.crime.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.enums.RepOrderStatus;
+import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -133,11 +137,12 @@ class IojAppealIntegrationTest {
     @Test
     void givenValidContent_whenCreateIsInvoked_thenShouldReturnSuccessResponse() throws Exception {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO(
+                workflowRequest.getApplicationDTO().getRepId().intValue(), RepOrderStatus.CURR.getCode());
 
         stubForOAuth();
         stubForCreateIojAppeal(objectMapper.writeValueAsString(TestModelDataBuilder.getApiCreateIojAppealResponse()));
-        stubForFindRepOrder(objectMapper.writeValueAsString(
-                TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO())));
+        stubForFindRepOrder(objectMapper.writeValueAsString(repOrderDTO));
         stubForDetermineMagsRepDecision(
                 objectMapper.writeValueAsString(TestModelDataBuilder.getDetermineMagsRepDecisionResponse()));
         stubForCalculateContributions(
@@ -156,7 +161,8 @@ class IojAppealIntegrationTest {
         stubForInvokeStoredProcedure(objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO()));
         stubForUpdateCrownCourtApplication(
                 objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse()));
-        stubForGetUserSummary(objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getUserSummaryDTO()));
+        stubForGetUserSummary(objectMapper.writeValueAsString(
+                TestModelDataBuilder.getUserSummaryDTO(List.of(Action.CREATE_IOJ.getCode()), NewWorkReason.NEW)));
 
         IOJAppealDTO expected = TestModelDataBuilder.getIOJAppealDTO();
         String requestBody = objectMapper.writeValueAsString(workflowRequest);

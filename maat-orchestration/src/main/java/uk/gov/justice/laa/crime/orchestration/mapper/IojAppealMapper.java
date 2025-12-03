@@ -9,11 +9,13 @@ import uk.gov.justice.laa.crime.enums.IojAppealAssessor;
 import uk.gov.justice.laa.crime.enums.IojAppealDecision;
 import uk.gov.justice.laa.crime.enums.IojAppealDecisionReason;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentStatusDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJDecisionReasonDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.NewWorkReasonDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -116,5 +118,15 @@ public class IojAppealMapper {
                 .withUserSession(userMapper.userDtoToUserSession(request.getUserDTO()));
 
         return new ApiCreateIojAppealRequest(iojAppeal, iojAppealMetadata);
+    }
+
+    public UserActionDTO getUserActionDTO(WorkflowRequest request) {
+        NewWorkReason newWorkReason = NewWorkReason.getFrom(request.getApplicationDTO()
+                .getAssessmentDTO()
+                .getIojAppeal()
+                .getNewWorkReasonDTO()
+                .getCode());
+
+        return userMapper.getUserActionDTO(request, Action.CREATE_IOJ, newWorkReason);
     }
 }

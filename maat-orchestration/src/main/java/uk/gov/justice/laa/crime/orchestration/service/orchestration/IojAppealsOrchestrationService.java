@@ -8,13 +8,16 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
+import uk.gov.justice.laa.crime.orchestration.mapper.IojAppealMapper;
 import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
 import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
 import uk.gov.justice.laa.crime.orchestration.service.IojAppealService;
 import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
 import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
+import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
 
 import org.springframework.stereotype.Service;
 
@@ -27,8 +30,10 @@ public class IojAppealsOrchestrationService {
     private final IojAppealService iojAppealService;
     private final MaatCourtDataService maatCourtDataService;
     private final ContributionService contributionService;
+    private final IojAppealMapper iojAppealMapper;
     private final ProceedingsService proceedingsService;
     private final RepOrderService repOrderService;
+    private final WorkflowPreProcessorService workflowPreProcessorService;
 
     public IOJAppealDTO find(int appealId) {
         return iojAppealService.find(appealId);
@@ -41,6 +46,9 @@ public class IojAppealsOrchestrationService {
             log.error("Could not find rep order for request {}", request);
             throw new MaatOrchestrationException(request.getApplicationDTO());
         }
+
+        UserActionDTO userActionDTO = iojAppealMapper.getUserActionDTO(request);
+        workflowPreProcessorService.preProcessRequest(request, repOrderDto, userActionDTO);
 
         iojAppealService.create(request);
 

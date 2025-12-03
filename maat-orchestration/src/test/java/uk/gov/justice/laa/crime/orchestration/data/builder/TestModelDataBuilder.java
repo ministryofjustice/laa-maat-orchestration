@@ -1357,6 +1357,14 @@ public class TestModelDataBuilder {
                 .build();
     }
 
+    public static RepOrderDTO buildRepOrderDTO(int repOrderId, String rorsStatus) {
+        return RepOrderDTO.builder()
+                .id(repOrderId)
+                .dateModified(APPLICATION_TIMESTAMP.toLocalDateTime())
+                .rorsStatus(rorsStatus)
+                .build();
+    }
+
     public static RepOrderDTO buildRepOrderDTOWithAssessorName() {
         UserDTO userDTO =
                 UserDTO.builder().firstName("FIRSTNAME").surname("SURNAME").build();
