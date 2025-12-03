@@ -77,7 +77,7 @@ class IojAppealsOrchestrationServiceTest {
 
         when(repOrderService.getRepOrder(workflowRequest)).thenReturn(repOrderDTO);
         when(iojAppealMapper.getUserActionDTO(workflowRequest)).thenReturn(userActionDTO);
-        when(proceedingsService.determineMagsRepDecisionResult(workflowRequest))
+        when(proceedingsService.determineMagsRepDecision(workflowRequest))
                 .thenReturn(workflowRequest.getApplicationDTO());
         when(contributionService.calculate(workflowRequest)).thenReturn(workflowRequest.getApplicationDTO());
         when(maatCourtDataService.invokeStoredProcedure(any(), any(), any()))
@@ -91,7 +91,7 @@ class IojAppealsOrchestrationServiceTest {
         verify(iojAppealService).create(workflowRequest);
 
         verify(workflowPreProcessorService).preProcessRequest(workflowRequest, repOrderDTO, userActionDTO);
-        verify(proceedingsService).determineMagsRepDecisionResult(workflowRequest);
+        verify(proceedingsService).determineMagsRepDecision(workflowRequest);
         verify(contributionService).calculate(workflowRequest);
         verify(maatCourtDataService)
                 .invokeStoredProcedure(

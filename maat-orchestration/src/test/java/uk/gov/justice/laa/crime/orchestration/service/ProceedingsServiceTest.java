@@ -44,8 +44,7 @@ class ProceedingsServiceTest {
     private CCLFUpdateService cclfUpdateService;
 
     @Test
-    void
-            givenWorkflowRequest_whenDetermineMagsRepDecisionResultIsInvoked_thenApiServiceIsCalledAndApplicationNotUpdated() {
+    void givenWorkflowRequest_whenDetermineMagsRepDecisionIsInvoked_thenApiServiceIsCalledAndApplicationNotUpdated() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
 
         ApiDetermineMagsRepDecisionRequest request = TestModelDataBuilder.getDetermineMagsRepDecisionRequest();
@@ -55,7 +54,7 @@ class ProceedingsServiceTest {
                 .thenReturn(request);
         when(proceedingsApiService.determineMagsRepDecision(request)).thenReturn(response);
 
-        proceedingsService.determineMagsRepDecisionResult(workflowRequest);
+        proceedingsService.determineMagsRepDecision(workflowRequest);
 
         verify(proceedingsMapper).workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest);
         verify(proceedingsApiService).determineMagsRepDecision(request);
@@ -64,8 +63,7 @@ class ProceedingsServiceTest {
     }
 
     @Test
-    void
-            givenWorkflowRequest_whenDetermineMagsRepDecisionResultIsInvoked_thenApiServiceIsCalledAndApplicationUpdated() {
+    void givenWorkflowRequest_whenDetermineMagsRepDecisionIsInvoked_thenApiServiceIsCalledAndApplicationUpdated() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
 
         ApiDetermineMagsRepDecisionRequest request = TestModelDataBuilder.getDetermineMagsRepDecisionRequest();
@@ -78,7 +76,7 @@ class ProceedingsServiceTest {
                         response, workflowRequest.getApplicationDTO()))
                 .thenReturn(workflowRequest.getApplicationDTO());
 
-        proceedingsService.determineMagsRepDecisionResult(workflowRequest);
+        proceedingsService.determineMagsRepDecision(workflowRequest);
 
         verify(proceedingsMapper).workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest);
         verify(proceedingsApiService).determineMagsRepDecision(request);

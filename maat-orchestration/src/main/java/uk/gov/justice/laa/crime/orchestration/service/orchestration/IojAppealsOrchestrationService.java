@@ -52,7 +52,7 @@ public class IojAppealsOrchestrationService {
 
         iojAppealService.create(request);
 
-        proceedingsService.determineMagsRepDecisionResult(request);
+        proceedingsService.determineMagsRepDecision(request);
         request.setApplicationDTO(contributionService.calculate(request));
         request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
                 request.getApplicationDTO(), request.getUserDTO(), StoredProcedure.PRE_UPDATE_CC_APPLICATION));

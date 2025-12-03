@@ -26,7 +26,7 @@ public class ProceedingsService {
     private final FeatureDecisionService featureDecisionService;
     private final CCLFUpdateService cclfUpdateService;
 
-    public ApplicationDTO determineMagsRepDecisionResult(WorkflowRequest workflowRequest) {
+    public ApplicationDTO determineMagsRepDecision(WorkflowRequest workflowRequest) {
         ApiDetermineMagsRepDecisionRequest apiDetermineMagsRepDecisionRequest =
                 proceedingsMapper.workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest);
         ApiDetermineMagsRepDecisionResponse determineMagsRepDecisionResponse =
