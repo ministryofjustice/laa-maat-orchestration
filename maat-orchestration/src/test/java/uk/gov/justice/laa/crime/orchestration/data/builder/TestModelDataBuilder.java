@@ -29,8 +29,11 @@ import uk.gov.justice.laa.crime.common.model.hardship.ExtraExpenditure;
 import uk.gov.justice.laa.crime.common.model.hardship.HardshipMetadata;
 import uk.gov.justice.laa.crime.common.model.hardship.HardshipReview;
 import uk.gov.justice.laa.crime.common.model.hardship.SolicitorCosts;
+import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealRequest;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiGetIojAppealResponse;
+import uk.gov.justice.laa.crime.common.model.ioj.IojAppeal;
+import uk.gov.justice.laa.crime.common.model.ioj.IojAppealMetadata;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentChildWeighting;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentDetail;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.FinancialAssessmentIncomeEvidence;
@@ -421,6 +424,24 @@ public class TestModelDataBuilder {
                 .withDecisionReason(IojAppealDecisionReason.DAMAGE_TO_REPUTATION)
                 .withNotes(CASEWORKER_NOTES)
                 .withDecisionDate(LocalDateTime.of(2025, 12, 01, 10, 15));
+    }
+
+    public static ApiCreateIojAppealRequest getApiCreateIojAppealRequest() {
+        IojAppeal iojAppeal = new IojAppeal()
+                .withReceivedDate(LocalDateTime.of(2025, 10, 1, 13, 0))
+                .withAppealReason(NewWorkReason.NEW)
+                .withAppealAssessor(IojAppealAssessor.CASEWORKER)
+                .withAppealDecision(IojAppealDecision.PASS)
+                .withDecisionReason(IojAppealDecisionReason.DAMAGE_TO_REPUTATION)
+                .withNotes(CASEWORKER_NOTES)
+                .withDecisionDate(LocalDateTime.of(2025, 12, 1, 10, 15));
+
+        IojAppealMetadata iojAppealMetadata = new IojAppealMetadata()
+                .withLegacyApplicationId(REP_ID)
+                .withCaseManagementUnitId(CMU_ID)
+                .withUserSession(getApiUserSession());
+
+        return new ApiCreateIojAppealRequest().withIojAppeal(iojAppeal).withIojAppealMetadata(iojAppealMetadata);
     }
 
     public static ApiCreateIojAppealResponse getApiCreateIojAppealResponse() {
