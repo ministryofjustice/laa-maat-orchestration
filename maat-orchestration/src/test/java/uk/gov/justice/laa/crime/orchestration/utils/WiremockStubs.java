@@ -16,7 +16,6 @@ import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataB
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.REP_ID;
 
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
-import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 
 import java.util.Map;
 import java.util.UUID;
@@ -152,13 +151,6 @@ public class WiremockStubs {
 
     public static void stubForGetUserSummary(String response) {
         stubFor(get(urlMatching(MAAT_API_USER_URL + Constants.USERNAME))
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(response)));
-    }
-
-    public static void stubForGetRepOrders(String response) {
-        stubFor(get(urlMatching(MAAT_API_ASSESSMENT_URL + "/rep-orders/" + TestModelDataBuilder.REP_ID))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response)));

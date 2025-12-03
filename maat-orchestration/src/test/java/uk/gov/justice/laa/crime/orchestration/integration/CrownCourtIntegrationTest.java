@@ -9,7 +9,7 @@ import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataB
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForUpdateCrownCourtOutcome;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForUpdateSendToCCLF;
-import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetRepOrders;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindRepOrder;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForOAuth;
@@ -139,7 +139,7 @@ class CrownCourtIntegrationTest {
         stubForInvokeStoredProcedure(objectMapper.writeValueAsString(applicationDTO));
         stubForUpdateCrownCourtOutcome(objectMapper.writeValueAsString(updateCrownCourtOutcomeResponse));
         stubForGetUserSummary(objectMapper.writeValueAsString(userSummaryDTO));
-        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
+        stubForFindRepOrder(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
         stubForUpdateSendToCCLF();
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))

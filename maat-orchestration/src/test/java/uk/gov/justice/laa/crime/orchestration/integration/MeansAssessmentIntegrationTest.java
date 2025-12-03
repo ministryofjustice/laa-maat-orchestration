@@ -13,8 +13,8 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertS
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForUpdateCrownCourtApplication;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCalculateContributions;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindRepOrder;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetContributionsSummaries;
-import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetRepOrders;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForOAuth;
@@ -165,7 +165,7 @@ class MeansAssessmentIntegrationTest {
         stubForCalculateContributions(cccCalculateResponse);
         stubForGetContributionsSummaries(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
-        stubForGetRepOrders(repOrderDTO);
+        stubForFindRepOrder(repOrderDTO);
         stubForUpdateSendToCCLF();
 
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
@@ -243,7 +243,7 @@ class MeansAssessmentIntegrationTest {
         stubForCalculateContributions(cccCalculateResponse);
         stubForGetContributionsSummaries(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
-        stubForGetRepOrders(repOrderDTO);
+        stubForFindRepOrder(repOrderDTO);
         stubForUpdateSendToCCLF();
 
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
