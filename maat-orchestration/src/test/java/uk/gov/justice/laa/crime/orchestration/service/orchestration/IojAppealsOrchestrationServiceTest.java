@@ -60,8 +60,6 @@ class IojAppealsOrchestrationServiceTest {
 
     @Test
     void givenAppealId_whenFindIsInvoked_thenIojAppealServiceIsCalled() {
-        when(iojAppealService.find(EXISTING_APPEAL_ID)).thenReturn(new IOJAppealDTO());
-
         iojAppealsOrchestrationService.find(EXISTING_APPEAL_ID);
 
         verify(iojAppealService).find(EXISTING_APPEAL_ID);
