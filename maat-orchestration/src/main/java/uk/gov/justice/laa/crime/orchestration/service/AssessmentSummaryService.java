@@ -8,6 +8,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.AssessmentSummaryType;
 
 import java.util.Collection;
 
@@ -18,17 +19,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class AssessmentSummaryService {
 
-    public static final String INITIAL_ASSESSMENT = "Initial Assessment";
-    public static final String FULL_MEANS_TEST = "Full Means Test";
-
     public AssessmentSummaryDTO getSummary(HardshipReviewDTO hardshipReviewDTO, CourtType courtType) {
         return AssessmentSummaryDTO.builder()
                 .id(hardshipReviewDTO.getId())
                 .status(hardshipReviewDTO.getAsessmentStatus().getStatus())
                 .type(
                         courtType == CourtType.CROWN_COURT
-                                ? "Hardship Review - Crown Court"
-                                : "Hardship Review - Magistrate")
+                                ? AssessmentSummaryType.HARDSHIP_REVIEW_CROWN_COURT.getName()
+                                : AssessmentSummaryType.HARDSHIP_REVIEW_MAGS_COURT.getName())
                 .result(hardshipReviewDTO.getReviewResult())
                 .assessmentDate(hardshipReviewDTO.getReviewDate())
                 .build();
@@ -38,7 +36,7 @@ public class AssessmentSummaryService {
         return AssessmentSummaryDTO.builder()
                 .id(iojAppealDTO.getIojId().intValue())
                 .status(iojAppealDTO.getAssessmentStatusDTO().getStatus())
-                .type("IoJ Appeal")
+                .type(AssessmentSummaryType.IOJ_APPEAL.getName())
                 .result(iojAppealDTO.getAppealDecisionResult())
                 .assessmentDate(iojAppealDTO.getReceivedDate())
                 .build();
@@ -69,16 +67,16 @@ public class AssessmentSummaryService {
         boolean isFullAvailable = Boolean.TRUE.equals(financialAssessmentDTO.getFullAvailable());
         String fullAssessmentStatus = isFullAvailable
                 ? financialAssessmentDTO.getFull().getAssessmnentStatusDTO().getStatus()
-                : "";
+                : StringUtils.EMPTY;
         if (StringUtils.isNotBlank(fullAssessmentStatus)) {
-            assessmentSummaryDTO.setType(FULL_MEANS_TEST);
+            assessmentSummaryDTO.setType(AssessmentSummaryType.FULL_MEANS_ASSESSMENT.getName());
             assessmentSummaryDTO.setStatus(
                     CurrentStatus.getFrom(fullAssessmentStatus).getDescription());
             assessmentSummaryDTO.setResult(financialAssessmentDTO.getFull().getResult());
             assessmentSummaryDTO.setAssessmentDate(
                     financialAssessmentDTO.getFull().getAssessmentDate());
         } else {
-            assessmentSummaryDTO.setType(INITIAL_ASSESSMENT);
+            assessmentSummaryDTO.setType(AssessmentSummaryType.INITIAL_MEANS_ASSESSMENT.getName());
             assessmentSummaryDTO.setStatus(CurrentStatus.getFrom(financialAssessmentDTO
                             .getInitial()
                             .getAssessmnentStatusDTO()

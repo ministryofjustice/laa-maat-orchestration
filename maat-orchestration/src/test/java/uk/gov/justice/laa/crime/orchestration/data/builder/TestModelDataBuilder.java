@@ -133,6 +133,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RoleDataItemDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.AssessmentSummaryType;
 import uk.gov.justice.laa.crime.proceeding.MagsDecisionResult;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
@@ -556,9 +557,9 @@ public class TestModelDataBuilder {
     public static AssessmentSummaryDTO getAssessmentSummaryDTOFromHardship(CourtType courtType) {
         AssessmentSummaryDTO assessmentSummaryDTO = getAssessmentSummaryDTO();
         if (courtType == CourtType.CROWN_COURT) {
-            assessmentSummaryDTO.setType("Hardship Review - Crown Court");
+            assessmentSummaryDTO.setType(AssessmentSummaryType.HARDSHIP_REVIEW_CROWN_COURT.getName());
         } else {
-            assessmentSummaryDTO.setType("Hardship Review - Magistrate");
+            assessmentSummaryDTO.setType(AssessmentSummaryType.HARDSHIP_REVIEW_MAGS_COURT.getName());
         }
         return assessmentSummaryDTO;
     }
@@ -818,7 +819,7 @@ public class TestModelDataBuilder {
         return AssessmentSummaryDTO.builder()
                 .id(LEGACY_APPEAL_ID)
                 .status(CurrentStatus.COMPLETE.getStatus())
-                .type("IoJ Appeal")
+                .type(AssessmentSummaryType.IOJ_APPEAL.getName())
                 .result(RESULT_PASS)
                 .assessmentDate(receivedDate)
                 .build();
@@ -1504,7 +1505,7 @@ public class TestModelDataBuilder {
         return AssessmentSummaryDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID)
                 .status(CurrentStatus.COMPLETE.getDescription())
-                .type("Full Means Test")
+                .type(AssessmentSummaryType.FULL_MEANS_ASSESSMENT.getName())
                 .result(RESULT_PASS)
                 .assessmentDate(ASSESSMENT_DATE)
                 .reviewType(RT_CODE_ER)
@@ -1515,7 +1516,7 @@ public class TestModelDataBuilder {
         return AssessmentSummaryDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID)
                 .status(CurrentStatus.COMPLETE.getDescription())
-                .type("Initial Assessment")
+                .type(AssessmentSummaryType.INITIAL_MEANS_ASSESSMENT.getName())
                 .result(RESULT_FAIL)
                 .reviewType(RT_CODE_ER)
                 .build();
