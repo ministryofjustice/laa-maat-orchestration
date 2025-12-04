@@ -1,5 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
+import static uk.gov.justice.laa.crime.orchestration.common.Constants.MAGS_COURT_CASE_TYPES;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
@@ -8,6 +10,7 @@ import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCo
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
+import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
@@ -27,6 +30,13 @@ public class ProceedingsService {
     private final CCLFUpdateService cclfUpdateService;
 
     public ApplicationDTO determineMagsRepDecision(WorkflowRequest workflowRequest) {
+        CaseType caseType = CaseType.getFrom(
+                workflowRequest.getApplicationDTO().getCaseDetailsDTO().getCaseType());
+
+        if (!MAGS_COURT_CASE_TYPES.contains(caseType)) {
+            return workflowRequest.getApplicationDTO();
+        }
+
         ApiDetermineMagsRepDecisionRequest apiDetermineMagsRepDecisionRequest =
                 proceedingsMapper.workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest);
         ApiDetermineMagsRepDecisionResponse determineMagsRepDecisionResponse =

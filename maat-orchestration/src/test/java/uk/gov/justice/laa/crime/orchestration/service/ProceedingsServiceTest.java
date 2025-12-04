@@ -11,6 +11,7 @@ import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCo
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
+import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
@@ -42,6 +43,18 @@ class ProceedingsServiceTest {
 
     @Mock
     private CCLFUpdateService cclfUpdateService;
+
+    @Test
+    void givenNonMagsCaseType_whenDetermineMagsRepDecisionIsInvoked_thenApiServiceNotCalledAndApplicationNotUpdated() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().getCaseDetailsDTO().setCaseType(CaseType.COMMITAL.getCaseType());
+
+        proceedingsService.determineMagsRepDecision(workflowRequest);
+
+        verify(proceedingsMapper, never()).workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest);
+        verify(proceedingsApiService, never()).determineMagsRepDecision(any());
+        verify(proceedingsMapper, never()).determineMagsRepDecisionResponseToApplicationDto(any(), any());
+    }
 
     @Test
     void givenWorkflowRequest_whenDetermineMagsRepDecisionIsInvoked_thenApiServiceIsCalledAndApplicationNotUpdated() {
