@@ -10,8 +10,10 @@ import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiFinancialAsses
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiHardshipOverview;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiIOJSummary;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiPassportAssessment;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.CaseType;
@@ -21,6 +23,7 @@ import uk.gov.justice.laa.crime.enums.DecisionReason;
 import uk.gov.justice.laa.crime.enums.EvidenceFeeLevel;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.enums.ReviewResult;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicantDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.CapitalEquityDTO;
@@ -34,12 +37,15 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.IncomeEvidenceSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.OutcomeDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.RepOrderDecisionDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.SysGenString;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.util.DateUtil;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
+import java.time.ZoneId;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -50,6 +56,39 @@ import org.springframework.stereotype.Component;
 public class ProceedingsMapper extends CrownCourtMapper {
 
     private final UserMapper userMapper;
+
+    public ApiDetermineMagsRepDecisionRequest workflowRequestToDetermineMagsRepDecisionRequest(
+            WorkflowRequest request) {
+        ApplicationDTO applicationDTO = request.getApplicationDTO();
+
+        return new ApiDetermineMagsRepDecisionRequest()
+                .withRepId(applicationDTO.getRepId().intValue())
+                .withCaseType(
+                        CaseType.getFrom(applicationDTO.getCaseDetailsDTO().getCaseType()))
+                .withPassportAssessment(applicationDtoToPassportAssessment(applicationDTO))
+                .withIojAppeal(new ApiIOJSummary()
+                        .withDecisionResult(
+                                applicationDTO.getAssessmentDTO().getIojAppeal().getAppealDecisionResult())
+                        .withIojResult(applicationDTO.getIojResult()))
+                .withFinancialAssessment(applicationDtoToFinancialAssessment(applicationDTO))
+                .withUserSession(userMapper.userDtoToUserSession(request.getUserDTO()));
+    }
+
+    public ApplicationDTO determineMagsRepDecisionResponseToApplicationDto(
+            ApiDetermineMagsRepDecisionResponse response, ApplicationDTO applicationDTO) {
+        RepOrderDecisionDTO repOrderDecisionDTO = applicationDTO.getRepOrderDecision();
+        repOrderDecisionDTO.setCode(
+                response.getDecisionResult().getDecisionReason().getCode());
+        repOrderDecisionDTO.setDescription(new SysGenString(
+                response.getDecisionResult().getDecisionReason().getDescription()));
+        applicationDTO.setDecisionDate(Date.from(response.getDecisionResult()
+                .getDecisionDate()
+                .atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant()));
+
+        return applicationDTO;
+    }
 
     public ApiUpdateApplicationRequest workflowRequestToUpdateApplicationRequest(
             ApplicationDTO application, UserDTO userDTO) {

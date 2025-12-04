@@ -1,16 +1,21 @@
 package uk.gov.justice.laa.crime.orchestration.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.LEGACY_APPEAL_ID;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionId;
+import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionIdGivenContent;
 
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
+import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.filter.WebClientTestUtils;
-import uk.gov.justice.laa.crime.orchestration.service.IojAppealService;
+import uk.gov.justice.laa.crime.orchestration.service.orchestration.IojAppealsOrchestrationService;
 import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
 
 import org.junit.jupiter.api.Test;
@@ -25,6 +30,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @WebMvcTest(IojAppealController.class)
 @Import(OrchestrationTestConfiguration.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -34,15 +41,18 @@ class IojAppealControllerTest {
     @Autowired
     private MockMvc mvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @MockitoBean
-    private IojAppealService iojAppealService;
+    private IojAppealsOrchestrationService orchestrationService;
 
     @MockitoBean
     private TraceIdHandler traceIdHandler;
 
     @Test
     void givenValidRequest_whenFindIsInvoked_thenOkResponseIsReturned() throws Exception {
-        when(iojAppealService.find(anyInt())).thenReturn(new IOJAppealDTO());
+        when(orchestrationService.find(anyInt())).thenReturn(new IOJAppealDTO());
 
         String endpoint = ENDPOINT_URL + "/" + LEGACY_APPEAL_ID;
         mvc.perform(buildRequestWithTransactionId(HttpMethod.GET, endpoint, true))
@@ -61,7 +71,7 @@ class IojAppealControllerTest {
         WebClientResponseException webClientResponseException =
                 WebClientTestUtils.getWebClientResponseException(HttpStatus.NOT_FOUND);
 
-        when(iojAppealService.find(anyInt())).thenThrow(webClientResponseException);
+        when(orchestrationService.find(anyInt())).thenThrow(webClientResponseException);
 
         String endpoint = ENDPOINT_URL + "/" + LEGACY_APPEAL_ID;
         mvc.perform(buildRequestWithTransactionId(HttpMethod.GET, endpoint, true))
@@ -74,10 +84,38 @@ class IojAppealControllerTest {
         WebClientResponseException webClientResponseException =
                 WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
 
-        when(iojAppealService.find(anyInt())).thenThrow(webClientResponseException);
+        when(orchestrationService.find(anyInt())).thenThrow(webClientResponseException);
 
         String endpoint = ENDPOINT_URL + "/" + LEGACY_APPEAL_ID;
         mvc.perform(buildRequestWithTransactionId(HttpMethod.GET, endpoint, true))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void givenValidRequest_whenCreateIsInvoked_thenOkResponseIsReturned() throws Exception {
+        when(orchestrationService.create(any(WorkflowRequest.class))).thenReturn(new ApplicationDTO());
+
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkFlowRequest());
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    void givenInvalidRequest_whenCreateIsInvoked_thenBadRequestResponseIsReturned() throws Exception {
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, "", ENDPOINT_URL, true))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void givenWebClientInternalServerErrorStatus_whenCreateIsInvoked_thenInternalServerErrorResponseIsReturned()
+            throws Exception {
+        WebClientResponseException webClientResponseException =
+                WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
+        when(orchestrationService.create(any(WorkflowRequest.class))).thenThrow(webClientResponseException);
+
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkFlowRequest());
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isInternalServerError());
     }
 }

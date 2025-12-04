@@ -2,8 +2,10 @@ package uk.gov.justice.laa.crime.orchestration.service.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.orchestration.client.CrownCourtProceedingApiClient;
@@ -18,6 +20,13 @@ public class ProceedingsApiService {
     private final CrownCourtProceedingApiClient crownCourtProceedingApiClient;
     private static final String RESPONSE_STRING = "Response from Proceedings Service: {}";
     private static final String REQUEST_STRING = "Request to Proceedings Service: {}";
+
+    public ApiDetermineMagsRepDecisionResponse determineMagsRepDecision(ApiDetermineMagsRepDecisionRequest request) {
+        log.debug(REQUEST_STRING, request);
+        ApiDetermineMagsRepDecisionResponse response = crownCourtProceedingApiClient.determineMagsRepDecision(request);
+        log.debug(RESPONSE_STRING, response);
+        return response;
+    }
 
     public ApiUpdateApplicationResponse updateApplication(ApiUpdateApplicationRequest request) {
         log.debug(REQUEST_STRING, request);

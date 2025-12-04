@@ -13,9 +13,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.LEGACY_APPEAL_ID;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.REP_ID;
 
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
-import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 
 import java.util.Map;
 import java.util.UUID;
@@ -81,7 +81,7 @@ public class WiremockStubs {
         verify(exactly(times), postRequestedFor(urlPathMatching(CCC_URL + "/calculate-contribution")));
     }
 
-    public static void stubForGetContributionsSummary(String response) {
+    public static void stubForGetContributionsSummaries(String response) {
         stubFor(get(urlMatching(CCC_URL + "/summaries"))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
@@ -149,13 +149,6 @@ public class WiremockStubs {
                         .withBody(response)));
     }
 
-    public static void stubForGetRepOrders(String response) {
-        stubFor(get(urlMatching(MAAT_API_ASSESSMENT_URL + "/rep-orders/" + TestModelDataBuilder.REP_ID))
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(response)));
-    }
-
     public static void stubForUpdateSendToCCLF() {
         stubFor(put(urlMatching(MAAT_API_APPLICATION_URL + "/applicant/update-cclf"))
                 .willReturn(WireMock.ok()));
@@ -167,6 +160,27 @@ public class WiremockStubs {
 
     public static void stubForFindIojAppeal(String response) {
         stubFor(get(urlMatching("/api/internal/v1/ioj-appeals/lookup-by-legacy-id/" + LEGACY_APPEAL_ID))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
+
+    public static void stubForCreateIojAppeal(String response) {
+        stubFor(post(urlMatching("/api/internal/v1/ioj-appeals"))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
+
+    public static void stubForFindRepOrder(String response) {
+        stubFor(get(urlMatching(MAAT_API_ASSESSMENT_URL + "/rep-orders/" + REP_ID))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
+
+    public static void stubForDetermineMagsRepDecision(String response) {
+        stubFor(post(urlMatching(CCP_URL + "/determine-mags-rep-decision"))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response)));

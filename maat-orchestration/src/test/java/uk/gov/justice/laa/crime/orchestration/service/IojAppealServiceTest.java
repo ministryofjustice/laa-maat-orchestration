@@ -1,33 +1,34 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealRequest;
+import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiGetIojAppealResponse;
-import uk.gov.justice.laa.crime.orchestration.client.CrimeAssessmentApiClient;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.IojAppealMapper;
+import uk.gov.justice.laa.crime.orchestration.service.api.AssessmentApiService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @ExtendWith({MockitoExtension.class})
 class IojAppealServiceTest {
 
-    private static final Integer EXISTING_APPEAL_ID = 1;
+    private static final int EXISTING_APPEAL_ID = 44;
 
     @Mock
     private IojAppealMapper iojAppealMapper;
 
     @Mock
-    private CrimeAssessmentApiClient assessmentServiceApi;
+    private AssessmentApiService assessmentApiService;
 
     @InjectMocks
     private IojAppealService iojAppealService;
@@ -35,7 +36,7 @@ class IojAppealServiceTest {
     @Test
     void givenAppealId_whenFindIsInvoked_thenApiServiceIsCalledAndResponseMapped() {
         ApiGetIojAppealResponse response = TestModelDataBuilder.getIojAppealResponse();
-        when(assessmentServiceApi.getIojAppeal(EXISTING_APPEAL_ID)).thenReturn(response);
+        when(assessmentApiService.find(EXISTING_APPEAL_ID)).thenReturn(response);
 
         iojAppealService.find(EXISTING_APPEAL_ID);
 
@@ -43,11 +44,20 @@ class IojAppealServiceTest {
     }
 
     @Test
-    void givenNullResponse_whenFindIsInvoked_thenExceptionThrownAndMapperNotCalled() {
-        when(assessmentServiceApi.getIojAppeal(any())).thenReturn(null);
+    void givenWorkflowRequest_whenCreateIsInvoked_thenApiServiceIsCalledAndLegacyAppealIdMapped() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
 
-        assertThatThrownBy(() -> iojAppealService.find(any())).isInstanceOf(WebClientResponseException.class);
+        ApiCreateIojAppealRequest request = new ApiCreateIojAppealRequest();
+        ApiCreateIojAppealResponse response = new ApiCreateIojAppealResponse().withLegacyAppealId(EXISTING_APPEAL_ID);
 
-        verify(iojAppealMapper, times(0)).apiGetIojAppealResponseToIojAppealDTO(any());
+        when(iojAppealMapper.mapIojAppealDtoToApiCreateIojAppealRequest(workflowRequest))
+                .thenReturn(request);
+        when(assessmentApiService.create(request)).thenReturn(response);
+
+        ApplicationDTO applicationDTO = iojAppealService.create(workflowRequest);
+
+        verify(iojAppealMapper).mapIojAppealDtoToApiCreateIojAppealRequest(workflowRequest);
+        verify(assessmentApiService).create(request);
+        assertThat(applicationDTO.getAssessmentDTO().getIojAppeal().getIojId()).isEqualTo(EXISTING_APPEAL_ID);
     }
 }

@@ -29,7 +29,11 @@ import uk.gov.justice.laa.crime.common.model.hardship.ExtraExpenditure;
 import uk.gov.justice.laa.crime.common.model.hardship.HardshipMetadata;
 import uk.gov.justice.laa.crime.common.model.hardship.HardshipReview;
 import uk.gov.justice.laa.crime.common.model.hardship.SolicitorCosts;
+import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealRequest;
+import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiGetIojAppealResponse;
+import uk.gov.justice.laa.crime.common.model.ioj.IojAppeal;
+import uk.gov.justice.laa.crime.common.model.ioj.IojAppealMetadata;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentChildWeighting;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentDetail;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.FinancialAssessmentIncomeEvidence;
@@ -38,7 +42,9 @@ import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCapitalEvidenc
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiIOJSummary;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiRepOrderCrownCourtOutcome;
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
+import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.dto.ErrorDTO;
@@ -130,6 +136,8 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RoleDataItemDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.ReservationsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.AssessmentSummaryType;
+import uk.gov.justice.laa.crime.proceeding.MagsDecisionResult;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
@@ -307,6 +315,28 @@ public class TestModelDataBuilder {
                         .withUserSession(getApiUserSession()));
     }
 
+    public static ApiDetermineMagsRepDecisionRequest getDetermineMagsRepDecisionRequest() {
+        return new ApiDetermineMagsRepDecisionRequest()
+                .withRepId(REP_ID)
+                .withCaseType(CaseType.EITHER_WAY)
+                .withPassportAssessment(getApiPassportAssessment())
+                .withIojAppeal(getApiIOJSummary())
+                .withFinancialAssessment(getApiFinancialAssessment())
+                .withUserSession(getApiUserSession());
+    }
+
+    public static ApiDetermineMagsRepDecisionResponse getDetermineEmptyMagsRepDecisionResponse() {
+        return new ApiDetermineMagsRepDecisionResponse().withDecisionResult(null);
+    }
+
+    public static ApiDetermineMagsRepDecisionResponse getDetermineMagsRepDecisionResponse() {
+        MagsDecisionResult magsDecisionResult = new MagsDecisionResult();
+        magsDecisionResult.setDecisionDate(LocalDate.now());
+        magsDecisionResult.setDecisionReason(DecisionReason.GRANTED);
+
+        return new ApiDetermineMagsRepDecisionResponse().withDecisionResult(magsDecisionResult);
+    }
+
     public static uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest
             getUpdateApplicationRequest() {
         return new uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest()
@@ -394,6 +424,28 @@ public class TestModelDataBuilder {
                 .withDecisionReason(IojAppealDecisionReason.DAMAGE_TO_REPUTATION)
                 .withNotes(CASEWORKER_NOTES)
                 .withDecisionDate(LocalDateTime.of(2025, 12, 01, 10, 15));
+    }
+
+    public static ApiCreateIojAppealRequest getApiCreateIojAppealRequest() {
+        IojAppeal iojAppeal = new IojAppeal()
+                .withReceivedDate(LocalDateTime.of(2025, 10, 1, 13, 0))
+                .withAppealReason(NewWorkReason.NEW)
+                .withAppealAssessor(IojAppealAssessor.CASEWORKER)
+                .withAppealDecision(IojAppealDecision.PASS)
+                .withDecisionReason(IojAppealDecisionReason.DAMAGE_TO_REPUTATION)
+                .withNotes(CASEWORKER_NOTES)
+                .withDecisionDate(LocalDateTime.of(2025, 12, 1, 10, 15));
+
+        IojAppealMetadata iojAppealMetadata = new IojAppealMetadata()
+                .withLegacyApplicationId(REP_ID)
+                .withCaseManagementUnitId(CMU_ID)
+                .withUserSession(getApiUserSession());
+
+        return new ApiCreateIojAppealRequest().withIojAppeal(iojAppeal).withIojAppealMetadata(iojAppealMetadata);
+    }
+
+    public static ApiCreateIojAppealResponse getApiCreateIojAppealResponse() {
+        return new ApiCreateIojAppealResponse().withAppealId(APPEAL_ID).withLegacyAppealId(LEGACY_APPEAL_ID);
     }
 
     public static uk.gov.justice.laa.crime.common.model.proceeding.common.ApiFinancialAssessment
@@ -526,9 +578,9 @@ public class TestModelDataBuilder {
     public static AssessmentSummaryDTO getAssessmentSummaryDTOFromHardship(CourtType courtType) {
         AssessmentSummaryDTO assessmentSummaryDTO = getAssessmentSummaryDTO();
         if (courtType == CourtType.CROWN_COURT) {
-            assessmentSummaryDTO.setType("Hardship Review - Crown Court");
+            assessmentSummaryDTO.setType(AssessmentSummaryType.HARDSHIP_REVIEW_CROWN_COURT.getName());
         } else {
-            assessmentSummaryDTO.setType("Hardship Review - Magistrate");
+            assessmentSummaryDTO.setType(AssessmentSummaryType.HARDSHIP_REVIEW_MAGS_COURT.getName());
         }
         return assessmentSummaryDTO;
     }
@@ -777,6 +829,20 @@ public class TestModelDataBuilder {
                 .appealReason(getIojDecisionReasonDTO())
                 .assessmentStatusDTO(getAssessmentStatusDTO(CurrentStatus.COMPLETE))
                 .newWorkReasonDTO(newWorkReasonDTO)
+                .build();
+    }
+
+    public static AssessmentSummaryDTO getAssessmentSummaryDTOFromIojAppealDTO() {
+        Date receivedDate = Date.from(LocalDateTime.of(2025, 10, 01, 13, 0)
+                .atZone(ZoneId.systemDefault())
+                .toInstant());
+
+        return AssessmentSummaryDTO.builder()
+                .id(LEGACY_APPEAL_ID)
+                .status(CurrentStatus.COMPLETE.getStatus())
+                .type(AssessmentSummaryType.IOJ_APPEAL.getName())
+                .result(RESULT_PASS)
+                .assessmentDate(receivedDate)
                 .build();
     }
 
@@ -1313,6 +1379,14 @@ public class TestModelDataBuilder {
                 .build();
     }
 
+    public static RepOrderDTO buildRepOrderDTO(int repOrderId, String rorsStatus) {
+        return RepOrderDTO.builder()
+                .id(repOrderId)
+                .dateModified(APPLICATION_TIMESTAMP.toLocalDateTime())
+                .rorsStatus(rorsStatus)
+                .build();
+    }
+
     public static RepOrderDTO buildRepOrderDTOWithAssessorName() {
         UserDTO userDTO =
                 UserDTO.builder().firstName("FIRSTNAME").surname("SURNAME").build();
@@ -1452,7 +1526,7 @@ public class TestModelDataBuilder {
         return AssessmentSummaryDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID)
                 .status(CurrentStatus.COMPLETE.getDescription())
-                .type("Full Means Test")
+                .type(AssessmentSummaryType.FULL_MEANS_ASSESSMENT.getName())
                 .result(RESULT_PASS)
                 .assessmentDate(ASSESSMENT_DATE)
                 .reviewType(RT_CODE_ER)
@@ -1463,7 +1537,7 @@ public class TestModelDataBuilder {
         return AssessmentSummaryDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID)
                 .status(CurrentStatus.COMPLETE.getDescription())
-                .type("Initial Assessment")
+                .type(AssessmentSummaryType.INITIAL_MEANS_ASSESSMENT.getName())
                 .result(RESULT_FAIL)
                 .reviewType(RT_CODE_ER)
                 .build();

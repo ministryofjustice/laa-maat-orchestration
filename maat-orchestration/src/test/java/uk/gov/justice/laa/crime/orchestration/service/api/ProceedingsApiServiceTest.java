@@ -3,6 +3,7 @@ package uk.gov.justice.laa.crime.orchestration.service.api;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
+import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiDetermineMagsRepDecisionRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateApplicationRequest;
 import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCourtRequest;
 import uk.gov.justice.laa.crime.orchestration.client.CrownCourtProceedingApiClient;
@@ -21,6 +22,13 @@ class ProceedingsApiServiceTest {
 
     @InjectMocks
     private ProceedingsApiService proceedingsApiService;
+
+    @Test
+    void givenValidRequest_whenDetermineMagsRepDecisionIsInvoked_ThenAPIRequestIsSent() {
+        proceedingsApiService.determineMagsRepDecision(new ApiDetermineMagsRepDecisionRequest());
+
+        verify(crownCourtApiClient).determineMagsRepDecision(any(ApiDetermineMagsRepDecisionRequest.class));
+    }
 
     @Test
     void givenValidRequest_whenUpdateIsInvoked_thenAPIRequestIsSent() {

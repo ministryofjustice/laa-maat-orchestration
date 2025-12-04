@@ -161,7 +161,7 @@ class MeansAssessmentOrchestrationServiceTest {
                         workflowRequest.getApplicationDTO(),
                         workflowRequest.getUserDTO(),
                         StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2);
-        verify(assessmentSummaryService, times(1)).getSummary(any());
+        verify(assessmentSummaryService, times(1)).getSummary(any(FinancialAssessmentDTO.class));
         verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 
@@ -191,7 +191,7 @@ class MeansAssessmentOrchestrationServiceTest {
                         workflowRequest.getApplicationDTO(),
                         workflowRequest.getUserDTO(),
                         StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2);
-        verify(assessmentSummaryService, times(1)).getSummary(any());
+        verify(assessmentSummaryService, times(1)).getSummary(any(FinancialAssessmentDTO.class));
         verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 
@@ -218,7 +218,7 @@ class MeansAssessmentOrchestrationServiceTest {
                         workflowRequest.getApplicationDTO(),
                         workflowRequest.getUserDTO(),
                         StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2);
-        verify(assessmentSummaryService, times(1)).getSummary(any());
+        verify(assessmentSummaryService, times(1)).getSummary(any(FinancialAssessmentDTO.class));
         verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 

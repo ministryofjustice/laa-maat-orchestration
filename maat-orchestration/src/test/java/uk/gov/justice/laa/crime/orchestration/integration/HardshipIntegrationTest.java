@@ -22,8 +22,8 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertS
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCalculateContributions;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCheckContributionsRule;
-import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetContributionsSummary;
-import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetRepOrders;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindRepOrder;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetContributionsSummaries;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForOAuth;
@@ -132,7 +132,7 @@ class HardshipIntegrationTest {
         stubForOAuth();
         stubForGetUserSummary(objectMapper.writeValueAsString(
                 TestModelDataBuilder.getUserSummaryDTO(CREATE_ROLE_ACTIONS, NewWorkReason.NEW)));
-        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
+        stubForFindRepOrder(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
         String requestBody = objectMapper.writeValueAsString(
                 TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
@@ -146,7 +146,7 @@ class HardshipIntegrationTest {
         stubForOAuth();
         stubForGetUserSummary(
                 objectMapper.writeValueAsString(TestModelDataBuilder.getUserSummaryDTO(null, NewWorkReason.NEW)));
-        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
+        stubForFindRepOrder(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
         String requestBody = objectMapper.writeValueAsString(
                 TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
@@ -160,7 +160,7 @@ class HardshipIntegrationTest {
         stubForOAuth();
         stubForGetUserSummary(objectMapper.writeValueAsString(
                 TestModelDataBuilder.getUserSummaryDTO(UPDATE_ROLE_ACTIONS, NewWorkReason.NEW)));
-        stubForGetRepOrders(objectMapper.writeValueAsString(
+        stubForFindRepOrder(objectMapper.writeValueAsString(
                 TestModelDataBuilder.buildRepOrderDTOWithModifiedDateOf("2023-06-27T10:15:30")));
         String requestBody = objectMapper.writeValueAsString(
                 TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
@@ -238,7 +238,7 @@ class HardshipIntegrationTest {
         stubForOAuth();
         stubForGetUserSummary(
                 objectMapper.writeValueAsString(TestModelDataBuilder.getUserSummaryDTO(null, NewWorkReason.NEW)));
-        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
+        stubForFindRepOrder(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
         String requestBody = objectMapper.writeValueAsString(
                 TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
@@ -252,7 +252,7 @@ class HardshipIntegrationTest {
         stubForOAuth();
         stubForGetUserSummary(objectMapper.writeValueAsString(
                 TestModelDataBuilder.getUserSummaryDTO(UPDATE_ROLE_ACTIONS, NewWorkReason.NEW)));
-        stubForGetRepOrders(objectMapper.writeValueAsString(
+        stubForFindRepOrder(objectMapper.writeValueAsString(
                 TestModelDataBuilder.buildRepOrderDTOWithModifiedDateOf("2023-06-27T10:15:30")));
         String requestBody = objectMapper.writeValueAsString(
                 TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
@@ -283,11 +283,11 @@ class HardshipIntegrationTest {
         stubForCheckContributionsRule();
         stubForCalculateContributions(
                 objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
-        stubForGetContributionsSummary(
+        stubForGetContributionsSummaries(
                 objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary())));
         stubForGetUserSummary(objectMapper.writeValueAsString(
                 TestModelDataBuilder.getUserSummaryDTO(UPDATE_ROLE_ACTIONS, NewWorkReason.NEW)));
-        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
+        stubForFindRepOrder(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
         stubForOAuth();
     }
 
@@ -314,11 +314,11 @@ class HardshipIntegrationTest {
         stubForCheckContributionsRule();
         stubForCalculateContributions(
                 objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
-        stubForGetContributionsSummary(
+        stubForGetContributionsSummaries(
                 objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary())));
         stubForGetUserSummary(objectMapper.writeValueAsString(
                 TestModelDataBuilder.getUserSummaryDTO(CREATE_ROLE_ACTIONS, NewWorkReason.NEW)));
-        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTOWithAssessorName()));
+        stubForFindRepOrder(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTOWithAssessorName()));
         stubForOAuth();
         if (CourtType.CROWN_COURT.equals(courtType)) {
             wiremock.stubFor(put(urlMatching("/api/internal/v1/proceedings"))
@@ -331,7 +331,7 @@ class HardshipIntegrationTest {
 
     private void stubForCreateInvalidHardship() throws Exception {
         stubForOAuth();
-        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTOWithAssessorName()));
+        stubForFindRepOrder(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTOWithAssessorName()));
         stubForGetUserSummary(objectMapper.writeValueAsString(
                 TestModelDataBuilder.getUserSummaryDTO(CREATE_ROLE_ACTIONS, NewWorkReason.NEW)));
         String errorResponse =

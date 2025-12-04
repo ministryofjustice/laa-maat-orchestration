@@ -13,8 +13,8 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertS
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForUpdateCrownCourtApplication;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCalculateContributions;
-import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetContributionsSummary;
-import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetRepOrders;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindRepOrder;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetContributionsSummaries;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForOAuth;
@@ -163,9 +163,9 @@ class MeansAssessmentIntegrationTest {
                         .withBody(cmaResponse)));
         stubForUpdateCrownCourtApplication(ccpResponse);
         stubForCalculateContributions(cccCalculateResponse);
-        stubForGetContributionsSummary(cccSummariesResponse);
+        stubForGetContributionsSummaries(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
-        stubForGetRepOrders(repOrderDTO);
+        stubForFindRepOrder(repOrderDTO);
         stubForUpdateSendToCCLF();
 
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
@@ -241,9 +241,9 @@ class MeansAssessmentIntegrationTest {
                         .withBody(cmaResponse)));
         stubForUpdateCrownCourtApplication(ccpResponse);
         stubForCalculateContributions(cccCalculateResponse);
-        stubForGetContributionsSummary(cccSummariesResponse);
+        stubForGetContributionsSummaries(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
-        stubForGetRepOrders(repOrderDTO);
+        stubForFindRepOrder(repOrderDTO);
         stubForUpdateSendToCCLF();
 
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
