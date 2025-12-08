@@ -50,7 +50,7 @@ evidenceApi:
   oauthUrl: https://laa-crime-auth-evidence.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 casApi:
-  baseUrl: https://laa-crime-assessment-service-test.apps.live.cloud-platform.service.justice.gov.uk/api/internal/v1
+  baseUrl: http://crime-assessment-service.laa-crime-assessment-service-test.svc.cluster.local/api/internal/v1
   oauthUrl: https://laa-crime-auth-cas.auth.eu-west-2.amazoncognito.com/oauth2/token
   
 serviceAccount:
