@@ -7,11 +7,6 @@ import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
-import org.springframework.stereotype.Component;
-import uk.gov.justice.laa.crime.common.model.meansassessment.*;
-import uk.gov.justice.laa.crime.enums.*;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentChildWeighting;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentDetail;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentSectionSummary;
@@ -69,6 +64,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.stereotype.Component;
 
 @Component

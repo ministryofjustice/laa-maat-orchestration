@@ -28,10 +28,14 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubFor
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.client.WireMock;
+import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.enums.NewWorkReason;
+import uk.gov.justice.laa.crime.enums.orchestration.Action;
+import uk.gov.justice.laa.crime.orchestration.data.Constants;
+import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
+
 import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,11 +46,10 @@ import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.justice.laa.crime.enums.CourtType;
-import uk.gov.justice.laa.crime.enums.NewWorkReason;
-import uk.gov.justice.laa.crime.enums.orchestration.Action;
-import uk.gov.justice.laa.crime.orchestration.data.Constants;
-import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.client.WireMock;
 
 class HardshipIntegrationTest extends WiremockIntegrationTest {
     private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/hardship";
