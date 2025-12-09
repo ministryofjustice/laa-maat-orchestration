@@ -1,10 +1,9 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceRequest;
@@ -20,19 +19,24 @@ import uk.gov.justice.laa.crime.orchestration.mapper.IncomeEvidenceMapper;
 import uk.gov.justice.laa.crime.orchestration.service.api.EvidenceApiService;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class IncomeEvidenceServiceTest {
 
     @Mock
     private EvidenceApiService evidenceApiService;
+
     @Mock
     private MaatCourtDataApiService maatCourtDataApiService;
+
     @Mock
     private IncomeEvidenceMapper incomeEvidenceMapper;
+
     @InjectMocks
     private IncomeEvidenceService incomeEvidenceService;
 
@@ -45,7 +49,8 @@ class IncomeEvidenceServiceTest {
                 .thenReturn(new ApiCreateIncomeEvidenceRequest());
         when(evidenceApiService.createEvidence(any(ApiCreateIncomeEvidenceRequest.class)))
                 .thenReturn(new ApiCreateIncomeEvidenceResponse());
-        when(incomeEvidenceMapper.mapToMaatApiUpdateAssessment(any(WorkflowRequest.class), any(RepOrderDTO.class), any(ApiCreateIncomeEvidenceResponse.class)))
+        when(incomeEvidenceMapper.mapToMaatApiUpdateAssessment(
+                        any(WorkflowRequest.class), any(RepOrderDTO.class), any(ApiCreateIncomeEvidenceResponse.class)))
                 .thenReturn(new MaatApiUpdateAssessment());
         when(maatCourtDataApiService.updateFinancialAssessment(any(MaatApiUpdateAssessment.class)))
                 .thenReturn(new MaatApiAssessmentResponse());
@@ -54,8 +59,9 @@ class IncomeEvidenceServiceTest {
 
         verify(evidenceApiService).createEvidence(any(ApiCreateIncomeEvidenceRequest.class));
         verify(maatCourtDataApiService).updateFinancialAssessment(any(MaatApiUpdateAssessment.class));
-        verify(incomeEvidenceMapper).maatApiAssessmentResponseToApplicationDTO(any(MaatApiAssessmentResponse.class),
-                any(ApplicationDTO.class));
+        verify(incomeEvidenceMapper)
+                .maatApiAssessmentResponseToApplicationDTO(
+                        any(MaatApiAssessmentResponse.class), any(ApplicationDTO.class));
     }
 
     @Test
@@ -63,11 +69,13 @@ class IncomeEvidenceServiceTest {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrder = TestModelDataBuilder.buildRepOrderDTO("CURR");
 
-        when(incomeEvidenceMapper.workflowRequestToApiUpdateIncomeEvidenceRequest(any(ApplicationDTO.class), any(UserDTO.class)))
+        when(incomeEvidenceMapper.workflowRequestToApiUpdateIncomeEvidenceRequest(
+                        any(ApplicationDTO.class), any(UserDTO.class)))
                 .thenReturn(new ApiUpdateIncomeEvidenceRequest());
         when(evidenceApiService.updateEvidence(any(ApiUpdateIncomeEvidenceRequest.class)))
                 .thenReturn(new ApiUpdateIncomeEvidenceResponse());
-        when(incomeEvidenceMapper.mapUpdateEvidenceToMaatApiUpdateAssessment(any(WorkflowRequest.class), any(RepOrderDTO.class), any(ApiUpdateIncomeEvidenceResponse.class)))
+        when(incomeEvidenceMapper.mapUpdateEvidenceToMaatApiUpdateAssessment(
+                        any(WorkflowRequest.class), any(RepOrderDTO.class), any(ApiUpdateIncomeEvidenceResponse.class)))
                 .thenReturn(new MaatApiUpdateAssessment());
         when(maatCourtDataApiService.updateFinancialAssessment(any(MaatApiUpdateAssessment.class)))
                 .thenReturn(new MaatApiAssessmentResponse());
@@ -76,7 +84,8 @@ class IncomeEvidenceServiceTest {
 
         verify(evidenceApiService).updateEvidence(any(ApiUpdateIncomeEvidenceRequest.class));
         verify(maatCourtDataApiService).updateFinancialAssessment(any(MaatApiUpdateAssessment.class));
-        verify(incomeEvidenceMapper).maatApiAssessmentResponseToApplicationDTO(any(MaatApiAssessmentResponse.class),
-                any(ApplicationDTO.class));
-    }}
-
+        verify(incomeEvidenceMapper)
+                .maatApiAssessmentResponseToApplicationDTO(
+                        any(MaatApiAssessmentResponse.class), any(ApplicationDTO.class));
+    }
+}

@@ -1,18 +1,19 @@
 package uk.gov.justice.laa.crime.orchestration.service.api;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.verify;
+
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiCreateMeansAssessmentRequest;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiUpdateMeansAssessmentRequest;
 import uk.gov.justice.laa.crime.orchestration.client.CrimeMeansAssessmentApiClient;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class MeansAssessmentApiServiceTest {

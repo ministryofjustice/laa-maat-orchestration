@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Data
@@ -32,6 +33,9 @@ public class ServicesConfiguration {
 
     @NotNull
     private EvidenceApi evidenceApi;
+
+    @NotNull
+    private CasApi casApi;
 
     @Data
     @AllArgsConstructor
@@ -105,6 +109,17 @@ public class ServicesConfiguration {
     @NoArgsConstructor
     public static class EvidenceApi {
 
+        @NotNull
+        private String baseUrl;
+
+        @NotNull
+        private String registrationId;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CasApi {
         @NotNull
         private String baseUrl;
 

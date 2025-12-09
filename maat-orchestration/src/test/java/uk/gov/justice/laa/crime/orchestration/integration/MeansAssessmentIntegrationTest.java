@@ -12,8 +12,6 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertS
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForUpdateCrownCourtApplication;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCalculateContributions;
-import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetContributionsSummary;
-import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetRepOrders;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForRollbackMeansAssessment;
@@ -62,7 +60,8 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
     @BeforeEach
     void setUp() {
         this.mvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
-                .addFilter(springSecurityFilterChain).build();
+                .addFilter(springSecurityFilterChain)
+                .build();
     }
 
     @AfterEach
@@ -72,7 +71,8 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
 
     @Test
     void givenValidIds_whenFindIsInvoked_thenAssessmentIsReturned() throws Exception {
-        String response = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiGetMeansAssessmentResponse());
+        String response =
+                objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiGetMeansAssessmentResponse());
 
         stubForOAuth();
         stubFor(get(urlMatching(CMA_URL + "/" + Constants.FINANCIAL_ASSESSMENT_ID))
@@ -92,18 +92,16 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
     void givenEmptyOAuthToken_whenFindIsInvoked_thenUnauthorizedAccessIsReturned() throws Exception {
         String findAssessmentUrl = String.format(
                 "%s/%d/applicantId/%d", ENDPOINT_URL, Constants.FINANCIAL_ASSESSMENT_ID, Constants.APPLICANT_ID);
-        mvc.perform(buildRequest(HttpMethod.GET, findAssessmentUrl, false))
-                .andExpect(status().isUnauthorized());
+        mvc.perform(buildRequest(HttpMethod.GET, findAssessmentUrl, false)).andExpect(status().isUnauthorized());
     }
 
     @Test
     void givenInvalidIds_whenFindIsInvoked_thenBadRequestIsReturned() throws Exception {
         stubForOAuth();
 
-        String findAssessmentUrl = String.format(
-                "%s/%d/applicantId/%s", ENDPOINT_URL, Constants.FINANCIAL_ASSESSMENT_ID, "invalid-id");
-        mvc.perform(buildRequest(HttpMethod.GET, findAssessmentUrl))
-                .andExpect(status().isBadRequest());
+        String findAssessmentUrl =
+                String.format("%s/%d/applicantId/%s", ENDPOINT_URL, Constants.FINANCIAL_ASSESSMENT_ID, "invalid-id");
+        mvc.perform(buildRequest(HttpMethod.GET, findAssessmentUrl)).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -114,17 +112,21 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
 
         String findAssessmentUrl = String.format(
                 "%s/%d/applicantId/%d", ENDPOINT_URL, Constants.FINANCIAL_ASSESSMENT_ID, Constants.APPLICANT_ID);
-        mvc.perform(buildRequest(HttpMethod.GET, findAssessmentUrl))
-                .andExpect(status().isInternalServerError());
+        mvc.perform(buildRequest(HttpMethod.GET, findAssessmentUrl)).andExpect(status().isInternalServerError());
     }
 
     @Test
     void givenValidRequestData_whenCreateIsInvoked_thenAssessmentIsCreated() throws Exception {
-        String cmaResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiMeansAssessmentResponse());
-        String ccpResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
-        String cccCalculateResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse());
-        String cccSummariesResponse = objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary()));
-        String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT));
+        String cmaResponse =
+                objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiMeansAssessmentResponse());
+        String ccpResponse =
+                objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
+        String cccCalculateResponse =
+                objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse());
+        String cccSummariesResponse =
+                objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary()));
+        String maatApiResponse =
+                objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT));
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
         String userSummaryResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getUserSummaryDTO());
         String repOrderDTO = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getRepOrderDTO());
@@ -136,15 +138,18 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
                         .withBody(cmaResponse)));
         stubForUpdateCrownCourtApplication(ccpResponse);
         stubForCalculateContributions(cccCalculateResponse);
-        stubForGetContributionsSummary(cccSummariesResponse);
+        stubForGetContributionsSummaries(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
-        stubForGetRepOrders(repOrderDTO);
+        stubForFindRepOrder(repOrderDTO);
         stubForUpdateSendToCCLF();
 
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", "DB_PRE_UPDATE_CC_APPLICATION", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_PRE_UPDATE_CC_APPLICATION", "DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
+        stubForInvokeStoredProcedure(
+                "DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", maatApiResponse);
+        stubForInvokeStoredProcedure(
+                "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", "DB_PRE_UPDATE_CC_APPLICATION", maatApiResponse);
+        stubForInvokeStoredProcedure(
+                "DB_PRE_UPDATE_CC_APPLICATION", "DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
         stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
@@ -181,8 +186,7 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         String cmaRollbackResponse = objectMapper.writeValueAsString(new ApiRollbackMeansAssessmentResponse());
 
         stubForOAuth();
-        wiremock.stubFor(post(urlMatching(CMA_URL))
-                .willReturn(WireMock.serverError()));
+        wiremock.stubFor(post(urlMatching(CMA_URL)).willReturn(WireMock.serverError()));
         stubForRollbackMeansAssessment(cmaRollbackResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
@@ -191,11 +195,16 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
 
     @Test
     void givenValidRequestData_whenUpdateIsInvoked_thenAssessmentIsUpdated() throws Exception {
-        String cmaResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiMeansAssessmentResponse());
-        String ccpResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
-        String cccCalculateResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse());
-        String cccSummariesResponse = objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary()));
-        String maatApiResponse = objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT));
+        String cmaResponse =
+                objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiMeansAssessmentResponse());
+        String ccpResponse =
+                objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse());
+        String cccCalculateResponse =
+                objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse());
+        String cccSummariesResponse =
+                objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary()));
+        String maatApiResponse =
+                objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT));
         String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
         String userSummaryResponse = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getUserSummaryDTO());
         String repOrderDTO = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getRepOrderDTO());
@@ -207,15 +216,18 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
                         .withBody(cmaResponse)));
         stubForUpdateCrownCourtApplication(ccpResponse);
         stubForCalculateContributions(cccCalculateResponse);
-        stubForGetContributionsSummary(cccSummariesResponse);
+        stubForGetContributionsSummaries(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
-        stubForGetRepOrders(repOrderDTO);
+        stubForFindRepOrder(repOrderDTO);
         stubForUpdateSendToCCLF();
 
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", "DB_PRE_UPDATE_CC_APPLICATION", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_PRE_UPDATE_CC_APPLICATION", "DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
+        stubForInvokeStoredProcedure(
+                "DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", maatApiResponse);
+        stubForInvokeStoredProcedure(
+                "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", "DB_PRE_UPDATE_CC_APPLICATION", maatApiResponse);
+        stubForInvokeStoredProcedure(
+                "DB_PRE_UPDATE_CC_APPLICATION", "DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
         stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
@@ -252,8 +264,7 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         String cmaRollbackResponse = objectMapper.writeValueAsString(new ApiRollbackMeansAssessmentResponse());
 
         stubForOAuth();
-        wiremock.stubFor(put(urlMatching(CMA_URL))
-                .willReturn(WireMock.serverError()));
+        wiremock.stubFor(put(urlMatching(CMA_URL)).willReturn(WireMock.serverError()));
         stubForRollbackMeansAssessment(cmaRollbackResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))

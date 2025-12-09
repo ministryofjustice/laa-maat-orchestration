@@ -23,17 +23,21 @@ public class IncomeEvidenceSummaryDTO extends GenericDTO {
     private Date upliftRemovedDate;
     private Date firstReminderDate;
     private Date secondReminderDate;
+
     @Builder.Default
     private String incomeEvidenceNotes = "";
+
     @Builder.Default
     private Collection<EvidenceDTO> applicantIncomeEvidenceList = new ArrayList<>();
+
     @Builder.Default
     private Collection<EvidenceDTO> partnerIncomeEvidenceList = new ArrayList<>();
+
     @Builder.Default
     private Collection<ExtraEvidenceDTO> extraEvidenceList = new ArrayList<>();
+
     @Builder.Default
     private Boolean enabled = Boolean.FALSE;
+
     private Boolean upliftsAvailable;
-
 }
-

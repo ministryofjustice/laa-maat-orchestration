@@ -8,7 +8,7 @@ import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataB
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForUpdateCrownCourtOutcome;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForUpdateSendToCCLF;
-import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetRepOrders;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindRepOrder;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForUpdateCrownCourtOutcome;
@@ -54,7 +54,8 @@ class CrownCourtIntegrationTest extends WiremockIntegrationTest {
     @BeforeEach
     void setUp() {
         this.mvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
-            .addFilter(springSecurityFilterChain).build();
+                .addFilter(springSecurityFilterChain)
+                .build();
     }
 
     @AfterEach
@@ -65,7 +66,7 @@ class CrownCourtIntegrationTest extends WiremockIntegrationTest {
     @Test
     void givenNoOAuthToken_whenUpdateIsInvoked_thenUnauthorisedResponseIsReturned() throws Exception {
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, "{}", ENDPOINT_URL, false))
-            .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -77,7 +78,7 @@ class CrownCourtIntegrationTest extends WiremockIntegrationTest {
         stubForOAuth();
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
-            .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -89,23 +90,24 @@ class CrownCourtIntegrationTest extends WiremockIntegrationTest {
 
         stubForOAuth();
         stubFor(post(urlMatching(MAAT_API_ASSESSMENT_URL + "/execute-stored-procedure"))
-            .willReturn(WireMock.serverError()));
+                .willReturn(WireMock.serverError()));
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
-            .andExpect(status().isInternalServerError());
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
     void givenValidRequest_whenUpdateIsInvoked_thenCrownCourtIsUpdated() throws Exception {
         WorkflowRequest request = TestModelDataBuilder.buildWorkFlowRequest();
-        ApiUpdateCrownCourtOutcomeResponse updateCrownCourtOutcomeResponse = TestModelDataBuilder.getApiUpdateCrownCourtResponse();
+        ApiUpdateCrownCourtOutcomeResponse updateCrownCourtOutcomeResponse =
+                TestModelDataBuilder.getApiUpdateCrownCourtResponse();
         ApplicationDTO applicationDTO = getApplicationDTO();
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
         userSummaryDTO.setFeatureToggle(List.of(FeatureToggleDTO.builder()
-            .featureName(FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING.getName())
-            .action(FeatureToggleAction.READ.getName())
-            .isEnabled("Y")
-            .build()));
+                .featureName(FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING.getName())
+                .action(FeatureToggleAction.READ.getName())
+                .isEnabled("Y")
+                .build()));
 
         request.setApplicationDTO(applicationDTO);
 
@@ -115,11 +117,11 @@ class CrownCourtIntegrationTest extends WiremockIntegrationTest {
         stubForInvokeStoredProcedure(objectMapper.writeValueAsString(applicationDTO));
         stubForUpdateCrownCourtOutcome(objectMapper.writeValueAsString(updateCrownCourtOutcomeResponse));
         stubForGetUserSummary(objectMapper.writeValueAsString(userSummaryDTO));
-        stubForGetRepOrders(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
+        stubForFindRepOrder(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
         stubForUpdateSendToCCLF();
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
 
         assertStubForUpdateCrownCourtOutcome(1);
         assertStubForUpdateSendToCCLF(1);

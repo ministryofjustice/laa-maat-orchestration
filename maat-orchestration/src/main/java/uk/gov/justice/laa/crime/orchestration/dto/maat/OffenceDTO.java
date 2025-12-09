@@ -14,5 +14,4 @@ public class OffenceDTO extends GenericDTO {
     private String offenceType;
     private String description;
     private Double contributionCap;
-
 }

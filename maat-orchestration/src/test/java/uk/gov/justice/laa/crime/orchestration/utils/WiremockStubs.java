@@ -1,17 +1,31 @@
 package uk.gov.justice.laa.crime.orchestration.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.http.MediaType;
+import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.patch;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.LEGACY_APPEAL_ID;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.REP_ID;
+
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
-import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 
 import java.util.Map;
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.http.MediaType;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.client.WireMock;
 
 @TestConfiguration
 public class WiremockStubs {
@@ -25,30 +39,27 @@ public class WiremockStubs {
 
     public static void stubForOAuth() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> token = Map.of(
-                "expires_in", 3600,
-                "token_type", "Bearer",
-                "access_token", UUID.randomUUID()
-        );
+        Map<String, Object> token =
+                Map.of("expires_in", 3600, "token_type", "Bearer", "access_token", UUID.randomUUID());
 
         stubFor(post("/oauth2/token")
-            .willReturn(WireMock.ok()
-                    .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                    .withBody(mapper.writeValueAsString(token))));
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(mapper.writeValueAsString(token))));
     }
 
     public static void stubForUpdateCrownCourtApplication(String response) {
         stubFor((put(urlMatching(CCP_URL))
-            .willReturn(WireMock.ok()
-                    .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                    .withBody(response))));
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response))));
     }
 
     public static void stubForUpdateCrownCourtOutcome(String response) {
         stubFor((put(urlMatching(CCP_URL + "/update-crown-court"))
-            .willReturn(WireMock.ok()
-                .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                .withBody(response))));
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response))));
     }
 
     public static void assertStubForUpdateCrownCourtApplication(int times) {
@@ -61,32 +72,31 @@ public class WiremockStubs {
 
     public static void stubForCalculateContributions(String response) {
         stubFor(post(urlMatching(CCC_URL + "/calculate-contribution"))
-            .willReturn(WireMock.ok()
-                    .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                    .withBody(response)));
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
     }
 
     public static void assertStubForCalculateContributions(int times) {
         verify(exactly(times), postRequestedFor(urlPathMatching(CCC_URL + "/calculate-contribution")));
     }
 
-    public static void stubForGetContributionsSummary(String response) {
+    public static void stubForGetContributionsSummaries(String response) {
         stubFor(get(urlMatching(CCC_URL + "/summaries"))
-            .willReturn(WireMock.ok()
-                    .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                    .withBody(response)));
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
     }
 
     public static void assertStubForGetContributionsSummary(int times, Integer repId) {
-        verify(exactly(times), getRequestedFor(urlPathMatching(
-            CCC_URL + "/summaries/" + repId)));
+        verify(exactly(times), getRequestedFor(urlPathMatching(CCC_URL + "/summaries/" + repId)));
     }
 
     public static void stubForCheckContributionsRule() {
         stubFor(post(urlMatching(CCC_URL + "/check-contribution-rule"))
-            .willReturn(WireMock.ok()
-                    .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                    .withBody(Boolean.TRUE.toString())));
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(Boolean.TRUE.toString())));
     }
 
     public static void assertStubForCheckContributionsRule(int times) {
@@ -102,25 +112,27 @@ public class WiremockStubs {
 
     public static void stubForInvokeStoredProcedure(String currentState, String response) {
         stubFor(post(urlMatching(MAAT_API_ASSESSMENT_URL + "/execute-stored-procedure"))
-            .inScenario("invokeStoredProcedure")
-            .whenScenarioStateIs("DB_ASSESSMENT_POST_PROCESSING_PART_2")
-            .willReturn(WireMock.ok()
-                    .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                    .withBody(response)));
+                .inScenario("invokeStoredProcedure")
+                .whenScenarioStateIs("DB_ASSESSMENT_POST_PROCESSING_PART_2")
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
     }
 
     public static void stubForInvokeStoredProcedure(String currentState, String nextState, String response) {
         stubFor(post(urlMatching(MAAT_API_ASSESSMENT_URL + "/execute-stored-procedure"))
-            .inScenario("invokeStoredProcedure")
-            .whenScenarioStateIs(currentState)
-            .willSetStateTo(nextState)
-            .willReturn(WireMock.ok()
-                    .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                    .withBody(response)));
+                .inScenario("invokeStoredProcedure")
+                .whenScenarioStateIs(currentState)
+                .willSetStateTo(nextState)
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
     }
 
     public static void assertStubForInvokeStoredProcedure(int times) {
-        verify(exactly(times), postRequestedFor(urlPathMatching(MAAT_API_ASSESSMENT_URL + "/execute-stored-procedure")));
+        verify(
+                exactly(times),
+                postRequestedFor(urlPathMatching(MAAT_API_ASSESSMENT_URL + "/execute-stored-procedure")));
     }
 
     public static void stubForRollbackMeansAssessment(String response) {
@@ -137,13 +149,6 @@ public class WiremockStubs {
                         .withBody(response)));
     }
 
-    public static void stubForGetRepOrders(String response) {
-        stubFor(get(urlMatching(MAAT_API_ASSESSMENT_URL + "/rep-orders/" + TestModelDataBuilder.REP_ID))
-                .willReturn(WireMock.ok()
-                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
-                        .withBody(response)));
-    }
-
     public static void stubForUpdateSendToCCLF() {
         stubFor(put(urlMatching(MAAT_API_APPLICATION_URL + "/applicant/update-cclf"))
                 .willReturn(WireMock.ok()));
@@ -151,5 +156,33 @@ public class WiremockStubs {
 
     public static void assertStubForUpdateSendToCCLF(int times) {
         verify(exactly(times), putRequestedFor(urlPathMatching(MAAT_API_APPLICATION_URL + "/applicant/update-cclf")));
+    }
+
+    public static void stubForFindIojAppeal(String response) {
+        stubFor(get(urlMatching("/api/internal/v1/ioj-appeals/lookup-by-legacy-id/" + LEGACY_APPEAL_ID))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
+
+    public static void stubForCreateIojAppeal(String response) {
+        stubFor(post(urlMatching("/api/internal/v1/ioj-appeals"))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
+
+    public static void stubForFindRepOrder(String response) {
+        stubFor(get(urlMatching(MAAT_API_ASSESSMENT_URL + "/rep-orders/" + REP_ID))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
+
+    public static void stubForDetermineMagsRepDecision(String response) {
+        stubFor(post(urlMatching(CCP_URL + "/determine-mags-rep-decision"))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
     }
 }

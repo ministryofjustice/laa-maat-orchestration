@@ -2,17 +2,18 @@ package uk.gov.justice.laa.crime.orchestration.service.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.common.model.hardship.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipRequest;
 import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.orchestration.client.HardshipApiClient;
 
+import org.springframework.stereotype.Service;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class HardshipApiService {
-    
+
     private final HardshipApiClient hardshipApiClient;
     private static final String RESPONSE_STRING = "Response from Hardship Service: {}";
     private static final String REQUEST_STRING = "Request to Hardship Service: {}";
@@ -42,5 +43,4 @@ public class HardshipApiService {
         log.info(REQUEST_STRING, hardshipReviewId);
         hardshipApiClient.rollback(hardshipReviewId);
     }
-
 }

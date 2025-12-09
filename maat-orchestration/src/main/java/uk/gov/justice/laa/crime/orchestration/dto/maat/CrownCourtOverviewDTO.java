@@ -19,5 +19,4 @@ public class CrownCourtOverviewDTO extends GenericDTO {
     private ApplicantPaymentDetailsDTO applicantPaymentDetailsDTO;
     private Collection<CorrespondenceDTO> correspondence;
     private AppealDTO appealDTO;
-
 }

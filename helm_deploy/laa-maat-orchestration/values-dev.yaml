@@ -48,6 +48,10 @@ catApi:
 evidenceApi:
   baseUrl: http://laa-crime-evidence.laa-crime-evidence-dev.svc.cluster.local/api/internal/v1/evidence
   oauthUrl: https://laa-crime-auth-evidence.auth.eu-west-2.amazoncognito.com/oauth2/token
+  
+casApi:
+  baseUrl: https://laa-crime-assessment-service-dev.apps.live.cloud-platform.service.justice.gov.uk/api/internal/v1
+  oauthUrl: https://laa-crime-auth-cas.auth.eu-west-2.amazoncognito.com/oauth2/token
 
 serviceAccount:
   # Specifies whether a service account should be created

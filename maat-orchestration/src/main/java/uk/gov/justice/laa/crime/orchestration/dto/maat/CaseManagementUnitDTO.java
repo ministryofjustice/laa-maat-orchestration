@@ -23,5 +23,4 @@ public class CaseManagementUnitDTO extends GenericDTO {
     private String name;
     private String description;
     private Date timeStamp;
-
 }
