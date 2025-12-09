@@ -17,8 +17,9 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJDecisionReasonDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.NewWorkReasonDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 import org.springframework.stereotype.Component;
@@ -54,20 +55,27 @@ public class IojAppealMapper {
 
         String appealSetUpResult = null;
 
+        boolean appealSuccessful = Boolean.TRUE.equals(response.getAppealSuccessful());
+        String appealDecision = (appealSuccessful ? IojAppealDecision.PASS : IojAppealDecision.FAIL).toString();
+
         if (response.getAppealAssessor().equals(IojAppealAssessor.CASEWORKER)) {
-            if (response.getAppealDecision().equals(IojAppealDecision.PASS)) {
+            if (Boolean.TRUE.equals(response.getAppealSuccessful())) {
                 appealSetUpResult = SET_UP_RESULT_CASEWORKER_PASS;
-            } else if (response.getAppealDecision().equals(IojAppealDecision.FAIL)) {
+            } else if (Boolean.FALSE.equals(response.getAppealSuccessful())) {
                 appealSetUpResult = SET_UP_RESULT_CASEWORKER_FAIL;
             }
         } else if (response.getAppealAssessor().equals(IojAppealAssessor.JUDGE)) {
             appealSetUpResult = SET_UP_RESULT_JUDGE;
         }
 
-        Date receivedDate = Date.from(
-                response.getReceivedDate().atZone(ZoneId.systemDefault()).toInstant());
-        Date decisionDate = Date.from(
-                response.getDecisionDate().atZone(ZoneId.systemDefault()).toInstant());
+        Date receivedDate = Date.from(response.getReceivedDate()
+                .atStartOfDay()
+                .atOffset(ZoneOffset.UTC)
+                .toInstant());
+        Date decisionDate = Date.from(response.getDecisionDate()
+                .atStartOfDay()
+                .atOffset(ZoneOffset.UTC)
+                .toInstant());
 
         return IOJAppealDTO.builder()
                 .iojId(Long.valueOf(response.getLegacyAppealId()))
@@ -75,7 +83,7 @@ public class IojAppealMapper {
                 .receivedDate(receivedDate)
                 .decisionDate(decisionDate)
                 .appealSetUpResult(appealSetUpResult)
-                .appealDecisionResult(response.getAppealDecision().toString())
+                .appealDecisionResult(appealDecision)
                 .notes(response.getNotes())
                 .appealReason(iojDecisionReasonDTO)
                 .assessmentStatusDTO(assessmentStatusDTO)
@@ -90,30 +98,37 @@ public class IojAppealMapper {
 
         boolean judicialReview = iojAppealDto.getAppealReason().getCode().equals(NewWorkReason.JR.getCode());
 
-        LocalDateTime receivedDate = iojAppealDto
+        LocalDate receivedDate = iojAppealDto
                 .getReceivedDate()
                 .toInstant()
                 .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-        LocalDateTime decisionDate = iojAppealDto
+                .toLocalDate();
+        LocalDate decisionDate = iojAppealDto
                 .getDecisionDate()
                 .toInstant()
                 .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
+                .toLocalDate();
 
         IojAppeal iojAppeal = new IojAppeal()
                 .withReceivedDate(receivedDate)
                 .withAppealReason(
                         NewWorkReason.getFrom(iojAppealDto.getNewWorkReasonDTO().getCode()))
                 .withAppealAssessor(judicialReview ? IojAppealAssessor.JUDGE : IojAppealAssessor.CASEWORKER)
-                .withAppealDecision(Enum.valueOf(IojAppealDecision.class, iojAppealDto.getAppealDecisionResult()))
+                .withAppealSuccessful(IojAppealDecision.PASS.toString().equals(iojAppealDto.getAppealDecisionResult()))
                 .withDecisionReason(IojAppealDecisionReason.getFrom(
                         iojAppealDto.getAppealReason().getCode()))
                 .withNotes(iojAppealDto.getNotes())
                 .withDecisionDate(decisionDate);
 
+        LocalDate applicationReceivedDate = request.getApplicationDTO()
+                .getDateReceived()
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
         IojAppealMetadata iojAppealMetadata = new IojAppealMetadata()
                 .withLegacyApplicationId(request.getApplicationDTO().getRepId().intValue())
+                .withApplicationReceivedDate(applicationReceivedDate)
                 .withCaseManagementUnitId(iojAppealDto.getCmuId().intValue())
                 .withUserSession(userMapper.userDtoToUserSession(request.getUserDTO()));
 

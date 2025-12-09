@@ -66,7 +66,6 @@ import uk.gov.justice.laa.crime.enums.HardshipReviewDetailType;
 import uk.gov.justice.laa.crime.enums.HardshipReviewResult;
 import uk.gov.justice.laa.crime.enums.HardshipReviewStatus;
 import uk.gov.justice.laa.crime.enums.IojAppealAssessor;
-import uk.gov.justice.laa.crime.enums.IojAppealDecision;
 import uk.gov.justice.laa.crime.enums.IojAppealDecisionReason;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
@@ -417,27 +416,28 @@ public class TestModelDataBuilder {
                 .withAppealId(APPEAL_ID)
                 .withLegacyAppealId(LEGACY_APPEAL_ID)
                 .withCaseManagementUnitId(CMU_ID)
-                .withReceivedDate(LocalDateTime.of(2025, 10, 01, 13, 0))
+                .withReceivedDate(LocalDate.of(2025, 10, 01))
                 .withAppealReason(NewWorkReason.NEW)
                 .withAppealAssessor(IojAppealAssessor.CASEWORKER)
-                .withAppealDecision(IojAppealDecision.PASS)
+                .withAppealSuccessful(true)
                 .withDecisionReason(IojAppealDecisionReason.DAMAGE_TO_REPUTATION)
                 .withNotes(CASEWORKER_NOTES)
-                .withDecisionDate(LocalDateTime.of(2025, 12, 01, 10, 15));
+                .withDecisionDate(LocalDate.of(2025, 12, 01));
     }
 
     public static ApiCreateIojAppealRequest getApiCreateIojAppealRequest() {
         IojAppeal iojAppeal = new IojAppeal()
-                .withReceivedDate(LocalDateTime.of(2025, 10, 1, 13, 0))
+                .withReceivedDate(LocalDate.of(2025, 10, 1))
                 .withAppealReason(NewWorkReason.NEW)
                 .withAppealAssessor(IojAppealAssessor.CASEWORKER)
-                .withAppealDecision(IojAppealDecision.PASS)
+                .withAppealSuccessful(true)
                 .withDecisionReason(IojAppealDecisionReason.DAMAGE_TO_REPUTATION)
                 .withNotes(CASEWORKER_NOTES)
-                .withDecisionDate(LocalDateTime.of(2025, 12, 1, 10, 15));
+                .withDecisionDate(LocalDate.of(2025, 12, 1));
 
         IojAppealMetadata iojAppealMetadata = new IojAppealMetadata()
                 .withLegacyApplicationId(REP_ID)
+                .withApplicationReceivedDate(LocalDate.of(2022, 10, 13))
                 .withCaseManagementUnitId(CMU_ID)
                 .withUserSession(getApiUserSession());
 
@@ -810,12 +810,11 @@ public class TestModelDataBuilder {
         NewWorkReasonDTO newWorkReasonDTO = getNewWorkReasonDTO();
         newWorkReasonDTO.setType(NEW_WORK_REASON_TYPE);
 
-        Date receivedDate = Date.from(LocalDateTime.of(2025, 10, 01, 13, 0)
-                .atZone(ZoneId.systemDefault())
-                .toInstant());
-        Date decisionDate = Date.from(LocalDateTime.of(2025, 12, 01, 10, 15)
-                .atZone(ZoneId.systemDefault())
-                .toInstant());
+        Date receivedDate =
+                Date.from(LocalDate.of(2025, 10, 1).atStartOfDay(ZoneOffset.UTC).toInstant());
+
+        Date decisionDate =
+                Date.from(LocalDate.of(2025, 12, 1).atStartOfDay(ZoneOffset.UTC).toInstant());
 
         return IOJAppealDTO.builder()
                 .iojId(Long.valueOf(LEGACY_APPEAL_ID))
@@ -833,9 +832,8 @@ public class TestModelDataBuilder {
     }
 
     public static AssessmentSummaryDTO getAssessmentSummaryDTOFromIojAppealDTO() {
-        Date receivedDate = Date.from(LocalDateTime.of(2025, 10, 01, 13, 0)
-                .atZone(ZoneId.systemDefault())
-                .toInstant());
+        Date receivedDate = Date.from(
+                LocalDate.of(2025, 10, 01).atStartOfDay(ZoneOffset.UTC).toInstant());
 
         return AssessmentSummaryDTO.builder()
                 .id(LEGACY_APPEAL_ID)
