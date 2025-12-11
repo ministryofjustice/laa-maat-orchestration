@@ -59,9 +59,9 @@ public class IojAppealMapper {
         String appealDecision = (appealSuccessful ? IojAppealDecision.PASS : IojAppealDecision.FAIL).toString();
 
         if (response.getAppealAssessor().equals(IojAppealAssessor.CASEWORKER)) {
-            if (Boolean.TRUE.equals(response.getAppealSuccessful())) {
+            if (appealSuccessful) {
                 appealSetUpResult = SET_UP_RESULT_CASEWORKER_PASS;
-            } else if (Boolean.FALSE.equals(response.getAppealSuccessful())) {
+            } else {
                 appealSetUpResult = SET_UP_RESULT_CASEWORKER_FAIL;
             }
         } else if (response.getAppealAssessor().equals(IojAppealAssessor.JUDGE)) {
