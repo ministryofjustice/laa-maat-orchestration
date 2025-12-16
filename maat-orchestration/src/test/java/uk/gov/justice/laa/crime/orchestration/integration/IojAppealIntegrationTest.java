@@ -87,6 +87,7 @@ class IojAppealIntegrationTest extends WiremockIntegrationTest {
 
         IOJAppealDTO expected = TestModelDataBuilder.getIOJAppealDTO();
 
+        // Jackson returns the date with a timestamp
         DateTimeFormatter expectedDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'+00:00'");
 
         String expectedReceivedDate =

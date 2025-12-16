@@ -18,13 +18,13 @@ java {
 
 def versions = [
 		pitest                  : "1.21.0",
-		sentry					: "8.23.0",
+		sentry					        : "8.23.0",
 		springdocVersion        : "2.8.13",
-		commonsModSchemas       : "1.40.0",
+		commonsModSchemas       : "1.43.0",
 		crimeCommonsClasses     : "4.23.0",
-		wiremock				: "3.10.6",
+		wiremock				        : "3.10.6",
 		resilience4jVersion     : "2.3.0",
-		commonsLang3Version		: "3.19.0",
+		commonsLang3Version		  : "3.19.0",
 ]
 
 configurations {
