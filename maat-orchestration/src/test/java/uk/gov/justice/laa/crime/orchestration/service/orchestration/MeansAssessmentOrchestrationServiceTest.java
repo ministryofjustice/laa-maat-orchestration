@@ -112,12 +112,11 @@ class MeansAssessmentOrchestrationServiceTest {
     }
 
     @Test
-    void givenARequestWithC3Enabled_whenCreateIsInvoked_thenApplicationDTOIsUpdatedWithContribution() {
+    void givenValidRequest_whenCreateIsInvoked_thenApplicationDTOIsUpdatedWithContribution() {
         when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTO);
         when(maatCourtDataService.invokeStoredProcedure(
                         any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
                 .thenReturn(applicationDTO);
-        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
         when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
         ApplicationDTO actual = orchestrationService.create(workflowRequest);
 
@@ -139,39 +138,11 @@ class MeansAssessmentOrchestrationServiceTest {
     }
 
     @Test
-    void givenARequestWithC3NotEnabled_whenCreateIsInvoked_thenCalculationContributionIsNotCalled() {
-        when(maatCourtDataService.invokeStoredProcedure(
-                        any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
-                .thenReturn(workflowRequest.getApplicationDTO());
-
-        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(false);
-        when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
-        orchestrationService.create(workflowRequest);
-        verify(meansAssessmentService).create(workflowRequest);
-        verify(contributionService, times(0)).calculate(workflowRequest);
-        verify(maatCourtDataService)
-                .invokeStoredProcedure(
-                        workflowRequest.getApplicationDTO(),
-                        workflowRequest.getUserDTO(),
-                        StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1);
-
-        verify(proceedingsService, times(1)).updateApplication(workflowRequest, repOrderDTO);
-        verify(maatCourtDataService)
-                .invokeStoredProcedure(
-                        workflowRequest.getApplicationDTO(),
-                        workflowRequest.getUserDTO(),
-                        StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2);
-        verify(assessmentSummaryService, times(1)).getSummary(any(FinancialAssessmentDTO.class));
-        verify(applicationService).updateDateModified(eq(workflowRequest), any());
-    }
-
-    @Test
-    void givenARequestWithC3Enabled_whenUpdateIsInvoked_thenApplicationDTOIsUpdatedWithContribution() {
+    void givenValidRequest_whenUpdateIsInvoked_thenApplicationDTOIsUpdatedWithContribution() {
         when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTO);
         when(maatCourtDataService.invokeStoredProcedure(
                         any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
                 .thenReturn(applicationDTO);
-        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
         when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
 
         ApplicationDTO actual = orchestrationService.update(workflowRequest);
@@ -196,39 +167,11 @@ class MeansAssessmentOrchestrationServiceTest {
     }
 
     @Test
-    void givenARequestWithC3NotEnabled_whenUpdateIsInvoked_thenCalculationContributionIsNotCalled() {
-        when(maatCourtDataService.invokeStoredProcedure(
-                        any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
-                .thenReturn(workflowRequest.getApplicationDTO());
-        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(false);
-        when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
-
-        orchestrationService.update(workflowRequest);
-        verify(meansAssessmentService).update(workflowRequest);
-        verify(contributionService, times(0)).calculate(workflowRequest);
-        verify(maatCourtDataService)
-                .invokeStoredProcedure(
-                        workflowRequest.getApplicationDTO(),
-                        workflowRequest.getUserDTO(),
-                        StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1);
-
-        verify(proceedingsService, times(1)).updateApplication(workflowRequest, repOrderDTO);
-        verify(maatCourtDataService)
-                .invokeStoredProcedure(
-                        workflowRequest.getApplicationDTO(),
-                        workflowRequest.getUserDTO(),
-                        StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2);
-        verify(assessmentSummaryService, times(1)).getSummary(any(FinancialAssessmentDTO.class));
-        verify(applicationService).updateDateModified(eq(workflowRequest), any());
-    }
-
-    @Test
-    void givenC3EnabledAndPostProcessingNotEnabled_whenUpdateIsInvoked_thenWorkflowPreProcessorServiceIsNotCalled() {
+    void givenPostProcessingNotEnabled_whenUpdateIsInvoked_thenWorkflowPreProcessorServiceIsNotCalled() {
         when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTO);
         when(maatCourtDataService.invokeStoredProcedure(
                         any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
                 .thenReturn(applicationDTO);
-        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
         when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest))
                 .thenReturn(false);
 
@@ -242,11 +185,10 @@ class MeansAssessmentOrchestrationServiceTest {
     }
 
     @Test
-    void givenC3AndPostProcessingEnabled_whenUpdateIsInvoked_thenWorkflowPreProcessorServiceIsCalled() {
+    void givenPostProcessingEnabled_whenUpdateIsInvoked_thenWorkflowPreProcessorServiceIsCalled() {
         when(maatCourtDataService.invokeStoredProcedure(
                         any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
                 .thenReturn(workflowRequest.getApplicationDTO());
-        when(featureDecisionService.isC3Enabled(workflowRequest)).thenReturn(true);
         when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest))
                 .thenReturn(true);
 
@@ -303,12 +245,12 @@ class MeansAssessmentOrchestrationServiceTest {
         ApplicationDTO applicationSpy = spy(workflowRequest.getApplicationDTO());
         workflowRequest.setApplicationDTO(applicationSpy);
 
+        when(contributionService.calculate(workflowRequest)).thenReturn(workflowRequest.getApplicationDTO());
         when(maatCourtDataService.invokeStoredProcedure(
                         any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
                 .thenAnswer(invocation -> {
                     StoredProcedure procedure = invocation.getArgument(2);
-                    if (procedure == StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1
-                            || procedure == StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3) {
+                    if (procedure == StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3) {
                         workflowRequest.getApplicationDTO().setAlertMessage(WRN_MSG_REASSESSMENT);
                     }
                     return workflowRequest.getApplicationDTO();
@@ -331,12 +273,12 @@ class MeansAssessmentOrchestrationServiceTest {
         ApplicationDTO applicationSpy = spy(workflowRequest.getApplicationDTO());
         workflowRequest.setApplicationDTO(applicationSpy);
 
+        when(contributionService.calculate(workflowRequest)).thenReturn(workflowRequest.getApplicationDTO());
         when(maatCourtDataService.invokeStoredProcedure(
                         any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
                 .thenAnswer(invocation -> {
                     StoredProcedure procedure = invocation.getArgument(2);
-                    if (procedure == StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1
-                            || procedure == StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3) {
+                    if (procedure == StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3) {
                         workflowRequest.getApplicationDTO().setAlertMessage(WRN_MSG_INCOMPLETE_ASSESSMENT);
                     }
                     return workflowRequest.getApplicationDTO();
@@ -357,11 +299,14 @@ class MeansAssessmentOrchestrationServiceTest {
     void givenSuccessfulPostAssessmentProcessing_whenCreateIsInvoked_thenRollbackIsNotInvoked() {
         workflowRequest.getApplicationDTO().setAlertMessage(MOCK_ALERT);
 
+        when(contributionService.calculate(workflowRequest)).thenReturn(workflowRequest.getApplicationDTO());
         when(maatCourtDataService.invokeStoredProcedure(
                         any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
                 .thenReturn(workflowRequest.getApplicationDTO());
         when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
+
         orchestrationService.create(workflowRequest);
+
         verify(proceedingsService, times(1)).updateApplication(workflowRequest, repOrderDTO);
         verify(meansAssessmentService, times(0)).rollback(any());
         verify(applicationService).updateDateModified(eq(workflowRequest), any());

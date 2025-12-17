@@ -19,17 +19,6 @@ public class FeatureDecisionService {
     }
 
     /**
-     * Returns whether the CCC Service is enabled based on whether the user has the requisite
-     * feature flag (CurrentFeatureToggles.CALCULATE_CONTRIBUTION) and action (Create) in their
-     * user summary information.
-     * @param workflowRequest The workflow request to check against.
-     * @return A boolean describing whether C3 should be invoked for the user's request.
-     */
-    public boolean isC3Enabled(WorkflowRequest workflowRequest) {
-        return isFeatureEnabled(workflowRequest, FeatureToggle.CALCULATE_CONTRIBUTION, FeatureToggleAction.CREATE);
-    }
-
-    /**
      * Returns whether the MAAT post-assessment processing flow is enabled based on whether the user
      * has the requisite feature flag (CurrentFeatureToggles.MAAT_POST_ASSESSMENT_PROCESSING) and action
      * (Read) in their user summary information.

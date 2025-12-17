@@ -75,11 +75,8 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.ReviewTypeDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.SysGenDate;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.SysGenString;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FeatureToggleDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
-import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggle;
-import uk.gov.justice.laa.crime.orchestration.enums.FeatureToggleAction;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -411,13 +408,7 @@ public class MeansAssessmentDataBuilder {
     }
 
     public static UserSummaryDTO getUserSummaryDTO() {
-        return UserSummaryDTO.builder()
-                .featureToggle(List.of(FeatureToggleDTO.builder()
-                        .featureName(FeatureToggle.CALCULATE_CONTRIBUTION.getName())
-                        .action(FeatureToggleAction.CREATE.getName())
-                        .isEnabled("Y")
-                        .build()))
-                .build();
+        return UserSummaryDTO.builder().build();
     }
 
     public static RepOrderDTO getRepOrderDTO() {
