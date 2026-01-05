@@ -51,7 +51,7 @@
                 <maskPattern>otherText=([^,]+)</maskPattern>
                 <maskPattern>capitalNote=([^,]+)</maskPattern>
                 <maskPattern>iojResultNote=([^,]+)</maskPattern>
-                <pattern>%d{HH:mm:ss.SSS} traceId: %X{traceId:-} spanId: %X{spanId:-} [%thread] %-5level %logger{36} - %msg%n</pattern>
+                <pattern>%d{HH:mm:ss.SSS} traceId: %X{traceId:-} spanId: %X{spanId:-} [%thread] %-5level %logger{36} - %replace(%msg){'[\r\n]+', '|'}%n</pattern>
             </layout>
         </encoder>
     </appender>
