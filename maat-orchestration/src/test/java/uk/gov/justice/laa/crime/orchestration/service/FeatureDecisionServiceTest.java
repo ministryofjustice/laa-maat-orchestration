@@ -29,12 +29,11 @@ class FeatureDecisionServiceTest {
     @Mock
     private MaatCourtDataService maatCourtDataService;
 
-    private static final String IS_C3_ENABLED_METHOD_NAME = "isC3Enabled";
     private static final String IS_MAAT_POST_ASSESSMENT_PROCESSING_ENABLED_METHOD_NAME =
             "isMaatPostAssessmentProcessingEnabled";
 
     @ParameterizedTest
-    @ValueSource(strings = {IS_C3_ENABLED_METHOD_NAME, IS_MAAT_POST_ASSESSMENT_PROCESSING_ENABLED_METHOD_NAME})
+    @ValueSource(strings = {IS_MAAT_POST_ASSESSMENT_PROCESSING_ENABLED_METHOD_NAME})
     void givenUserDoesNotHaveFeatureToggle_whenFeatureToggleMethodIsInvoked_thenReturnFalse(String methodName)
             throws Exception {
         when(maatCourtDataService.getUserSummary(Constants.USERNAME)).thenReturn(new UserSummaryDTO());
@@ -105,28 +104,14 @@ class FeatureDecisionServiceTest {
     }
 
     private static Stream<Arguments> userHasFeatureToggleButWithoutRequiredAction() {
-        return Stream.of(
-                Arguments.of(IS_C3_ENABLED_METHOD_NAME, FeatureToggle.CALCULATE_CONTRIBUTION, FeatureToggleAction.READ),
-                Arguments.of(
-                        IS_MAAT_POST_ASSESSMENT_PROCESSING_ENABLED_METHOD_NAME,
-                        FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING,
-                        FeatureToggleAction.CREATE));
+        return Stream.of(Arguments.of(
+                IS_MAAT_POST_ASSESSMENT_PROCESSING_ENABLED_METHOD_NAME,
+                FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING,
+                FeatureToggleAction.CREATE));
     }
 
     private static Stream<Arguments> userHasFeatureToggleWithRequiredAction() {
         return Stream.of(
-                Arguments.of(
-                        IS_C3_ENABLED_METHOD_NAME,
-                        FeatureToggle.CALCULATE_CONTRIBUTION,
-                        FeatureToggleAction.CREATE,
-                        "Y",
-                        true),
-                Arguments.of(
-                        IS_C3_ENABLED_METHOD_NAME,
-                        FeatureToggle.CALCULATE_CONTRIBUTION,
-                        FeatureToggleAction.CREATE,
-                        "N",
-                        false),
                 Arguments.of(
                         IS_MAAT_POST_ASSESSMENT_PROCESSING_ENABLED_METHOD_NAME,
                         FeatureToggle.MAAT_POST_ASSESSMENT_PROCESSING,

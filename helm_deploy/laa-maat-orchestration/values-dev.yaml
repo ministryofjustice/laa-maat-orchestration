@@ -115,7 +115,7 @@ actuator:
     failureThreshold: 5
 
 logging:
-  level: DEBUG
+  level: INFO
 
 securityContext:
   allowPrivilegeEscalation: false
