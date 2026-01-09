@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -13,6 +14,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_INCOMPLETE_ASSESSMENT;
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_REASSESSMENT;
 
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
@@ -25,12 +27,15 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
+import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
+import uk.gov.justice.laa.crime.orchestration.service.ApplicationTrackingDataService;
 import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
 import uk.gov.justice.laa.crime.orchestration.service.CCLFUpdateService;
 import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
 import uk.gov.justice.laa.crime.orchestration.service.FeatureDecisionService;
+import uk.gov.justice.laa.crime.orchestration.service.IncomeEvidenceService;
 import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
 import uk.gov.justice.laa.crime.orchestration.service.MeansAssessmentService;
 import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
@@ -71,6 +76,9 @@ class MeansAssessmentOrchestrationServiceTest {
     private AssessmentSummaryService assessmentSummaryService;
 
     @Mock
+    private ApplicationTrackingMapper applicationTrackingMapper;
+
+    @Mock
     private MeansAssessmentMapper meansAssessmentMapper;
 
     @Mock
@@ -87,6 +95,12 @@ class MeansAssessmentOrchestrationServiceTest {
 
     @Mock
     private MaatCourtDataApiService maatCourtDataApiService;
+
+    @Mock
+    private IncomeEvidenceService incomeEvidenceService;
+
+    @Mock
+    private ApplicationTrackingDataService applicationTrackingDataService;
 
     @InjectMocks
     private MeansAssessmentOrchestrationService orchestrationService;
@@ -167,7 +181,57 @@ class MeansAssessmentOrchestrationServiceTest {
     }
 
     @Test
-    void givenPostProcessingNotEnabled_whenUpdateIsInvoked_thenWorkflowPreProcessorServiceIsNotCalled() {
+    void givenPostProcessingNotEnabled_whenCreatedIsInvoked_thenPostProcessingWorkflowIsNotInvoked() {
+        when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTO);
+        when(maatCourtDataService.invokeStoredProcedure(
+                        any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
+                .thenReturn(applicationDTO);
+        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest))
+                .thenReturn(false);
+
+        orchestrationService.create(workflowRequest);
+
+        verify(maatCourtDataService)
+                .invokeStoredProcedure(
+                        applicationDTO, workflowRequest.getUserDTO(), StoredProcedure.PRE_UPDATE_CC_APPLICATION);
+
+        verify(workflowPreProcessorService, never()).preProcessRequest(any(), any(), any());
+        verify(incomeEvidenceService, never()).createEvidence(any(), any());
+        verify(proceedingsService, never()).determineMagsRepDecision(any());
+        verify(applicationTrackingDataService, never()).sendTrackingOutputResult(any());
+
+        verify(applicationService).updateDateModified(eq(workflowRequest), any());
+    }
+
+    @Test
+    void givenPostProcessingEnabled_whenCreatedIsInvoked_thenPostProcessingWorkflowIsInvoked() {
+        when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTO);
+        when(maatCourtDataService.invokeStoredProcedure(
+                        any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
+                .thenReturn(workflowRequest.getApplicationDTO());
+        when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest))
+                .thenReturn(true);
+        when(applicationTrackingMapper.build(any(), any()))
+                .thenReturn(new ApplicationTrackingOutputResult().withUsn(123));
+
+        orchestrationService.create(workflowRequest);
+        verify(maatCourtDataService, never())
+                .invokeStoredProcedure(
+                        workflowRequest.getApplicationDTO(),
+                        workflowRequest.getUserDTO(),
+                        StoredProcedure.PRE_UPDATE_CC_APPLICATION);
+        verify(workflowPreProcessorService).preProcessRequest(any(), any(), any());
+
+        verify(incomeEvidenceService, times(1)).createEvidence(any(), any());
+        verify(proceedingsService, times(1)).determineMagsRepDecision(any());
+        verify(contributionService, times(1)).calculate(any());
+        verify(applicationTrackingDataService, times(1)).sendTrackingOutputResult(any());
+
+        verify(applicationService).updateDateModified(eq(workflowRequest), any());
+    }
+
+    @Test
+    void givenPostProcessingNotEnabled_whenUpdateIsInvoked_thenPostProcessingWorkflowIsNotInvoked() {
         when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTO);
         when(maatCourtDataService.invokeStoredProcedure(
                         any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
@@ -180,25 +244,39 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(maatCourtDataService)
                 .invokeStoredProcedure(
                         applicationDTO, workflowRequest.getUserDTO(), StoredProcedure.PRE_UPDATE_CC_APPLICATION);
-        verify(workflowPreProcessorService, times(0)).preProcessRequest(any(), any(), any());
+
+        verify(workflowPreProcessorService, never()).preProcessRequest(any(), any(), any());
+        verify(incomeEvidenceService, never()).createEvidence(any(), any());
+        verify(proceedingsService, never()).determineMagsRepDecision(any());
+        verify(applicationTrackingDataService, never()).sendTrackingOutputResult(any());
+
         verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
-    void givenPostProcessingEnabled_whenUpdateIsInvoked_thenWorkflowPreProcessorServiceIsCalled() {
+    void givenPostProcessingEnabled_whenUpdateIsInvoked_thenPostProcessingWorkflowIsInvoked() {
+        when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTO);
         when(maatCourtDataService.invokeStoredProcedure(
                         any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
                 .thenReturn(workflowRequest.getApplicationDTO());
         when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest))
                 .thenReturn(true);
+        when(applicationTrackingMapper.build(any(), any()))
+                .thenReturn(new ApplicationTrackingOutputResult().withUsn(123));
 
         orchestrationService.update(workflowRequest);
-        verify(maatCourtDataService, times(0))
+        verify(maatCourtDataService, never())
                 .invokeStoredProcedure(
                         workflowRequest.getApplicationDTO(),
                         workflowRequest.getUserDTO(),
                         StoredProcedure.PRE_UPDATE_CC_APPLICATION);
         verify(workflowPreProcessorService).preProcessRequest(any(), any(), any());
+
+        verify(incomeEvidenceService, never()).createEvidence(any(), any());
+        verify(proceedingsService, times(1)).determineMagsRepDecision(any());
+        verify(contributionService, times(1)).calculate(any());
+        verify(applicationTrackingDataService, times(1)).sendTrackingOutputResult(any());
+
         verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 
