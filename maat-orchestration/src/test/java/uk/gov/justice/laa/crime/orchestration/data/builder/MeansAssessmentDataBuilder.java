@@ -186,31 +186,16 @@ public class MeansAssessmentDataBuilder {
     public static WorkflowRequest buildWorkFlowRequest() {
         return WorkflowRequest.builder()
                 .userDTO(getUserDTO())
-                .applicationDTO(getApplicationDTO())
+                .applicationDTO(getApplicationDTO(true))
                 .build();
     }
 
     public static ApplicationDTO getApplicationDTO() {
-        return ApplicationDTO.builder()
-                .repId(REP_ID.longValue())
-                .dateReceived(Date.from(
-                        DATETIME_RECEIVED.atZone(ZoneId.systemDefault()).toInstant()))
-                .committalDate(Date.from(
-                        COMMITTAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
-                .decisionDate(Date.from(
-                        DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
-                .applicantDTO(getApplicantDTO())
-                .assessmentDTO(getAssessmentDTO())
-                .crownCourtOverviewDTO(getCrownCourtOverviewDTOForContribution())
-                .caseDetailsDTO(getCaseDetailDTO())
-                .caseManagementUnitDTO(getCaseManagementUnitDTO())
-                .offenceDTO(getOffenceDTO())
-                .statusDTO(getRepStatusDTO())
-                .magsOutcomeDTO(getOutcomeDTO(CourtType.MAGISTRATE))
-                .passportedDTO(getPassportedDTO())
-                .repOrderDecision(getRepOrderDecisionDTO())
-                .iojResult(RESULT_PASS)
-                .build();
+        return getApplicationDTO(false);
+    }
+
+    public static ApplicationDTO getApplicationDTOWithUpdateAllowed() {
+        return getApplicationDTO(true);
     }
 
     public static ApplicantDTO getApplicantDTO() {
@@ -423,6 +408,31 @@ public class MeansAssessmentDataBuilder {
                 .decisionReasonCode("rder-code")
                 .crownRepOrderDecision("cc-rep-doc")
                 .crownRepOrderType("cc-rep-type")
+                .userCreatedEntity(
+                        UserDTO.builder().firstName("Mock").surname("User").build())
+                .build();
+    }
+
+    private static ApplicationDTO getApplicationDTO(boolean updateAllowed) {
+        return ApplicationDTO.builder()
+                .repId(REP_ID.longValue())
+                .dateReceived(Date.from(
+                        DATETIME_RECEIVED.atZone(ZoneId.systemDefault()).toInstant()))
+                .committalDate(Date.from(
+                        COMMITTAL_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .decisionDate(Date.from(
+                        DECISION_DATETIME.atZone(ZoneId.systemDefault()).toInstant()))
+                .applicantDTO(getApplicantDTO())
+                .assessmentDTO(getAssessmentDTO())
+                .crownCourtOverviewDTO(getCrownCourtOverviewDTOForContribution())
+                .caseDetailsDTO(getCaseDetailDTO())
+                .caseManagementUnitDTO(getCaseManagementUnitDTO())
+                .offenceDTO(getOffenceDTO())
+                .statusDTO(getRepStatusDTO(updateAllowed))
+                .magsOutcomeDTO(getOutcomeDTO(CourtType.MAGISTRATE))
+                .passportedDTO(getPassportedDTO())
+                .repOrderDecision(getRepOrderDecisionDTO())
+                .iojResult(RESULT_PASS)
                 .build();
     }
 
@@ -530,8 +540,12 @@ public class MeansAssessmentDataBuilder {
                 .build();
     }
 
-    private static RepStatusDTO getRepStatusDTO() {
-        return RepStatusDTO.builder().status("RepStatus").removeContribs(true).build();
+    private static RepStatusDTO getRepStatusDTO(boolean updateAllowed) {
+        return RepStatusDTO.builder()
+                .status("RepStatus")
+                .removeContribs(true)
+                .updateAllowed(updateAllowed)
+                .build();
     }
 
     public static ApiGetMeansAssessmentResponse getApiGetMeansAssessmentResponse() {
