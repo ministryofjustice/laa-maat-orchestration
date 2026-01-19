@@ -37,6 +37,7 @@ import uk.gov.justice.laa.crime.common.model.ioj.IojAppealMetadata;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentChildWeighting;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentDetail;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.FinancialAssessmentIncomeEvidence;
+import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCapitalEvidence;
 import uk.gov.justice.laa.crime.common.model.proceeding.common.ApiCrownCourtSummary;
@@ -47,6 +48,7 @@ import uk.gov.justice.laa.crime.common.model.proceeding.request.ApiUpdateCrownCo
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMagsRepDecisionResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.dto.ErrorDTO;
 import uk.gov.justice.laa.crime.enums.AppealType;
 import uk.gov.justice.laa.crime.enums.AssessmentType;
@@ -179,6 +181,7 @@ public class TestModelDataBuilder {
     public static final LocalDate ALL_EVIDENCE_RECEIVED_DATE = LocalDate.of(2024, 12, 18);
     public static final LocalDate UPLIFT_APPLIED_DATE = LocalDate.of(2025, 1, 18);
     public static final LocalDate UPLIFT_REMOVED_DATE = LocalDate.of(2025, 1, 21);
+    public static final Integer USN = 123456789;
     private static final Integer APPLICANT_EVIDENCE_ID = 9552473;
     private static final Integer PARTNER_EVIDENCE_ID = 9552474;
     private static final Integer EXTRA_EVIDENCE_ID = 9552475;
@@ -564,6 +567,10 @@ public class TestModelDataBuilder {
             }
         });
         return details;
+    }
+
+    public static ApplicationTrackingOutputResult getApplicationTrackingOutputResult() {
+        return new ApplicationTrackingOutputResult().withUsn(1);
     }
 
     public static AssessmentSummaryDTO getAssessmentSummaryDTO() {
@@ -971,6 +978,7 @@ public class TestModelDataBuilder {
     private static FinancialAssessmentDTO getFinancialAssessmentDTO(CourtType courtType) {
         return FinancialAssessmentDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID)
+                .usn(USN.longValue())
                 .full(getFullAssessmentDTO())
                 .fullAvailable(Boolean.TRUE)
                 .initial(getInitialAssessmentDTO())
@@ -1611,6 +1619,14 @@ public class TestModelDataBuilder {
                         .withApplicantDetails(getApplicantDetails(true))
                         .withIncomeEvidenceItems(
                                 List.of(getIncomeEvidence(PARTNER_EVIDENCE_ID, IncomeEvidenceType.TAX_RETURN))));
+    }
+
+    public static MaatApiAssessmentResponse getMaatApiAssessmentResponse() {
+        MaatApiAssessmentResponse response = new MaatApiAssessmentResponse();
+        response.setId(REP_ID);
+        response.setFinAssIncomeEvidences(Collections.emptyList());
+
+        return response;
     }
 
     public static ApiUpdateIncomeEvidenceResponse getUpdateIncomeEvidenceResponse(
