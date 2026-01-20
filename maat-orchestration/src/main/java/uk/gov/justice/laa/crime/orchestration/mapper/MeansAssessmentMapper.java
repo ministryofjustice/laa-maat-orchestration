@@ -64,6 +64,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -259,7 +260,7 @@ public class MeansAssessmentMapper {
 
     private boolean isPartnerContraryInterest(ApplicationDTO application) {
         return application.getPartnerContraryInterestDTO() != null
-                && !StringUtils.equals(
+                && !Strings.CI.equals(
                         ContraryInterestDTO.NO_CONTRARY_INTEREST,
                         application.getPartnerContraryInterestDTO().getCode());
     }
