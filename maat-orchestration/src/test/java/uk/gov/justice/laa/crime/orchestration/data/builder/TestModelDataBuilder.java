@@ -837,7 +837,7 @@ public class TestModelDataBuilder {
 
         return AssessmentSummaryDTO.builder()
                 .id(LEGACY_APPEAL_ID)
-                .status(CurrentStatus.COMPLETE.getStatus())
+                .status(CurrentStatus.COMPLETE.getDescription())
                 .type(AssessmentSummaryType.IOJ_APPEAL.getName())
                 .result(RESULT_PASS)
                 .assessmentDate(receivedDate)
