@@ -107,12 +107,12 @@ public class ContributionMapper extends CrownCourtMapper {
                                         financialAssessmentDTO.getFull().getTotalAnnualDisposableIncome())
                                 : null);
 
-        if (hardshipOverviewDTO.getCrownCourtHardship() != null) {
+        if (hardshipOverviewDTO != null && hardshipOverviewDTO.getCrownCourtHardship() != null) {
             request.withDisposableIncomeAfterCrownHardship(
                     hardshipOverviewDTO.getCrownCourtHardship().getDisposableIncomeAfterHardship());
         }
 
-        if (hardshipOverviewDTO.getMagCourtHardship() != null) {
+        if (hardshipOverviewDTO != null && hardshipOverviewDTO.getMagCourtHardship() != null) {
             request.withDisposableIncomeAfterMagHardship(
                     hardshipOverviewDTO.getMagCourtHardship().getDisposableIncomeAfterHardship());
         }
@@ -124,16 +124,23 @@ public class ContributionMapper extends CrownCourtMapper {
         FinancialAssessmentDTO financialAssessmentDTO =
                 application.getAssessmentDTO().getFinancialAssessmentDTO();
         InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
-        log.info("applicationDtoToAssessments.initialAssessmentDTO.status-->"
-                + initialAssessmentDTO.getAssessmnentStatusDTO().getStatus());
-        assessmentList.add(new ApiAssessment()
-                .withAssessmentType(AssessmentType.INIT)
-                .withResult(AssessmentResult.getFrom(initialAssessmentDTO.getResult()))
-                .withAssessmentDate(toLocalDateTime(initialAssessmentDTO.getAssessmentDate()))
-                .withNewWorkReason(NewWorkReason.getFrom(
-                        initialAssessmentDTO.getNewWorkReason().getCode()))
-                .withStatus(CurrentStatus.getFrom(
-                        initialAssessmentDTO.getAssessmnentStatusDTO().getStatus())));
+
+        if (initialAssessmentDTO != null
+                && null != initialAssessmentDTO.getAssessmnentStatusDTO()
+                && StringUtils.isNotBlank(
+                        initialAssessmentDTO.getAssessmnentStatusDTO().getStatus())
+                && StringUtils.isNotBlank(initialAssessmentDTO.getResult())) {
+            log.info("applicationDtoToAssessments.initialAssessmentDTO.status-->"
+                    + initialAssessmentDTO.getAssessmnentStatusDTO().getStatus());
+            assessmentList.add(new ApiAssessment()
+                    .withAssessmentType(AssessmentType.INIT)
+                    .withResult(AssessmentResult.getFrom(initialAssessmentDTO.getResult()))
+                    .withAssessmentDate(toLocalDateTime(initialAssessmentDTO.getAssessmentDate()))
+                    .withNewWorkReason(NewWorkReason.getFrom(
+                            initialAssessmentDTO.getNewWorkReason().getCode()))
+                    .withStatus(CurrentStatus.getFrom(
+                            initialAssessmentDTO.getAssessmnentStatusDTO().getStatus())));
+        }
 
         FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
         log.info("applicationDtoToAssessments.fullAssessmentDTO-->" + fullAssessmentDTO);
@@ -155,7 +162,7 @@ public class ContributionMapper extends CrownCourtMapper {
         }
 
         PassportedDTO passported = application.getPassportedDTO();
-        if (passported.getPassportedId() != null) {
+        if (passported != null && passported.getPassportedId() != null) {
             log.info("applicationDtoToAssessments.passported.status-->"
                     + passported.getAssessementStatusDTO().getStatus());
             assessmentList.add(new ApiAssessment()
