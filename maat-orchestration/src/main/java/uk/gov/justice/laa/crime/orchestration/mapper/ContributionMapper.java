@@ -137,7 +137,7 @@ public class ContributionMapper extends CrownCourtMapper {
                 initialAssessmentDTO.map(InitialAssessmentDTO::getResult).filter(StringUtils::isNotBlank);
 
         if (initialStatus.isPresent() && initialResult.isPresent()) {
-            log.info("applicationDtoToAssessments.initialAssessmentDTO.status-->" + initialStatus.get());
+            log.info("applicationDtoToAssessments.initialAssessmentDTO.status-->{}", initialStatus.get());
             assessmentList.add(new ApiAssessment()
                     .withAssessmentType(AssessmentType.INIT)
                     .withResult(AssessmentResult.getFrom(initialResult.get()))
@@ -160,7 +160,7 @@ public class ContributionMapper extends CrownCourtMapper {
                 fullAssessmentDTO.map(FullAssessmentDTO::getResult).filter(StringUtils::isNotBlank);
 
         if (fullStatus.isPresent() && fullResult.isPresent()) {
-            log.info("applicationDtoToAssessments.fullAssessmentDTO.status-->" + fullStatus.get());
+            log.info("applicationDtoToAssessments.fullAssessmentDTO.status-->{}", fullStatus.get());
             assessmentList.add(new ApiAssessment()
                     .withAssessmentType(AssessmentType.FULL)
                     .withResult(AssessmentResult.getFrom(fullResult.get()))
