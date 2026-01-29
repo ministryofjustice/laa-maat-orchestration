@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
 import static uk.gov.justice.laa.crime.util.DateUtil.toLocalDateTime;
 
@@ -19,6 +20,7 @@ import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.contribution.AssessmentType;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentStatusDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtOverviewDTO;
@@ -29,6 +31,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipOverviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IncomeEvidenceSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.NewWorkReasonDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.SysGenDate;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.SysGenString;
@@ -40,6 +43,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -107,12 +111,12 @@ public class ContributionMapper extends CrownCourtMapper {
                                         financialAssessmentDTO.getFull().getTotalAnnualDisposableIncome())
                                 : null);
 
-        if (hardshipOverviewDTO.getCrownCourtHardship() != null) {
+        if (hardshipOverviewDTO != null && hardshipOverviewDTO.getCrownCourtHardship() != null) {
             request.withDisposableIncomeAfterCrownHardship(
                     hardshipOverviewDTO.getCrownCourtHardship().getDisposableIncomeAfterHardship());
         }
 
-        if (hardshipOverviewDTO.getMagCourtHardship() != null) {
+        if (hardshipOverviewDTO != null && hardshipOverviewDTO.getMagCourtHardship() != null) {
             request.withDisposableIncomeAfterMagHardship(
                     hardshipOverviewDTO.getMagCourtHardship().getDisposableIncomeAfterHardship());
         }
@@ -123,39 +127,55 @@ public class ContributionMapper extends CrownCourtMapper {
         List<ApiAssessment> assessmentList = new ArrayList<>();
         FinancialAssessmentDTO financialAssessmentDTO =
                 application.getAssessmentDTO().getFinancialAssessmentDTO();
-        InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
-        log.info("applicationDtoToAssessments.initialAssessmentDTO.status-->"
-                + initialAssessmentDTO.getAssessmnentStatusDTO().getStatus());
-        assessmentList.add(new ApiAssessment()
-                .withAssessmentType(AssessmentType.INIT)
-                .withResult(AssessmentResult.getFrom(initialAssessmentDTO.getResult()))
-                .withAssessmentDate(toLocalDateTime(initialAssessmentDTO.getAssessmentDate()))
-                .withNewWorkReason(NewWorkReason.getFrom(
-                        initialAssessmentDTO.getNewWorkReason().getCode()))
-                .withStatus(CurrentStatus.getFrom(
-                        initialAssessmentDTO.getAssessmnentStatusDTO().getStatus())));
 
-        FullAssessmentDTO fullAssessmentDTO = financialAssessmentDTO.getFull();
-        log.info("applicationDtoToAssessments.fullAssessmentDTO-->" + fullAssessmentDTO);
-        if (null != fullAssessmentDTO
-                && null != fullAssessmentDTO.getAssessmnentStatusDTO()
-                && StringUtils.isNotBlank(
-                        fullAssessmentDTO.getAssessmnentStatusDTO().getStatus())
-                && StringUtils.isNotBlank(fullAssessmentDTO.getResult())) {
-            log.info("applicationDtoToAssessments.fullAssessmentDTO.status-->"
-                    + fullAssessmentDTO.getAssessmnentStatusDTO().getStatus());
+        Optional<InitialAssessmentDTO> initialAssessmentDTO = ofNullable(financialAssessmentDTO.getInitial());
+        Optional<String> initialStatus = initialAssessmentDTO
+                .map(InitialAssessmentDTO::getAssessmnentStatusDTO)
+                .map(AssessmentStatusDTO::getStatus)
+                .filter(StringUtils::isNotBlank);
+        Optional<String> initialResult =
+                initialAssessmentDTO.map(InitialAssessmentDTO::getResult).filter(StringUtils::isNotBlank);
+
+        if (initialStatus.isPresent() && initialResult.isPresent()) {
+            log.info("applicationDtoToAssessments.initialAssessmentDTO.status-->{}", initialStatus.get());
+            assessmentList.add(new ApiAssessment()
+                    .withAssessmentType(AssessmentType.INIT)
+                    .withResult(AssessmentResult.getFrom(initialResult.get()))
+                    .withAssessmentDate(toLocalDateTime(initialAssessmentDTO
+                            .map(InitialAssessmentDTO::getAssessmentDate)
+                            .orElse(null)))
+                    .withNewWorkReason(NewWorkReason.getFrom(initialAssessmentDTO
+                            .map(InitialAssessmentDTO::getNewWorkReason)
+                            .map(NewWorkReasonDTO::getCode)
+                            .orElse(null)))
+                    .withStatus(CurrentStatus.getFrom(initialStatus.get())));
+        }
+
+        Optional<FullAssessmentDTO> fullAssessmentDTO = ofNullable(financialAssessmentDTO.getFull());
+        Optional<String> fullStatus = fullAssessmentDTO
+                .map(FullAssessmentDTO::getAssessmnentStatusDTO)
+                .map(AssessmentStatusDTO::getStatus)
+                .filter(StringUtils::isNotBlank);
+        Optional<String> fullResult =
+                fullAssessmentDTO.map(FullAssessmentDTO::getResult).filter(StringUtils::isNotBlank);
+
+        if (fullStatus.isPresent() && fullResult.isPresent()) {
+            log.info("applicationDtoToAssessments.fullAssessmentDTO.status-->{}", fullStatus.get());
             assessmentList.add(new ApiAssessment()
                     .withAssessmentType(AssessmentType.FULL)
-                    .withResult(AssessmentResult.getFrom(fullAssessmentDTO.getResult()))
-                    .withAssessmentDate(toLocalDateTime(fullAssessmentDTO.getAssessmentDate()))
-                    .withNewWorkReason(NewWorkReason.getFrom(
-                            initialAssessmentDTO.getNewWorkReason().getCode()))
-                    .withStatus(CurrentStatus.getFrom(
-                            fullAssessmentDTO.getAssessmnentStatusDTO().getStatus())));
+                    .withResult(AssessmentResult.getFrom(fullResult.get()))
+                    .withAssessmentDate(toLocalDateTime(fullAssessmentDTO
+                            .map(FullAssessmentDTO::getAssessmentDate)
+                            .orElse(null)))
+                    .withNewWorkReason(NewWorkReason.getFrom(initialAssessmentDTO
+                            .map(InitialAssessmentDTO::getNewWorkReason)
+                            .map(NewWorkReasonDTO::getCode)
+                            .orElse(null)))
+                    .withStatus(CurrentStatus.getFrom(fullStatus.get())));
         }
 
         PassportedDTO passported = application.getPassportedDTO();
-        if (passported.getPassportedId() != null) {
+        if (passported != null && passported.getPassportedId() != null) {
             log.info("applicationDtoToAssessments.passported.status-->"
                     + passported.getAssessementStatusDTO().getStatus());
             assessmentList.add(new ApiAssessment()

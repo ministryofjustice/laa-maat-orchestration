@@ -8,6 +8,7 @@ import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCalculateContri
 import uk.gov.justice.laa.crime.common.model.contribution.ApiMaatCheckContributionRuleRequest;
 import uk.gov.justice.laa.crime.common.model.contribution.common.ApiContributionSummary;
 import uk.gov.justice.laa.crime.enums.AppealType;
+import uk.gov.justice.laa.crime.enums.AssessmentType;
 import uk.gov.justice.laa.crime.enums.CaseType;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.MagCourtOutcome;
@@ -214,6 +215,129 @@ class ContributionMapperTest {
     void givenAEmptyContributionSummaries_whenContributionMapperIsInvoked_thenMappingIsCorrect() {
         Collection<ContributionSummaryDTO> contributionSummaryDTOS = contributionMapper.contributionSummaryToDto(null);
         softly.assertThat(contributionSummaryDTOS).isEmpty();
+        softly.assertAll();
+    }
+
+    @Test
+    void givenInitialAssessment_whenContributionMapperIsInvoked_thenMappingIsCorrect() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().setPassportedDTO(null);
+        workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .setFull(null);
+        workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .setHardship(null);
+
+        ApiMaatCalculateContributionRequest apiMaatCalculateContributionRequest =
+                contributionMapper.workflowRequestToMaatCalculateContributionRequest(workflowRequest);
+
+        softly.assertThat(apiMaatCalculateContributionRequest
+                        .getAssessments()
+                        .get(0)
+                        .getAssessmentType()
+                        .name())
+                .isEqualTo(AssessmentType.INIT.name());
+        softly.assertThat(apiMaatCalculateContributionRequest.getAssessments().size())
+                .isEqualTo(1);
+        softly.assertAll();
+    }
+
+    @Test
+    void givenInitialAndFullAssessment_whenContributionMapperIsInvoked_thenMappingIsCorrect() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().setPassportedDTO(null);
+        workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .setHardship(null);
+
+        ApiMaatCalculateContributionRequest apiMaatCalculateContributionRequest =
+                contributionMapper.workflowRequestToMaatCalculateContributionRequest(workflowRequest);
+
+        softly.assertThat(apiMaatCalculateContributionRequest
+                        .getAssessments()
+                        .get(0)
+                        .getAssessmentType()
+                        .name())
+                .isEqualTo(AssessmentType.INIT.name());
+        softly.assertThat(apiMaatCalculateContributionRequest
+                        .getAssessments()
+                        .get(1)
+                        .getAssessmentType()
+                        .name())
+                .isEqualTo(AssessmentType.FULL.name());
+        softly.assertThat(apiMaatCalculateContributionRequest.getAssessments().size())
+                .isEqualTo(2);
+        softly.assertAll();
+    }
+
+    @Test
+    void givenInitialFullAndHardshipAssessments_whenContributionMapperIsInvoked_thenMappingIsCorrect() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().setPassportedDTO(null);
+
+        ApiMaatCalculateContributionRequest apiMaatCalculateContributionRequest =
+                contributionMapper.workflowRequestToMaatCalculateContributionRequest(workflowRequest);
+
+        softly.assertThat(apiMaatCalculateContributionRequest
+                        .getAssessments()
+                        .get(0)
+                        .getAssessmentType()
+                        .name())
+                .isEqualTo(AssessmentType.INIT.name());
+        softly.assertThat(apiMaatCalculateContributionRequest
+                        .getAssessments()
+                        .get(1)
+                        .getAssessmentType()
+                        .name())
+                .isEqualTo(AssessmentType.FULL.name());
+        softly.assertThat(apiMaatCalculateContributionRequest
+                        .getAssessments()
+                        .get(2)
+                        .getAssessmentType()
+                        .name())
+                .isEqualTo(AssessmentType.HARDSHIP.name());
+        softly.assertThat(apiMaatCalculateContributionRequest.getAssessments().size())
+                .isEqualTo(3);
+        softly.assertAll();
+    }
+
+    @Test
+    void givenPassportedAssessment_whenContributionMapperIsInvoked_thenMappingIsCorrect() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .setInitial(null);
+        workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .setFull(null);
+        workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .setHardship(null);
+
+        ApiMaatCalculateContributionRequest apiMaatCalculateContributionRequest =
+                contributionMapper.workflowRequestToMaatCalculateContributionRequest(workflowRequest);
+
+        softly.assertThat(apiMaatCalculateContributionRequest
+                        .getAssessments()
+                        .get(0)
+                        .getAssessmentType()
+                        .name())
+                .isEqualTo(AssessmentType.PASSPORT.name());
+        softly.assertThat(apiMaatCalculateContributionRequest.getAssessments().size())
+                .isEqualTo(1);
         softly.assertAll();
     }
 }
