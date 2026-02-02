@@ -6,7 +6,6 @@ import uk.gov.justice.laa.crime.common.model.ioj.ApiGetIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.IojAppeal;
 import uk.gov.justice.laa.crime.common.model.ioj.IojAppealMetadata;
 import uk.gov.justice.laa.crime.enums.IojAppealAssessor;
-import uk.gov.justice.laa.crime.enums.IojAppealDecision;
 import uk.gov.justice.laa.crime.enums.IojAppealDecisionReason;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
@@ -16,6 +15,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJDecisionReasonDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.NewWorkReasonDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.IojAppealDecisionResult;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -56,7 +56,8 @@ public class IojAppealMapper {
         String appealSetUpResult = null;
 
         boolean appealSuccessful = Boolean.TRUE.equals(response.getAppealSuccessful());
-        String appealDecision = (appealSuccessful ? IojAppealDecision.PASS : IojAppealDecision.FAIL).toString();
+        String appealDecision =
+                (appealSuccessful ? IojAppealDecisionResult.PASS : IojAppealDecisionResult.FAIL).toString();
 
         if (response.getAppealAssessor().equals(IojAppealAssessor.CASEWORKER)) {
             if (appealSuccessful) {
@@ -114,7 +115,8 @@ public class IojAppealMapper {
                 .withAppealReason(
                         NewWorkReason.getFrom(iojAppealDto.getNewWorkReasonDTO().getCode()))
                 .withAppealAssessor(judicialReview ? IojAppealAssessor.JUDGE : IojAppealAssessor.CASEWORKER)
-                .withAppealSuccessful(IojAppealDecision.PASS.toString().equals(iojAppealDto.getAppealDecisionResult()))
+                .withAppealSuccessful(
+                        IojAppealDecisionResult.PASS.toString().equals(iojAppealDto.getAppealDecisionResult()))
                 .withDecisionReason(IojAppealDecisionReason.getFrom(
                         iojAppealDto.getAppealReason().getCode()))
                 .withNotes(iojAppealDto.getNotes())

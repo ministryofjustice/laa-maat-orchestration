@@ -2,12 +2,12 @@ package uk.gov.justice.laa.crime.orchestration.exception;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.justice.laa.crime.dto.ErrorDTO;
 import uk.gov.justice.laa.crime.exception.ValidationException;
-import uk.gov.justice.laa.crime.orchestration.dto.validation.ErrorDTO;
 import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,8 +44,7 @@ public class CrimeValidationExceptionHandler {
     @ExceptionHandler(CrimeValidationException.class)
     public ResponseEntity<ErrorDTO> handleCrimeValidationException(CrimeValidationException ex) {
         log.error("CrimeValidationException: ", ex);
-        return buildErrorResponse(
-                HttpStatus.BAD_REQUEST, ex.getExceptionMessage().stream().collect(Collectors.toList()));
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, new ArrayList<>(ex.getExceptionMessages()));
     }
 
     @ExceptionHandler(ValidationException.class)

@@ -3,18 +3,27 @@ package uk.gov.justice.laa.crime.orchestration.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.justice.laa.crime.orchestration.data.Constants.TEST_TRACE_ID;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionIdGivenContent;
 
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.UserDTO;
-import uk.gov.justice.laa.crime.orchestration.filter.WebClientTestUtils;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.CrownCourtOrchestrationService;
 import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
+import uk.gov.justice.laa.crime.orchestration.utils.WebClientTestUtils;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -24,6 +33,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -67,9 +77,35 @@ class CrownCourtControllerTest {
     }
 
     @Test
-    void givenInvalidRequest_whenUpdateIsInvoked_thenBadRequestResponseIsReturned() throws Exception {
+    void givenEmptyRequest_whenUpdateIsInvoked_thenBadRequestResponseIsReturned() throws Exception {
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, "", ENDPOINT_URL, true))
                 .andExpect(status().isBadRequest());
+    }
+
+    static Stream<Arguments> messageListData() {
+        return Stream.of(
+                Arguments.of(Arrays.asList("test", "data")), Arguments.of(List.of()), Arguments.of((Object) null));
+    }
+
+    @ParameterizedTest
+    @MethodSource("messageListData")
+    void givenInvalidRequest_whenUpdateIsInvoked_thenBadRequestResponseIsReturned(List<String> messageList)
+            throws Exception {
+        when(traceIdHandler.getTraceId()).thenReturn(TEST_TRACE_ID);
+        String requestBody = buildRequestBody();
+
+        when(orchestrationService.updateOutcome(any(WorkflowRequest.class)))
+                .thenThrow(
+                        WebClientTestUtils.getErrorDTOWebClientResponseException(HttpStatus.BAD_REQUEST, messageList));
+
+        ResultActions result = mvc.perform(
+                        buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.traceId").value(TEST_TRACE_ID))
+                .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.toString()))
+                .andExpect(jsonPath("$.message").value(HttpStatus.BAD_REQUEST.getReasonPhrase()));
+        WebClientTestUtils.checkErrorMessageFromErrorDTO(messageList, result);
     }
 
     @Test

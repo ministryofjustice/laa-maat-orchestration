@@ -151,7 +151,7 @@ class ValidationServiceTest {
         assertThatThrownBy(() -> validationService.isUserActionValid(
                         TestModelDataBuilder.getUserActionDTOWithReservation(), userSummaryDTO))
                 .isInstanceOf(CrimeValidationException.class)
-                .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
+                .extracting("exceptionMessages", InstanceOfAssertFactories.ITERABLE)
                 .contains(USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED);
     }
 
@@ -164,7 +164,7 @@ class ValidationServiceTest {
 
         assertThatThrownBy(() -> validationService.isUserActionValid(userActionDTO, userSummaryDTO))
                 .isInstanceOf(CrimeValidationException.class)
-                .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
+                .extracting("exceptionMessages", InstanceOfAssertFactories.ITERABLE)
                 .contains(USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION);
     }
 
@@ -177,7 +177,7 @@ class ValidationServiceTest {
 
         assertThatThrownBy(() -> validationService.isUserActionValid(userActionDTO, userSummaryDTO))
                 .isInstanceOf(CrimeValidationException.class)
-                .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
+                .extracting("exceptionMessages", InstanceOfAssertFactories.ITERABLE)
                 .contains(USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE);
     }
 
@@ -190,7 +190,7 @@ class ValidationServiceTest {
 
         assertThatThrownBy(() -> validationService.isUserActionValid(userActionDTO, userSummaryDTO))
                 .isInstanceOf(CrimeValidationException.class)
-                .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
+                .extracting("exceptionMessages", InstanceOfAssertFactories.ITERABLE)
                 .contains(USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED);
     }
 
@@ -205,7 +205,7 @@ class ValidationServiceTest {
 
         assertThatThrownBy(() -> validationService.isUserActionValid(userActionDTO, userSummaryDTO))
                 .isInstanceOf(CrimeValidationException.class)
-                .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
+                .extracting("exceptionMessages", InstanceOfAssertFactories.ITERABLE)
                 .contains(
                         USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE,
                         USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION,
@@ -224,7 +224,7 @@ class ValidationServiceTest {
 
         assertThatThrownBy(() -> validationService.isUserActionValid(userActionDTO, userSummaryDTO))
                 .isInstanceOf(CrimeValidationException.class)
-                .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
+                .extracting("exceptionMessages", InstanceOfAssertFactories.ITERABLE)
                 .contains(
                         USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE,
                         USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION);
@@ -240,7 +240,7 @@ class ValidationServiceTest {
 
         assertThatThrownBy(() -> validationService.isUserActionValid(userActionDTO, userSummaryDTO))
                 .isInstanceOf(CrimeValidationException.class)
-                .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
+                .extracting("exceptionMessages", InstanceOfAssertFactories.ITERABLE)
                 .contains(
                         USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION,
                         USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED);
@@ -256,7 +256,7 @@ class ValidationServiceTest {
 
         assertThatThrownBy(() -> validationService.isUserActionValid(userActionDTO, userSummaryDTO))
                 .isInstanceOf(CrimeValidationException.class)
-                .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
+                .extracting("exceptionMessages", InstanceOfAssertFactories.ITERABLE)
                 .contains(
                         USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE,
                         USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED);
@@ -280,7 +280,7 @@ class ValidationServiceTest {
         assertThatThrownBy(() -> validationService.isUserActionValid(
                         TestModelDataBuilder.getUserActionDTOWithReservation(), userSummaryDTO))
                 .isInstanceOf(CrimeValidationException.class)
-                .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
+                .extracting("exceptionMessages", InstanceOfAssertFactories.ITERABLE)
                 .contains(USER_DOES_NOT_HAVE_A_ROLE_CAPABLE_OF_PERFORMING_THIS_ACTION);
     }
 
@@ -293,7 +293,7 @@ class ValidationServiceTest {
         assertThatThrownBy(() -> validationService.isUserActionValid(
                         TestModelDataBuilder.getUserActionDTOWithReservation(), userSummaryDTO))
                 .isInstanceOf(CrimeValidationException.class)
-                .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
+                .extracting("exceptionMessages", InstanceOfAssertFactories.ITERABLE)
                 .contains(USER_DOES_NOT_HAVE_A_VALID_NEW_WORK_REASON_CODE);
     }
 
@@ -306,7 +306,7 @@ class ValidationServiceTest {
         assertThatThrownBy(() -> validationService.isUserActionValid(
                         TestModelDataBuilder.getUserActionDTOWithReservation(), userSummaryDTO))
                 .isInstanceOf(CrimeValidationException.class)
-                .extracting("exceptionMessage", InstanceOfAssertFactories.ITERABLE)
+                .extracting("exceptionMessages", InstanceOfAssertFactories.ITERABLE)
                 .contains(USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED);
     }
 

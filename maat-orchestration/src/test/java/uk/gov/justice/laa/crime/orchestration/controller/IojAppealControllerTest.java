@@ -4,21 +4,31 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.justice.laa.crime.orchestration.data.Constants.TEST_TRACE_ID;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.LEGACY_APPEAL_ID;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionId;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionIdGivenContent;
 
+import uk.gov.justice.laa.crime.error.ErrorMessage;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
-import uk.gov.justice.laa.crime.orchestration.filter.WebClientTestUtils;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.IojAppealsOrchestrationService;
 import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
+import uk.gov.justice.laa.crime.orchestration.utils.WebClientTestUtils;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -28,6 +38,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -105,6 +116,34 @@ class IojAppealControllerTest {
     void givenInvalidRequest_whenCreateIsInvoked_thenBadRequestResponseIsReturned() throws Exception {
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, "", ENDPOINT_URL, true))
                 .andExpect(status().isBadRequest());
+    }
+
+    static Stream<Arguments> errorListData() {
+        return Stream.of(
+                Arguments.of(Arrays.asList(new ErrorMessage("fieldA", "Test"), new ErrorMessage("fieldB", "Error"))),
+                Arguments.of(List.of()),
+                Arguments.of((Object) null));
+    }
+
+    @ParameterizedTest
+    @MethodSource("errorListData")
+    void givenBadRequest_whenCreateIsInvoked_thenBadRequestResponseIsReturned(List<ErrorMessage> errorMessages)
+            throws Exception {
+        when(traceIdHandler.getTraceId()).thenReturn(TEST_TRACE_ID);
+        when(orchestrationService.create(any(WorkflowRequest.class)))
+                .thenThrow(WebClientTestUtils.getProblemDetailWebClientResponseException(
+                        HttpStatus.BAD_REQUEST, errorMessages));
+
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkFlowRequest());
+        // ProblemDetail should be converted to ErrorDTO, and returned as "application/json"
+        ResultActions resultActions = mvc.perform(
+                        buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.traceId").value(TEST_TRACE_ID))
+                .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.toString()))
+                .andExpect(jsonPath("$.message").value(HttpStatus.BAD_REQUEST.getReasonPhrase()));
+        WebClientTestUtils.checkMessageListFromProblemDetail(errorMessages, resultActions);
     }
 
     @Test
