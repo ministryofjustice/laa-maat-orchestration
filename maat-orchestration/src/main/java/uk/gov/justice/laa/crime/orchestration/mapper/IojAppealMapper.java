@@ -97,7 +97,7 @@ public class IojAppealMapper {
         IOJAppealDTO iojAppealDto =
                 request.getApplicationDTO().getAssessmentDTO().getIojAppeal();
 
-        boolean judicialReview = iojAppealDto.getAppealReason().getCode().equals(NewWorkReason.JR.getCode());
+        boolean judicialReview = iojAppealDto.getNewWorkReasonDTO().getCode().equals(NewWorkReason.JR.getCode());
 
         LocalDate receivedDate = iojAppealDto
                 .getReceivedDate()

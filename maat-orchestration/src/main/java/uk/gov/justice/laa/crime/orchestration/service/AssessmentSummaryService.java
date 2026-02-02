@@ -35,7 +35,9 @@ public class AssessmentSummaryService {
     public AssessmentSummaryDTO getSummary(IOJAppealDTO iojAppealDTO) {
         return AssessmentSummaryDTO.builder()
                 .id(iojAppealDTO.getIojId().intValue())
-                .status(iojAppealDTO.getAssessmentStatusDTO().getStatus())
+                .status(CurrentStatus.getFrom(
+                                iojAppealDTO.getAssessmentStatusDTO().getStatus())
+                        .getDescription())
                 .type(AssessmentSummaryType.IOJ_APPEAL.getName())
                 .result(iojAppealDTO.getAppealDecisionResult())
                 .assessmentDate(iojAppealDTO.getReceivedDate())
