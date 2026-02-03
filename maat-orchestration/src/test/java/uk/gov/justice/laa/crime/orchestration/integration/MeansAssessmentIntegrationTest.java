@@ -183,7 +183,8 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
 
     @Test
     void givenValidRequestAndPostProcessingEnabled_whenCreateIsInvoked_thenAssessmentIsCreated() throws Exception {
-        String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
+        String requestBody =
+                objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequestWithHardship());
 
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
         userSummaryDTO.setFeatureToggle(List.of(FeatureToggleDTO.builder()
@@ -229,7 +230,6 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
         stubForInvokeStoredProcedure(
                 "DB_GET_APPLICATION_CORRESPONDENCE", "DB_PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE", maatApiResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk());
@@ -325,7 +325,8 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
 
     @Test
     void givenValidRequestAndPostProcessingEnabled_whenUpdateIsInvoked_thenAssessmentIsUpdated() throws Exception {
-        String requestBody = objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequest());
+        String requestBody =
+                objectMapper.writeValueAsString(MeansAssessmentDataBuilder.buildWorkFlowRequestWithHardship());
 
         UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
         userSummaryDTO.setFeatureToggle(List.of(FeatureToggleDTO.builder()

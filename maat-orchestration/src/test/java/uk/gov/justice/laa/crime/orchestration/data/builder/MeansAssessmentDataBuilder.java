@@ -192,6 +192,17 @@ public class MeansAssessmentDataBuilder {
                 .build();
     }
 
+    public static WorkflowRequest buildWorkFlowRequestWithHardship() {
+        WorkflowRequest request = buildWorkFlowRequest();
+        request.getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .setHardship(HardshipOverviewDTO.builder()
+                        .crownCourtHardship(new HardshipReviewDTO())
+                        .build());
+        return request;
+    }
+
     public static ApplicationDTO getApplicationDTO() {
         return getApplicationDTO(false);
     }
@@ -764,14 +775,7 @@ public class MeansAssessmentDataBuilder {
                 .fullAvailable(true)
                 .full(getFullAssessmentDTO())
                 .initial(getInitialAssessmentDTO())
-                .hardship(getHardshipOverviewDTO())
                 .incomeEvidence(getIncomeEvidenceSummaryDTO())
-                .build();
-    }
-
-    public static HardshipOverviewDTO getHardshipOverviewDTO() {
-        return HardshipOverviewDTO.builder()
-                .crownCourtHardship(new HardshipReviewDTO())
                 .build();
     }
 
