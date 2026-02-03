@@ -62,6 +62,8 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.ExtraEvidenceDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FrequenciesDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FullAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipOverviewDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IncomeEvidenceSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
@@ -762,7 +764,14 @@ public class MeansAssessmentDataBuilder {
                 .fullAvailable(true)
                 .full(getFullAssessmentDTO())
                 .initial(getInitialAssessmentDTO())
+                .hardship(getHardshipOverviewDTO())
                 .incomeEvidence(getIncomeEvidenceSummaryDTO())
+                .build();
+    }
+
+    public static HardshipOverviewDTO getHardshipOverviewDTO() {
+        return HardshipOverviewDTO.builder()
+                .crownCourtHardship(new HardshipReviewDTO())
                 .build();
     }
 

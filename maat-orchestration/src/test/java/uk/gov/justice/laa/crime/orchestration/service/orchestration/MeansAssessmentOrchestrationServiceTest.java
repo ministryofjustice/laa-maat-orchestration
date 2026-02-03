@@ -193,6 +193,12 @@ class MeansAssessmentOrchestrationServiceTest {
 
         verify(maatCourtDataService)
                 .invokeStoredProcedure(
+                        any(ApplicationDTO.class),
+                        any(UserDTO.class),
+                        eq(StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3));
+
+        verify(maatCourtDataService)
+                .invokeStoredProcedure(
                         applicationDTO, workflowRequest.getUserDTO(), StoredProcedure.PRE_UPDATE_CC_APPLICATION);
 
         verify(workflowPreProcessorService, never()).preProcessRequest(any(), any(), any());
@@ -215,6 +221,13 @@ class MeansAssessmentOrchestrationServiceTest {
                 .thenReturn(new ApplicationTrackingOutputResult().withUsn(123));
 
         orchestrationService.create(workflowRequest);
+
+        verify(maatCourtDataService, never())
+                .invokeStoredProcedure(
+                        any(ApplicationDTO.class),
+                        any(UserDTO.class),
+                        eq(StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3));
+
         verify(maatCourtDataService, never())
                 .invokeStoredProcedure(
                         workflowRequest.getApplicationDTO(),
