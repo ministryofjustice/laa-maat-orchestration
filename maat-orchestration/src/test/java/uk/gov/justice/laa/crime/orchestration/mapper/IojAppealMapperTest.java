@@ -8,6 +8,7 @@ import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.IojAppealDecisionResult;
 
 import java.util.stream.Stream;
 
@@ -20,7 +21,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import uk.gov.justice.laa.crime.orchestration.enums.IojAppealDecisionResult;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class IojAppealMapperTest {
