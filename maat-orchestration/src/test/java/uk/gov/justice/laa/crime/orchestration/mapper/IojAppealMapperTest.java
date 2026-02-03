@@ -4,7 +4,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealRequest;
 import uk.gov.justice.laa.crime.enums.IojAppealAssessor;
-import uk.gov.justice.laa.crime.enums.IojAppealDecision;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -21,6 +20,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import uk.gov.justice.laa.crime.orchestration.enums.IojAppealDecisionResult;
 
 @ExtendWith(SoftAssertionsExtension.class)
 class IojAppealMapperTest {
@@ -86,8 +86,8 @@ class IojAppealMapperTest {
 
     private static Stream<Arguments> appealDecisionResults() {
         return Stream.of(
-                Arguments.of(IojAppealDecision.PASS.toString(), true),
-                Arguments.of(IojAppealDecision.FAIL.toString(), false),
+                Arguments.of(IojAppealDecisionResult.PASS.toString(), true),
+                Arguments.of(IojAppealDecisionResult.FAIL.toString(), false),
                 Arguments.of("", false),
                 Arguments.of(null, false));
     }
