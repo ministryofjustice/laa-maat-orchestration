@@ -139,10 +139,10 @@ public class MeansAssessmentOrchestrationService {
                     request.getUserDTO(),
                     StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3));
 
-            // check feature flag here - only need to do this for the new workflow, not for the old way of doing
-            // things
+            request.setApplicationDTO(contributionService.calculate(request));
+
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                    contributionService.calculate(request),
+                    request.getApplicationDTO(),
                     request.getUserDTO(),
                     StoredProcedure.PRE_UPDATE_CC_APPLICATION));
         }
