@@ -17,6 +17,7 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertS
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForUpdateCrownCourtApplication;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForUpdateFinancialAssessment;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForUpdateMeansAssessment;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForUpdateSendToCCLF;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCalculateContributions;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCreateEvidence;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCreateMeansAssessment;
@@ -161,7 +162,6 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         stubForGetContributionsSummaries(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
         stubForFindRepOrder(repOrderDTO);
-        stubForUpdateSendToCCLF();
 
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
         stubForInvokeStoredProcedure(
@@ -224,12 +224,11 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         stubForCalculateContributions(calculateContributionResponse);
         stubForSendApplicationTrackingResult();
         stubForUpdateCrownCourtApplication(updateCrownCourtApplicationResponse);
+        stubForUpdateSendToCCLF();
 
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
         stubForInvokeStoredProcedure(
-                "DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", maatApiResponse);
-        stubForInvokeStoredProcedure(
-                "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", "DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
+                "DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
         stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
@@ -244,8 +243,9 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         assertStubForCalculateContributions(1);
         assertStubForSendApplicationTrackingResult(1);
         assertStubForUpdateCrownCourtApplication(1);
+        assertStubForUpdateSendToCCLF(1);
 
-        assertStubForInvokeStoredProcedure(3);
+        assertStubForInvokeStoredProcedure(2);
     }
 
     @Test
@@ -304,7 +304,6 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         stubForGetContributionsSummaries(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
         stubForFindRepOrder(repOrderDTO);
-        stubForUpdateSendToCCLF();
 
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
         stubForInvokeStoredProcedure(
@@ -362,12 +361,11 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         stubForCalculateContributions(calculateContributionResponse);
         stubForSendApplicationTrackingResult();
         stubForUpdateCrownCourtApplication(updateCrownCourtApplicationResponse);
+        stubForUpdateSendToCCLF();
 
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
         stubForInvokeStoredProcedure(
-                "DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", maatApiResponse);
-        stubForInvokeStoredProcedure(
-                "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", "DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
+                "DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
         stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
@@ -382,8 +380,9 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         assertStubForCalculateContributions(1);
         assertStubForSendApplicationTrackingResult(1);
         assertStubForUpdateCrownCourtApplication(1);
+        assertStubForUpdateSendToCCLF(1);
 
-        assertStubForInvokeStoredProcedure(3);
+        assertStubForInvokeStoredProcedure(2);
     }
 
     @Test

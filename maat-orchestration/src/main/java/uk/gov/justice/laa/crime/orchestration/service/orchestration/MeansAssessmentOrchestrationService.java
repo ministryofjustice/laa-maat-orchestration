@@ -127,18 +127,18 @@ public class MeansAssessmentOrchestrationService {
     private ApplicationDTO processCrownCourtProceedings(WorkflowRequest request, Action action) {
         request.getApplicationDTO().setAlertMessage("");
 
-        // call post_processing_part_1_c3 and map the application
-        request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                request.getApplicationDTO(),
-                request.getUserDTO(),
-                StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3));
-
         RepOrderDTO repOrderDTO = maatCourtDataApiService.getRepOrderByRepId(
                 request.getApplicationDTO().getRepId().intValue());
 
         if (featureDecisionService.isMaatPostAssessmentProcessingEnabled(request)) {
             meansAssessmentPostProcessingWorkflow(request, action, repOrderDTO);
         } else {
+            // call post_processing_part_1_c3 and map the application
+            request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                    request.getApplicationDTO(),
+                    request.getUserDTO(),
+                    StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_1_C3));
+
             // check feature flag here - only need to do this for the new workflow, not for the old way of doing
             // things
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
