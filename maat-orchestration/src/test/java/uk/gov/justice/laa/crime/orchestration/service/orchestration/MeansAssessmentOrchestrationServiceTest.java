@@ -146,7 +146,7 @@ class MeansAssessmentOrchestrationServiceTest {
                 .invokeStoredProcedure(
                         applicationDTO,
                         workflowRequest.getUserDTO(),
-                        StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2);
+                        StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE);
         verify(assessmentSummaryService, times(1)).getSummary(any(FinancialAssessmentDTO.class));
         verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
@@ -175,7 +175,7 @@ class MeansAssessmentOrchestrationServiceTest {
                 .invokeStoredProcedure(
                         workflowRequest.getApplicationDTO(),
                         workflowRequest.getUserDTO(),
-                        StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2);
+                        StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE);
         verify(assessmentSummaryService, times(1)).getSummary(any(FinancialAssessmentDTO.class));
         verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }

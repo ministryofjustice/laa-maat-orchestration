@@ -142,9 +142,7 @@ public class MeansAssessmentOrchestrationService {
             request.setApplicationDTO(contributionService.calculate(request));
 
             request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                    request.getApplicationDTO(),
-                    request.getUserDTO(),
-                    StoredProcedure.PRE_UPDATE_CC_APPLICATION));
+                    request.getApplicationDTO(), request.getUserDTO(), StoredProcedure.PRE_UPDATE_CC_APPLICATION));
         }
 
         // Check for any validation alerts resulted as part of the pre_update_checks and raise exception
@@ -158,9 +156,10 @@ public class MeansAssessmentOrchestrationService {
         // call CCP service
         proceedingsService.updateApplication(request, repOrderDTO);
 
-        // call post_processing_part_2
         ApplicationDTO application = maatCourtDataService.invokeStoredProcedure(
-                request.getApplicationDTO(), request.getUserDTO(), StoredProcedure.ASSESSMENT_POST_PROCESSING_PART_2);
+                request.getApplicationDTO(),
+                request.getUserDTO(),
+                StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE);
 
         AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(
                 request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO());
