@@ -169,8 +169,8 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         stubForInvokeStoredProcedure(
                 "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", "DB_PRE_UPDATE_CC_APPLICATION", maatApiResponse);
         stubForInvokeStoredProcedure(
-                "DB_PRE_UPDATE_CC_APPLICATION", "DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
+                "DB_PRE_UPDATE_CC_APPLICATION", "DB_PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE", maatApiResponse);
+        stubForInvokeStoredProcedure("DB_PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE", maatApiResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk());
@@ -228,8 +228,8 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
 
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
         stubForInvokeStoredProcedure(
-                "DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
+                "DB_GET_APPLICATION_CORRESPONDENCE", "DB_PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE", maatApiResponse);
+        stubForInvokeStoredProcedure("DB_PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE", maatApiResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk());
@@ -311,8 +311,8 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         stubForInvokeStoredProcedure(
                 "DB_ASSESSMENT_POST_PROCESSING_PART_1_C3", "DB_PRE_UPDATE_CC_APPLICATION", maatApiResponse);
         stubForInvokeStoredProcedure(
-                "DB_PRE_UPDATE_CC_APPLICATION", "DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
+                "DB_PRE_UPDATE_CC_APPLICATION", "DB_PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE", maatApiResponse);
+        stubForInvokeStoredProcedure("DB_PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE", maatApiResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk());
@@ -365,8 +365,8 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
 
         stubForInvokeStoredProcedure(Scenario.STARTED, "DB_GET_APPLICATION_CORRESPONDENCE", maatApiResponse);
         stubForInvokeStoredProcedure(
-                "DB_GET_APPLICATION_CORRESPONDENCE", "DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
-        stubForInvokeStoredProcedure("DB_ASSESSMENT_POST_PROCESSING_PART_2", maatApiResponse);
+                "DB_GET_APPLICATION_CORRESPONDENCE", "DB_PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE", maatApiResponse);
+        stubForInvokeStoredProcedure("DB_PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE", maatApiResponse);
 
         mvc.perform(buildRequestGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL))
                 .andExpect(status().isOk());
