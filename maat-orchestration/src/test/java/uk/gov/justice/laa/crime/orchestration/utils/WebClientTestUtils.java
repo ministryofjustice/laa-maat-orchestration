@@ -9,10 +9,13 @@ import uk.gov.justice.laa.crime.error.ErrorExtension;
 import uk.gov.justice.laa.crime.error.ErrorMessage;
 import uk.gov.justice.laa.crime.util.ProblemDetailUtil;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.hamcrest.Matchers;
+import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +26,32 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class WebClientTestUtils {
+
+    /** Reference to be used in the MethodSource annotations to use the messageListData content. */
+    public static final String MESSAGE_LIST_DATA =
+            "uk.gov.justice.laa.crime.orchestration.utils.WebClientTestUtils#messageListData";
+    /**
+     * Method used in tests to provide basic test data. Is called via the MESSAGE_LIST_DATA static String
+     * @return Stream of Arguments which are {@literal List<String>s}.
+     */
+    public static Stream<Arguments> messageListData() {
+        return Stream.of(
+                Arguments.of(Arrays.asList("test", "data")), Arguments.of(List.of()), Arguments.of((Object) null));
+    }
+
+    /** Reference to be used in the MethodSource annotations to use the errorListData content. */
+    public static final String ERROR_LIST_DATA =
+            "uk.gov.justice.laa.crime.orchestration.utils.WebClientTestUtils#errorListData";
+    /**
+     * Method used in tests to provide basic test data. Is called via the ERROR_LIST_DATA static String
+     * @return Stream of Arguments which are {@literal List<ErrorMessage>s}.
+     */
+    static Stream<Arguments> errorListData() {
+        return Stream.of(
+                Arguments.of(Arrays.asList(new ErrorMessage("fieldA", "Test"), new ErrorMessage("fieldB", "Error"))),
+                Arguments.of(List.of()),
+                Arguments.of((Object) null));
+    }
 
     public static WebClientResponseException getWebClientResponseException(HttpStatus status) {
         return WebClientResponseException.create(

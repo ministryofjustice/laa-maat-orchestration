@@ -9,6 +9,7 @@ import static uk.gov.justice.laa.crime.orchestration.data.Constants.TEST_TRACE_I
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionIdGivenContent;
 
 import uk.gov.justice.laa.crime.enums.CourtType;
+import uk.gov.justice.laa.crime.error.ErrorMessage;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -17,13 +18,10 @@ import uk.gov.justice.laa.crime.orchestration.service.orchestration.EvidenceOrch
 import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
 import uk.gov.justice.laa.crime.orchestration.utils.WebClientTestUtils;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -52,7 +50,7 @@ class EvidenceControllerTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    MockMvc mockMvc;
+    MockMvc mvc;
 
     @MockitoBean
     private TraceIdHandler traceIdHandler;
@@ -63,24 +61,19 @@ class EvidenceControllerTest {
                 .thenReturn(new ApplicationDTO());
         String requestBody = objectMapper.writeValueAsString(
                 TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
-        mockMvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
     void givenEmptyRequest_whenUpdateIsInvoked_thenBadRequestResponseIsReturned() throws Exception {
-        mockMvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, "", ENDPOINT_URL, true))
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, "", ENDPOINT_URL, true))
                 .andExpect(status().isBadRequest());
     }
 
-    static Stream<Arguments> messageListData() {
-        return Stream.of(
-                Arguments.of(Arrays.asList("test", "data")), Arguments.of(List.of()), Arguments.of((Object) null));
-    }
-
     @ParameterizedTest
-    @MethodSource("messageListData")
+    @MethodSource(WebClientTestUtils.MESSAGE_LIST_DATA)
     void givenInvalidRequest_whenUpdateIsInvoked_thenBadRequestResponseIsReturned(List<String> messageList)
             throws Exception {
         when(traceIdHandler.getTraceId()).thenReturn(TEST_TRACE_ID);
@@ -91,7 +84,7 @@ class EvidenceControllerTest {
                 .thenThrow(
                         WebClientTestUtils.getErrorDTOWebClientResponseException(HttpStatus.BAD_REQUEST, messageList));
 
-        ResultActions result = mockMvc.perform(
+        ResultActions result = mvc.perform(
                         buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -99,6 +92,29 @@ class EvidenceControllerTest {
                 .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.toString()))
                 .andExpect(jsonPath("$.message").value(HttpStatus.BAD_REQUEST.getReasonPhrase()));
         WebClientTestUtils.checkErrorMessageFromErrorDTO(messageList, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource(WebClientTestUtils.ERROR_LIST_DATA)
+    void givenBadRequest_whenCreateIsInvoked_thenBadRequestResponseIsReturned(List<ErrorMessage> errorMessages)
+            throws Exception {
+        when(traceIdHandler.getTraceId()).thenReturn(TEST_TRACE_ID);
+        when(evidenceOrchestrationService.updateIncomeEvidence(any(WorkflowRequest.class)))
+                .thenThrow(WebClientTestUtils.getProblemDetailWebClientResponseException(
+                        HttpStatus.BAD_REQUEST, errorMessages));
+
+        String requestBody = objectMapper.writeValueAsString(
+                TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
+
+        // ProblemDetail should be converted to ErrorDTO, and returned as "application/json"
+        ResultActions resultActions = mvc.perform(
+                        buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.traceId").value(TEST_TRACE_ID))
+                .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.toString()))
+                .andExpect(jsonPath("$.message").value(HttpStatus.BAD_REQUEST.getReasonPhrase()));
+        WebClientTestUtils.checkMessageListFromProblemDetail(errorMessages, resultActions);
     }
 
     @Test
@@ -112,7 +128,7 @@ class EvidenceControllerTest {
 
         String requestBody = objectMapper.writeValueAsString(
                 TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
-        mockMvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.PUT, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
