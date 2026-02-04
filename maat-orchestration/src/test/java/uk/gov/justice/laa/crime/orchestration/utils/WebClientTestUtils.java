@@ -103,6 +103,7 @@ public class WebClientTestUtils {
                     .andExpect(jsonPath("$.messageList", Matchers.containsInAnyOrder(messageList.toArray())));
         }
     }
+
     /**
      * Checks the provided resultAction's response has populated the ErrorDTO's messageList as expected using the
      * parameterised errorMessages. Used to validate mapping and behaviour.
