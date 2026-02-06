@@ -6,6 +6,7 @@ import uk.gov.justice.laa.crime.dto.ErrorDTO;
 import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
 import uk.gov.justice.laa.crime.util.ProblemDetailUtil;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -55,7 +56,10 @@ public class DefaultExceptionHandler {
     @ExceptionHandler(WebClientRequestException.class)
     public ResponseEntity<ErrorDTO> onRuntimeException(WebClientRequestException exception) {
         return buildErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage(), traceIdHandler.getTraceId(), List.of());
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                exception.getMessage(),
+                traceIdHandler.getTraceId(),
+                Collections.emptyList());
     }
 
     private static ResponseEntity<ErrorDTO> buildErrorResponse(
