@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class Constants {
 
     public static final BigDecimal DISPOSABLE_INCOME = BigDecimal.valueOf(12000.0);
@@ -22,4 +24,6 @@ public class Constants {
     public static final Integer CONTRIBUTIONS_ID = 43;
     public static final Integer APPLICANT_ID = 999;
     public static final String USERNAME = "mock-u";
+    public static final String TEST_TRACE_ID = "test-trace-id";
+    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 }

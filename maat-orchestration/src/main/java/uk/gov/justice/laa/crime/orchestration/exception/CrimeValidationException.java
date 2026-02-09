@@ -9,9 +9,9 @@ import java.util.List;
 @Setter
 public class CrimeValidationException extends RuntimeException {
 
-    private final List<String> exceptionMessage;
+    private final List<String> exceptionMessages;
 
-    public CrimeValidationException(List<String> exceptionMessage) {
-        this.exceptionMessage = exceptionMessage;
+    public CrimeValidationException(List<String> exceptionMessages) {
+        this.exceptionMessages = exceptionMessages;
     }
 }

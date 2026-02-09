@@ -4,11 +4,11 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealRequest;
 import uk.gov.justice.laa.crime.enums.IojAppealAssessor;
-import uk.gov.justice.laa.crime.enums.IojAppealDecision;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
+import uk.gov.justice.laa.crime.orchestration.enums.IojAppealDecisionResult;
 
 import java.util.stream.Stream;
 
@@ -86,8 +86,8 @@ class IojAppealMapperTest {
 
     private static Stream<Arguments> appealDecisionResults() {
         return Stream.of(
-                Arguments.of(IojAppealDecision.PASS.toString(), true),
-                Arguments.of(IojAppealDecision.FAIL.toString(), false),
+                Arguments.of(IojAppealDecisionResult.PASS.toString(), true),
+                Arguments.of(IojAppealDecisionResult.FAIL.toString(), false),
                 Arguments.of("", false),
                 Arguments.of(null, false));
     }
