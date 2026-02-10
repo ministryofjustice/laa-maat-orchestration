@@ -2,6 +2,7 @@ package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
@@ -10,7 +11,9 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
+import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.IojAppealMapper;
+import uk.gov.justice.laa.crime.orchestration.service.ApplicationTrackingDataService;
 import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
 import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
 import uk.gov.justice.laa.crime.orchestration.service.IojAppealService;
@@ -34,6 +37,8 @@ public class IojAppealsOrchestrationService {
     private final ProceedingsService proceedingsService;
     private final RepOrderService repOrderService;
     private final WorkflowPreProcessorService workflowPreProcessorService;
+    private final ApplicationTrackingMapper applicationTrackingMapper;
+    private final ApplicationTrackingDataService applicationTrackingDataService;
 
     public IOJAppealDTO find(int appealId) {
         return iojAppealService.find(appealId);
@@ -67,6 +72,13 @@ public class IojAppealsOrchestrationService {
         AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(
                 request.getApplicationDTO().getAssessmentDTO().getIojAppeal());
         assessmentSummaryService.updateApplication(request.getApplicationDTO(), assessmentSummaryDTO);
+
+        // Call Application Tracking Service endpoint
+        ApplicationTrackingOutputResult applicationTrackingOutputResult =
+                applicationTrackingMapper.build(request, repOrderDto);
+        if (null != applicationTrackingOutputResult.getUsn()) {
+            applicationTrackingDataService.sendTrackingOutputResult(applicationTrackingOutputResult);
+        }
 
         return request.getApplicationDTO();
     }
