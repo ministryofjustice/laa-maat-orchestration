@@ -86,7 +86,7 @@ class IojAppealsOrchestrationServiceTest {
         when(contributionService.calculate(workflowRequest)).thenReturn(workflowRequest.getApplicationDTO());
         when(maatCourtDataService.invokeStoredProcedure(any(), any(), any()))
                 .thenReturn(workflowRequest.getApplicationDTO());
-        when(applicationTrackingMapper.build(any(), any())).thenReturn(applicationTrackingOutputResult);
+        when(applicationTrackingMapper.build(any(), any(), any(), any())).thenReturn(applicationTrackingOutputResult);
 
         AssessmentSummaryDTO assessmentSummaryDTO = TestModelDataBuilder.getAssessmentSummaryDTOFromIojAppealDTO();
         when(assessmentSummaryService.getSummary(iojAppealDTO)).thenReturn(assessmentSummaryDTO);

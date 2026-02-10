@@ -214,7 +214,7 @@ class HardshipOrchestrationServiceTest {
                         any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
                 .thenReturn(applicationDTO);
 
-        when(applicationTrackingMapper.build(any(), any()))
+        when(applicationTrackingMapper.build(any(), any(), any(), any()))
                 .thenReturn(new ApplicationTrackingOutputResult().withUsn(12345));
         when(repOrderService.getRepOrder(any())).thenReturn(repOrderDTO);
 
@@ -467,7 +467,7 @@ class HardshipOrchestrationServiceTest {
                 .thenReturn(assessmentSummaryDTO);
         when(hardshipMapper.getUserActionDTO(any(), any()))
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
-        when(applicationTrackingMapper.build(any(), any()))
+        when(applicationTrackingMapper.build(any(), any(), any(), any()))
                 .thenReturn(new ApplicationTrackingOutputResult().withUsn(12345));
         when(repOrderService.getRepOrder(any())).thenReturn(repOrderDTO);
 

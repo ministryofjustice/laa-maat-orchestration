@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
@@ -186,8 +188,8 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         proceedingsService.updateApplication(request, repOrderDTO);
 
         // Call application.handle_eform_result stored procedure OR Equivalent ATS service endpoint
-        ApplicationTrackingOutputResult applicationTrackingOutputResult =
-                applicationTrackingMapper.build(request, repOrderDTO);
+        ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(
+                request, repOrderDTO, AssessmentType.CCHARDSHIP, RequestSource.HARDSHIP);
         if (null != applicationTrackingOutputResult.getUsn()) {
             applicationTrackingDataService.sendTrackingOutputResult(applicationTrackingOutputResult);
         }
