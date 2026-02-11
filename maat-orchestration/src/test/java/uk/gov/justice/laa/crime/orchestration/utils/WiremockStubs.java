@@ -4,6 +4,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.patch;
+import static com.github.tomakehurst.wiremock.client.WireMock.patchRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
@@ -210,6 +211,10 @@ public class WiremockStubs {
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response)));
+    }
+
+    public static void assertStubForPatchRepOrder(int times) {
+        verify(exactly(times), patchRequestedFor(urlPathMatching(MAAT_API_ASSESSMENT_URL + "/rep-orders/" + REP_ID)));
     }
 
     public static void stubForDetermineMagsRepDecision(String response) {
