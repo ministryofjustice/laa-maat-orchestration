@@ -39,7 +39,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApplicationTrackingMapper {
 
-    public ApplicationTrackingOutputResult build(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {
+    public ApplicationTrackingOutputResult build(
+            WorkflowRequest workflowRequest,
+            RepOrderDTO repOrderDTO,
+            AssessmentType assessmentType,
+            RequestSource requestSource) {
 
         ApplicationTrackingOutputResult request = new ApplicationTrackingOutputResult();
         ApplicationDTO application = workflowRequest.getApplicationDTO();
@@ -62,7 +66,7 @@ public class ApplicationTrackingMapper {
                         ? null
                         : CaseType.fromValue(application.getCaseDetailsDTO().getCaseType()));
         request.setAssessmentId(financialAssessmentDTO.getId().intValue());
-        request.setAssessmentType(AssessmentType.CCHARDSHIP);
+        request.setAssessmentType(assessmentType);
         request.setDwpResult(passportedDTO.getDwpResult());
         request.setRepDecision(
                 repOrderDecisionDTO.getDescription() != null
@@ -73,7 +77,7 @@ public class ApplicationTrackingMapper {
                         ? crownCourtSummaryDTO.getRepOrderDecision().getValue()
                         : null);
         request.setMagsOutcome(application.getMagsOutcomeDTO().getOutcome());
-        request.setRequestSource(RequestSource.HARDSHIP);
+        request.setRequestSource(requestSource);
         request.setUserCreated(workflowRequest.getUserDTO().getUserName());
         request.setIoj(buildIOJ(workflowRequest, repOrderDTO));
         request.setPassport(buildPassport(workflowRequest, repOrderDTO));

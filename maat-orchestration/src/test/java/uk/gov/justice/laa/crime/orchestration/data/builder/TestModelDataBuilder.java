@@ -179,6 +179,7 @@ public class TestModelDataBuilder {
     public static final LocalDate ALL_EVIDENCE_RECEIVED_DATE = LocalDate.of(2024, 12, 18);
     public static final LocalDate UPLIFT_APPLIED_DATE = LocalDate.of(2025, 1, 18);
     public static final LocalDate UPLIFT_REMOVED_DATE = LocalDate.of(2025, 1, 21);
+    public static final Integer USN = 123456789;
     private static final Integer APPLICANT_EVIDENCE_ID = 9552473;
     private static final Integer PARTNER_EVIDENCE_ID = 9552474;
     private static final Integer EXTRA_EVIDENCE_ID = 9552475;
@@ -982,6 +983,7 @@ public class TestModelDataBuilder {
     public static FinancialAssessmentDTO getFinancialAssessmentDTO() {
         return FinancialAssessmentDTO.builder()
                 .id(Constants.FINANCIAL_ASSESSMENT_ID)
+                .usn(USN.longValue())
                 .full(getFullAssessmentDTO())
                 .fullAvailable(Boolean.FALSE)
                 .initial(getInitialAssessmentDTO())

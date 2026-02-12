@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.LEGACY_APPEAL_ID;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForSendApplicationTrackingResult;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCalculateContributions;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCreateIojAppeal;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForDetermineMagsRepDecision;
@@ -17,12 +18,12 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubFor
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetContributionsSummaries;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForSendApplicationTrackingResult;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForUpdateCrownCourtApplication;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
-import uk.gov.justice.laa.crime.enums.RepOrderStatus;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
@@ -119,8 +120,7 @@ class IojAppealIntegrationTest extends WiremockIntegrationTest {
     @Test
     void givenValidContent_whenCreateIsInvoked_thenShouldReturnSuccessResponse() throws Exception {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
-        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO(
-                workflowRequest.getApplicationDTO().getRepId().intValue(), RepOrderStatus.CURR.getCode());
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTOWithAssessorName();
 
         stubForOAuth();
         stubForCreateIojAppeal(objectMapper.writeValueAsString(TestModelDataBuilder.getApiCreateIojAppealResponse()));
@@ -144,6 +144,7 @@ class IojAppealIntegrationTest extends WiremockIntegrationTest {
                 objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse()));
         stubForGetUserSummary(objectMapper.writeValueAsString(
                 TestModelDataBuilder.getUserSummaryDTO(List.of(Action.CREATE_IOJ.getCode()), NewWorkReason.NEW)));
+        stubForSendApplicationTrackingResult();
 
         IOJAppealDTO expected = TestModelDataBuilder.getIOJAppealDTO();
         String requestBody = objectMapper.writeValueAsString(workflowRequest);
@@ -175,5 +176,6 @@ class IojAppealIntegrationTest extends WiremockIntegrationTest {
                         jsonPath("$.assessmentDTO.iojAppeal.newWorkReasonDTO").value(expected.getNewWorkReasonDTO()));
 
         verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/ioj-appeals")));
+        assertStubForSendApplicationTrackingResult(1);
     }
 }
