@@ -7,6 +7,8 @@ import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.exception.ValidationException;
@@ -161,6 +163,20 @@ public class MeansAssessmentOrchestrationService {
                 request.getUserDTO(),
                 StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE);
 
+        AssessmentType assessmentType = Boolean.TRUE.equals(request.getApplicationDTO()
+                        .getAssessmentDTO()
+                        .getFinancialAssessmentDTO()
+                        .getFullAvailable())
+                ? AssessmentType.MEANS_FULL
+                : AssessmentType.MEANS_INIT;
+
+        ApplicationTrackingOutputResult applicationTrackingOutputResult =
+                applicationTrackingMapper.build(request, repOrderDTO, assessmentType, RequestSource.MEANS_ASSESSMENT);
+
+        if (applicationTrackingOutputResult.getUsn() != null) {
+            applicationTrackingDataService.sendTrackingOutputResult(applicationTrackingOutputResult);
+        }
+
         AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(
                 request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO());
         assessmentSummaryService.updateApplication(application, assessmentSummaryDTO);
@@ -178,12 +194,5 @@ public class MeansAssessmentOrchestrationService {
         proceedingsService.determineMagsRepDecision(request);
 
         request.setApplicationDTO(contributionService.calculate(request));
-
-        ApplicationTrackingOutputResult applicationTrackingOutputResult =
-                applicationTrackingMapper.build(request, repOrderDTO);
-
-        if (applicationTrackingOutputResult.getUsn() != null) {
-            applicationTrackingDataService.sendTrackingOutputResult(applicationTrackingOutputResult);
-        }
     }
 }

@@ -178,6 +178,7 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         assertStubForUpdateCrownCourtApplication(1);
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1, TestModelDataBuilder.REP_ID);
+        assertStubForSendApplicationTrackingResult(1);
         assertStubForInvokeStoredProcedure(4);
     }
 
@@ -320,6 +321,7 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         assertStubForUpdateCrownCourtApplication(1);
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1, TestModelDataBuilder.REP_ID);
+        assertStubForSendApplicationTrackingResult(1);
         assertStubForInvokeStoredProcedure(4);
     }
 
