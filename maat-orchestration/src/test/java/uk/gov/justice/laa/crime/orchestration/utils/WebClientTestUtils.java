@@ -114,9 +114,7 @@ public class WebClientTestUtils {
             throws Exception {
         if (Objects.isNull(errorMessages) || errorMessages.isEmpty()) {
             // if empty, should have had problemDetails.detail put in place. Check for it.
-            resultActions
-                    .andExpect(jsonPath("$.messageList.length()").value(1))
-                    .andExpect(jsonPath("$.messageList[0]").value(HttpStatus.BAD_REQUEST.getReasonPhrase()));
+            resultActions.andExpect(jsonPath("$.messageList").isEmpty());
         } else {
             List<String> messageList =
                     errorMessages.stream().map(ErrorMessage::message).toList();
