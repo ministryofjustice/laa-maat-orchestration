@@ -2,6 +2,7 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import static uk.gov.justice.laa.crime.orchestration.data.Constants.ASSESSMENT_SUMMARY_ID;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.LEGACY_APPEAL_ID;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.USN;
 
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
@@ -52,7 +53,7 @@ class ApplicationTrackingMapperTest {
         ApplicationTrackingOutputResult request =
                 mapper.build(workflowRequest, repOrderDTO, AssessmentType.CCHARDSHIP, RequestSource.HARDSHIP);
 
-        softly.assertThat(request.getUsn()).isNull();
+        softly.assertThat(request.getUsn()).isEqualTo(USN.longValue());
         softly.assertThat(request.getMaatRef()).isEqualTo(TestModelDataBuilder.REP_ID.intValue());
         softly.assertThat(request.getActionKeyId()).isEqualTo(Constants.FINANCIAL_ASSESSMENT_ID);
         softly.assertThat(request.getCaseId())
