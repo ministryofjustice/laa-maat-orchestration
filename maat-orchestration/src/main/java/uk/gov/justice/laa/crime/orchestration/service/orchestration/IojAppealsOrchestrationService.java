@@ -15,6 +15,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.IojAppealMapper;
+import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationTrackingDataService;
 import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
 import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
@@ -41,6 +42,7 @@ public class IojAppealsOrchestrationService {
     private final WorkflowPreProcessorService workflowPreProcessorService;
     private final ApplicationTrackingMapper applicationTrackingMapper;
     private final ApplicationTrackingDataService applicationTrackingDataService;
+    private final ApplicationService applicationService;
 
     public IOJAppealDTO find(int appealId) {
         return iojAppealService.find(appealId);
@@ -74,6 +76,8 @@ public class IojAppealsOrchestrationService {
         AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(
                 request.getApplicationDTO().getAssessmentDTO().getIojAppeal());
         assessmentSummaryService.updateApplication(request.getApplicationDTO(), assessmentSummaryDTO);
+
+        applicationService.updateDateModified(request, request.getApplicationDTO());
 
         // Call Application Tracking Service endpoint
         ApplicationTrackingOutputResult applicationTrackingOutputResult =

@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.LEGACY_APPEAL_ID;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForPatchRepOrder;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForSendApplicationTrackingResult;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCalculateContributions;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCreateIojAppeal;
@@ -176,6 +177,8 @@ class IojAppealIntegrationTest extends WiremockIntegrationTest {
                         jsonPath("$.assessmentDTO.iojAppeal.newWorkReasonDTO").value(expected.getNewWorkReasonDTO()));
 
         verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/ioj-appeals")));
+
+        assertStubForPatchRepOrder(1);
         assertStubForSendApplicationTrackingResult(1);
     }
 }

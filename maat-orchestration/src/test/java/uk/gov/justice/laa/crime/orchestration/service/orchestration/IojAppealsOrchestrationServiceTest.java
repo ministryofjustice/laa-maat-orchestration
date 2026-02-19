@@ -15,6 +15,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.IojAppealMapper;
+import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
 import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
 import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
 import uk.gov.justice.laa.crime.orchestration.service.IojAppealService;
@@ -32,6 +33,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith({MockitoExtension.class})
 class IojAppealsOrchestrationServiceTest {
     private static final int EXISTING_APPEAL_ID = 1;
+
+    @Mock
+    private ApplicationService applicationService;
 
     @Mock
     private AssessmentSummaryService assessmentSummaryService;
@@ -109,6 +113,7 @@ class IojAppealsOrchestrationServiceTest {
                         workflowRequest.getApplicationDTO(),
                         workflowRequest.getUserDTO(),
                         StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE);
+        verify(applicationService).updateDateModified(workflowRequest, workflowRequest.getApplicationDTO());
 
         verify(assessmentSummaryService, times(1)).getSummary(iojAppealDTO);
         verify(assessmentSummaryService).updateApplication(workflowRequest.getApplicationDTO(), assessmentSummaryDTO);
