@@ -36,7 +36,7 @@ class IojAppealServiceTest {
     @Test
     void givenAppealId_whenFindIsInvoked_thenApiServiceIsCalledAndResponseMapped() {
         ApiGetIojAppealResponse response = TestModelDataBuilder.getIojAppealResponse();
-        when(assessmentApiService.find(EXISTING_APPEAL_ID)).thenReturn(response);
+        when(assessmentApiService.findIojAppeal(EXISTING_APPEAL_ID)).thenReturn(response);
 
         iojAppealService.find(EXISTING_APPEAL_ID);
 
@@ -52,12 +52,12 @@ class IojAppealServiceTest {
 
         when(iojAppealMapper.mapIojAppealDtoToApiCreateIojAppealRequest(workflowRequest))
                 .thenReturn(request);
-        when(assessmentApiService.create(request)).thenReturn(response);
+        when(assessmentApiService.createIojAppeal(request)).thenReturn(response);
 
         ApplicationDTO applicationDTO = iojAppealService.create(workflowRequest);
 
         verify(iojAppealMapper).mapIojAppealDtoToApiCreateIojAppealRequest(workflowRequest);
-        verify(assessmentApiService).create(request);
+        verify(assessmentApiService).createIojAppeal(request);
         assertThat(applicationDTO.getAssessmentDTO().getIojAppeal().getIojId()).isEqualTo(EXISTING_APPEAL_ID);
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
+import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 
 @HttpExchange
 public interface CrimeAssessmentApiClient {
@@ -18,4 +19,7 @@ public interface CrimeAssessmentApiClient {
 
     @PostExchange("/ioj-appeals")
     ApiCreateIojAppealResponse createIojAppeal(@RequestBody ApiCreateIojAppealRequest request);
+
+    @GetExchange("/passport/{assessmentId}")
+    ApiGetPassportedAssessmentResponse getPassportAssessment(@PathVariable Integer assessmentId);
 }

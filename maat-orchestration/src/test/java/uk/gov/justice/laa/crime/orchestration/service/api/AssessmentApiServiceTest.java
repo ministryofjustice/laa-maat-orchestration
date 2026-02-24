@@ -27,28 +27,28 @@ class AssessmentApiServiceTest {
     private AssessmentApiService assessmentApiService;
 
     @Test
-    void givenAppealId_whenFindIsInvoked_thenApiClientReturnsResponse() {
+    void givenAppealId_whenFindIojAppealIsInvoked_thenApiClientReturnsResponse() {
         when(assessmentApiClient.getIojAppeal(EXISTING_APPEAL_ID)).thenReturn(new ApiGetIojAppealResponse());
 
-        assessmentApiService.find(EXISTING_APPEAL_ID);
+        assessmentApiService.findIojAppeal(EXISTING_APPEAL_ID);
 
         verify(assessmentApiClient).getIojAppeal(EXISTING_APPEAL_ID);
     }
 
     @Test
-    void givenNullResponse_whenFindIsInvoked_thenExceptionThrown() {
+    void givenNullResponse_whenFindIojAppealIsInvoked_thenExceptionThrown() {
         when(assessmentApiClient.getIojAppeal(EXISTING_APPEAL_ID)).thenReturn(null);
 
-        assertThatThrownBy(() -> assessmentApiService.find(EXISTING_APPEAL_ID))
+        assertThatThrownBy(() -> assessmentApiService.findIojAppeal(EXISTING_APPEAL_ID))
                 .isInstanceOf(WebClientResponseException.class);
     }
 
     @Test
-    void givenCreateIojAppealRequest_whenCreateIsInvoked_thenApiClientReturnsResponse() {
+    void givenCreateIojAppealRequest_whenCreateIojAppealIsInvoked_thenApiClientReturnsResponse() {
         ApiCreateIojAppealRequest request = new ApiCreateIojAppealRequest();
         when(assessmentApiClient.createIojAppeal(request)).thenReturn(new ApiCreateIojAppealResponse());
 
-        assessmentApiService.create(request);
+        assessmentApiService.createIojAppeal(request);
 
         verify(assessmentApiClient).createIojAppeal(request);
     }

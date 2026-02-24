@@ -24,7 +24,7 @@ public class IojAppealService {
     private final UserMapper userMapper;
 
     public IOJAppealDTO find(int appealId) {
-        ApiGetIojAppealResponse response = assessmentApiService.find(appealId);
+        ApiGetIojAppealResponse response = assessmentApiService.findIojAppeal(appealId);
 
         return iojAppealMapper.apiGetIojAppealResponseToIojAppealDTO(response);
     }
@@ -35,7 +35,7 @@ public class IojAppealService {
 
         ApiCreateIojAppealRequest iojAppealRequest =
                 iojAppealMapper.mapIojAppealDtoToApiCreateIojAppealRequest(request);
-        ApiCreateIojAppealResponse iojAppealResponse = assessmentApiService.create(iojAppealRequest);
+        ApiCreateIojAppealResponse iojAppealResponse = assessmentApiService.createIojAppeal(iojAppealRequest);
 
         iojAppealDto.setIojId(iojAppealResponse.getLegacyAppealId().longValue());
 
