@@ -11,8 +11,8 @@ public class PassportAssessmentOrchestrationService {
 
     private final PassportAssessmentService passportAssessmentService;
 
-    public PassportedDTO find(int assessmentId) {
-        return passportAssessmentService.find(assessmentId);
+    public PassportedDTO find(int legacyId) {
+        return passportAssessmentService.find(legacyId);
     }
 
 }

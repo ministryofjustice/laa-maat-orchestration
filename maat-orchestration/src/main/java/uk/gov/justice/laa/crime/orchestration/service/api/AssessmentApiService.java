@@ -46,9 +46,16 @@ public class AssessmentApiService {
         return response;
     }
 
-    public ApiGetPassportedAssessmentResponse findPassportAssessment(int assessmentId) {
+    public ApiGetPassportedAssessmentResponse findPassportAssessment(int legacyId) {
+        log.debug("Request to Assessment Service to retrieve Passport Assessment: {}", legacyId);
+
         ApiGetPassportedAssessmentResponse response = Optional.ofNullable(
-            assessmentApiClient.getPassportAssessment(assessmentId)).orElseThrow();
+                assessmentApiClient.getPassportAssessment(legacyId))
+            .orElseThrow(() ->
+                new WebClientResponseException(HttpStatus.NOT_FOUND.value(), "Not found", null,
+                    null, null));
+
+        log.debug(REQUEST_STRING, response);
 
         return response;
     }

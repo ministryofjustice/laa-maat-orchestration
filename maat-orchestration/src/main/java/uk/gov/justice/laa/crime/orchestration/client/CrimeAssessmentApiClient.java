@@ -20,6 +20,6 @@ public interface CrimeAssessmentApiClient {
     @PostExchange("/ioj-appeals")
     ApiCreateIojAppealResponse createIojAppeal(@RequestBody ApiCreateIojAppealRequest request);
 
-    @GetExchange("/passport/{assessmentId}")
-    ApiGetPassportedAssessmentResponse getPassportAssessment(@PathVariable Integer assessmentId);
+    @GetExchange("/passport/lookup-by-legacy-id/{legacyId}")
+    ApiGetPassportedAssessmentResponse getPassportAssessment(@PathVariable Integer legacyId);
 }

@@ -14,9 +14,9 @@ public class PassportAssessmentService {
     private final AssessmentApiService assessmentApiService;
     private final PassportAssessmentMapper passportAssessmentMapper;
 
-    public PassportedDTO find(int assessmentId) {
+    public PassportedDTO find(int legacyId) {
         ApiGetPassportedAssessmentResponse response = assessmentApiService.findPassportAssessment(
-            assessmentId);
+            legacyId);
 
         return passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(response);
     }
