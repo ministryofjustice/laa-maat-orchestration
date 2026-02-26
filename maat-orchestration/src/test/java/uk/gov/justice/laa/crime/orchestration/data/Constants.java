@@ -9,6 +9,7 @@ import java.time.ZoneOffset;
 import java.util.Date;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import uk.gov.justice.laa.crime.enums.NewWorkReason;
 
 public class Constants {
 
@@ -26,4 +27,9 @@ public class Constants {
     public static final String USERNAME = "mock-u";
     public static final String TEST_TRACE_ID = "test-trace-id";
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    public static final Integer USN = 123456789;
+    public static final LocalDateTime ASSESSMENT_DATETIME = LocalDateTime.of(2022, 9, 3, 0, 0, 0);
+    public static final String NOTES = "This is a test note.";
+    public static final int PASSPORT_ASSESSMENT_ID = 123;
+    public static final LocalDateTime LAST_SIGNON_DATETIME = LocalDateTime.of(2022, 8, 3, 0, 0, 0);
 }
