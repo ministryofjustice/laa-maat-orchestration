@@ -63,7 +63,7 @@ class AssessmentApiServiceTest {
     @Test
     void givenValidLegacyId_whenFindPassportAssessmentIsInvoked_thenApiClientReturnsResponse() {
         ApiGetPassportedAssessmentResponse response =
-            PassportAssessmentDataBuilder.getPassportedAssessmentResponse();
+            PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse();
 
         when(assessmentApiClient.getPassportAssessment(PASSPORT_ASSESSMENT_ID))
             .thenReturn(response);

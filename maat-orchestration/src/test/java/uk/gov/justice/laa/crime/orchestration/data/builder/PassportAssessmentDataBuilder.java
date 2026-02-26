@@ -11,6 +11,7 @@ import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.PassportAssessmentDecision;
 import uk.gov.justice.laa.crime.enums.PassportAssessmentDecisionReason;
 import uk.gov.justice.laa.crime.enums.ReviewType;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 
 @Component
 public class PassportAssessmentDataBuilder {
@@ -23,7 +24,7 @@ public class PassportAssessmentDataBuilder {
             .withLegacyPartnerId(null);
     }
 
-    public static ApiGetPassportedAssessmentResponse getPassportedAssessmentResponse() {
+    public static ApiGetPassportedAssessmentResponse getApiGetPassportedAssessmentResponse() {
         return new ApiGetPassportedAssessmentResponse()
             .withAssessmentId("deb7a9a4-2ad3-4ac8-95a4-ef0746c52ed0")
             .withLegacyAssessmentId(PASSPORT_ASSESSMENT_ID)
@@ -36,5 +37,10 @@ public class PassportAssessmentDataBuilder {
             .withAssessmentDecision(PassportAssessmentDecision.PASS)
             .withDecisionReason(PassportAssessmentDecisionReason.DWP_CHECK)
             .withNotes(NOTES);
+    }
+
+    // TODO: Populate this with actual test values once questions been resolved
+    public static PassportedDTO getPassportedDTO() {
+        return PassportedDTO.builder().build();
     }
 }
