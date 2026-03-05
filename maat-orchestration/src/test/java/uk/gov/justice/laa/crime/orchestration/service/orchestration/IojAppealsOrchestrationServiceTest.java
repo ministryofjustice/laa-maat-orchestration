@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -13,6 +14,8 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
+import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
+import uk.gov.justice.laa.crime.orchestration.exception.RollbackException;
 import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.IojAppealMapper;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
@@ -33,6 +36,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith({MockitoExtension.class})
 class IojAppealsOrchestrationServiceTest {
     private static final int EXISTING_APPEAL_ID = 1;
+    private static final String APPEAL_ID = "654";
 
     @Mock
     private ApplicationService applicationService;
@@ -117,5 +121,38 @@ class IojAppealsOrchestrationServiceTest {
 
         verify(assessmentSummaryService, times(1)).getSummary(iojAppealDTO);
         verify(assessmentSummaryService).updateApplication(workflowRequest.getApplicationDTO(), assessmentSummaryDTO);
+    }
+
+    @Test
+    void givenWorkflowRequest_whenCreateIsInvokedAndPostProcessingFails_thenMaatOrchestrationExceptionThrown() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO());
+        UserActionDTO userActionDTO = TestModelDataBuilder.getUserActionDTO();
+
+        when(repOrderService.getRepOrder(workflowRequest)).thenReturn(repOrderDTO);
+        when(iojAppealMapper.getUserActionDTO(workflowRequest)).thenReturn(userActionDTO);
+        when(proceedingsService.determineMagsRepDecision(workflowRequest))
+                .thenThrow(new RuntimeException("Runtime Exception"));
+
+        assertThatThrownBy(() -> iojAppealsOrchestrationService.create(workflowRequest))
+                .isInstanceOf(MaatOrchestrationException.class);
+    }
+
+    @Test
+    void givenWorkflowRequest_whenCreateIsInvokedAndPostProcessAndRollbackFails_thenWebClientExceptionThrown() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO());
+        UserActionDTO userActionDTO = TestModelDataBuilder.getUserActionDTO();
+
+        when(iojAppealService.create(workflowRequest)).thenReturn(APPEAL_ID);
+        when(repOrderService.getRepOrder(workflowRequest)).thenReturn(repOrderDTO);
+        when(iojAppealMapper.getUserActionDTO(workflowRequest)).thenReturn(userActionDTO);
+        when(proceedingsService.determineMagsRepDecision(workflowRequest))
+                .thenThrow(new RuntimeException("Runtime Exception"));
+        when(iojAppealService.rollback(APPEAL_ID, workflowRequest))
+                .thenThrow(new RollbackException(workflowRequest.getApplicationDTO()));
+
+        assertThatThrownBy(() -> iojAppealsOrchestrationService.create(workflowRequest))
+                .isInstanceOf(RollbackException.class);
     }
 }

@@ -12,6 +12,8 @@ import uk.gov.justice.laa.crime.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
+import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
+import uk.gov.justice.laa.crime.orchestration.exception.RollbackException;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.IojAppealsOrchestrationService;
 
 import org.springframework.http.MediaType;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class IojAppealController {
 
     private final IojAppealsOrchestrationService orchestrationService;
+    private static final int REQUEST_ROLLED_BACK = 555;
 
     @GetMapping(value = "/{appealId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Find IoJ Appeal")
@@ -56,6 +59,13 @@ public class IojAppealController {
                             schema = @Schema(implementation = ApplicationDTO.class)))
     @DefaultHTTPErrorResponse
     public ResponseEntity<ApplicationDTO> create(@Valid @RequestBody WorkflowRequest workflowRequest) {
-        return ResponseEntity.ok(orchestrationService.create(workflowRequest));
+        log.info("Received request to create IoJ Appeal");
+        try {
+            return ResponseEntity.ok(orchestrationService.create(workflowRequest));
+        } catch (RollbackException ex) {
+            return ResponseEntity.internalServerError().body(ex.getApplicationDTO());
+        } catch (MaatOrchestrationException ex) {
+            return ResponseEntity.status(REQUEST_ROLLED_BACK).body(ex.getApplicationDTO());
+        }
     }
 }

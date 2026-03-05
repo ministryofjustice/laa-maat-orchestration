@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealRequest;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiGetIojAppealResponse;
+import uk.gov.justice.laa.crime.common.model.ioj.ApiRollbackIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.client.CrimeAssessmentApiClient;
 
@@ -54,6 +55,13 @@ public class AssessmentApiService {
 
         log.debug(REQUEST_STRING, response);
 
+        return response;
+    }
+
+    public ApiRollbackIojAppealResponse rollback(String appealId) {
+        log.debug(REQUEST_STRING, appealId);
+        ApiRollbackIojAppealResponse response = assessmentApiClient.rollback(appealId);
+        log.debug(RESPONSE_STRING, response);
         return response;
     }
 }

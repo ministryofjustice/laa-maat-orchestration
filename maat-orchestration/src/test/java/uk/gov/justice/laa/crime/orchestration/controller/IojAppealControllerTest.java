@@ -18,6 +18,8 @@ import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
+import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
+import uk.gov.justice.laa.crime.orchestration.exception.RollbackException;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.IojAppealsOrchestrationService;
 import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
 import uk.gov.justice.laa.crime.orchestration.utils.WebClientTestUtils;
@@ -166,6 +168,23 @@ class IojAppealControllerTest {
                 WebClientTestUtils.getWebClientResponseException(HttpStatus.INTERNAL_SERVER_ERROR);
         when(orchestrationService.create(any(WorkflowRequest.class))).thenThrow(webClientResponseException);
 
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkFlowRequest());
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void givenPostProcessingFails_whenCreateIsInvoked_thenInternalServerErrorResponseIsReturned() throws Exception {
+        when(orchestrationService.create(any(WorkflowRequest.class))).thenThrow(MaatOrchestrationException.class);
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkFlowRequest());
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
+                .andExpect(status().is(555));
+    }
+
+    @Test
+    void givenPostProcessingAndRollbackFail_whenCreateIsInvoked_thenInternalServerErrorResponseIsReturned()
+            throws Exception {
+        when(orchestrationService.create(any(WorkflowRequest.class))).thenThrow(RollbackException.class);
         String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkFlowRequest());
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isInternalServerError());
