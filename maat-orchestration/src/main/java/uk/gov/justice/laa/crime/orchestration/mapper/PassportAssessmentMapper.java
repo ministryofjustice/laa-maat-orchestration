@@ -6,6 +6,7 @@ import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
+import uk.gov.justice.laa.crime.enums.BenefitRecipient;
 import uk.gov.justice.laa.crime.enums.BenefitType;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentStatusDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.JobSeekerDTO;
@@ -41,6 +42,7 @@ public class PassportAssessmentMapper {
             .type(response.getAssessmentReason().getType())
             .build();
 
+        // TODO: Need to populate passportSummaryEvidenceDTO following completion of investigation LCAM-2002
         // Not setting dwpResult and dwpWhoChecked as these are no longer used in MAAT and so can left as null.
         PassportedDTO dto = PassportedDTO.builder()
             .passportedId(Long.valueOf(response.getLegacyAssessmentId()))
@@ -50,16 +52,14 @@ public class PassportAssessmentMapper {
             .assessementStatusDTO(assessmentStatusDTO)
             .passportConfirmationDTO(passportConfirmationDTO)
             .newWorkReason(newWorkReasonDTO)
-            .benefitClaimedByPartner() // TODO: Set this based on call to get partner details from MAAT API???
             .partnerDetails() // TODO: Use partner id in declared benefit to get partner details from MAAT API???
             .notes(response.getNotes())
-            .result(response.getAssessmentDecision()) // TODO: Need to confirm if map based on assessment decision, FAIL_BYPASS = dwp FAIL, what is DWP pass, think this might be redundant???
+            .result(response.getAssessmentDecision().getCode())
             .under18HeardYouthCourt(response.getDeclaredUnder18())
             .under18HeardMagsCourt() // TODO: Need to double check it's ok to not set these as we are not getting any detail back from crime assessment
             .under18FullEducation() // TODO: Need to double check it's ok to not set these as we are not getting any detail back from crime assessment
             .under16() // TODO: Need to double check it's ok to not set these as we are not getting any detail back from crime assessment
             .between1617() // TODO: Need to double check it's ok to not set these as we are not getting any detail back from crime assessment
-            .passportSummaryEvidenceDTO() // TODO: Assume call to evidence service to populate this???
             .build();
 
         if (response.getReviewType() != null) {
@@ -71,6 +71,9 @@ public class PassportAssessmentMapper {
         }
 
         if (response.getDeclaredBenefit() != null) {
+            dto.setBenefitClaimedByPartner(BenefitRecipient.PARTNER.equals(
+                response.getDeclaredBenefit().getBenefitRecipient()));
+
             switch (response.getDeclaredBenefit().getBenefitType()) {
                 case BenefitType.INCOME_SUPPORT -> dto.setBenefitIncomeSupport(true);
                 case BenefitType.JSA -> {
