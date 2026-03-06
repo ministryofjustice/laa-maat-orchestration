@@ -1,12 +1,17 @@
 package uk.gov.justice.laa.crime.orchestration.service.api;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
+import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.client.MaatCourtDataApiClient;
 import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.SendToCCLFDTO;
@@ -46,6 +51,18 @@ public class MaatCourtDataApiService {
         return userSummaryDTO;
     }
 
+    public ApplicantDTO getApplicant(int applicantId) {
+        log.debug(REQUEST_STRING, applicantId);
+
+        ApplicantDTO response = Optional.ofNullable(maatApiClient.getApplicant(applicantId))
+            .orElseThrow(
+                () -> new WebClientResponseException(HttpStatus.NOT_FOUND.value(), "Not found",
+                    null, null, null));
+
+        log.debug(RESPONSE_STRING, response);
+        return response;
+    }
+
     public void updateSendToCCLF(SendToCCLFDTO sendToCCLFDTO) {
         log.debug(REQUEST_STRING, sendToCCLFDTO);
         maatApiClient.updateSendToCCLF(sendToCCLFDTO);
@@ -53,15 +70,17 @@ public class MaatCourtDataApiService {
 
     public FinancialAssessmentDTO getFinancialAssessment(int financialAssessmentId) {
         log.info(REQUEST_STRING, financialAssessmentId);
-        FinancialAssessmentDTO financialAssessmentDTO = maatApiClient.getFinancialAssessment(financialAssessmentId);
+        FinancialAssessmentDTO financialAssessmentDTO = maatApiClient.getFinancialAssessment(
+            financialAssessmentId);
         log.debug(RESPONSE_STRING, financialAssessmentDTO);
         return financialAssessmentDTO;
     }
 
-    public MaatApiAssessmentResponse updateFinancialAssessment(MaatApiUpdateAssessment maatApiUpdateAssessment) {
+    public MaatApiAssessmentResponse updateFinancialAssessment(
+        MaatApiUpdateAssessment maatApiUpdateAssessment) {
         log.debug(REQUEST_STRING, maatApiUpdateAssessment);
         MaatApiAssessmentResponse financialAssessmentDTO =
-                maatApiClient.updateFinancialAssessment(maatApiUpdateAssessment);
+            maatApiClient.updateFinancialAssessment(maatApiUpdateAssessment);
         log.debug(RESPONSE_STRING, financialAssessmentDTO);
         return financialAssessmentDTO;
     }

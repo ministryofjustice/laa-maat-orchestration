@@ -4,6 +4,7 @@ import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAsse
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
 import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.SendToCCLFDTO;
@@ -30,6 +31,9 @@ public interface MaatCourtDataApiClient {
 
     @GetExchange("/users/summary/{username}")
     UserSummaryDTO getUserSummary(@PathVariable String username);
+
+    @GetExchange("/application/applicant/{applicantId}")
+    ApplicantDTO getApplicant(@PathVariable int applicantId);
 
     @PutExchange("/application/applicant/update-cclf")
     void updateSendToCCLF(@RequestBody SendToCCLFDTO request);

@@ -1,19 +1,21 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import jakarta.validation.ValidationException;
-import java.time.ZoneId;
-import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
+import uk.gov.justice.laa.crime.common.model.passported.DeclaredBenefit;
 import uk.gov.justice.laa.crime.enums.BenefitRecipient;
 import uk.gov.justice.laa.crime.enums.BenefitType;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentStatusDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.JobSeekerDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.NewWorkReasonDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.PartnerDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportConfirmationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ReviewTypeDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO;
+import uk.gov.justice.laa.crime.util.DateUtil;
 
 @Component
 @RequiredArgsConstructor
@@ -22,7 +24,7 @@ public class PassportAssessmentMapper {
     private static final String ASSESSMENT_STATUS_DESCRIPTION = "Complete";
 
     public PassportedDTO apiGetPassportedAssessmentResponseToPassportedDTO(
-        ApiGetPassportedAssessmentResponse response) {
+        ApiGetPassportedAssessmentResponse response, ApplicantDTO applicantDTO) {
 
         // TODO: Could split this out into seperate class as duplicate to ioj???
         AssessmentStatusDTO assessmentStatusDTO = AssessmentStatusDTO.builder()
@@ -48,11 +50,10 @@ public class PassportAssessmentMapper {
             .passportedId(Long.valueOf(response.getLegacyAssessmentId()))
             .cmuId(Long.valueOf(response.getCaseManagementUnitId()))
             .usn(Long.valueOf(response.getUsn()))
-            .date(Date.from(response.getAssessmentDate().atZone(ZoneId.systemDefault()).toInstant()))
+            .date(DateUtil.toDate(response.getAssessmentDate()))
             .assessementStatusDTO(assessmentStatusDTO)
             .passportConfirmationDTO(passportConfirmationDTO)
             .newWorkReason(newWorkReasonDTO)
-            .partnerDetails() // TODO: Use partner id in declared benefit to get partner details from MAAT API???
             .notes(response.getNotes())
             .result(response.getAssessmentDecision().getCode())
             .under18HeardYouthCourt(response.getDeclaredUnder18())
@@ -70,18 +71,26 @@ public class PassportAssessmentMapper {
             dto.setReviewType(reviewTypeDTO);
         }
 
-        if (response.getDeclaredBenefit() != null) {
-            dto.setBenefitClaimedByPartner(BenefitRecipient.PARTNER.equals(
-                response.getDeclaredBenefit().getBenefitRecipient()));
+        DeclaredBenefit declaredBenefit = response.getDeclaredBenefit();
+        if (declaredBenefit != null) {
+            if (applicantDTO != null) {
+                dto.setBenefitClaimedByPartner(true);
 
-            switch (response.getDeclaredBenefit().getBenefitType()) {
+                PartnerDTO partnerDTO = PartnerDTO.builder()
+                    .firstName(applicantDTO.getFirstName())
+                    .surname(applicantDTO.getLastName())
+                    .nationaInsuranceNumber(applicantDTO.getNiNumber())
+                    .dateOfBirth(DateUtil.asDate(applicantDTO.getDob()))
+                    .build();
+                dto.setPartnerDetails(partnerDTO);
+            }
+
+            switch (declaredBenefit.getBenefitType()) {
                 case BenefitType.INCOME_SUPPORT -> dto.setBenefitIncomeSupport(true);
                 case BenefitType.JSA -> {
                     JobSeekerDTO jobSeekerDTO = JobSeekerDTO.builder()
-                        .isJobSeeker(
-                            BenefitType.JSA.equals(response.getDeclaredBenefit().getBenefitType()))
-                        .lastSignedOn(Date.from(response.getDeclaredBenefit().getLastSignOnDate()
-                            .atZone(ZoneId.systemDefault()).toInstant()))
+                        .isJobSeeker(BenefitType.JSA.equals(declaredBenefit.getBenefitType()))
+                        .lastSignedOn(DateUtil.toDate(declaredBenefit.getLastSignOnDate()))
                         .build();
                     dto.setBenefitJobSeeker(jobSeekerDTO);
                 }
