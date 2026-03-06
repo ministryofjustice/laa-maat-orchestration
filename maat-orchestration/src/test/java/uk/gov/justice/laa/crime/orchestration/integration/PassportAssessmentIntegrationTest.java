@@ -56,7 +56,7 @@ class PassportAssessmentIntegrationTest extends WiremockIntegrationTest {
     void givenValidLegacyId_whenFindIsInvoked_thenPassportAssessmentIsReturned() throws Exception {
         stubForOAuth();
         stubForFindPassportAssessment(objectMapper.writeValueAsString(
-            PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse()));
+            PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(false)));
 
         PassportedDTO expected = PassportAssessmentDataBuilder.getPassportedDTO();
 

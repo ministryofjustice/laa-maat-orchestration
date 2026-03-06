@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.data;
 
+import java.time.LocalDate;
 import uk.gov.justice.laa.crime.enums.HardshipReviewResult;
 
 import java.math.BigDecimal;
@@ -9,7 +10,6 @@ import java.time.ZoneOffset;
 import java.util.Date;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import uk.gov.justice.laa.crime.enums.NewWorkReason;
 
 public class Constants {
 
@@ -24,6 +24,11 @@ public class Constants {
             Date.from(Instant.ofEpochSecond(ASSESSMENT_SUMMARY_DATETIME.toEpochSecond(ZoneOffset.UTC)));
     public static final Integer CONTRIBUTIONS_ID = 43;
     public static final Integer APPLICANT_ID = 999;
+    public static final Integer PARTNER_ID = 666;
+    public static final String FIRST_NAME = "Edward";
+    public static final String LAST_NAME = "Munson";
+    public static final String NI_NUMBER = "JR679802A";
+    public static final LocalDate DATE_OF_BIRTH = LocalDate.of(1969, 11, 24)
     public static final String USERNAME = "mock-u";
     public static final String TEST_TRACE_ID = "test-trace-id";
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();

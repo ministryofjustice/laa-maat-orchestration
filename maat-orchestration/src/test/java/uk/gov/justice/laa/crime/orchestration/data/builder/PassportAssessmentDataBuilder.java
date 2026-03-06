@@ -12,6 +12,7 @@ import uk.gov.justice.laa.crime.enums.PassportAssessmentDecision;
 import uk.gov.justice.laa.crime.enums.PassportAssessmentDecisionReason;
 import uk.gov.justice.laa.crime.enums.ReviewType;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO;
 
 @Component
 public class PassportAssessmentDataBuilder {
@@ -24,7 +25,15 @@ public class PassportAssessmentDataBuilder {
             .withLegacyPartnerId(null);
     }
 
-    public static ApiGetPassportedAssessmentResponse getApiGetPassportedAssessmentResponse() {
+    private static DeclaredBenefit getDeclaredPartnerBenefit() {
+        return new DeclaredBenefit()
+            .withBenefitType(BenefitType.JSA)
+            .withLastSignOnDate(LAST_SIGNON_DATETIME)
+            .withBenefitRecipient(BenefitRecipient.PARTNER)
+            .withLegacyPartnerId(PARTNER_ID);
+    }
+
+    public static ApiGetPassportedAssessmentResponse getApiGetPassportedAssessmentResponse(boolean hasPartner) {
         return new ApiGetPassportedAssessmentResponse()
             .withAssessmentId("deb7a9a4-2ad3-4ac8-95a4-ef0746c52ed0")
             .withLegacyAssessmentId(PASSPORT_ASSESSMENT_ID)
@@ -33,10 +42,19 @@ public class PassportAssessmentDataBuilder {
             .withAssessmentReason(NewWorkReason.FMA)
             .withReviewType(ReviewType.ER)
             .withDeclaredUnder18(false)
-            .withDeclaredBenefit(getDeclaredBenefit())
+            .withDeclaredBenefit(hasPartner ? getDeclaredPartnerBenefit() : getDeclaredBenefit())
             .withAssessmentDecision(PassportAssessmentDecision.PASS)
             .withDecisionReason(PassportAssessmentDecisionReason.DWP_CHECK)
             .withNotes(NOTES);
+    }
+
+    public static ApplicantDTO getApplicantDTO() {
+        return ApplicantDTO.builder()
+            .firstName(FIRST_NAME)
+            .lastName(LAST_NAME)
+            .niNumber(NI_NUMBER)
+            .dob(DATE_OF_BIRTH)
+            .build();
     }
 
     // TODO: Populate this with actual test values once questions been resolved
