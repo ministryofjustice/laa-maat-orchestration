@@ -19,21 +19,20 @@ public class PassportAssessmentService {
     private final MaatCourtDataApiService maatCourtDataApiService;
     private final PassportAssessmentMapper passportAssessmentMapper;
 
+    private boolean hasPartnerBenefit(DeclaredBenefit declaredBenefit) {
+        return declaredBenefit != null && BenefitRecipient.PARTNER.equals(
+            declaredBenefit.getBenefitRecipient());
+    }
+
     public PassportedDTO find(int legacyId) {
         ApiGetPassportedAssessmentResponse response = assessmentApiService.findPassportAssessment(
             legacyId);
 
-        DeclaredBenefit declaredBenefit = response.getDeclaredBenefit();
-        if (declaredBenefit != null
-            && BenefitRecipient.PARTNER.equals(declaredBenefit.getBenefitRecipient())) {
-            ApplicantDTO applicantDTO = maatCourtDataApiService.getApplicant(
-                declaredBenefit.getLegacyPartnerId());
+        ApplicantDTO applicantDTO =
+            hasPartnerBenefit(response.getDeclaredBenefit()) ? maatCourtDataApiService.getApplicant(
+                response.getDeclaredBenefit().getLegacyPartnerId()) : null;
 
-            return passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(
-                response, applicantDTO);
-        } else {
-            return passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(
-                response, null);
-        }
+        return passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(response,
+            applicantDTO);
     }
 }

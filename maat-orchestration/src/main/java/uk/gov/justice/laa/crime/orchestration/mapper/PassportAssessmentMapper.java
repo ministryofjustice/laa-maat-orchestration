@@ -26,7 +26,6 @@ public class PassportAssessmentMapper {
     public PassportedDTO apiGetPassportedAssessmentResponseToPassportedDTO(
         ApiGetPassportedAssessmentResponse response, ApplicantDTO applicantDTO) {
 
-        // TODO: Could split this out into seperate class as duplicate to ioj???
         AssessmentStatusDTO assessmentStatusDTO = AssessmentStatusDTO.builder()
             .status(AssessmentStatusDTO.COMPLETE)
             .description(ASSESSMENT_STATUS_DESCRIPTION)
@@ -37,7 +36,6 @@ public class PassportAssessmentMapper {
             .description(response.getDecisionReason().getDescription())
             .build();
 
-        // TODO: Could split this out into seperate class as duplicate to ioj???
         NewWorkReasonDTO newWorkReasonDTO = NewWorkReasonDTO.builder()
             .code(response.getAssessmentReason().getCode())
             .description(response.getAssessmentReason().getDescription())
@@ -45,6 +43,7 @@ public class PassportAssessmentMapper {
             .build();
 
         // TODO: Need to populate passportSummaryEvidenceDTO following completion of investigation LCAM-2002
+        // TODO: Might need to amend mapping of legacy age related values based on feedback from the business
         // Not setting dwpResult and dwpWhoChecked as these are no longer used in MAAT and so can left as null.
         PassportedDTO dto = PassportedDTO.builder()
             .passportedId(Long.valueOf(response.getLegacyAssessmentId()))
@@ -57,10 +56,6 @@ public class PassportAssessmentMapper {
             .notes(response.getNotes())
             .result(response.getAssessmentDecision().getCode())
             .under18HeardYouthCourt(response.getDeclaredUnder18())
-            .under18HeardMagsCourt() // TODO: Need to double check it's ok to not set these as we are not getting any detail back from crime assessment
-            .under18FullEducation() // TODO: Need to double check it's ok to not set these as we are not getting any detail back from crime assessment
-            .under16() // TODO: Need to double check it's ok to not set these as we are not getting any detail back from crime assessment
-            .between1617() // TODO: Need to double check it's ok to not set these as we are not getting any detail back from crime assessment
             .build();
 
         if (response.getReviewType() != null) {

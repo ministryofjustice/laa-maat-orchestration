@@ -28,7 +28,7 @@ public class Constants {
     public static final String FIRST_NAME = "Edward";
     public static final String LAST_NAME = "Munson";
     public static final String NI_NUMBER = "JR679802A";
-    public static final LocalDate DATE_OF_BIRTH = LocalDate.of(1969, 11, 24)
+    public static final LocalDate DATE_OF_BIRTH = LocalDate.of(1969, 11, 24);
     public static final String USERNAME = "mock-u";
     public static final String TEST_TRACE_ID = "test-trace-id";
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
