@@ -1,4 +1,5 @@
-FROM amazoncorretto:21-alpine
+FROM amazoncorretto:21-alpine3.23-jdk
+RUN apk add --no-cache --upgrade zlib=1.3.2-r0
 RUN mkdir -p /opt/laa-maat-orchestration/
 WORKDIR /opt/laa-maat-orchestration/
 COPY ./build/libs/maat-orchestration.jar /opt/laa-maat-orchestration/app.jar
