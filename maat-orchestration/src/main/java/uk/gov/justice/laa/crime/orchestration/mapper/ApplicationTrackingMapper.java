@@ -151,7 +151,7 @@ public class ApplicationTrackingMapper {
         assessment.setMeansAssessmentId(financialAssessmentDTO.getId());
         uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO fa =
                 repOrderDTO.getFinancialAssessments().stream()
-                        .filter(pa -> pa.getId() == financialAssessmentDTO.getId())
+                        .filter(pa -> pa.getId().equals(financialAssessmentDTO.getId()))
                         .findFirst()
                         .orElse(null);
         assessment.setMeansAssessorName(
