@@ -1,9 +1,10 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.service.PassportAssessmentService;
+
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -14,5 +15,4 @@ public class PassportAssessmentOrchestrationService {
     public PassportedDTO find(int legacyId) {
         return passportAssessmentService.find(legacyId);
     }
-
 }

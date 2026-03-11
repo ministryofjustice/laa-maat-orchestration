@@ -30,10 +30,9 @@ public class AssessmentApiService {
         // 404s are intercepted by the WebClientFilters, so we re-throw the exception here to be
         // caught by our DefaultExceptionHandler
         ApiGetIojAppealResponse apiGetIojAppealResponse = Optional.ofNullable(
-                assessmentApiClient.getIojAppeal(appealId))
-            .orElseThrow(() ->
-                new WebClientResponseException(HttpStatus.NOT_FOUND.value(), "Not found", null,
-                    null, null));
+                        assessmentApiClient.getIojAppeal(appealId))
+                .orElseThrow(() ->
+                        new WebClientResponseException(HttpStatus.NOT_FOUND.value(), "Not found", null, null, null));
 
         log.debug(RESPONSE_STRING, apiGetIojAppealResponse);
         return apiGetIojAppealResponse;
@@ -50,10 +49,9 @@ public class AssessmentApiService {
         log.debug("Request to Assessment Service to retrieve Passport Assessment: {}", legacyId);
 
         ApiGetPassportedAssessmentResponse response = Optional.ofNullable(
-                assessmentApiClient.getPassportAssessment(legacyId))
-            .orElseThrow(() ->
-                new WebClientResponseException(HttpStatus.NOT_FOUND.value(), "Not found", null,
-                    null, null));
+                        assessmentApiClient.getPassportAssessment(legacyId))
+                .orElseThrow(() ->
+                        new WebClientResponseException(HttpStatus.NOT_FOUND.value(), "Not found", null, null, null));
 
         log.debug(REQUEST_STRING, response);
 

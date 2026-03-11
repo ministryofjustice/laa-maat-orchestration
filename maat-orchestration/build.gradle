@@ -20,7 +20,7 @@ def versions = [
 		pitest                  : "1.21.0",
 		sentry					: "8.23.0",
 		springdocVersion        : "2.8.13",
-		commonsModSchemas       : "1.43.1-SNAPSHOT",
+		commonsModSchemas       : "1.45.0-SNAPSHOT",
 		crimeCommonsClasses     : "4.30.0-SNAPSHOT",
 		wiremock				: "3.10.6",
 		resilience4jVersion     : "2.3.0",

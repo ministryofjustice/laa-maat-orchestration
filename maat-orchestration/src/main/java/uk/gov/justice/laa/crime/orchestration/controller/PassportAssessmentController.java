@@ -7,15 +7,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.justice.laa.crime.annotation.DefaultHTTPErrorResponse;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
+import uk.gov.justice.laa.crime.orchestration.service.orchestration.PassportAssessmentOrchestrationService;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.justice.laa.crime.annotation.DefaultHTTPErrorResponse;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
-import uk.gov.justice.laa.crime.orchestration.service.orchestration.PassportAssessmentOrchestrationService;
 
 @Slf4j
 @RestController
@@ -40,5 +41,4 @@ public class PassportAssessmentController {
 
         return ResponseEntity.ok(orchestrationService.find(legacyId));
     }
-
 }

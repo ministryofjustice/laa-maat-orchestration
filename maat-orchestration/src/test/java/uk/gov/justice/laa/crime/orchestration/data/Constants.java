@@ -1,10 +1,10 @@
 package uk.gov.justice.laa.crime.orchestration.data;
 
-import java.time.LocalDate;
 import uk.gov.justice.laa.crime.enums.HardshipReviewResult;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
@@ -36,5 +36,6 @@ public class Constants {
     public static final LocalDateTime ASSESSMENT_DATETIME = LocalDateTime.of(2022, 9, 3, 0, 0, 0);
     public static final String NOTES = "This is a test note.";
     public static final int PASSPORT_ASSESSMENT_ID = 123;
+    public static final int CASE_MANAGEMENT_UNIT_ID = 50;
     public static final LocalDateTime LAST_SIGNON_DATETIME = LocalDateTime.of(2022, 8, 3, 0, 0, 0);
 }
