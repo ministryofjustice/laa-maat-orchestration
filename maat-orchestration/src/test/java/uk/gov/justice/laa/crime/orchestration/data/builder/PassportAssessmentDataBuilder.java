@@ -90,9 +90,9 @@ public class PassportAssessmentDataBuilder {
 
     public static JobSeekerDTO getJobSeekerDTO() {
         return JobSeekerDTO.builder()
-            .isJobSeeker(true)
-            .lastSignedOn(DateUtil.toDate(Constants.LAST_SIGNON_DATETIME))
-            .build();
+                .isJobSeeker(true)
+                .lastSignedOn(DateUtil.toDate(Constants.LAST_SIGNON_DATETIME))
+                .build();
     }
 
     public static PassportedDTO getPassportedDTO(boolean hasPartner) {

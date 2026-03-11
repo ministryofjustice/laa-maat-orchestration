@@ -1,6 +1,5 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
-import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.passported.DeclaredBenefit;
