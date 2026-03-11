@@ -12,7 +12,6 @@ import uk.gov.justice.laa.crime.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
-import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.HardshipOrchestrationService;
 
 import org.springframework.http.MediaType;
@@ -33,7 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class HardshipController {
 
     private final HardshipOrchestrationService orchestrationService;
-    private static final int REQUEST_ROLLED_BACK = 555;
 
     @GetMapping(value = "/{hardshipReviewId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Find Hardship review")
@@ -60,12 +58,7 @@ public class HardshipController {
     @DefaultHTTPErrorResponse
     public ResponseEntity<ApplicationDTO> create(@Valid @RequestBody WorkflowRequest workflowRequest) {
         log.info("Received request to create hardship");
-        ApplicationDTO applicationDTO;
-        try {
-            applicationDTO = orchestrationService.create(workflowRequest);
-        } catch (MaatOrchestrationException ex) {
-            return ResponseEntity.status(REQUEST_ROLLED_BACK).body(ex.getApplicationDTO());
-        }
+        ApplicationDTO applicationDTO = orchestrationService.create(workflowRequest);
         return ResponseEntity.ok(applicationDTO);
     }
 
@@ -80,12 +73,7 @@ public class HardshipController {
     @DefaultHTTPErrorResponse
     public ResponseEntity<ApplicationDTO> update(@Valid @RequestBody WorkflowRequest workflowRequest) {
         log.info("Received request to update hardship");
-        ApplicationDTO applicationDTO;
-        try {
-            applicationDTO = orchestrationService.update(workflowRequest);
-        } catch (MaatOrchestrationException ex) {
-            return ResponseEntity.status(REQUEST_ROLLED_BACK).body(ex.getApplicationDTO());
-        }
+        ApplicationDTO applicationDTO = orchestrationService.update(workflowRequest);
         return ResponseEntity.ok(applicationDTO);
     }
 }

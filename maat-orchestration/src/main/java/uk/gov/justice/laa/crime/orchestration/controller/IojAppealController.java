@@ -12,8 +12,6 @@ import uk.gov.justice.laa.crime.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
-import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
-import uk.gov.justice.laa.crime.orchestration.exception.RollbackException;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.IojAppealsOrchestrationService;
 
 import org.springframework.http.MediaType;
@@ -60,12 +58,6 @@ public class IojAppealController {
     @DefaultHTTPErrorResponse
     public ResponseEntity<ApplicationDTO> create(@Valid @RequestBody WorkflowRequest workflowRequest) {
         log.info("Received request to create IoJ Appeal");
-        try {
-            return ResponseEntity.ok(orchestrationService.create(workflowRequest));
-        } catch (RollbackException ex) {
-            return ResponseEntity.internalServerError().body(ex.getApplicationDTO());
-        } catch (MaatOrchestrationException ex) {
-            return ResponseEntity.status(REQUEST_ROLLED_BACK).body(ex.getApplicationDTO());
-        }
+        return ResponseEntity.ok(orchestrationService.create(workflowRequest));
     }
 }

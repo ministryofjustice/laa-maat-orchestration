@@ -3,6 +3,7 @@ package uk.gov.justice.laa.crime.orchestration.exception;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.justice.laa.crime.dto.ErrorDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
 import uk.gov.justice.laa.crime.util.ProblemDetailUtil;
 
@@ -28,6 +29,7 @@ public class DefaultExceptionHandler {
 
     private final TraceIdHandler traceIdHandler;
     private final ObjectMapper mapper;
+    private static final int REQUEST_ROLLED_BACK = 555;
 
     @ExceptionHandler(WebClientResponseException.class)
     public ResponseEntity<ErrorDTO> onRuntimeException(WebClientResponseException exception) {
@@ -60,6 +62,16 @@ public class DefaultExceptionHandler {
                 exception.getMessage(),
                 traceIdHandler.getTraceId(),
                 Collections.emptyList());
+    }
+
+    @ExceptionHandler(RollbackException.class)
+    public ResponseEntity<ApplicationDTO> handleRollbackException(RollbackException ex) {
+        return ResponseEntity.internalServerError().body(ex.getApplicationDTO());
+    }
+
+    @ExceptionHandler(MaatOrchestrationException.class)
+    public ResponseEntity<ApplicationDTO> handleMaatOrchestrationException(MaatOrchestrationException ex) {
+        return ResponseEntity.status(REQUEST_ROLLED_BACK).body(ex.getApplicationDTO());
     }
 
     private static ResponseEntity<ErrorDTO> buildErrorResponse(

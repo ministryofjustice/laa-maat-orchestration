@@ -12,7 +12,6 @@ import uk.gov.justice.laa.crime.annotation.DefaultHTTPErrorResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
-import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.MeansAssessmentOrchestrationService;
 
 import org.springframework.http.MediaType;
@@ -35,7 +34,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class MeansAssessmentController {
 
     private final MeansAssessmentOrchestrationService assessmentOrchestrationService;
-    private static final int REQUEST_ROLLED_BACK = 555;
 
     @GetMapping(
             value = "/{financialAssessmentId}/applicantId/{applicantId}",
@@ -65,12 +63,7 @@ public class MeansAssessmentController {
     @DefaultHTTPErrorResponse
     public ResponseEntity<ApplicationDTO> create(@Valid @RequestBody WorkflowRequest workflowRequest) {
         log.info("Received request to create means assessment");
-        ApplicationDTO applicationDTO;
-        try {
-            applicationDTO = assessmentOrchestrationService.create(workflowRequest);
-        } catch (MaatOrchestrationException ex) {
-            return ResponseEntity.status(REQUEST_ROLLED_BACK).body(ex.getApplicationDTO());
-        }
+        ApplicationDTO applicationDTO = assessmentOrchestrationService.create(workflowRequest);
         return ResponseEntity.ok(applicationDTO);
     }
 
@@ -85,12 +78,7 @@ public class MeansAssessmentController {
     @DefaultHTTPErrorResponse
     public ResponseEntity<ApplicationDTO> update(@Valid @RequestBody WorkflowRequest workflowRequest) {
         log.info("Received request to update means assessment");
-        ApplicationDTO applicationDTO;
-        try {
-            applicationDTO = assessmentOrchestrationService.update(workflowRequest);
-        } catch (MaatOrchestrationException ex) {
-            return ResponseEntity.status(REQUEST_ROLLED_BACK).body(ex.getApplicationDTO());
-        }
+        ApplicationDTO applicationDTO = assessmentOrchestrationService.update(workflowRequest);
         return ResponseEntity.ok(applicationDTO);
     }
 }
