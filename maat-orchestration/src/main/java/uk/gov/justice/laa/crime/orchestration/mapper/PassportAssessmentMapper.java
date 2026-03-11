@@ -92,7 +92,6 @@ public class PassportAssessmentMapper {
                 case BenefitType.GSPC -> dto.setBenefitGaurenteedStatePension(true);
                 case BenefitType.ESA -> dto.setBenefitEmploymentSupport(true);
                 case BenefitType.UC -> dto.setBenefitUniversalCredit(true);
-                default -> throw new ValidationException("Valid benefit type not returned in response.");
             }
         }
 

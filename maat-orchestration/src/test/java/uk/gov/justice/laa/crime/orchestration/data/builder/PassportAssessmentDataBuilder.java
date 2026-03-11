@@ -10,6 +10,7 @@ import uk.gov.justice.laa.crime.enums.PassportAssessmentDecision;
 import uk.gov.justice.laa.crime.enums.PassportAssessmentDecisionReason;
 import uk.gov.justice.laa.crime.enums.ReviewType;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.JobSeekerDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.NewWorkReasonDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PartnerDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportConfirmationDTO;
@@ -85,6 +86,13 @@ public class PassportAssessmentDataBuilder {
                 .niNumber(Constants.NI_NUMBER)
                 .dob(Constants.DATE_OF_BIRTH)
                 .build();
+    }
+
+    public static JobSeekerDTO getJobSeekerDTO() {
+        return JobSeekerDTO.builder()
+            .isJobSeeker(true)
+            .lastSignedOn(DateUtil.toDate(Constants.LAST_SIGNON_DATETIME))
+            .build();
     }
 
     public static PassportedDTO getPassportedDTO(boolean hasPartner) {
