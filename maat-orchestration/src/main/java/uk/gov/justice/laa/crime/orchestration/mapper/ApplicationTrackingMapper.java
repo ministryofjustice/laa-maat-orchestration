@@ -59,13 +59,13 @@ public class ApplicationTrackingMapper {
                         ? financialAssessmentDTO.getUsn().intValue()
                         : null);
         request.setMaatRef(application.getRepId().intValue());
-        request.setActionKeyId(financialAssessmentDTO.getId().intValue());
+        request.setActionKeyId(financialAssessmentDTO.getId());
         request.setCaseId(application.getCaseId());
         request.setCaseType(
                 StringUtils.isBlank(application.getCaseDetailsDTO().getCaseType())
                         ? null
                         : CaseType.fromValue(application.getCaseDetailsDTO().getCaseType()));
-        request.setAssessmentId(financialAssessmentDTO.getId().intValue());
+        request.setAssessmentId(financialAssessmentDTO.getId());
         request.setAssessmentType(assessmentType);
         request.setDwpResult(passportedDTO.getDwpResult());
         request.setRepDecision(
@@ -148,11 +148,10 @@ public class ApplicationTrackingMapper {
         FinancialAssessmentDTO financialAssessmentDTO =
                 application.getAssessmentDTO().getFinancialAssessmentDTO();
         MeansAssessment assessment = new MeansAssessment();
-        assessment.setMeansAssessmentId(financialAssessmentDTO.getId().intValue());
+        assessment.setMeansAssessmentId(financialAssessmentDTO.getId());
         uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO fa =
                 repOrderDTO.getFinancialAssessments().stream()
-                        .filter(pa ->
-                                pa.getId() == financialAssessmentDTO.getId().intValue())
+                        .filter(pa -> pa.getId().equals(financialAssessmentDTO.getId()))
                         .findFirst()
                         .orElse(null);
         assessment.setMeansAssessorName(
