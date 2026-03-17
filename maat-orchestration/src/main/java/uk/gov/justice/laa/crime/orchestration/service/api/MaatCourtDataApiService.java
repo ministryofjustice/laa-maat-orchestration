@@ -14,7 +14,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.SendToCCLFDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -53,9 +52,10 @@ public class MaatCourtDataApiService {
     public ApplicantDTO getApplicant(int applicantId) {
         log.debug(REQUEST_STRING, applicantId);
 
-        ApplicantDTO response = Optional.ofNullable(maatApiClient.getApplicant(applicantId))
-                .orElseThrow(() ->
-                        new WebClientResponseException(HttpStatus.NOT_FOUND.value(), "Not found", null, null, null));
+        ApplicantDTO response = maatApiClient.getApplicant(applicantId);
+        if (response == null) {
+            throw new WebClientResponseException(HttpStatus.NOT_FOUND.value(), "Not found", null, null, null);
+        }
 
         log.debug(RESPONSE_STRING, response);
         return response;

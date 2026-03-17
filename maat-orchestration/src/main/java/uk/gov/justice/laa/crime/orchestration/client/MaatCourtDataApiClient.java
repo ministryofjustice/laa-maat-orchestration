@@ -32,8 +32,8 @@ public interface MaatCourtDataApiClient {
     @GetExchange("/users/summary/{username}")
     UserSummaryDTO getUserSummary(@PathVariable String username);
 
-    @GetExchange("/application/applicant/{applicantId}")
-    ApplicantDTO getApplicant(@PathVariable int applicantId);
+    @GetExchange("/application/applicant/{id}")
+    ApplicantDTO getApplicant(@PathVariable int id);
 
     @PutExchange("/application/applicant/update-cclf")
     void updateSendToCCLF(@RequestBody SendToCCLFDTO request);

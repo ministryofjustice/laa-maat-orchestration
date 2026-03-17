@@ -27,9 +27,9 @@ public class PassportAssessmentService {
     public PassportedDTO find(int legacyId) {
         ApiGetPassportedAssessmentResponse response = assessmentApiService.findPassportAssessment(legacyId);
 
-        ApplicantDTO applicantDTO = hasPartnerBenefit(response.getDeclaredBenefit())
-                ? maatCourtDataApiService.getApplicant(
-                        response.getDeclaredBenefit().getLegacyPartnerId())
+        DeclaredBenefit declaredBenefit = response.getDeclaredBenefit();
+        ApplicantDTO applicantDTO = hasPartnerBenefit(declaredBenefit)
+                ? maatCourtDataApiService.getApplicant(declaredBenefit.getLegacyPartnerId())
                 : null;
 
         return passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(response, applicantDTO);
