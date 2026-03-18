@@ -59,13 +59,13 @@ class PassportAssessmentIntegrationTest extends WiremockIntegrationTest {
     }
 
     @Test
-    void givenValidLegacyId_whenFindIsInvoked_thenPassportAssessmentIsReturned() throws Exception {
+    void givenValidId_whenFindIsInvoked_thenPassportAssessmentIsReturned() throws Exception {
         stubForOAuth();
         stubForFindPassportAssessment(objectMapper.writeValueAsString(
-                PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(false)));
+                PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(Constants.WITHOUT_PARTNER)));
         stubForGetApplicant(objectMapper.writeValueAsString(PassportAssessmentDataBuilder.getApplicantDTO()));
 
-        PassportedDTO expected = PassportAssessmentDataBuilder.getPassportedDTO(false);
+        PassportedDTO expected = PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITHOUT_PARTNER);
 
         DateTimeFormatter expectedDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'+00:00'");
 
@@ -104,7 +104,7 @@ class PassportAssessmentIntegrationTest extends WiremockIntegrationTest {
 
     @Test
     void givenEmptyOAuthToken_whenFindIsInvoked_thenFailsUnauthorisedAccess() throws Exception {
-        mvc.perform(buildRequest(HttpMethod.GET, ENDPOINT_URL + "/" + PASSPORT_ASSESSMENT_ID, false))
+        mvc.perform(buildRequest(HttpMethod.GET, ENDPOINT_URL + "/" + PASSPORT_ASSESSMENT_ID, Constants.WITHOUT_AUTH))
                 .andExpect(status().isUnauthorized());
     }
 

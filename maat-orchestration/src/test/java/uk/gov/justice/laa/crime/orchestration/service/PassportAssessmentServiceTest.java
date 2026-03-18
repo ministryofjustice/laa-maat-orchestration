@@ -35,11 +35,11 @@ class PassportAssessmentServiceTest {
     private PassportAssessmentService passportAssessmentService;
 
     @Test
-    void givenValidLegacyIdWithPartner_whenFindIsInvoked_thenPassportedDTOIsReturned() {
+    void givenValidIdWithPartner_whenFindIsInvoked_thenPassportedDTOIsReturned() {
         ApiGetPassportedAssessmentResponse response =
-                PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(true);
+                PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(Constants.WITH_PARTNER);
         ApplicantDTO applicantDTO = PassportAssessmentDataBuilder.getApplicantDTO();
-        PassportedDTO passportedDTO = PassportAssessmentDataBuilder.getPassportedDTO(true);
+        PassportedDTO passportedDTO = PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITH_PARTNER);
 
         when(assessmentApiService.findPassportAssessment(Constants.PASSPORT_ASSESSMENT_ID))
                 .thenReturn(response);
@@ -52,10 +52,10 @@ class PassportAssessmentServiceTest {
     }
 
     @Test
-    void givenValidLegacyId_whenFindIsInvoked_thenPassportDTOIsReturned() {
+    void givenValidId_whenFindIsInvoked_thenPassportDTOIsReturned() {
         ApiGetPassportedAssessmentResponse response =
-                PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(false);
-        PassportedDTO passportedDTO = PassportAssessmentDataBuilder.getPassportedDTO(false);
+                PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(Constants.WITHOUT_PARTNER);
+        PassportedDTO passportedDTO = PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITHOUT_PARTNER);
 
         when(assessmentApiService.findPassportAssessment(Constants.PASSPORT_ASSESSMENT_ID))
                 .thenReturn(response);

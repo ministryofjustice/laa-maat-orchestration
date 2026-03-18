@@ -45,11 +45,10 @@ public class AssessmentApiService {
         return response;
     }
 
-    public ApiGetPassportedAssessmentResponse findPassportAssessment(int legacyId) {
-        log.debug("Request to Assessment Service to retrieve Passport Assessment: {}", legacyId);
+    public ApiGetPassportedAssessmentResponse findPassportAssessment(int id) {
+        log.debug("Request to Assessment Service to retrieve Passport Assessment: {}", id);
 
-        ApiGetPassportedAssessmentResponse response = Optional.ofNullable(
-                        assessmentApiClient.getPassportAssessment(legacyId))
+        ApiGetPassportedAssessmentResponse response = Optional.ofNullable(assessmentApiClient.getPassportAssessment(id))
                 .orElseThrow(() ->
                         new WebClientResponseException(HttpStatus.NOT_FOUND.value(), "Not found", null, null, null));
 

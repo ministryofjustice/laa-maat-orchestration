@@ -27,7 +27,7 @@ public class PassportAssessmentController {
 
     private final PassportAssessmentOrchestrationService orchestrationService;
 
-    @GetMapping(value = "/{legacyId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Find Passport Assessment")
     @ApiResponse(
             responseCode = "200",
@@ -36,9 +36,9 @@ public class PassportAssessmentController {
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = PassportedDTO.class)))
     @DefaultHTTPErrorResponse
-    public ResponseEntity<PassportedDTO> find(@PathVariable int legacyId) {
-        log.info("Received request to find Passport Assessment by legacy ID - {}", legacyId);
+    public ResponseEntity<PassportedDTO> find(@PathVariable int id) {
+        log.info("Received request to find Passport Assessment by ID - {}", id);
 
-        return ResponseEntity.ok(orchestrationService.find(legacyId));
+        return ResponseEntity.ok(orchestrationService.find(id));
     }
 }

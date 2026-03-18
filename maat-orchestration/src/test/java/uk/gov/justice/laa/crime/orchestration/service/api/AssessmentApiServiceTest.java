@@ -59,9 +59,9 @@ class AssessmentApiServiceTest {
     }
 
     @Test
-    void givenValidLegacyId_whenFindPassportAssessmentIsInvoked_thenApiClientReturnsResponse() {
+    void givenValidId_whenFindPassportAssessmentIsInvoked_thenApiClientReturnsResponse() {
         ApiGetPassportedAssessmentResponse response =
-                PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(false);
+                PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(Constants.WITHOUT_PARTNER);
 
         when(assessmentApiClient.getPassportAssessment(Constants.PASSPORT_ASSESSMENT_ID))
                 .thenReturn(response);
@@ -71,7 +71,7 @@ class AssessmentApiServiceTest {
     }
 
     @Test
-    void givenInvalidLegacyId_whenFindPassportAssessmentIsInvoked_thenExceptionThrown() {
+    void givenInvalidId_whenFindPassportAssessmentIsInvoked_thenExceptionThrown() {
         when(assessmentApiClient.getPassportAssessment(Constants.PASSPORT_ASSESSMENT_ID))
                 .thenReturn(null);
 

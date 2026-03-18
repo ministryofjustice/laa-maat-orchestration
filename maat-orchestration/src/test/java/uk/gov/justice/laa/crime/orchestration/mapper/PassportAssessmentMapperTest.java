@@ -2,6 +2,7 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.enums.BenefitType;
+import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.PassportAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 
@@ -24,9 +25,9 @@ class PassportAssessmentMapperTest {
     @Test
     void
             givenValidApiResponse_whenApiGetPassportedAssessmentResponseToPassportedDTOIsInvoked_thenPassportDTOIsReturned() {
-        PassportedDTO expected = PassportAssessmentDataBuilder.getPassportedDTO(false);
+        PassportedDTO expected = PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITHOUT_PARTNER);
         PassportedDTO actual = passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(
-                PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(false), null);
+                PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(Constants.WITHOUT_PARTNER), null);
 
         softly.assertThat(actual)
                 .usingRecursiveComparison()
@@ -37,9 +38,9 @@ class PassportAssessmentMapperTest {
     @Test
     void
             givenValidApiResponseWithPartner_whenApiGetPassportedAssessmentResponseToPassportedDTOIsInvoked_thenPassportDTOIsReturned() {
-        PassportedDTO expected = PassportAssessmentDataBuilder.getPassportedDTO(true);
+        PassportedDTO expected = PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITH_PARTNER);
         PassportedDTO actual = passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(
-                PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(true),
+                PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(Constants.WITH_PARTNER),
                 PassportAssessmentDataBuilder.getApplicantDTO());
 
         softly.assertThat(actual)
@@ -53,7 +54,7 @@ class PassportAssessmentMapperTest {
     void
             givenDifferentDeclaredBenefitsInApiResponse_whenApiGetPassportedAssessmentResponseToPassportedDTOIsInvoked_thenAppropriateBenefitIsReturned(
                     BenefitType benefit) {
-        PassportedDTO expected = PassportAssessmentDataBuilder.getPassportedDTO(false);
+        PassportedDTO expected = PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITHOUT_PARTNER);
         expected.setBenefitIncomeSupport(false);
         switch (benefit) {
             case BenefitType.INCOME_SUPPORT -> expected.setBenefitIncomeSupport(true);
@@ -64,7 +65,7 @@ class PassportAssessmentMapperTest {
         }
 
         ApiGetPassportedAssessmentResponse response =
-                PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(false);
+                PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(Constants.WITHOUT_PARTNER);
         response.getDeclaredBenefit().setBenefitType(benefit);
         PassportedDTO actual =
                 passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(response, null);

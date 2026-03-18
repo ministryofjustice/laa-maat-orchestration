@@ -38,4 +38,7 @@ public class Constants {
     public static final int PASSPORT_ASSESSMENT_ID = 123;
     public static final int CASE_MANAGEMENT_UNIT_ID = 50;
     public static final LocalDateTime LAST_SIGNON_DATETIME = LocalDateTime.of(2022, 8, 3, 0, 0, 0);
+    public static final boolean WITH_PARTNER = true;
+    public static final boolean WITHOUT_PARTNER = false;
+    public static final boolean WITHOUT_AUTH = false;
 }

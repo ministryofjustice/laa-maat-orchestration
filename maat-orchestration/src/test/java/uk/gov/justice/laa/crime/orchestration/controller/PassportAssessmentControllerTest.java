@@ -39,21 +39,21 @@ class PassportAssessmentControllerTest {
     private TraceIdHandler traceIdHandler;
 
     @Test
-    void givenValidLegacyId_whenFindIsInvoked_thenOkResponseIsReturned() throws Exception {
-        PassportedDTO dto = PassportAssessmentDataBuilder.getPassportedDTO(false);
+    void givenValidId_whenFindIsInvoked_thenOkResponseIsReturned() throws Exception {
+        PassportedDTO dto = PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITHOUT_PARTNER);
 
         when(passportAssessmentOrchestrationService.find(Constants.PASSPORT_ASSESSMENT_ID))
                 .thenReturn(dto);
 
         mvc.perform(buildRequestWithTransactionId(
-                        HttpMethod.GET, ENDPOINT_URL + "/" + Constants.PASSPORT_ASSESSMENT_ID, false))
+                        HttpMethod.GET, ENDPOINT_URL + "/" + Constants.PASSPORT_ASSESSMENT_ID, Constants.WITHOUT_AUTH))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
-    void givenInvalidLegacyId_whenFindIsInvoked_thenBadRequestResponseIsReturned() throws Exception {
-        mvc.perform(buildRequestWithTransactionId(HttpMethod.GET, ENDPOINT_URL + "/inv4l1d1d", false))
+    void givenInvalidId_whenFindIsInvoked_thenBadRequestResponseIsReturned() throws Exception {
+        mvc.perform(buildRequestWithTransactionId(HttpMethod.GET, ENDPOINT_URL + "/inv4l1d1d", Constants.WITHOUT_AUTH))
                 .andExpect(status().isBadRequest());
     }
 }

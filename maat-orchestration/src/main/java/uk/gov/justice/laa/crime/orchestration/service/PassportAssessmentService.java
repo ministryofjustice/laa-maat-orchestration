@@ -24,8 +24,8 @@ public class PassportAssessmentService {
         return declaredBenefit != null && BenefitRecipient.PARTNER.equals(declaredBenefit.getBenefitRecipient());
     }
 
-    public PassportedDTO find(int legacyId) {
-        ApiGetPassportedAssessmentResponse response = assessmentApiService.findPassportAssessment(legacyId);
+    public PassportedDTO find(int id) {
+        ApiGetPassportedAssessmentResponse response = assessmentApiService.findPassportAssessment(id);
 
         DeclaredBenefit declaredBenefit = response.getDeclaredBenefit();
         ApplicantDTO applicantDTO = hasPartnerBenefit(declaredBenefit)

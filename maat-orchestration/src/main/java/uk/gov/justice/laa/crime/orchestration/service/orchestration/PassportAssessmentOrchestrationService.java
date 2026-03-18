@@ -12,7 +12,7 @@ public class PassportAssessmentOrchestrationService {
 
     private final PassportAssessmentService passportAssessmentService;
 
-    public PassportedDTO find(int legacyId) {
-        return passportAssessmentService.find(legacyId);
+    public PassportedDTO find(int id) {
+        return passportAssessmentService.find(id);
     }
 }

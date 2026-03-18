@@ -24,8 +24,8 @@ class PassportAssessmentOrchestrationServiceTest {
     private PassportAssessmentOrchestrationService passportAssessmentOrchestrationService;
 
     @Test
-    void givenValidLegacyId_whenFindIsInvoked_thenPassportedDTOIsReturned() {
-        PassportedDTO dto = PassportAssessmentDataBuilder.getPassportedDTO(false);
+    void givenValidId_whenFindIsInvoked_thenPassportedDTOIsReturned() {
+        PassportedDTO dto = PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITHOUT_PARTNER);
 
         when(passportAssessmentService.find(Constants.PASSPORT_ASSESSMENT_ID)).thenReturn(dto);
 
