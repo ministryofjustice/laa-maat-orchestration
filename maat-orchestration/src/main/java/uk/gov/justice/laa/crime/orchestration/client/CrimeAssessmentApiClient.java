@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
-import org.springframework.web.service.annotation.PatchExchange;
 import org.springframework.web.service.annotation.PostExchange;
 
 @HttpExchange
@@ -22,7 +21,7 @@ public interface CrimeAssessmentApiClient {
     @PostExchange("/ioj-appeals")
     ApiCreateIojAppealResponse createIojAppeal(@RequestBody ApiCreateIojAppealRequest request);
 
-    @PatchExchange("/ioj-appeals/{appealId}/rollback")
+    @PostExchange("/ioj-appeals/{appealId}/rollback")
     ApiRollbackIojAppealResponse rollback(@PathVariable String appealID);
 
     @GetExchange("/passport/lookup-by-legacy-id/{id}")

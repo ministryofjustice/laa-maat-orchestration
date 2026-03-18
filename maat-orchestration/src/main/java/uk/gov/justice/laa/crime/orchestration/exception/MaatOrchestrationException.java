@@ -13,4 +13,9 @@ public class MaatOrchestrationException extends RuntimeException {
     public MaatOrchestrationException(ApplicationDTO applicationDTO) {
         this.applicationDTO = applicationDTO;
     }
+
+    public MaatOrchestrationException(ApplicationDTO applicationDTO, Throwable cause) {
+        super(cause);
+        this.applicationDTO = applicationDTO;
+    }
 }

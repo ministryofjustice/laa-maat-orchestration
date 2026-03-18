@@ -14,6 +14,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
+import uk.gov.justice.laa.crime.orchestration.exception.RollbackException;
 import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.IojAppealMapper;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
@@ -90,8 +91,20 @@ public class IojAppealsOrchestrationService {
         } catch (Exception ex) {
             log.error("IoJ Appeal Post Processing failed, rolling back create IoJ Appeal", ex);
             Sentry.captureException(ex);
-            iojAppealService.rollback(appealId, request);
-            throw new MaatOrchestrationException(request.getApplicationDTO());
+
+            try {
+                iojAppealService.rollback(appealId, request);
+            } catch (Exception rollbackException) {
+                log.error("Rollback also failed for appealId {}", appealId, rollbackException);
+
+                RollbackException wrappedRollbackException = rollbackException instanceof RollbackException
+                        ? (RollbackException) rollbackException
+                        : new RollbackException(request.getApplicationDTO(), rollbackException);
+
+                wrappedRollbackException.addSuppressed(ex);
+                throw wrappedRollbackException;
+            }
+            throw new MaatOrchestrationException(request.getApplicationDTO(), ex);
         }
 
         return request.getApplicationDTO();

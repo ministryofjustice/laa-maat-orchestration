@@ -2,6 +2,7 @@ package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -124,7 +125,7 @@ class IojAppealsOrchestrationServiceTest {
     }
 
     @Test
-    void givenWorkflowRequest_whenCreateIsInvokedAndPostProcessingFails_thenMaatOrchestrationExceptionThrown() {
+    void givenPostProcessingFailure_whenCreateIsInvokedAndRollbackSuccessful_thenMaatOrchestrationExceptionThrown() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO());
         UserActionDTO userActionDTO = TestModelDataBuilder.getUserActionDTO();
@@ -139,20 +140,22 @@ class IojAppealsOrchestrationServiceTest {
     }
 
     @Test
-    void givenWorkflowRequest_whenCreateIsInvokedAndPostProcessAndRollbackFails_thenWebClientExceptionThrown() {
+    void givenPostProcessingFailure_whenCreateIsInvokedAndRollbackUnsuccessful_thenRollbackExceptionIsThrown() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO());
         UserActionDTO userActionDTO = TestModelDataBuilder.getUserActionDTO();
+        RuntimeException runtimeError = new RuntimeException("Runtime Exception");
+        RuntimeException rollbackError = new RuntimeException("Rollback Exception");
 
         when(iojAppealService.create(workflowRequest)).thenReturn(APPEAL_ID);
         when(repOrderService.getRepOrder(workflowRequest)).thenReturn(repOrderDTO);
         when(iojAppealMapper.getUserActionDTO(workflowRequest)).thenReturn(userActionDTO);
-        when(proceedingsService.determineMagsRepDecision(workflowRequest))
-                .thenThrow(new RuntimeException("Runtime Exception"));
-        when(iojAppealService.rollback(APPEAL_ID, workflowRequest))
-                .thenThrow(new RollbackException(workflowRequest.getApplicationDTO()));
+        when(proceedingsService.determineMagsRepDecision(workflowRequest)).thenThrow(runtimeError);
+        doThrow(rollbackError).when(iojAppealService).rollback(APPEAL_ID, workflowRequest);
 
         assertThatThrownBy(() -> iojAppealsOrchestrationService.create(workflowRequest))
-                .isInstanceOf(RollbackException.class);
+                .isInstanceOf(RollbackException.class)
+                .hasSuppressedException(runtimeError)
+                .hasCause(rollbackError);
     }
 }

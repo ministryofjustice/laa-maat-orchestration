@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class IojAppealController {
 
     private final IojAppealsOrchestrationService orchestrationService;
-    private static final int REQUEST_ROLLED_BACK = 555;
 
     @GetMapping(value = "/{appealId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Find IoJ Appeal")

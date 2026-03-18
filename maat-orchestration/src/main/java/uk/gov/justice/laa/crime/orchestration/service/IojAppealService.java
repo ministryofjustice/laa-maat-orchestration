@@ -44,15 +44,13 @@ public class IojAppealService {
         return iojAppealResponse.getAppealId();
     }
 
-    public String rollback(String appealId, WorkflowRequest request) {
+    public void rollback(String appealId, WorkflowRequest request) {
         request.getApplicationDTO().getAssessmentDTO().getIojAppeal().setIojId(null);
         ApiRollbackIojAppealResponse apiRollbackIojAppealResponse = assessmentApiService.rollback(appealId);
-        if (Boolean.TRUE.equals(apiRollbackIojAppealResponse.getRollbackSuccessful())) {
-            log.info("IoJ Appeal rolled back successfully for Appeal Id: {}", appealId);
-            return apiRollbackIojAppealResponse.getAppealId();
-        } else {
+        if (Boolean.FALSE.equals(apiRollbackIojAppealResponse.getRollbackSuccessful())) {
             log.error("Unable to rollback IoJ Appeal for Appeal Id: {}", appealId);
             throw new RollbackException(request.getApplicationDTO());
         }
+        log.info("IoJ Appeal rolled back successfully for Appeal Id: {}", appealId);
     }
 }

@@ -6,4 +6,8 @@ public class RollbackException extends MaatOrchestrationException {
     public RollbackException(ApplicationDTO applicationDTO) {
         super(applicationDTO);
     }
+
+    public RollbackException(ApplicationDTO applicationDTO, Throwable cause) {
+        super(applicationDTO, cause);
+    }
 }

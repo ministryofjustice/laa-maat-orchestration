@@ -2,6 +2,7 @@ package uk.gov.justice.laa.crime.orchestration.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -179,14 +180,16 @@ class IojAppealControllerTest {
         String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkFlowRequest());
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().is(555));
+        verify(orchestrationService).create(any(WorkflowRequest.class));
     }
 
     @Test
-    void givenPostProcessingAndRollbackFail_whenCreateIsInvoked_thenInternalServerErrorResponseIsReturned()
+    void givenPostProcessingFailsAndRollbackUnsuccessful_whenCreateIsInvoked_thenInternalServerErrorResponseIsReturned()
             throws Exception {
         when(orchestrationService.create(any(WorkflowRequest.class))).thenThrow(RollbackException.class);
         String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkFlowRequest());
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isInternalServerError());
+        verify(orchestrationService).create(any(WorkflowRequest.class));
     }
 }
