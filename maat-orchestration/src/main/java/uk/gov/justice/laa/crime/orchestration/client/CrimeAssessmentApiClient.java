@@ -3,6 +3,7 @@ package uk.gov.justice.laa.crime.orchestration.client;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealRequest;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiGetIojAppealResponse;
+import uk.gov.justice.laa.crime.common.model.ioj.ApiRollbackIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,9 @@ public interface CrimeAssessmentApiClient {
 
     @PostExchange("/ioj-appeals")
     ApiCreateIojAppealResponse createIojAppeal(@RequestBody ApiCreateIojAppealRequest request);
+
+    @PostExchange("/ioj-appeals/{appealId}/rollback")
+    ApiRollbackIojAppealResponse rollback(@PathVariable String appealId);
 
     @GetExchange("/passport/lookup-by-legacy-id/{id}")
     ApiGetPassportedAssessmentResponse getPassportAssessment(@PathVariable Integer id);

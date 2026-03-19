@@ -56,6 +56,7 @@ public class IojAppealController {
                             schema = @Schema(implementation = ApplicationDTO.class)))
     @DefaultHTTPErrorResponse
     public ResponseEntity<ApplicationDTO> create(@Valid @RequestBody WorkflowRequest workflowRequest) {
+        log.info("Received request to create IoJ Appeal");
         return ResponseEntity.ok(orchestrationService.create(workflowRequest));
     }
 }

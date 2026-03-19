@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
+import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
@@ -13,6 +14,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
+import uk.gov.justice.laa.crime.orchestration.exception.RollbackException;
 import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.IojAppealMapper;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
@@ -59,31 +61,50 @@ public class IojAppealsOrchestrationService {
         UserActionDTO userActionDTO = iojAppealMapper.getUserActionDTO(request);
         workflowPreProcessorService.preProcessRequest(request, repOrderDto, userActionDTO);
 
-        iojAppealService.create(request);
+        String appealId = iojAppealService.create(request);
 
-        proceedingsService.determineMagsRepDecision(request);
-        request.setApplicationDTO(contributionService.calculate(request));
-        request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                request.getApplicationDTO(), request.getUserDTO(), StoredProcedure.PRE_UPDATE_CC_APPLICATION));
+        try {
+            proceedingsService.determineMagsRepDecision(request);
+            request.setApplicationDTO(contributionService.calculate(request));
+            request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                    request.getApplicationDTO(), request.getUserDTO(), StoredProcedure.PRE_UPDATE_CC_APPLICATION));
 
-        proceedingsService.updateApplication(request, repOrderDto);
+            proceedingsService.updateApplication(request, repOrderDto);
 
-        request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                request.getApplicationDTO(),
-                request.getUserDTO(),
-                StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE));
+            request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                    request.getApplicationDTO(),
+                    request.getUserDTO(),
+                    StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE));
 
-        AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(
-                request.getApplicationDTO().getAssessmentDTO().getIojAppeal());
-        assessmentSummaryService.updateApplication(request.getApplicationDTO(), assessmentSummaryDTO);
+            AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(
+                    request.getApplicationDTO().getAssessmentDTO().getIojAppeal());
+            assessmentSummaryService.updateApplication(request.getApplicationDTO(), assessmentSummaryDTO);
 
-        applicationService.updateDateModified(request, request.getApplicationDTO());
+            applicationService.updateDateModified(request, request.getApplicationDTO());
 
-        // Call Application Tracking Service endpoint
-        ApplicationTrackingOutputResult applicationTrackingOutputResult =
-                applicationTrackingMapper.build(request, repOrderDto, AssessmentType.IOJ, RequestSource.PASSPORT_IOJ);
-        if (null != applicationTrackingOutputResult.getUsn()) {
-            applicationTrackingDataService.sendTrackingOutputResult(applicationTrackingOutputResult);
+            // Call Application Tracking Service endpoint
+            ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(
+                    request, repOrderDto, AssessmentType.IOJ, RequestSource.PASSPORT_IOJ);
+            if (null != applicationTrackingOutputResult.getUsn()) {
+                applicationTrackingDataService.sendTrackingOutputResult(applicationTrackingOutputResult);
+            }
+        } catch (Exception ex) {
+            log.error("IoJ Appeal Post Processing failed, rolling back create IoJ Appeal", ex);
+            Sentry.captureException(ex);
+
+            try {
+                iojAppealService.rollback(appealId, request);
+            } catch (Exception exception) {
+                log.error("Rollback also failed for appealId {}", appealId, exception);
+
+                RollbackException rollbackException = exception instanceof RollbackException existingRollbackException
+                        ? existingRollbackException
+                        : new RollbackException(request.getApplicationDTO(), exception);
+
+                rollbackException.addSuppressed(ex);
+                throw rollbackException;
+            }
+            throw new MaatOrchestrationException(request.getApplicationDTO(), ex);
         }
 
         return request.getApplicationDTO();

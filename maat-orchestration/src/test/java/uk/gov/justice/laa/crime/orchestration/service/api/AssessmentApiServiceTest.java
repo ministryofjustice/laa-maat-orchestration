@@ -22,8 +22,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 @ExtendWith({MockitoExtension.class})
 class AssessmentApiServiceTest {
-
     private static final int EXISTING_APPEAL_ID = 1;
+    private static final String ROLLBACK_APPEAL_ID = "654";
 
     @Mock
     private CrimeAssessmentApiClient assessmentApiClient;
@@ -56,6 +56,12 @@ class AssessmentApiServiceTest {
         assessmentApiService.createIojAppeal(request);
 
         verify(assessmentApiClient).createIojAppeal(request);
+    }
+
+    @Test
+    void givenAppealId_whenRollbackIsInvoked_thenApiClientRollbackIsCalled() {
+        assessmentApiService.rollback(ROLLBACK_APPEAL_ID);
+        verify(assessmentApiClient).rollback(ROLLBACK_APPEAL_ID);
     }
 
     @Test

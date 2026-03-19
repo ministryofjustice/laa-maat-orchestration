@@ -2,6 +2,7 @@ package uk.gov.justice.laa.crime.orchestration.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -18,6 +19,8 @@ import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
+import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
+import uk.gov.justice.laa.crime.orchestration.exception.RollbackException;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.IojAppealsOrchestrationService;
 import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
 import uk.gov.justice.laa.crime.orchestration.utils.WebClientTestUtils;
@@ -169,5 +172,24 @@ class IojAppealControllerTest {
         String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkFlowRequest());
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void givenPostProcessingFails_whenCreateIsInvoked_thenInternalServerErrorResponseIsReturned() throws Exception {
+        when(orchestrationService.create(any(WorkflowRequest.class))).thenThrow(MaatOrchestrationException.class);
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkFlowRequest());
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
+                .andExpect(status().is(555));
+        verify(orchestrationService).create(any(WorkflowRequest.class));
+    }
+
+    @Test
+    void givenPostProcessingFailsAndRollbackUnsuccessful_whenCreateIsInvoked_thenInternalServerErrorResponseIsReturned()
+            throws Exception {
+        when(orchestrationService.create(any(WorkflowRequest.class))).thenThrow(RollbackException.class);
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkFlowRequest());
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
+                .andExpect(status().isInternalServerError());
+        verify(orchestrationService).create(any(WorkflowRequest.class));
     }
 }
