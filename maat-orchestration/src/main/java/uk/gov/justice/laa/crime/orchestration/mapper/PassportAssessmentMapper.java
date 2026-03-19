@@ -78,7 +78,6 @@ public class PassportAssessmentMapper {
         PassportedDTO dto = PassportedDTO.builder()
                 .passportedId(Long.valueOf(response.getLegacyAssessmentId()))
                 .cmuId(Long.valueOf(response.getCaseManagementUnitId()))
-                .usn(Long.valueOf(response.getUsn()))
                 .date(DateUtil.toDate(response.getAssessmentDate()))
                 .assessementStatusDTO(assessmentStatusDTO)
                 .passportConfirmationDTO(
@@ -88,6 +87,10 @@ public class PassportAssessmentMapper {
                 .result(response.getAssessmentDecision().getCode())
                 .under18HeardYouthCourt(response.getDeclaredUnder18())
                 .build();
+
+        if (response.getUsn() != null) {
+            dto.setUsn(Long.valueOf(response.getUsn()));
+        }
 
         if (response.getReviewType() != null) {
             dto.setReviewType(reviewTypeToReviewTypeDTO(response.getReviewType()));
