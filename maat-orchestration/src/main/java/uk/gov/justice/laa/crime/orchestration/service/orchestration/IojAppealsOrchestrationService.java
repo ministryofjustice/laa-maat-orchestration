@@ -94,15 +94,15 @@ public class IojAppealsOrchestrationService {
 
             try {
                 iojAppealService.rollback(appealId, request);
-            } catch (Exception rollbackException) {
-                log.error("Rollback also failed for appealId {}", appealId, rollbackException);
+            } catch (Exception exception) {
+                log.error("Rollback also failed for appealId {}", appealId, exception);
 
-                RollbackException wrappedRollbackException = rollbackException instanceof RollbackException
-                        ? (RollbackException) rollbackException
-                        : new RollbackException(request.getApplicationDTO(), rollbackException);
+                RollbackException rollbackException = exception instanceof RollbackException existingRollbackException
+                        ? existingRollbackException
+                        : new RollbackException(request.getApplicationDTO(), exception);
 
-                wrappedRollbackException.addSuppressed(ex);
-                throw wrappedRollbackException;
+                rollbackException.addSuppressed(ex);
+                throw rollbackException;
             }
             throw new MaatOrchestrationException(request.getApplicationDTO(), ex);
         }

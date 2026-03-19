@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.utils;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
@@ -13,6 +14,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.APPEAL_ID;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.LEGACY_APPEAL_ID;
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.REP_ID;
 
@@ -238,6 +240,11 @@ public class WiremockStubs {
                         .withBody(response)));
     }
 
+    public static void stubForDetermineMagsRepDecisionException() {
+        stubFor(post(urlMatching(CCP_URL + "/determine-mags-rep-decision"))
+                .willReturn(aResponse().withStatus(500)));
+    }
+
     public static void assertStubForDetermineMagsRepDecision(int times) {
         verify(exactly(times), postRequestedFor(urlPathMatching(CCP_URL + "/determine-mags-rep-decision")));
     }
@@ -262,5 +269,12 @@ public class WiremockStubs {
 
     public static void assertStubForUpdateFinancialAssessment(int times) {
         verify(exactly(times), putRequestedFor(urlPathMatching(MAAT_API_ASSESSMENT_URL + "/financial-assessments")));
+    }
+
+    public static void stubForRollbackIojAppeal(String response) {
+        stubFor(post(urlMatching("/api/internal/v1/ioj-appeals/" + APPEAL_ID + "/rollback"))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
     }
 }

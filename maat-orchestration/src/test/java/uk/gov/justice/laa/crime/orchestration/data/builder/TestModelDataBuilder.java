@@ -32,6 +32,7 @@ import uk.gov.justice.laa.crime.common.model.hardship.SolicitorCosts;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealRequest;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiGetIojAppealResponse;
+import uk.gov.justice.laa.crime.common.model.ioj.ApiRollbackIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.IojAppeal;
 import uk.gov.justice.laa.crime.common.model.ioj.IojAppealMetadata;
 import uk.gov.justice.laa.crime.common.model.meansassessment.ApiAssessmentChildWeighting;
@@ -449,6 +450,13 @@ public class TestModelDataBuilder {
 
     public static ApiCreateIojAppealResponse getApiCreateIojAppealResponse() {
         return new ApiCreateIojAppealResponse().withAppealId(APPEAL_ID).withLegacyAppealId(LEGACY_APPEAL_ID);
+    }
+
+    public static ApiRollbackIojAppealResponse getApiRollbackIojAppealResponse(boolean rollbackSuccessful) {
+        return new ApiRollbackIojAppealResponse()
+                .withAppealId(APPEAL_ID)
+                .withLegacyAppealId(LEGACY_APPEAL_ID)
+                .withRollbackSuccessful(rollbackSuccessful);
     }
 
     public static uk.gov.justice.laa.crime.common.model.proceeding.common.ApiFinancialAssessment

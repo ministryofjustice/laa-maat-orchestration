@@ -14,11 +14,13 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertS
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCalculateContributions;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCreateIojAppeal;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForDetermineMagsRepDecision;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForDetermineMagsRepDecisionException;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindIojAppeal;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindRepOrder;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetContributionsSummaries;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForRollbackIojAppeal;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForSendApplicationTrackingResult;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForUpdateCrownCourtApplication;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
@@ -35,10 +37,13 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -180,5 +185,35 @@ class IojAppealIntegrationTest extends WiremockIntegrationTest {
 
         assertStubForPatchRepOrder(1);
         assertStubForSendApplicationTrackingResult(1);
+    }
+
+    @ParameterizedTest
+    @MethodSource("rollbackSuccessful")
+    void givenValidContent_whenCreateIsInvokedAndPostProcessingFails_thenShouldRollback(boolean rollbackSuccessful)
+            throws Exception {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTOWithAssessorName();
+
+        stubForOAuth();
+        stubForCreateIojAppeal(objectMapper.writeValueAsString(TestModelDataBuilder.getApiCreateIojAppealResponse()));
+        stubForFindRepOrder(objectMapper.writeValueAsString(repOrderDTO));
+        stubForDetermineMagsRepDecisionException();
+        stubForGetUserSummary(objectMapper.writeValueAsString(
+                TestModelDataBuilder.getUserSummaryDTO(List.of(Action.CREATE_IOJ.getCode()), NewWorkReason.NEW)));
+        stubForRollbackIojAppeal(objectMapper.writeValueAsString(
+                TestModelDataBuilder.getApiRollbackIojAppealResponse(rollbackSuccessful)));
+
+        String requestBody = objectMapper.writeValueAsString(workflowRequest);
+        if (rollbackSuccessful) {
+            mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
+                    .andExpect(status().is(555));
+        } else {
+            mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
+                    .andExpect(status().is(500));
+        }
+    }
+
+    static Stream<Boolean> rollbackSuccessful() {
+        return Stream.of(true, false);
     }
 }
