@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealRequest;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiGetIojAppealResponse;
+import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.client.CrimeAssessmentApiClient;
 
 import java.util.Optional;
@@ -23,7 +24,7 @@ public class AssessmentApiService {
 
     private final CrimeAssessmentApiClient assessmentApiClient;
 
-    public ApiGetIojAppealResponse find(int appealId) {
+    public ApiGetIojAppealResponse findIojAppeal(int appealId) {
         log.debug("Request to Assessment Service for IoJ Appeal ID: {}", appealId);
 
         // 404s are intercepted by the WebClientFilters, so we re-throw the exception here to be
@@ -37,10 +38,22 @@ public class AssessmentApiService {
         return apiGetIojAppealResponse;
     }
 
-    public ApiCreateIojAppealResponse create(ApiCreateIojAppealRequest request) {
+    public ApiCreateIojAppealResponse createIojAppeal(ApiCreateIojAppealRequest request) {
         log.debug(REQUEST_STRING, request);
         ApiCreateIojAppealResponse response = assessmentApiClient.createIojAppeal(request);
         log.debug(RESPONSE_STRING, response);
+        return response;
+    }
+
+    public ApiGetPassportedAssessmentResponse findPassportAssessment(int id) {
+        log.debug("Request to Assessment Service to retrieve Passport Assessment: {}", id);
+
+        ApiGetPassportedAssessmentResponse response = Optional.ofNullable(assessmentApiClient.getPassportAssessment(id))
+                .orElseThrow(() ->
+                        new WebClientResponseException(HttpStatus.NOT_FOUND.value(), "Not found", null, null, null));
+
+        log.debug(REQUEST_STRING, response);
+
         return response;
     }
 }

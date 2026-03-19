@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service.api;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -7,7 +8,10 @@ import static org.mockito.Mockito.when;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealRequest;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiGetIojAppealResponse;
+import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.client.CrimeAssessmentApiClient;
+import uk.gov.justice.laa.crime.orchestration.data.Constants;
+import uk.gov.justice.laa.crime.orchestration.data.builder.PassportAssessmentDataBuilder;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +22,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 @ExtendWith({MockitoExtension.class})
 class AssessmentApiServiceTest {
+
     private static final int EXISTING_APPEAL_ID = 1;
 
     @Mock
@@ -27,29 +32,50 @@ class AssessmentApiServiceTest {
     private AssessmentApiService assessmentApiService;
 
     @Test
-    void givenAppealId_whenFindIsInvoked_thenApiClientReturnsResponse() {
+    void givenAppealId_whenFindIojAppealIsInvoked_thenApiClientReturnsResponse() {
         when(assessmentApiClient.getIojAppeal(EXISTING_APPEAL_ID)).thenReturn(new ApiGetIojAppealResponse());
 
-        assessmentApiService.find(EXISTING_APPEAL_ID);
+        assessmentApiService.findIojAppeal(EXISTING_APPEAL_ID);
 
         verify(assessmentApiClient).getIojAppeal(EXISTING_APPEAL_ID);
     }
 
     @Test
-    void givenNullResponse_whenFindIsInvoked_thenExceptionThrown() {
+    void givenNullResponse_whenFindIojAppealIsInvoked_thenExceptionThrown() {
         when(assessmentApiClient.getIojAppeal(EXISTING_APPEAL_ID)).thenReturn(null);
 
-        assertThatThrownBy(() -> assessmentApiService.find(EXISTING_APPEAL_ID))
+        assertThatThrownBy(() -> assessmentApiService.findIojAppeal(EXISTING_APPEAL_ID))
                 .isInstanceOf(WebClientResponseException.class);
     }
 
     @Test
-    void givenCreateIojAppealRequest_whenCreateIsInvoked_thenApiClientReturnsResponse() {
+    void givenCreateIojAppealRequest_whenCreateIojAppealIsInvoked_thenApiClientReturnsResponse() {
         ApiCreateIojAppealRequest request = new ApiCreateIojAppealRequest();
         when(assessmentApiClient.createIojAppeal(request)).thenReturn(new ApiCreateIojAppealResponse());
 
-        assessmentApiService.create(request);
+        assessmentApiService.createIojAppeal(request);
 
         verify(assessmentApiClient).createIojAppeal(request);
+    }
+
+    @Test
+    void givenValidId_whenFindPassportAssessmentIsInvoked_thenApiClientReturnsResponse() {
+        ApiGetPassportedAssessmentResponse response =
+                PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(Constants.WITHOUT_PARTNER);
+
+        when(assessmentApiClient.getPassportAssessment(Constants.PASSPORT_ASSESSMENT_ID))
+                .thenReturn(response);
+
+        assertThat(assessmentApiService.findPassportAssessment(Constants.PASSPORT_ASSESSMENT_ID))
+                .isEqualTo(response);
+    }
+
+    @Test
+    void givenInvalidId_whenFindPassportAssessmentIsInvoked_thenExceptionThrown() {
+        when(assessmentApiClient.getPassportAssessment(Constants.PASSPORT_ASSESSMENT_ID))
+                .thenReturn(null);
+
+        assertThatThrownBy(() -> assessmentApiService.findPassportAssessment(Constants.PASSPORT_ASSESSMENT_ID))
+                .isInstanceOf(WebClientResponseException.class);
     }
 }

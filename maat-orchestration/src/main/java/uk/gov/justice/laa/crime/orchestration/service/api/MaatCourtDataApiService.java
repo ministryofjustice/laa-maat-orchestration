@@ -7,6 +7,7 @@ import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpda
 import uk.gov.justice.laa.crime.orchestration.client.MaatCourtDataApiClient;
 import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.SendToCCLFDTO;
@@ -14,7 +15,9 @@ import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Slf4j
 @Service
@@ -44,6 +47,18 @@ public class MaatCourtDataApiService {
         UserSummaryDTO userSummaryDTO = maatApiClient.getUserSummary(username);
         log.debug(RESPONSE_STRING, userSummaryDTO);
         return userSummaryDTO;
+    }
+
+    public ApplicantDTO getApplicant(int applicantId) {
+        log.debug(REQUEST_STRING, applicantId);
+
+        ApplicantDTO response = maatApiClient.getApplicant(applicantId);
+        if (response == null) {
+            throw new WebClientResponseException(HttpStatus.NOT_FOUND.value(), "Not found", null, null, null);
+        }
+
+        log.debug(RESPONSE_STRING, response);
+        return response;
     }
 
     public void updateSendToCCLF(SendToCCLFDTO sendToCCLFDTO) {

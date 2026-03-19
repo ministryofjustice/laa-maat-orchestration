@@ -170,8 +170,22 @@ public class WiremockStubs {
         verify(exactly(times), putRequestedFor(urlPathMatching(MAAT_API_APPLICATION_URL + "/applicant/update-cclf")));
     }
 
+    public static void stubForGetApplicant(String response) {
+        stubFor(get(urlMatching(MAAT_API_APPLICATION_URL + "/applicant/" + Constants.APPLICANT_ID))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
+
     public static void stubForFindIojAppeal(String response) {
         stubFor(get(urlMatching("/api/internal/v1/ioj-appeals/lookup-by-legacy-id/" + LEGACY_APPEAL_ID))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
+
+    public static void stubForFindPassportAssessment(String response) {
+        stubFor(get(urlMatching("/api/internal/v1/passport/lookup-by-legacy-id/" + Constants.PASSPORT_ASSESSMENT_ID))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response)));
