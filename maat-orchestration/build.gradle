@@ -4,7 +4,7 @@ plugins {
 	id "org.sonarqube" version "6.2.0.5505"
 	id "com.diffplug.spotless" version "8.0.0"
 	id "info.solidsoft.pitest" version "1.15.0"
-	id "org.springframework.boot" version "3.5.9"
+	id "org.springframework.boot" version "3.5.12"
 	id "io.spring.dependency-management" version "1.1.7"
 }
 
@@ -20,10 +20,10 @@ def versions = [
 		pitest                  : "1.21.0",
 		sentry					: "8.23.0",
 		springdocVersion        : "2.8.13",
-		commonsModSchemas       : "1.45.1",
+		commonsModSchemas       : "1.47.0",
 		crimeCommonsClasses     : "4.30.2",
 		wiremock				: "3.10.6",
-		resilience4jVersion     : "2.3.0",
+		resilience4jVersion     : "2.4.0",
 		commonsLang3Version		: "3.19.0",
 ]
 
