@@ -17,6 +17,7 @@ import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiDetermineMag
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateApplicationResponse;
 import uk.gov.justice.laa.crime.common.model.proceeding.response.ApiUpdateCrownCourtOutcomeResponse;
 import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CrownCourtOutcome;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.enums.DecisionReason;
@@ -70,7 +71,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
                         .withDecisionResult(
                                 applicationDTO.getAssessmentDTO().getIojAppeal().getAppealDecisionResult())
                         .withIojResult(applicationDTO.getIojResult()))
-                .withFinancialAssessment(applicationDtoToFinancialAssessment(applicationDTO))
+                .withFinancialAssessment(applicationDtoToFinancialAssessment(applicationDTO, CourtType.MAGISTRATE))
                 .withUserSession(userMapper.userDtoToUserSession(request.getUserDTO()));
     }
 
@@ -116,7 +117,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
                                 application.getAssessmentDTO().getIojAppeal().getAppealDecisionResult())
                         .withIojResult(application.getIojResult()))
                 .withPassportAssessment(applicationDtoToPassportAssessment(application))
-                .withFinancialAssessment(applicationDtoToFinancialAssessment(application));
+                .withFinancialAssessment(applicationDtoToFinancialAssessment(application, CourtType.CROWN_COURT));
 
         CrownCourtOverviewDTO crownCourtOverview = application.getCrownCourtOverviewDTO();
         CrownCourtSummaryDTO crownCourtSummary = crownCourtOverview.getCrownCourtSummaryDTO();
@@ -202,7 +203,8 @@ public class ProceedingsMapper extends CrownCourtMapper {
         return null;
     }
 
-    private ApiFinancialAssessment applicationDtoToFinancialAssessment(ApplicationDTO application) {
+    private ApiFinancialAssessment applicationDtoToFinancialAssessment(
+            ApplicationDTO application, CourtType courtType) {
 
         FinancialAssessmentDTO financialAssessmentDTO =
                 application.getAssessmentDTO().getFinancialAssessmentDTO();
@@ -221,12 +223,18 @@ public class ProceedingsMapper extends CrownCourtMapper {
                             fullAssessment.getAssessmnentStatusDTO().getStatus()));
         }
 
-        HardshipReviewDTO crownHardship = financialAssessmentDTO.getHardship().getCrownCourtHardship();
-        if (crownHardship.getId() != null) {
+        HardshipReviewDTO hardship;
+        if (courtType == CourtType.CROWN_COURT) {
+            hardship = financialAssessmentDTO.getHardship().getCrownCourtHardship();
+        } else {
+            hardship = financialAssessmentDTO.getHardship().getMagCourtHardship();
+        }
+
+        if (hardship.getId() != null) {
             assessment.withHardshipOverview(new ApiHardshipOverview()
-                    .withReviewResult(ReviewResult.getFrom(crownHardship.getReviewResult()))
-                    .withAssessmentStatus(CurrentStatus.getFrom(
-                            crownHardship.getAsessmentStatus().getStatus())));
+                    .withReviewResult(ReviewResult.getFrom(hardship.getReviewResult()))
+                    .withAssessmentStatus(
+                            CurrentStatus.getFrom(hardship.getAsessmentStatus().getStatus())));
         }
         return assessment;
     }
