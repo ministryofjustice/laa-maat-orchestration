@@ -198,7 +198,7 @@ public class MeansAssessmentDataBuilder {
                 .getAssessmentDTO()
                 .getFinancialAssessmentDTO()
                 .setHardship(HardshipOverviewDTO.builder()
-                        .crownCourtHardship(new HardshipReviewDTO())
+                        .magCourtHardship(new HardshipReviewDTO())
                         .build());
         return request;
     }
