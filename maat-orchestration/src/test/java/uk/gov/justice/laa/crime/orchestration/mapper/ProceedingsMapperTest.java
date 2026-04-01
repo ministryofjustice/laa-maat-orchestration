@@ -50,9 +50,17 @@ class ProceedingsMapperTest {
     ProceedingsMapper proceedingsMapper;
 
     @Test
-    void givenWorkflowRequest_workflowRequestToDetermineMagsRepDecisionRequestIsInvoked_thenReturnsApiRequest() {
+    void givenWorkflowRequest_whenWorkflowRequestToDetermineMagsRepDecisionRequestIsInvoked_thenReturnsApiRequest() {
         mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+
+        // Remove the crown hardship created above as we're only interested in the mags
+        workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .getHardship()
+                .setCrownCourtHardship(null);
 
         ApiDetermineMagsRepDecisionRequest expectedRequest = TestModelDataBuilder.getDetermineMagsRepDecisionRequest();
         ApiDetermineMagsRepDecisionRequest actualRequest =
