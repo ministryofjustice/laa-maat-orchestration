@@ -50,7 +50,7 @@ class ProceedingsMapperTest {
     ProceedingsMapper proceedingsMapper;
 
     @Test
-    void givenWorkflowRequest_whenWorkflowRequestToDetermineMagsRepDecisionRequestIsInvoked_thenReturnsApiRequest() {
+    void givenWorkflowRequest_whenMappingDetermineMagsRepDecisionRequest_thenReturnsApiRequest() {
         mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
 
@@ -77,8 +77,7 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void
-            givenNoFullAssessmentDate_whenWorkflowRequestToDetermineMagsRepDecisionRequestIsInvoked_thenFullAssessmentIsNotMapped() {
+    void givenNoFullAssessmentDate_whenMappingDetermineMagsRepDecisionRequest_thenDoesNotMapFullAssessment() {
         mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
 
@@ -98,7 +97,7 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void givenMagHardshipHasNoId_whenMappingMagsRequest_thenHardshipOverviewIsNotMapped() {
+    void givenMagHardshipWithoutId_whenMappingDetermineMagsRepDecisionRequest_thenDoesNotMapHardshipOverview() {
         mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
 
@@ -117,7 +116,7 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void givenCrownHardshipHasNoId_whenMappingUpdateApplicationRequest_thenHardshipOverviewIsNotMapped() {
+    void givenCrownHardshipWithoutId_whenMappingUpdateApplicationRequest_thenDoesNotMapHardshipOverview() {
         mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
 
@@ -136,7 +135,7 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void givenNoPassportedId_whenMappingMagsRequest_thenPassportAssessmentIsNull() {
+    void givenNoPassportedId_whenMappingDetermineMagsRepDecisionRequest_thenReturnsNullPassportAssessment() {
         mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
 
@@ -149,8 +148,7 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void
-            givenApiDetermineMagsRepDecisionResponse_whenDetermineMagsRepDecisionResponseToApplicationDtoIsInvoked_thenReturnsApplicationDto() {
+    void givenDetermineMagsRepDecisionResponse_whenMappingToApplicationDto_thenUpdatesApplication() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
 
         ApiDetermineMagsRepDecisionResponse expectedResponse =
@@ -180,7 +178,7 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void whenWorkflowRequestToUpdateApplicationRequestIsInvoked() {
+    void givenWorkflowRequest_whenMappingUpdateApplicationRequest_thenReturnsApiUpdateApplicationRequest() {
         mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
         ApiUpdateApplicationRequest expectedApplicationRequest = TestModelDataBuilder.getUpdateApplicationRequest();
@@ -192,7 +190,7 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void givenAEmptyInitStatus_whenWorkflowRequestToUpdateCrownCourtRequestIsInvoked_thenReturnEmptyInitStatus() {
+    void givenNullInitStatus_whenMappingUpdateCrownCourtRequest_thenReturnsNullInitStatus() {
         mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
         InitialAssessmentDTO initialAssessmentDTO = workflowRequest
@@ -213,7 +211,7 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void givenAValidWorkflowRequest_whenWorkflowRequestToUpdateCrownCourtRequestIsInvoked_thenReturnCorrectCCRequest() {
+    void givenValidWorkflowRequest_whenMappingUpdateCrownCourtRequest_thenReturnsCorrectRequest() {
         mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
         ApiUpdateCrownCourtRequest expectedCrownCourtRequest = TestModelDataBuilder.getUpdateCrownCourtRequest();
@@ -225,7 +223,7 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void whenUpdateApplicationResponseToApplicationDtoIsInvoked() {
+    void givenUpdateApplicationResponse_whenMappingToApplicationDto_thenUpdatesApplication() {
         ApiUpdateApplicationResponse updateApplicationResponse = TestModelDataBuilder.getApiUpdateApplicationResponse();
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT);
 
@@ -251,7 +249,7 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void updateCrownCourtResponseToApplicationDtoIsInvoked() {
+    void givenUpdateCrownCourtOutcomeResponse_whenMappingToApplicationDto_thenUpdatesApplication() {
         ApiUpdateCrownCourtOutcomeResponse updateCrownCourtResponse =
                 TestModelDataBuilder.getApiUpdateCrownCourtResponse();
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT);
@@ -308,17 +306,17 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void givenAStatusIsNull_whenGetCurrentStatusIsInvoked_thenNullIsReturned() {
+    void givenNullStatus_whenGettingCurrentStatus_thenReturnsNull() {
         assertThat(proceedingsMapper.getCurrentStatus(null)).isNull();
     }
 
     @Test
-    void givenAEmptyStatus_whenGetCurrentStatusIsInvoked_thenNullIsReturned() {
+    void givenBlankStatus_whenGettingCurrentStatus_thenReturnsNull() {
         assertThat(proceedingsMapper.getCurrentStatus("")).isNull();
     }
 
     @Test
-    void givenAEmptyStatus_whenGetCurrentStatusIsInvoked_thenCorrectStatusIsReturned() {
+    void givenValidStatus_whenGettingCurrentStatus_thenReturnsMappedStatus() {
         assertThat(proceedingsMapper.getCurrentStatus("COMPLETE")).isEqualTo(CurrentStatus.COMPLETE);
     }
 }
