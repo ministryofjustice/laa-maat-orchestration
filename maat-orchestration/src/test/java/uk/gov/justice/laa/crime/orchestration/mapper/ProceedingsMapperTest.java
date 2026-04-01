@@ -50,9 +50,17 @@ class ProceedingsMapperTest {
     ProceedingsMapper proceedingsMapper;
 
     @Test
-    void givenWorkflowRequest_workflowRequestToDetermineMagsRepDecisionRequestIsInvoked_thenReturnsApiRequest() {
+    void givenWorkflowRequest_whenMappingDetermineMagsRepDecisionRequest_thenReturnsApiRequest() {
         mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+
+        // Remove the crown hardship created above as we're only interested in the mags
+        workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .getHardship()
+                .setCrownCourtHardship(null);
 
         ApiDetermineMagsRepDecisionRequest expectedRequest = TestModelDataBuilder.getDetermineMagsRepDecisionRequest();
         ApiDetermineMagsRepDecisionRequest actualRequest =
@@ -69,8 +77,78 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void
-            givenApiDetermineMagsRepDecisionResponse_whenDetermineMagsRepDecisionResponseToApplicationDtoIsInvoked_thenReturnsApplicationDto() {
+    void givenNoFullAssessmentDate_whenMappingDetermineMagsRepDecisionRequest_thenDoesNotMapFullAssessment() {
+        mockApiUserSession();
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+
+        workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .getFull()
+                .setAssessmentDate(null);
+
+        ApiDetermineMagsRepDecisionRequest actual =
+                proceedingsMapper.workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest);
+
+        softly.assertThat(actual.getFinancialAssessment().getFullResult()).isNull();
+        softly.assertThat(actual.getFinancialAssessment().getFullStatus()).isNull();
+        softly.assertAll();
+    }
+
+    @Test
+    void givenMagHardshipWithoutId_whenMappingDetermineMagsRepDecisionRequest_thenDoesNotMapHardshipOverview() {
+        mockApiUserSession();
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+
+        workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .getHardship()
+                .getMagCourtHardship()
+                .setId(null);
+
+        ApiDetermineMagsRepDecisionRequest actual =
+                proceedingsMapper.workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest);
+
+        assertThat(actual.getFinancialAssessment().getHardshipOverview()).isNull();
+    }
+
+    @Test
+    void givenCrownHardshipWithoutId_whenMappingUpdateApplicationRequest_thenDoesNotMapHardshipOverview() {
+        mockApiUserSession();
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
+
+        workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .getHardship()
+                .getCrownCourtHardship()
+                .setId(null);
+
+        ApiUpdateApplicationRequest actual = proceedingsMapper.workflowRequestToUpdateApplicationRequest(
+                workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
+
+        assertThat(actual.getFinancialAssessment().getHardshipOverview()).isNull();
+    }
+
+    @Test
+    void givenNoPassportedId_whenMappingDetermineMagsRepDecisionRequest_thenReturnsNullPassportAssessment() {
+        mockApiUserSession();
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+
+        workflowRequest.getApplicationDTO().getPassportedDTO().setPassportedId(null);
+
+        ApiDetermineMagsRepDecisionRequest actual =
+                proceedingsMapper.workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest);
+
+        assertThat(actual.getPassportAssessment()).isNull();
+    }
+
+    @Test
+    void givenDetermineMagsRepDecisionResponse_whenMappingToApplicationDto_thenUpdatesApplication() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
 
         ApiDetermineMagsRepDecisionResponse expectedResponse =
@@ -81,12 +159,14 @@ class ProceedingsMapperTest {
         softly.assertThat(actualResponse.getRepOrderDecision().getCode())
                 .isEqualTo(
                         expectedResponse.getDecisionResult().getDecisionReason().getCode());
+
         softly.assertThat(actualResponse.getRepOrderDecision().getDescription())
                 .isEqualTo(new SysGenString(expectedResponse
                                 .getDecisionResult()
                                 .getDecisionReason()
                                 .getDescription())
                         .getValue());
+
         softly.assertThat(actualResponse.getDecisionDate())
                 .isEqualTo(expectedResponse
                         .getDecisionResult()
@@ -98,7 +178,7 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void whenWorkflowRequestToUpdateApplicationRequestIsInvoked() {
+    void givenWorkflowRequest_whenMappingUpdateApplicationRequest_thenReturnsApiUpdateApplicationRequest() {
         mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
         ApiUpdateApplicationRequest expectedApplicationRequest = TestModelDataBuilder.getUpdateApplicationRequest();
@@ -106,11 +186,11 @@ class ProceedingsMapperTest {
                 proceedingsMapper.workflowRequestToUpdateApplicationRequest(
                         workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
 
-        softly.assertThat(actualApplicationRequest).usingRecursiveComparison().isEqualTo(expectedApplicationRequest);
+        assertThat(actualApplicationRequest).usingRecursiveComparison().isEqualTo(expectedApplicationRequest);
     }
 
     @Test
-    void givenAEmptyInitStatus_whenWorkflowRequestToUpdateCrownCourtRequestIsInvoked_thenReturnEmptyInitStatus() {
+    void givenNullInitStatus_whenMappingUpdateCrownCourtRequest_thenReturnsNullInitStatus() {
         mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
         InitialAssessmentDTO initialAssessmentDTO = workflowRequest
@@ -127,13 +207,11 @@ class ProceedingsMapperTest {
                 proceedingsMapper.workflowRequestToUpdateCrownCourtRequest(
                         workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
 
-        softly.assertThat(actualApplicationRequest).usingRecursiveComparison().isEqualTo(expectedApplicationRequest);
-
-        softly.assertAll();
+        assertThat(actualApplicationRequest).usingRecursiveComparison().isEqualTo(expectedApplicationRequest);
     }
 
     @Test
-    void givenAValidWorkflowRequest_whenWorkflowRequestToUpdateCrownCourtRequestIsInvoked_thenReturnCorrectCCRequest() {
+    void givenValidWorkflowRequest_whenMappingUpdateCrownCourtRequest_thenReturnsCorrectRequest() {
         mockApiUserSession();
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
         ApiUpdateCrownCourtRequest expectedCrownCourtRequest = TestModelDataBuilder.getUpdateCrownCourtRequest();
@@ -141,11 +219,11 @@ class ProceedingsMapperTest {
                 proceedingsMapper.workflowRequestToUpdateCrownCourtRequest(
                         workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
 
-        softly.assertThat(actualApplicationRequest).usingRecursiveComparison().isEqualTo(expectedCrownCourtRequest);
+        assertThat(actualApplicationRequest).usingRecursiveComparison().isEqualTo(expectedCrownCourtRequest);
     }
 
     @Test
-    void whenUpdateApplicationResponseToApplicationDtoIsInvoked() {
+    void givenUpdateApplicationResponse_whenMappingToApplicationDto_thenUpdatesApplication() {
         ApiUpdateApplicationResponse updateApplicationResponse = TestModelDataBuilder.getApiUpdateApplicationResponse();
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT);
 
@@ -166,10 +244,12 @@ class ProceedingsMapperTest {
 
         softly.assertThat(updatedCrownCourtSummaryDTO.getCcRepType().getValue())
                 .isEqualTo(updateApplicationResponse.getCrownRepOrderType());
+
+        softly.assertAll();
     }
 
     @Test
-    void updateCrownCourtResponseToApplicationDtoIsInvoked() {
+    void givenUpdateCrownCourtOutcomeResponse_whenMappingToApplicationDto_thenUpdatesApplication() {
         ApiUpdateCrownCourtOutcomeResponse updateCrownCourtResponse =
                 TestModelDataBuilder.getApiUpdateCrownCourtResponse();
         ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO(CourtType.CROWN_COURT);
@@ -204,12 +284,14 @@ class ProceedingsMapperTest {
                 .isEqualTo(apiCrownCourtSummary.getEvidenceFeeLevel().getFeeLevel());
 
         checkOutcomes(crownCourtSummaryDTO.getOutcomeDTOs().stream().toList(), apiCrownCourtSummary);
+
+        softly.assertAll();
     }
 
     void checkOutcomes(List<OutcomeDTO> outcomes, ApiCrownCourtSummary apiCrownCourtSummary) {
-        var actualOutcome = outcomes.get(0);
+        var actualOutcome = outcomes.getFirst();
         var originalOutcome =
-                apiCrownCourtSummary.getRepOrderCrownCourtOutcome().get(0);
+                apiCrownCourtSummary.getRepOrderCrownCourtOutcome().getFirst();
 
         softly.assertThat(actualOutcome.getOutcome())
                 .isEqualTo(originalOutcome.getOutcome().getCode());
@@ -224,17 +306,17 @@ class ProceedingsMapperTest {
     }
 
     @Test
-    void givenAStatusIsNull_whenGetCurrentStatusIsInvoked_thenNullIsReturned() {
+    void givenNullStatus_whenGettingCurrentStatus_thenReturnsNull() {
         assertThat(proceedingsMapper.getCurrentStatus(null)).isNull();
     }
 
     @Test
-    void givenAEmptyStatus_whenGetCurrentStatusIsInvoked_thenNullIsReturned() {
+    void givenBlankStatus_whenGettingCurrentStatus_thenReturnsNull() {
         assertThat(proceedingsMapper.getCurrentStatus("")).isNull();
     }
 
     @Test
-    void givenAEmptyStatus_whenGetCurrentStatusIsInvoked_thenCorrectStatusIsReturned() {
+    void givenValidStatus_whenGettingCurrentStatus_thenReturnsMappedStatus() {
         assertThat(proceedingsMapper.getCurrentStatus("COMPLETE")).isEqualTo(CurrentStatus.COMPLETE);
     }
 }
