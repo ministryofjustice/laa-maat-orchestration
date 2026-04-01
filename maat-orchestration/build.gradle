@@ -24,7 +24,7 @@ def versions = [
 		crimeCommonsClasses     : "4.30.2",
 		wiremock				: "3.10.6",
 		resilience4jVersion     : "2.4.0",
-		commonsLang3Version		: "3.19.0",
+		commonsLang3Version		: "3.20.0",
 ]
 
 configurations {
