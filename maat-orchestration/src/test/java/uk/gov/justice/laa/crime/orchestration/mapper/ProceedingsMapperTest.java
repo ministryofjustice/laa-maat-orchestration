@@ -78,6 +78,78 @@ class ProceedingsMapperTest {
 
     @Test
     void
+            givenNoFullAssessmentDate_whenWorkflowRequestToDetermineMagsRepDecisionRequestIsInvoked_thenFullAssessmentIsNotMapped() {
+        mockApiUserSession();
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+
+        workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .getFull()
+                .setAssessmentDate(null);
+
+        ApiDetermineMagsRepDecisionRequest actual =
+                proceedingsMapper.workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest);
+
+        softly.assertThat(actual.getFinancialAssessment().getFullResult()).isNull();
+        softly.assertThat(actual.getFinancialAssessment().getFullStatus()).isNull();
+        softly.assertAll();
+    }
+
+    @Test
+    void givenMagHardshipHasNoId_whenMappingMagsRequest_thenHardshipOverviewIsNotMapped() {
+        mockApiUserSession();
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+
+        workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .getHardship()
+                .getMagCourtHardship()
+                .setId(null);
+
+        ApiDetermineMagsRepDecisionRequest actual =
+                proceedingsMapper.workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest);
+
+        assertThat(actual.getFinancialAssessment().getHardshipOverview()).isNull();
+    }
+
+    @Test
+    void givenCrownHardshipHasNoId_whenMappingUpdateApplicationRequest_thenHardshipOverviewIsNotMapped() {
+        mockApiUserSession();
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest(CourtType.CROWN_COURT);
+
+        workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .getHardship()
+                .getCrownCourtHardship()
+                .setId(null);
+
+        ApiUpdateApplicationRequest actual = proceedingsMapper.workflowRequestToUpdateApplicationRequest(
+                workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
+
+        assertThat(actual.getFinancialAssessment().getHardshipOverview()).isNull();
+    }
+
+    @Test
+    void givenNoPassportedId_whenMappingMagsRequest_thenPassportAssessmentIsNull() {
+        mockApiUserSession();
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+
+        workflowRequest.getApplicationDTO().getPassportedDTO().setPassportedId(null);
+
+        ApiDetermineMagsRepDecisionRequest actual =
+                proceedingsMapper.workflowRequestToDetermineMagsRepDecisionRequest(workflowRequest);
+
+        assertThat(actual.getPassportAssessment()).isNull();
+    }
+
+    @Test
+    void
             givenApiDetermineMagsRepDecisionResponse_whenDetermineMagsRepDecisionResponseToApplicationDtoIsInvoked_thenReturnsApplicationDto() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
 
