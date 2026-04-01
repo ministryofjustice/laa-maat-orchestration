@@ -33,6 +33,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtOverviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FullAssessmentDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipOverviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IncomeEvidenceSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
@@ -223,12 +224,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
                             fullAssessment.getAssessmnentStatusDTO().getStatus()));
         }
 
-        HardshipReviewDTO hardship;
-        if (courtType == CourtType.CROWN_COURT) {
-            hardship = financialAssessmentDTO.getHardship().getCrownCourtHardship();
-        } else {
-            hardship = financialAssessmentDTO.getHardship().getMagCourtHardship();
-        }
+        HardshipReviewDTO hardship = getHardshipReviewDTO(courtType, financialAssessmentDTO);
 
         if (hardship.getId() != null) {
             assessment.withHardshipOverview(new ApiHardshipOverview()
@@ -237,6 +233,13 @@ public class ProceedingsMapper extends CrownCourtMapper {
                             CurrentStatus.getFrom(hardship.getAsessmentStatus().getStatus())));
         }
         return assessment;
+    }
+
+    private static HardshipReviewDTO getHardshipReviewDTO(
+            CourtType courtType, FinancialAssessmentDTO financialAssessmentDTO) {
+        HardshipOverviewDTO hardship = financialAssessmentDTO.getHardship();
+
+        return courtType == CourtType.CROWN_COURT ? hardship.getCrownCourtHardship() : hardship.getMagCourtHardship();
     }
 
     public ApplicationDTO updateApplicationResponseToApplicationDto(
