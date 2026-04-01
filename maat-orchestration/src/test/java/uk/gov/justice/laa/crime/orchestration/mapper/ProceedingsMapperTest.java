@@ -161,12 +161,14 @@ class ProceedingsMapperTest {
         softly.assertThat(actualResponse.getRepOrderDecision().getCode())
                 .isEqualTo(
                         expectedResponse.getDecisionResult().getDecisionReason().getCode());
+
         softly.assertThat(actualResponse.getRepOrderDecision().getDescription())
                 .isEqualTo(new SysGenString(expectedResponse
                                 .getDecisionResult()
                                 .getDecisionReason()
                                 .getDescription())
                         .getValue());
+
         softly.assertThat(actualResponse.getDecisionDate())
                 .isEqualTo(expectedResponse
                         .getDecisionResult()
@@ -186,7 +188,7 @@ class ProceedingsMapperTest {
                 proceedingsMapper.workflowRequestToUpdateApplicationRequest(
                         workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
 
-        softly.assertThat(actualApplicationRequest).usingRecursiveComparison().isEqualTo(expectedApplicationRequest);
+        assertThat(actualApplicationRequest).usingRecursiveComparison().isEqualTo(expectedApplicationRequest);
     }
 
     @Test
@@ -207,9 +209,7 @@ class ProceedingsMapperTest {
                 proceedingsMapper.workflowRequestToUpdateCrownCourtRequest(
                         workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
 
-        softly.assertThat(actualApplicationRequest).usingRecursiveComparison().isEqualTo(expectedApplicationRequest);
-
-        softly.assertAll();
+        assertThat(actualApplicationRequest).usingRecursiveComparison().isEqualTo(expectedApplicationRequest);
     }
 
     @Test
@@ -221,7 +221,7 @@ class ProceedingsMapperTest {
                 proceedingsMapper.workflowRequestToUpdateCrownCourtRequest(
                         workflowRequest.getApplicationDTO(), workflowRequest.getUserDTO());
 
-        softly.assertThat(actualApplicationRequest).usingRecursiveComparison().isEqualTo(expectedCrownCourtRequest);
+        assertThat(actualApplicationRequest).usingRecursiveComparison().isEqualTo(expectedCrownCourtRequest);
     }
 
     @Test
@@ -246,6 +246,8 @@ class ProceedingsMapperTest {
 
         softly.assertThat(updatedCrownCourtSummaryDTO.getCcRepType().getValue())
                 .isEqualTo(updateApplicationResponse.getCrownRepOrderType());
+
+        softly.assertAll();
     }
 
     @Test
@@ -284,12 +286,14 @@ class ProceedingsMapperTest {
                 .isEqualTo(apiCrownCourtSummary.getEvidenceFeeLevel().getFeeLevel());
 
         checkOutcomes(crownCourtSummaryDTO.getOutcomeDTOs().stream().toList(), apiCrownCourtSummary);
+
+        softly.assertAll();
     }
 
     void checkOutcomes(List<OutcomeDTO> outcomes, ApiCrownCourtSummary apiCrownCourtSummary) {
-        var actualOutcome = outcomes.get(0);
+        var actualOutcome = outcomes.getFirst();
         var originalOutcome =
-                apiCrownCourtSummary.getRepOrderCrownCourtOutcome().get(0);
+                apiCrownCourtSummary.getRepOrderCrownCourtOutcome().getFirst();
 
         softly.assertThat(actualOutcome.getOutcome())
                 .isEqualTo(originalOutcome.getOutcome().getCode());
