@@ -19,7 +19,7 @@ java {
 def versions = [
 		pitest                  : "1.21.0",
 		sentry					: "8.36.0",
-		springdocVersion        : "2.8.14",
+		springdocVersion        : "3.0.3",
 		commonsModSchemas       : "1.50.0",
 		crimeCommonsClasses     : "4.33.0",
 		wiremock				: "4.0.8",
