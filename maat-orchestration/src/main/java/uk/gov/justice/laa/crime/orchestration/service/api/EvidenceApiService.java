@@ -39,9 +39,9 @@ public class EvidenceApiService {
         return apiUpdateIncomeEvidenceResponse;
     }
 
-    public ApiGetPassportEvidenceResponse getPassportedEvidence(int passportedAssessmentId) {
-        log.debug("Request to evidence service to retrieve evidence for passported assessment: {}", passportedAssessmentId);
-        ApiGetPassportEvidenceResponse response = evidenceApiClient.findPassportedEvidence(passportedAssessmentId);
+    public ApiGetPassportEvidenceResponse getPassportEvidence(int passportAssessmentId) {
+        log.debug("Request to evidence service to retrieve evidence for passport assessment: {}", passportAssessmentId);
+        ApiGetPassportEvidenceResponse response = evidenceApiClient.findPassportEvidence(passportAssessmentId);
         log.debug(RESPONSE_STRING, response);
         return response;
     }

@@ -26,6 +26,8 @@ public class PassportAssessmentMapper {
 
     private static final String ASSESSMENT_STATUS_DESCRIPTION = "Complete";
 
+    private final PassportEvidenceMapper passportEvidenceMapper;
+
     private PartnerDTO applicantDTOToPartnerDTO(ApplicantDTO applicant) {
         return PartnerDTO.builder()
                 .firstName(applicant.getFirstName())
@@ -66,14 +68,15 @@ public class PassportAssessmentMapper {
     }
 
     public PassportedDTO apiGetPassportedAssessmentResponseToPassportedDTO(
-            ApiGetPassportedAssessmentResponse assessment, ApiGetPassportEvidenceResponse evidence, ApplicantDTO applicant) {
+            ApiGetPassportedAssessmentResponse assessment,
+            ApiGetPassportEvidenceResponse evidence,
+            ApplicantDTO applicant) {
 
         AssessmentStatusDTO assessmentStatusDTO = AssessmentStatusDTO.builder()
                 .status(AssessmentStatusDTO.COMPLETE)
                 .description(ASSESSMENT_STATUS_DESCRIPTION)
                 .build();
 
-        // TODO: Need to populate passportSummaryEvidenceDTO following completion of LCAM-2002
         // TODO: Might need to amend mapping of legacy age related values following completion of LCAM-2016
         // Not setting dwpResult and dwpWhoChecked as these are no longer used in MAAT and so can left as null
         PassportedDTO dto = PassportedDTO.builder()
@@ -87,6 +90,8 @@ public class PassportAssessmentMapper {
                 .notes(assessment.getNotes())
                 .result(assessment.getAssessmentDecision().getCode())
                 .under18HeardYouthCourt(assessment.getDeclaredUnder18())
+                .passportSummaryEvidenceDTO(
+                        passportEvidenceMapper.apiGetPassportEvidenceResponseToIncomeEvidenceSummaryDTO(evidence))
                 .build();
 
         if (assessment.getUsn() != null) {

@@ -30,13 +30,14 @@ public class PassportAssessmentService {
     public PassportedDTO find(int id) {
         ApiGetPassportedAssessmentResponse assessment = assessmentApiService.findPassportAssessment(id);
 
-        ApiGetPassportEvidenceResponse evidence = evidenceApiService.getPassportedEvidence(id);
+        ApiGetPassportEvidenceResponse evidence = evidenceApiService.getPassportEvidence(id);
 
         DeclaredBenefit declaredBenefit = assessment.getDeclaredBenefit();
         ApplicantDTO applicant = hasPartnerBenefit(declaredBenefit)
                 ? maatCourtDataApiService.getApplicant(declaredBenefit.getLegacyPartnerId())
                 : null;
 
-        return passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(assessment, evidence, applicant);
+        return passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(
+                assessment, evidence, applicant);
     }
 }
