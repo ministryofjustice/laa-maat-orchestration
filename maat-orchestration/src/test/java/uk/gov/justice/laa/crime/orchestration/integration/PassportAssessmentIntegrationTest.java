@@ -7,10 +7,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.justice.laa.crime.orchestration.data.Constants.PASSPORT_ASSESSMENT_ID;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindPassportAssessment;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindPassportEvidence;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetApplicant;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
 
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
+import uk.gov.justice.laa.crime.orchestration.data.builder.EvidenceDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.PassportAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 
@@ -63,6 +65,8 @@ class PassportAssessmentIntegrationTest extends WiremockIntegrationTest {
         stubForOAuth();
         stubForFindPassportAssessment(objectMapper.writeValueAsString(
                 PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(Constants.WITHOUT_PARTNER)));
+        stubForFindPassportEvidence(objectMapper.writeValueAsString(
+                EvidenceDataBuilder.getApiGetPassportEvidenceResponse(Constants.WITHOUT_PARTNER)));
         stubForGetApplicant(objectMapper.writeValueAsString(PassportAssessmentDataBuilder.getApplicantDTO()));
 
         PassportedDTO expected = PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITHOUT_PARTNER);

@@ -193,6 +193,13 @@ public class WiremockStubs {
                         .withBody(response)));
     }
 
+    public static void stubForFindPassportEvidence(String response) {
+        stubFor(get(urlMatching("/api/internal/v1/evidence/passport/" + Constants.PASSPORT_ASSESSMENT_ID))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
+
     public static void stubForCreateEvidence(String response) {
         stubFor(post(urlMatching("/api/internal/v1/evidence"))
                 .willReturn(WireMock.ok()

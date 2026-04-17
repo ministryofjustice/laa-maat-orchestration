@@ -111,6 +111,7 @@ public class PassportAssessmentDataBuilder {
                 .benefitClaimedByPartner(hasPartner)
                 .partnerDetails(hasPartner ? getPartnerDTO() : new PartnerDTO())
                 .under18HeardYouthCourt(false)
+                .passportSummaryEvidenceDTO(EvidenceDataBuilder.getIncomeEvidenceSummaryDTO(hasPartner))
                 .build();
     }
 }

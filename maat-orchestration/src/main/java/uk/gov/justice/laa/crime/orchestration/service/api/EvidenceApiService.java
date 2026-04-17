@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceResponse;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiGetPassportEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceRequest;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceResponse;
 import uk.gov.justice.laa.crime.orchestration.client.EvidenceApiClient;
@@ -36,5 +37,12 @@ public class EvidenceApiService {
                 evidenceApiClient.updateEvidence(apiUpdateIncomeEvidenceRequest);
         log.debug(RESPONSE_STRING, apiUpdateIncomeEvidenceResponse);
         return apiUpdateIncomeEvidenceResponse;
+    }
+
+    public ApiGetPassportEvidenceResponse getPassportEvidence(int passportAssessmentId) {
+        log.debug("Request to evidence service to retrieve evidence for passport assessment: {}", passportAssessmentId);
+        ApiGetPassportEvidenceResponse response = evidenceApiClient.findPassportEvidence(passportAssessmentId);
+        log.debug(RESPONSE_STRING, response);
+        return response;
     }
 }

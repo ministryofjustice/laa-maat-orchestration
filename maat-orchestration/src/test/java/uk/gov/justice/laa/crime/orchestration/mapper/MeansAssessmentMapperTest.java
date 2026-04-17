@@ -49,6 +49,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -77,6 +78,8 @@ class MeansAssessmentMapperTest {
         softly.assertThat(actual)
                 .usingRecursiveComparison()
                 .ignoringCollectionOrder()
+                .withComparatorForType(Comparator.comparing(EvidenceDTO::getId), EvidenceDTO.class)
+                .withComparatorForType(Comparator.comparing(ExtraEvidenceDTO::getId), ExtraEvidenceDTO.class)
                 .isEqualTo(expected);
     }
 
