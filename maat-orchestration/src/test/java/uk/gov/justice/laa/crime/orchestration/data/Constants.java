@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.data;
 
 import uk.gov.justice.laa.crime.enums.HardshipReviewResult;
+import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -41,4 +42,23 @@ public class Constants {
     public static final boolean WITH_PARTNER = true;
     public static final boolean WITHOUT_PARTNER = false;
     public static final boolean WITHOUT_AUTH = false;
+    public static final LocalDateTime DATE_RECEIVED = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
+    public static final LocalDateTime DATE_MODIFIED = LocalDateTime.of(2023, 10, 13, 10, 15, 30);
+
+    // Evidence
+    public static final LocalDateTime INCOME_UPLIFT_APPLY_DATE = LocalDateTime.of(2021, 12, 12, 0, 0, 0);
+    public static final LocalDateTime INCOME_UPLIFT_REMOVE_DATE = INCOME_UPLIFT_APPLY_DATE.plusDays(10);
+    public static final LocalDateTime INCOME_EVIDENCE_DUE_DATE = LocalDateTime.of(2020, 10, 5, 0, 0, 0);
+    public static final LocalDateTime INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2020, 10, 1, 0, 0, 0);
+    public static final LocalDateTime EXTRA_INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2020, 10, 12, 0, 0, 0);
+    public static final LocalDateTime FIRST_REMINDER_DATE = LocalDateTime.of(2020, 10, 2, 0, 0, 0);
+    public static final LocalDateTime SECOND_REMINDER_DATE = LocalDateTime.of(2020, 10, 2, 0, 0, 0);
+    public static final String INCOME_EVIDENCE_DESCRIPTION = IncomeEvidenceType.TAX_RETURN.getDescription();
+    public static final String INCOME_EVIDENCE = IncomeEvidenceType.TAX_RETURN.getName();
+    public static final String EXTRA_INCOME_EVIDENCE_DESCRIPTION = IncomeEvidenceType.OTHER_ADHOC.getDescription();
+    public static final String EXTRA_INCOME_EVIDENCE = IncomeEvidenceType.OTHER_ADHOC.getName();
+    public static final Integer PARTNER_EVIDENCE_ID = 9552473;
+    public static final Integer APPLICANT_EVIDENCE_ID = 552473;
+    public static final Integer EXTRA_EVIDENCE_ID = 52473;
+    public static final String OTHER_DESCRIPTION = "OTHER DESCRIPTION";
 }

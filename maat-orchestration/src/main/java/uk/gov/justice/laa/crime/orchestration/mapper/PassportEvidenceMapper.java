@@ -42,6 +42,10 @@ public class PassportEvidenceMapper {
 
     private ExtraEvidenceDTO apiIncomeEvidenceToExtraEvidenceDTO(ApiIncomeEvidence evidenceItem, boolean isPartner) {
         return ExtraEvidenceDTO.builder()
+                .id(Long.valueOf(evidenceItem.getId()))
+                .evidenceTypeDTO(incomeEvidenceTypeToEvidenceTypeDTO(evidenceItem.getEvidenceType()))
+                .dateReceived(
+                        evidenceItem.getDateReceived() != null ? DateUtil.asDate(evidenceItem.getDateReceived()) : null)
                 .otherText(evidenceItem.getDescription())
                 .mandatory(evidenceItem.getMandatory())
                 .adhoc(isPartner ? "P" : "A")

@@ -22,6 +22,6 @@ public interface EvidenceApiClient {
     @PutExchange
     ApiUpdateIncomeEvidenceResponse updateEvidence(@RequestBody ApiUpdateIncomeEvidenceRequest request);
 
-    @GetExchange("/passport/{passportedAssessmentId}")
+    @GetExchange("/passport/{passportAssessmentId}")
     ApiGetPassportEvidenceResponse findPassportEvidence(@PathVariable int passportAssessmentId);
 }

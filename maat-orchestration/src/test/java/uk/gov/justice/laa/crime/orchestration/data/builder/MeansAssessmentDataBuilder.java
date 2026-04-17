@@ -55,17 +55,13 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.ContributionsDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtOverviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.CrownCourtSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.EmploymentStatusDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceFeeDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceTypeDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ExtraEvidenceDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FrequenciesDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FullAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipOverviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.IncomeEvidenceSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.NewWorkReasonDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.OffenceDTO;
@@ -97,11 +93,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class MeansAssessmentDataBuilder {
     public static final BigDecimal ANNUAL_DISPOSABLE_INCOME = BigDecimal.valueOf(1000.00);
-    private static final Integer PARTNER_EVIDENCE_ID = 9552473;
-    private static final Integer APPLICANT_EVIDENCE_ID = 552473;
-    private static final Integer PARTNER_ID = 88;
-    private static final String INCOME_EVIDENCE_DESCRIPTION = "Tax Return";
-    private static final String INCOME_EVIDENCE = "TAX RETURN";
     private static final String EVIDENCE_FEE_LEVEL_1 = "LEVEL1";
     private static final Integer PASSPORTED_ID = 777;
     private static final Integer APPLICANT_HISTORY_ID = 666;
@@ -127,13 +118,6 @@ public class MeansAssessmentDataBuilder {
     private static final BigDecimal PARTNER_ANNUAL_TOTAL = BigDecimal.valueOf(12000);
     private static final BigDecimal ANNUAL_TOTAL = APPLICANT_ANNUAL_TOTAL.add(PARTNER_ANNUAL_TOTAL);
     private static final String EMPLOYMENT_STATUS = "EMPLOY";
-    private static final String INCOME_EVIDENCE_NOTES = "Mock Income evidence notes";
-    private static final LocalDateTime INCOME_UPLIFT_APPLY_DATE = LocalDateTime.of(2021, 12, 12, 0, 0, 0);
-    private static final LocalDateTime INCOME_UPLIFT_REMOVE_DATE = INCOME_UPLIFT_APPLY_DATE.plusDays(10);
-    private static final LocalDateTime INCOME_EVIDENCE_DUE_DATE = LocalDateTime.of(2020, 10, 5, 0, 0, 0);
-    private static final LocalDateTime INCOME_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2020, 10, 1, 0, 0, 0);
-    private static final LocalDateTime FIRST_REMINDER_DATE = LocalDateTime.of(2020, 10, 2, 0, 0, 0);
-    private static final LocalDateTime SECOND_REMINDER_DATE = LocalDateTime.of(2020, 10, 2, 0, 0, 0);
     private static final String TRANSACTION_ID = "7c49ebfe-fe3a-4f2f-8dad-f7b8f03b8327";
     private static final BigDecimal THRESHOLD = BigDecimal.valueOf(5000.00);
     private static final BigDecimal AGGREGATED_EXPENSE = BigDecimal.valueOf(22000.00);
@@ -170,16 +154,12 @@ public class MeansAssessmentDataBuilder {
     private static final ZonedDateTime TIME_STAMP = toZonedDateTime(DATE_MODIFIED);
     public static final String SECTION = "INITA";
     public static final Integer INIT_MEANS_ID = 90;
-    private static final LocalDateTime PARTNER_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2020, 9, 13, 0, 0, 0);
-    private static final LocalDateTime APPLICANT_EVIDENCE_RECEIVED_DATE = LocalDateTime.of(2020, 10, 1, 0, 0, 0);
     public static final Date APPEAL_RECEIVED_DATE = new GregorianCalendar(2023, Calendar.MARCH, 18).getTime();
     public static final Integer TEST_REP_ID = 42312;
     public static final LocalDateTime TEST_MAGS_OUTCOME_DATE = LocalDateTime.of(2022, 6, 5, 0, 0);
 
     private static final LocalDateTime APPLICATION_TIMESTAMP = LocalDateTime.of(2022, 10, 1, 0, 0, 0);
     public static final Date APPEAL_SENTENCE_ORDER_DATE = new GregorianCalendar(2023, Calendar.AUGUST, 3).getTime();
-    public static final String OTHER_DESCRIPTION = "OTHER DESCRIPTION";
-    private static final Integer EXTRA_EVIDENCE_ID = 52473;
 
     public static ApiUserSession getApiUserSession() {
         return new ApiUserSession().withUserName(USERNAME).withSessionId(USER_SESSION);
@@ -477,59 +457,6 @@ public class MeansAssessmentDataBuilder {
         return UserDTO.builder().userName(USERNAME).userSession(USER_SESSION).build();
     }
 
-    public static IncomeEvidenceSummaryDTO getIncomeEvidenceSummaryDTO() {
-        return IncomeEvidenceSummaryDTO.builder()
-                .upliftAppliedDate(toDate(INCOME_UPLIFT_APPLY_DATE))
-                .upliftRemovedDate(toDate(INCOME_UPLIFT_REMOVE_DATE))
-                .incomeEvidenceNotes(INCOME_EVIDENCE_NOTES)
-                .applicantIncomeEvidenceList(List.of(getApplicantEvidenceDTO()))
-                .partnerIncomeEvidenceList(List.of(getPartnerEvidenceDTO()))
-                .extraEvidenceList(List.of(getExtraIncomeEvidenceDTO()))
-                .evidenceReceivedDate(toDate(INCOME_EVIDENCE_RECEIVED_DATE))
-                .evidenceDueDate(toDate(INCOME_EVIDENCE_DUE_DATE))
-                .firstReminderDate(toDate(FIRST_REMINDER_DATE))
-                .secondReminderDate(toDate(SECOND_REMINDER_DATE))
-                .enabled(Boolean.FALSE)
-                .build();
-    }
-
-    private static ExtraEvidenceDTO getExtraIncomeEvidenceDTO() {
-        return ExtraEvidenceDTO.builder()
-                .adhoc("Y")
-                .id(EXTRA_EVIDENCE_ID.longValue())
-                .evidenceTypeDTO(getEvidenceTypeDTO())
-                .dateReceived(toDate(DATETIME_RECEIVED))
-                .otherText(OTHER_DESCRIPTION)
-                .mandatory(true)
-                .timestamp(TIME_STAMP)
-                .build();
-    }
-
-    public static EvidenceDTO getApplicantEvidenceDTO() {
-        return EvidenceDTO.builder()
-                .id(APPLICANT_EVIDENCE_ID.longValue())
-                .evidenceTypeDTO(getEvidenceTypeDTO())
-                .dateReceived(toDate(APPLICANT_EVIDENCE_RECEIVED_DATE))
-                .timestamp(TIME_STAMP)
-                .build();
-    }
-
-    public static EvidenceDTO getPartnerEvidenceDTO() {
-        return EvidenceDTO.builder()
-                .id(PARTNER_EVIDENCE_ID.longValue())
-                .evidenceTypeDTO(getEvidenceTypeDTO())
-                .dateReceived(toDate(PARTNER_EVIDENCE_RECEIVED_DATE))
-                .timestamp(TIME_STAMP)
-                .build();
-    }
-
-    private static EvidenceTypeDTO getEvidenceTypeDTO() {
-        return EvidenceTypeDTO.builder()
-                .evidence(INCOME_EVIDENCE)
-                .description(INCOME_EVIDENCE_DESCRIPTION)
-                .build();
-    }
-
     private static AppealDTO getAppealDTO() {
         return AppealDTO.builder()
                 .available(true)
@@ -663,13 +590,13 @@ public class MeansAssessmentDataBuilder {
 
     public static ApiIncomeEvidenceSummary getApiIncomeEvidenceSummary() {
         return new ApiIncomeEvidenceSummary()
-                .withIncomeEvidenceNotes(INCOME_EVIDENCE_NOTES)
-                .withEvidenceDueDate(INCOME_EVIDENCE_DUE_DATE)
-                .withUpliftAppliedDate(INCOME_UPLIFT_APPLY_DATE)
-                .withEvidenceReceivedDate(INCOME_EVIDENCE_RECEIVED_DATE)
-                .withFirstReminderDate(FIRST_REMINDER_DATE)
-                .withSecondReminderDate(SECOND_REMINDER_DATE)
-                .withUpliftRemovedDate(INCOME_UPLIFT_REMOVE_DATE)
+                .withIncomeEvidenceNotes(Constants.NOTES)
+                .withEvidenceDueDate(Constants.INCOME_EVIDENCE_DUE_DATE)
+                .withUpliftAppliedDate(Constants.INCOME_UPLIFT_APPLY_DATE)
+                .withEvidenceReceivedDate(Constants.INCOME_EVIDENCE_RECEIVED_DATE)
+                .withFirstReminderDate(Constants.FIRST_REMINDER_DATE)
+                .withSecondReminderDate(Constants.SECOND_REMINDER_DATE)
+                .withUpliftRemovedDate(Constants.INCOME_UPLIFT_REMOVE_DATE)
                 .withIncomeEvidence(getIncomeEvidence(true));
     }
 
@@ -677,28 +604,28 @@ public class MeansAssessmentDataBuilder {
         List<ApiIncomeEvidence> incomeEvidences = new ArrayList<>();
 
         incomeEvidences.add(new ApiIncomeEvidence()
-                .withId(APPLICANT_EVIDENCE_ID)
+                .withId(Constants.APPLICANT_EVIDENCE_ID)
                 .withApplicantId(Constants.APPLICANT_ID)
-                .withDateReceived(APPLICANT_EVIDENCE_RECEIVED_DATE)
-                .withDateModified(DATE_MODIFIED)
-                .withIncomeEvidence(INCOME_EVIDENCE));
+                .withDateReceived(Constants.INCOME_EVIDENCE_RECEIVED_DATE)
+                .withDateModified(Constants.DATE_MODIFIED)
+                .withIncomeEvidence(Constants.INCOME_EVIDENCE));
 
         incomeEvidences.add(new ApiIncomeEvidence()
-                .withId(PARTNER_EVIDENCE_ID)
-                .withApplicantId(PARTNER_ID)
-                .withDateReceived(PARTNER_EVIDENCE_RECEIVED_DATE)
-                .withDateModified(DATE_MODIFIED)
-                .withIncomeEvidence(INCOME_EVIDENCE));
+                .withId(Constants.PARTNER_EVIDENCE_ID)
+                .withApplicantId(Constants.PARTNER_ID)
+                .withDateReceived(Constants.INCOME_EVIDENCE_RECEIVED_DATE)
+                .withDateModified(Constants.DATE_MODIFIED)
+                .withIncomeEvidence(Constants.INCOME_EVIDENCE));
 
         if (withExtra) {
             incomeEvidences.add(new ApiIncomeEvidence()
-                    .withAdhoc("Y")
-                    .withId(EXTRA_EVIDENCE_ID)
-                    .withIncomeEvidence(INCOME_EVIDENCE)
-                    .withDateReceived(DATETIME_RECEIVED)
-                    .withOtherText(OTHER_DESCRIPTION)
+                    .withAdhoc("A")
+                    .withId(Constants.EXTRA_EVIDENCE_ID)
+                    .withIncomeEvidence(Constants.INCOME_EVIDENCE)
+                    .withDateReceived(Constants.DATE_RECEIVED)
+                    .withOtherText(Constants.OTHER_DESCRIPTION)
                     .withMandatory("true")
-                    .withDateModified(DATE_MODIFIED));
+                    .withDateModified(Constants.DATE_MODIFIED));
         }
 
         return incomeEvidences;
@@ -775,7 +702,7 @@ public class MeansAssessmentDataBuilder {
                 .fullAvailable(true)
                 .full(getFullAssessmentDTO())
                 .initial(getInitialAssessmentDTO())
-                .incomeEvidence(getIncomeEvidenceSummaryDTO())
+                .incomeEvidence(EvidenceDataBuilder.getIncomeEvidenceSummaryDTO())
                 .build();
     }
 
