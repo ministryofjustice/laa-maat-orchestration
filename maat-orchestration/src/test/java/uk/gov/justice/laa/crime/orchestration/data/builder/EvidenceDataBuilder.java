@@ -75,11 +75,16 @@ public class EvidenceDataBuilder {
                 .withMandatory(true);
     }
 
-    public static ApiGetPassportEvidenceResponse getApiGetPassportEvidenceResponse() {
-        return new ApiGetPassportEvidenceResponse()
+    public static ApiGetPassportEvidenceResponse getApiGetPassportEvidenceResponse(boolean withPartner) {
+        ApiGetPassportEvidenceResponse response = new ApiGetPassportEvidenceResponse()
                 .withPassportEvidenceMetadata(getApiPassportEvidenceMetadata())
-                .withApplicantEvidenceItems(List.of(getApiIncomeEvidence(false), getExtraApiIncomeEvidence()))
-                .withPartnerEvidenceItems(List.of(getApiIncomeEvidence(true)));
+                .withApplicantEvidenceItems(List.of(getApiIncomeEvidence(false), getExtraApiIncomeEvidence()));
+
+        if (withPartner) {
+            response.setPartnerEvidenceItems(List.of(getApiIncomeEvidence(true)));
+        }
+
+        return response;
     }
 
     public static EvidenceDTO getApplicantEvidenceDTO() {
@@ -100,13 +105,12 @@ public class EvidenceDataBuilder {
                 .build();
     }
 
-    public static IncomeEvidenceSummaryDTO getIncomeEvidenceSummaryDTO() {
-        return IncomeEvidenceSummaryDTO.builder()
+    public static IncomeEvidenceSummaryDTO getIncomeEvidenceSummaryDTO(boolean withPartner) {
+        IncomeEvidenceSummaryDTO incomeEvidenceSummaryDTO = IncomeEvidenceSummaryDTO.builder()
                 .upliftAppliedDate(toDate(Constants.INCOME_UPLIFT_APPLY_DATE))
                 .upliftRemovedDate(toDate(Constants.INCOME_UPLIFT_REMOVE_DATE))
                 .incomeEvidenceNotes(Constants.NOTES)
                 .applicantIncomeEvidenceList(List.of(getApplicantEvidenceDTO()))
-                .partnerIncomeEvidenceList(List.of(getPartnerEvidenceDTO()))
                 .extraEvidenceList(List.of(getExtraIncomeEvidenceDTO(false)))
                 .evidenceReceivedDate(toDate(Constants.INCOME_EVIDENCE_RECEIVED_DATE))
                 .evidenceDueDate(toDate(Constants.INCOME_EVIDENCE_DUE_DATE))
@@ -114,5 +118,11 @@ public class EvidenceDataBuilder {
                 .secondReminderDate(toDate(Constants.SECOND_REMINDER_DATE))
                 .enabled(Boolean.FALSE)
                 .build();
+
+        if (withPartner) {
+            incomeEvidenceSummaryDTO.setPartnerIncomeEvidenceList(List.of(getPartnerEvidenceDTO()));
+        }
+
+        return incomeEvidenceSummaryDTO;
     }
 }

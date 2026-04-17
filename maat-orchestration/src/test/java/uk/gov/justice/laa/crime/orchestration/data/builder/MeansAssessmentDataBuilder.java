@@ -702,7 +702,7 @@ public class MeansAssessmentDataBuilder {
                 .fullAvailable(true)
                 .full(getFullAssessmentDTO())
                 .initial(getInitialAssessmentDTO())
-                .incomeEvidence(EvidenceDataBuilder.getIncomeEvidenceSummaryDTO())
+                .incomeEvidence(EvidenceDataBuilder.getIncomeEvidenceSummaryDTO(Constants.WITH_PARTNER))
                 .build();
     }
 

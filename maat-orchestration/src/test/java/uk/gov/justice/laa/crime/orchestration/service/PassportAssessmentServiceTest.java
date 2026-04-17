@@ -44,7 +44,8 @@ class PassportAssessmentServiceTest {
     void givenValidIdWithPartner_whenFindIsInvoked_thenPassportedDTOIsReturned() {
         ApiGetPassportedAssessmentResponse assessment =
                 PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(Constants.WITH_PARTNER);
-        ApiGetPassportEvidenceResponse evidence = EvidenceDataBuilder.getApiGetPassportEvidenceResponse();
+        ApiGetPassportEvidenceResponse evidence =
+                EvidenceDataBuilder.getApiGetPassportEvidenceResponse(Constants.WITH_PARTNER);
         ApplicantDTO applicant = PassportAssessmentDataBuilder.getApplicantDTO();
         PassportedDTO passportedDTO = PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITH_PARTNER);
 
@@ -65,7 +66,8 @@ class PassportAssessmentServiceTest {
     void givenValidId_whenFindIsInvoked_thenPassportDTOIsReturned() {
         ApiGetPassportedAssessmentResponse assessment =
                 PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(Constants.WITHOUT_PARTNER);
-        ApiGetPassportEvidenceResponse evidence = EvidenceDataBuilder.getApiGetPassportEvidenceResponse();
+        ApiGetPassportEvidenceResponse evidence =
+                EvidenceDataBuilder.getApiGetPassportEvidenceResponse(Constants.WITHOUT_PARTNER);
         PassportedDTO passportedDTO = PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITHOUT_PARTNER);
 
         when(assessmentApiService.findPassportAssessment(Constants.PASSPORT_ASSESSMENT_ID))

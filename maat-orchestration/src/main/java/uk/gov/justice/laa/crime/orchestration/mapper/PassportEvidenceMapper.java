@@ -1,6 +1,5 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
-import lombok.RequiredArgsConstructor;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiGetPassportEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiIncomeEvidence;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiPassportEvidenceMetadata;
@@ -20,7 +19,6 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class PassportEvidenceMapper {
 
     private EvidenceTypeDTO incomeEvidenceTypeToEvidenceTypeDTO(IncomeEvidenceType evidenceType) {
@@ -40,6 +38,7 @@ public class PassportEvidenceMapper {
                 .build();
     }
 
+    // Not setting otherDescription as this doesn't appear to be utilised for extra evidence
     private ExtraEvidenceDTO apiIncomeEvidenceToExtraEvidenceDTO(ApiIncomeEvidence evidenceItem, boolean isPartner) {
         return ExtraEvidenceDTO.builder()
                 .id(Long.valueOf(evidenceItem.getId()))
