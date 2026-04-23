@@ -66,4 +66,13 @@ public class WorkflowPreProcessorService {
             validationService.checkUpliftFieldPermissions(userSummaryDTO);
         }
     }
+
+    public void preProcessPassportRequest(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO, UserActionDTO userActionDTO) {
+        validationService.validate(workflowRequest, repOrderDTO);
+
+        UserSummaryDTO userSummaryDTO = Optional.ofNullable(userActionDTO.getUsername())
+            .map(maatCourtDataService::getUserSummary)
+            .orElse(null);
+        validationService.isUserActionValid(userActionDTO, userSummaryDTO);
+    }
 }

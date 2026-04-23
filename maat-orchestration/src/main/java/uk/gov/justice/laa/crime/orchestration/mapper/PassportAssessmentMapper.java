@@ -7,6 +7,8 @@ import uk.gov.justice.laa.crime.enums.BenefitType;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.PassportAssessmentDecisionReason;
 import uk.gov.justice.laa.crime.enums.ReviewType;
+import uk.gov.justice.laa.crime.enums.orchestration.Action;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentStatusDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.JobSeekerDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.NewWorkReasonDTO;
@@ -15,6 +17,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportConfirmationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ReviewTypeDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.util.DateUtil;
 
 import org.springframework.stereotype.Component;
@@ -24,6 +27,8 @@ import org.springframework.stereotype.Component;
 public class PassportAssessmentMapper {
 
     private static final String ASSESSMENT_STATUS_DESCRIPTION = "Complete";
+
+    private final UserMapper userMapper;
 
     private PartnerDTO applicantDTOToPartnerDTO(ApplicantDTO applicant) {
         return PartnerDTO.builder()
@@ -113,5 +118,15 @@ public class PassportAssessmentMapper {
         }
 
         return dto;
+    }
+
+    public UserActionDTO getUserActionDTO(WorkflowRequest workflowRequest) {
+        NewWorkReason newWorkReason = NewWorkReason.getFrom(workflowRequest
+            .getApplicationDTO()
+            .getPassportedDTO()
+            .getNewWorkReason()
+            .getCode());
+
+        return userMapper.getUserActionDTO(workflowRequest, Action.CREATE_PASSPORT_ASSESSMENT, newWorkReason);
     }
 }
