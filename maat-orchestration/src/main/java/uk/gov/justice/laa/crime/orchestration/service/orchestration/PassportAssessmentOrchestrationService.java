@@ -38,5 +38,7 @@ public class PassportAssessmentOrchestrationService {
         UserActionDTO userActionDTO = passportAssessmentMapper.getUserActionDTO(workflowRequest);
 
         workflowPreProcessorService.preProcessPassportRequest(workflowRequest, repOrderDTO, userActionDTO);
+
+        passportAssessmentService.create(workflowRequest);
     }
 }
