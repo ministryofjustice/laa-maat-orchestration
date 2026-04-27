@@ -21,7 +21,7 @@ def versions = [
 		sentry					: "8.36.0",
 		springdocVersion        : "2.8.14",
 		commonsModSchemas       : "1.50.0",
-		crimeCommonsClasses     : "4.33.0",
+		crimeCommonsClasses     : "4.35.0",
 		wiremock				: "4.0.8",
 		resilience4jVersion     : "2.4.0",
 		commonsLang3Version		: "3.20.0",
