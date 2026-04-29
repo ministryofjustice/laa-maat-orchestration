@@ -103,6 +103,7 @@ class PassportAssessmentIntegrationTest extends WiremockIntegrationTest {
                 .andExpect(jsonPath("$.under18FullEducation").value(expected.getUnder18FullEducation()))
                 .andExpect(jsonPath("$.under16").value(expected.getUnder16()))
                 .andExpect(jsonPath("$.between1617").value(expected.getBetween1617()))
+                .andExpect(jsonPath("$.passportSummaryEvidenceDTO").value(expected.getPassportSummaryEvidenceDTO()))
                 .andExpect(jsonPath("$.whoDwpChecked").value(expected.getWhoDwpChecked()));
     }
 
