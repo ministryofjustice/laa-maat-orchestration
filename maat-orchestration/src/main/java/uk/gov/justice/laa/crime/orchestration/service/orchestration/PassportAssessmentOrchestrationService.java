@@ -12,6 +12,7 @@ import uk.gov.justice.laa.crime.orchestration.mapper.PassportAssessmentMapper;
 import uk.gov.justice.laa.crime.orchestration.service.PassportAssessmentService;
 
 import org.springframework.stereotype.Service;
+import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
 import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
 
@@ -23,6 +24,7 @@ public class PassportAssessmentOrchestrationService {
     private final PassportAssessmentService passportAssessmentService;
     private final PassportAssessmentMapper passportAssessmentMapper;
     private final RepOrderService repOrderService;
+    private final ProceedingsService proceedingsService;
     private final WorkflowPreProcessorService workflowPreProcessorService;
 
     public PassportedDTO find(int id) {
@@ -40,5 +42,16 @@ public class PassportAssessmentOrchestrationService {
         workflowPreProcessorService.preProcessPassportRequest(workflowRequest, repOrderDTO, userActionDTO);
 
         passportAssessmentService.create(workflowRequest);
+
+        // IF APP STATUS COMPLETE BUT WE CAN SAFELY ASSUME ALWAYS SUCH I BELIEVE
+        // manage passport evidence - this doable??? no tickets for it and current create evidence seems geared for income evidence
+        // check income evidence available - this is done in MAAT using PP flag for means assessment, do the same for passported???
+        // determine mags rep decision
+        proceedingsService.determineMagsRepDecision(workflowRequest);
+        // check crown court actions - check crown repord - cap eq check - calc contribs - cc avail
+        // update cc application
+        // matrix process activity
+        // get application correspondence
+        // get assessments summary
     }
 }
