@@ -21,6 +21,7 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertS
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForInvokeStoredProcedure;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCalculateContributions;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCheckContributionsRule;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForDetermineMagsRepDecision;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForFindRepOrder;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetContributionsSummaries;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
@@ -261,6 +262,8 @@ class HardshipIntegrationTest extends WiremockIntegrationTest {
                                 TestModelDataBuilder.getApiPerformHardshipResponse()))));
 
         stubForInvokeStoredProcedure(objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO()));
+        stubForDetermineMagsRepDecision(
+                objectMapper.writeValueAsString(TestModelDataBuilder.getDetermineMagsRepDecisionResponse()));
         stubForCheckContributionsRule();
         stubForCalculateContributions(
                 objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
@@ -292,6 +295,8 @@ class HardshipIntegrationTest extends WiremockIntegrationTest {
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(objectMapper.writeValueAsString(TestModelDataBuilder.getApiFindHardshipResponse()))));
         stubForInvokeStoredProcedure(objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO()));
+        stubForDetermineMagsRepDecision(
+                objectMapper.writeValueAsString(TestModelDataBuilder.getDetermineMagsRepDecisionResponse()));
         stubForCheckContributionsRule();
         stubForCalculateContributions(
                 objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
@@ -335,13 +340,13 @@ class HardshipIntegrationTest extends WiremockIntegrationTest {
             assertStubForInvokeStoredProcedure(4);
         } else {
             assertStubForCheckContributionsRule(1);
-            assertStubForInvokeStoredProcedure(2);
+            assertStubForInvokeStoredProcedure(1);
         }
     }
 
     private static void verifyStubForUpdateHardship(CourtType courtType, Integer repId) {
         verify(exactly(1), putRequestedFor(urlPathMatching("/api/internal/v1/hardship")));
-        assertStubForInvokeStoredProcedure(2);
+        assertStubForInvokeStoredProcedure(1);
         assertStubForCheckContributionsRule(1);
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1, repId);

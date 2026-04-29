@@ -93,6 +93,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                 }
             }
 
+            applicationService.updateDateModified(request, application);
             // Update assessment summary view - displayed on the application tab
             AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(newHardship, courtType);
             assessmentSummaryService.updateApplication(application, hardshipSummary);
@@ -135,6 +136,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                 }
             }
 
+            applicationService.updateDateModified(request, request.getApplicationDTO());
             // Update assessment summary view - displayed on the application tab
             AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(hardshipReviewDTO, courtType);
             assessmentSummaryService.updateApplication(request.getApplicationDTO(), hardshipSummary);
@@ -155,9 +157,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     }
 
     private ApplicationDTO processMagCourtHardshipRules(WorkflowRequest request) {
-        // call assessments.determine_mags_rep_decision stored procedure
-        request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                request.getApplicationDTO(), request.getUserDTO(), StoredProcedure.DETERMINE_MAGS_REP_DECISION));
+        request.setApplicationDTO(proceedingsService.determineMagsRepDecision(request));
         if (contributionService.isVariationRequired(request.getApplicationDTO())) {
             return contributionService.calculate(request);
         }

@@ -69,8 +69,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
                         CaseType.getFrom(applicationDTO.getCaseDetailsDTO().getCaseType()))
                 .withPassportAssessment(applicationDtoToPassportAssessment(applicationDTO))
                 .withIojAppeal(new ApiIOJSummary()
-                        .withDecisionResult(
-                                applicationDTO.getAssessmentDTO().getIojAppeal().getAppealDecisionResult())
+                        .withDecisionResult(getIojDecisionResult(applicationDTO))
                         .withIojResult(applicationDTO.getIojResult()))
                 .withFinancialAssessment(applicationDtoToFinancialAssessment(applicationDTO, CourtType.MAGISTRATE))
                 .withUserSession(userMapper.userDtoToUserSession(request.getUserDTO()));
@@ -195,7 +194,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
     private ApiPassportAssessment applicationDtoToPassportAssessment(ApplicationDTO application) {
         PassportedDTO passported = application.getPassportedDTO();
 
-        if (passported.getPassportedId() != null) {
+        if (passported != null && passported.getPassportedId() != null) {
             return new ApiPassportAssessment()
                     .withResult(passported.getResult())
                     .withStatus(CurrentStatus.getFrom(
@@ -340,5 +339,18 @@ public class ProceedingsMapper extends CrownCourtMapper {
 
     CurrentStatus getCurrentStatus(String status) {
         return StringUtils.isNotBlank(status) ? CurrentStatus.getFrom(status) : null;
+    }
+
+    private String getIojDecisionResult(ApplicationDTO applicationDTO) {
+        if (applicationDTO.getAssessmentDTO().getIojAppeal().getAppealDecisionResult() != null
+                && !applicationDTO
+                        .getAssessmentDTO()
+                        .getIojAppeal()
+                        .getAppealDecisionResult()
+                        .isBlank()) {
+            return applicationDTO.getAssessmentDTO().getIojAppeal().getAppealDecisionResult();
+        }
+
+        return null;
     }
 }
