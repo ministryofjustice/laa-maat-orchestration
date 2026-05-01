@@ -54,7 +54,6 @@ public class EvidenceDataBuilder {
                 .dateReceived(toDate(Constants.EXTRA_INCOME_EVIDENCE_RECEIVED_DATE))
                 .otherText(Constants.OTHER_DESCRIPTION)
                 .mandatory(true)
-                .timestamp(toZonedDateTime(Constants.DATE_MODIFIED))
                 .build();
     }
 
@@ -69,7 +68,7 @@ public class EvidenceDataBuilder {
     private static ApiIncomeEvidence getExtraApiIncomeEvidence() {
         return new ApiIncomeEvidence()
                 .withId(Constants.EXTRA_EVIDENCE_ID)
-                .withDateReceived(parseLocalDate(Constants.INCOME_EVIDENCE_RECEIVED_DATE))
+                .withDateReceived(parseLocalDate(Constants.EXTRA_INCOME_EVIDENCE_RECEIVED_DATE))
                 .withEvidenceType(IncomeEvidenceType.OTHER_ADHOC)
                 .withDescription(Constants.OTHER_DESCRIPTION)
                 .withMandatory(true);
@@ -92,7 +91,6 @@ public class EvidenceDataBuilder {
                 .id(Constants.APPLICANT_EVIDENCE_ID.longValue())
                 .evidenceTypeDTO(getEvidenceTypeDTO())
                 .dateReceived(toDate(Constants.INCOME_EVIDENCE_RECEIVED_DATE))
-                .timestamp(toZonedDateTime(Constants.DATE_MODIFIED))
                 .build();
     }
 
@@ -101,7 +99,6 @@ public class EvidenceDataBuilder {
                 .id(Constants.PARTNER_EVIDENCE_ID.longValue())
                 .evidenceTypeDTO(getEvidenceTypeDTO())
                 .dateReceived(toDate(Constants.INCOME_EVIDENCE_RECEIVED_DATE))
-                .timestamp(toZonedDateTime(Constants.DATE_MODIFIED))
                 .build();
     }
 

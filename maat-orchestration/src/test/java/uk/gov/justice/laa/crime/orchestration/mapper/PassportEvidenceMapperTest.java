@@ -36,8 +36,6 @@ class PassportEvidenceMapperTest {
         softly.assertThat(actual)
                 .usingRecursiveComparison()
                 .ignoringCollectionOrder()
-                .withComparatorForType(Comparator.comparing(EvidenceDTO::getId), EvidenceDTO.class)
-                .withComparatorForType(Comparator.comparing(ExtraEvidenceDTO::getId), ExtraEvidenceDTO.class)
                 .isEqualTo(expected);
         softly.assertAll();
     }
