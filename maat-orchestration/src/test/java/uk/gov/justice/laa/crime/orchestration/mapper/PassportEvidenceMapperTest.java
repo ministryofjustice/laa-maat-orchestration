@@ -2,11 +2,7 @@ package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import uk.gov.justice.laa.crime.common.model.evidence.ApiGetPassportEvidenceResponse;
 import uk.gov.justice.laa.crime.orchestration.data.builder.EvidenceDataBuilder;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.EvidenceDTO;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ExtraEvidenceDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IncomeEvidenceSummaryDTO;
-
-import java.util.Comparator;
 
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
@@ -25,9 +21,8 @@ class PassportEvidenceMapperTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void
-            givenValidEvidenceResponse_whenApiGetPassportEvidenceResponseToIncomeEvidenceSummaryDTOIsInvoked_thenIncomeEvidenceSummaryDTOIsReturned(
-                    boolean withPartner) {
+    void givenValidEvidenceResponse_whenEvidenceResponseToEvidenceSummaryIsInvoked_thenMappingIsSuccessful(
+            boolean withPartner) {
         IncomeEvidenceSummaryDTO expected = EvidenceDataBuilder.getIncomeEvidenceSummaryDTO(withPartner);
         ApiGetPassportEvidenceResponse response = EvidenceDataBuilder.getApiGetPassportEvidenceResponse(withPartner);
         IncomeEvidenceSummaryDTO actual =

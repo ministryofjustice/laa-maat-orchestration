@@ -2,7 +2,6 @@ package uk.gov.justice.laa.crime.orchestration.data.builder;
 
 import static uk.gov.justice.laa.crime.util.DateUtil.parseLocalDate;
 import static uk.gov.justice.laa.crime.util.DateUtil.toDate;
-import static uk.gov.justice.laa.crime.util.DateUtil.toZonedDateTime;
 
 import uk.gov.justice.laa.crime.common.model.evidence.ApiGetPassportEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiIncomeEvidence;

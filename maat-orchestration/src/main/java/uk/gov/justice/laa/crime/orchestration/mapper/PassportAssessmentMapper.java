@@ -70,14 +70,13 @@ public class PassportAssessmentMapper {
     public PassportedDTO apiGetPassportedAssessmentResponseToPassportedDTO(
             ApiGetPassportedAssessmentResponse assessment,
             ApiGetPassportEvidenceResponse evidence,
-            ApplicantDTO applicant) {
+            ApplicantDTO partner) {
 
         AssessmentStatusDTO assessmentStatusDTO = AssessmentStatusDTO.builder()
                 .status(AssessmentStatusDTO.COMPLETE)
                 .description(ASSESSMENT_STATUS_DESCRIPTION)
                 .build();
 
-        // TODO: Might need to amend mapping of legacy age related values following completion of LCAM-2016
         // Not setting dwpResult and dwpWhoChecked as these are no longer used in MAAT and so can left as null
         PassportedDTO dto = PassportedDTO.builder()
                 .passportedId(Long.valueOf(assessment.getLegacyAssessmentId()))
@@ -104,9 +103,9 @@ public class PassportAssessmentMapper {
 
         DeclaredBenefit declaredBenefit = assessment.getDeclaredBenefit();
         if (declaredBenefit != null) {
-            if (applicant != null) {
+            if (partner != null) {
                 dto.setBenefitClaimedByPartner(true);
-                dto.setPartnerDetails(applicantDTOToPartnerDTO(applicant));
+                dto.setPartnerDetails(applicantDTOToPartnerDTO(partner));
             }
 
             switch (declaredBenefit.getBenefitType()) {

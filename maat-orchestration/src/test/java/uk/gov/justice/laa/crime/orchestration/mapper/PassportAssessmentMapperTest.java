@@ -56,9 +56,8 @@ class PassportAssessmentMapperTest {
 
     @ParameterizedTest
     @EnumSource(BenefitType.class)
-    void
-            givenDifferentDeclaredBenefitsInApiResponse_whenApiGetPassportedAssessmentResponseToPassportedDTOIsInvoked_thenAppropriateBenefitIsReturned(
-                    BenefitType benefit) {
+    void givenDifferentBenefitsInResponse_whenAssessmentResponseToPassportedIsInvoked_thenAppropriateBenefitIsReturned(
+            BenefitType benefit) {
         PassportedDTO expected = PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITHOUT_PARTNER);
         expected.setBenefitIncomeSupport(false);
         switch (benefit) {

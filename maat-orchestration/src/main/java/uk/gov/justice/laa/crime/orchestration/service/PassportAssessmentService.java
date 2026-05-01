@@ -33,11 +33,11 @@ public class PassportAssessmentService {
         ApiGetPassportEvidenceResponse evidence = evidenceApiService.getPassportEvidence(id);
 
         DeclaredBenefit declaredBenefit = assessment.getDeclaredBenefit();
-        ApplicantDTO applicant = hasPartnerBenefit(declaredBenefit)
+        ApplicantDTO partner = hasPartnerBenefit(declaredBenefit)
                 ? maatCourtDataApiService.getApplicant(declaredBenefit.getLegacyPartnerId())
                 : null;
 
         return passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(
-                assessment, evidence, applicant);
+                assessment, evidence, partner);
     }
 }
