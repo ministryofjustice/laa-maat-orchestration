@@ -212,7 +212,7 @@ class HardshipIntegrationTest extends WiremockIntegrationTest {
                 .andExpect(jsonPath("$.crownCourtOverviewDTO.contribution.monthlyContribs")
                         .value(150.0));
 
-        verifyStubForUpdateHardship(CourtType.MAGISTRATE, TestModelDataBuilder.REP_ID);
+        verifyStubForUpdateHardship(TestModelDataBuilder.REP_ID);
     }
 
     @Test
@@ -342,7 +342,7 @@ class HardshipIntegrationTest extends WiremockIntegrationTest {
         }
     }
 
-    private static void verifyStubForUpdateHardship(CourtType courtType, Integer repId) {
+    private static void verifyStubForUpdateHardship(Integer repId) {
         verify(exactly(1), putRequestedFor(urlPathMatching("/api/internal/v1/hardship")));
         assertStubForInvokeStoredProcedure(1);
         assertStubForCheckContributionsRule(1);
