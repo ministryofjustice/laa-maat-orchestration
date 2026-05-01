@@ -335,8 +335,6 @@ class HardshipIntegrationTest extends WiremockIntegrationTest {
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1, repId);
         if (CourtType.CROWN_COURT.equals(courtType)) {
-            // TODO: Uncomment this assertion for application tracking before activating hardship orchestration
-            // assertStubForHandleEformSerivce(1);
             assertStubForInvokeStoredProcedure(4);
         } else {
             assertStubForCheckContributionsRule(1);
@@ -350,9 +348,5 @@ class HardshipIntegrationTest extends WiremockIntegrationTest {
         assertStubForCheckContributionsRule(1);
         assertStubForCalculateContributions(1);
         assertStubForGetContributionsSummary(1, repId);
-        if (CourtType.CROWN_COURT.equals(courtType)) {
-            // TODO: Uncomment this assertion for application tracking before activating hardship orchestration
-            // assertStubForHandleEformSerivce(1);
-        }
     }
 }
