@@ -35,6 +35,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FullAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipOverviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IncomeEvidenceSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.OutcomeDTO;
@@ -69,7 +70,8 @@ public class ProceedingsMapper extends CrownCourtMapper {
                         CaseType.getFrom(applicationDTO.getCaseDetailsDTO().getCaseType()))
                 .withPassportAssessment(applicationDtoToPassportAssessment(applicationDTO))
                 .withIojAppeal(new ApiIOJSummary()
-                        .withDecisionResult(getIojDecisionResult(applicationDTO))
+                        .withDecisionResult(getIojDecisionResult(
+                                applicationDTO.getAssessmentDTO().getIojAppeal()))
                         .withIojResult(applicationDTO.getIojResult()))
                 .withFinancialAssessment(applicationDtoToFinancialAssessment(applicationDTO, CourtType.MAGISTRATE))
                 .withUserSession(userMapper.userDtoToUserSession(request.getUserDTO()));
@@ -341,16 +343,8 @@ public class ProceedingsMapper extends CrownCourtMapper {
         return StringUtils.isNotBlank(status) ? CurrentStatus.getFrom(status) : null;
     }
 
-    private String getIojDecisionResult(ApplicationDTO applicationDTO) {
-        if (applicationDTO.getAssessmentDTO().getIojAppeal().getAppealDecisionResult() != null
-                && !applicationDTO
-                        .getAssessmentDTO()
-                        .getIojAppeal()
-                        .getAppealDecisionResult()
-                        .isBlank()) {
-            return applicationDTO.getAssessmentDTO().getIojAppeal().getAppealDecisionResult();
-        }
-
-        return null;
+    private String getIojDecisionResult(IOJAppealDTO iojAppeal) {
+        String result = iojAppeal.getAppealDecisionResult();
+        return (result == null || result.isBlank()) ? null : result;
     }
 }
