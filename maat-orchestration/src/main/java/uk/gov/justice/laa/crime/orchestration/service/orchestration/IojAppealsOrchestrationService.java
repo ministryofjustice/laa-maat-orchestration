@@ -7,6 +7,7 @@ import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputR
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
+import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
@@ -26,6 +27,9 @@ import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
 import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
 import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -51,6 +55,9 @@ public class IojAppealsOrchestrationService {
     }
 
     public ApplicationDTO create(WorkflowRequest request) {
+
+        validateRequiredCreateFields(request);
+
         RepOrderDTO repOrderDto = repOrderService.getRepOrder(request);
 
         if (repOrderDto == null) {
@@ -108,5 +115,74 @@ public class IojAppealsOrchestrationService {
         }
 
         return request.getApplicationDTO();
+    }
+
+    /**
+     * Utility function
+     * Adds field to missingFields
+     * returns inverse of failureCondition
+     *
+     * @param fieldName
+     * @param failureCondition
+     * @param list
+     * @return
+     */
+    static boolean checkValid(String fieldName, boolean failureCondition, List<String> list) {
+        if (failureCondition) {
+            list.add(fieldName);
+        }
+        return !failureCondition;
+    }
+
+    /**
+     * Validate fields required to create Appeal.
+     * Service will return status 400, through {@code CrimeValidationExceptionHandler}
+     */
+    private void validateRequiredCreateFields(WorkflowRequest request) {
+        List<String> missingFields = new ArrayList<>();
+
+        ApplicationDTO applicationDTO = request != null ? request.getApplicationDTO() : null;
+        if (checkValid("applicationDTO", applicationDTO == null, missingFields)) {
+            checkValid("applicationDTO.repId", applicationDTO.getRepId() == null, missingFields);
+            checkValid("applicationDTO.dateReceived", applicationDTO.getDateReceived() == null, missingFields);
+            if (checkValid("applicationDTO.assessmentDTO", applicationDTO.getAssessmentDTO() == null, missingFields)) {
+                if (checkValid(
+                        "applicationDTO.assessmentDTO.iojAppeal",
+                        applicationDTO.getAssessmentDTO().getIojAppeal() == null,
+                        missingFields)) {
+                    IOJAppealDTO iojAppeal = applicationDTO.getAssessmentDTO().getIojAppeal();
+                    checkValid(
+                            "applicationDTO.assessmentDTO.iojAppeal.cmuId",
+                            iojAppeal.getCmuId() == null,
+                            missingFields);
+                    checkValid(
+                            "applicationDTO.assessmentDTO.iojAppeal.receivedDate",
+                            iojAppeal.getReceivedDate() == null,
+                            missingFields);
+                    if (checkValid(
+                            "applicationDTO.assessmentDTO.iojAppeal.newWorkReasonDTO",
+                            iojAppeal.getNewWorkReasonDTO() == null,
+                            missingFields)) {
+                        checkValid(
+                                "applicationDTO.assessmentDTO.iojAppeal.newWorkReasonDTO.code",
+                                iojAppeal.getNewWorkReasonDTO().getCode() == null,
+                                missingFields);
+                    }
+                    if (checkValid(
+                            "applicationDTO.assessmentDTO.iojAppeal.appealReason",
+                            iojAppeal.getAppealReason() == null,
+                            missingFields)) {
+                        checkValid(
+                                "applicationDTO.assessmentDTO.iojAppeal.appealReason.code",
+                                iojAppeal.getAppealReason().getCode() == null,
+                                missingFields);
+                    }
+                }
+            }
+        }
+
+        if (!missingFields.isEmpty()) {
+            throw new ValidationException("CreateIoJAppeal request is missing required fields: " + missingFields);
+        }
     }
 }

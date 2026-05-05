@@ -3,12 +3,14 @@ package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
+import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
@@ -29,11 +31,13 @@ import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
 import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
 
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -170,5 +174,76 @@ class IojAppealsOrchestrationServiceTest {
         RuntimeException runtimeException = new RuntimeException("Runtime Exception on rollback");
         RollbackException rollbackException = new RollbackException(new ApplicationDTO());
         return Stream.of(runtimeException, rollbackException);
+    }
+
+    static Stream<Arguments> requiredFieldNullers() {
+        return Stream.of(
+                Arguments.of("applicationDTO", (Consumer<WorkflowRequest>) req -> req.setApplicationDTO(null)),
+                Arguments.of("applicationDTO.repId", (Consumer<WorkflowRequest>)
+                        req -> req.getApplicationDTO().setRepId(null)),
+                Arguments.of("applicationDTO.dateReceived", (Consumer<WorkflowRequest>)
+                        req -> req.getApplicationDTO().setDateReceived(null)),
+                Arguments.of("applicationDTO.assessmentDTO", (Consumer<WorkflowRequest>)
+                        req -> req.getApplicationDTO().setAssessmentDTO(null)),
+                Arguments.of("assessmentDTO.iojAppeal", (Consumer<WorkflowRequest>)
+                        req -> req.getApplicationDTO().getAssessmentDTO().setIojAppeal(null)),
+                Arguments.of("iojAppeal.cmuId", (Consumer<WorkflowRequest>) req -> req.getApplicationDTO()
+                        .getAssessmentDTO()
+                        .getIojAppeal()
+                        .setCmuId(null)),
+                Arguments.of("iojAppeal.receivedDate", (Consumer<WorkflowRequest>) req -> req.getApplicationDTO()
+                        .getAssessmentDTO()
+                        .getIojAppeal()
+                        .setReceivedDate(null)),
+                Arguments.of("iojAppeal.newWorkReasonDTO", (Consumer<WorkflowRequest>) req -> req.getApplicationDTO()
+                        .getAssessmentDTO()
+                        .getIojAppeal()
+                        .setNewWorkReasonDTO(null)),
+                Arguments.of(
+                        "iojAppeal.newWorkReasonDTO.code", (Consumer<WorkflowRequest>) req -> req.getApplicationDTO()
+                                .getAssessmentDTO()
+                                .getIojAppeal()
+                                .getNewWorkReasonDTO()
+                                .setCode(null)),
+                Arguments.of("iojAppeal.appealReason", (Consumer<WorkflowRequest>) req -> req.getApplicationDTO()
+                        .getAssessmentDTO()
+                        .getIojAppeal()
+                        .setAppealReason(null)),
+                Arguments.of("iojAppeal.appealReason.code", (Consumer<WorkflowRequest>) req -> req.getApplicationDTO()
+                        .getAssessmentDTO()
+                        .getIojAppeal()
+                        .getAppealReason()
+                        .setCode(null)));
+    }
+
+    @ParameterizedTest(name = "missing {0} -> ValidationException")
+    @MethodSource("requiredFieldNullers")
+    void givenRequiredFieldMissing_whenCreateIsInvoked_thenValidationExceptionIsThrown(
+            String expectedFieldName, Consumer<WorkflowRequest> nullField) {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        nullField.accept(workflowRequest);
+
+        // make sure each null field causes a validationError
+        assertThatThrownBy(() -> iojAppealsOrchestrationService.create(workflowRequest))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining(expectedFieldName);
+
+        // make sure no downstream calls made it through
+        verify(repOrderService, never()).getRepOrder(any());
+        verify(iojAppealService, never()).create(any());
+    }
+
+    @Test
+    void givenMultipleRequiredFieldsMissing_whenCreateIsInvoked_thenAllFieldsAreReportedInOneMessage() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().setRepId(null);
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal().setCmuId(null);
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal().setNewWorkReasonDTO(null);
+
+        assertThatThrownBy(() -> iojAppealsOrchestrationService.create(workflowRequest))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("applicationDTO.repId")
+                .hasMessageContaining("iojAppeal.cmuId")
+                .hasMessageContaining("iojAppeal.newWorkReasonDTO");
     }
 }

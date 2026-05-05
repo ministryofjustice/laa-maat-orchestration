@@ -14,6 +14,7 @@ import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWith
 
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.error.ErrorMessage;
+import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -190,6 +191,25 @@ class IojAppealControllerTest {
         String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkFlowRequest());
         mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
                 .andExpect(status().isInternalServerError());
+        verify(orchestrationService).create(any(WorkflowRequest.class));
+    }
+
+    @Test
+    void givenRequestMissingCmuId_whenCreateIsInvoked_thenBadRequestResponseIsReturned() throws Exception {
+        when(traceIdHandler.getTraceId()).thenReturn(TEST_TRACE_ID);
+        when(orchestrationService.create(any(WorkflowRequest.class)))
+                .thenThrow(new ValidationException(
+                        "CreateIoJAppeal request is missing required fields: [iojAppeal.cmuId]"));
+
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal().setCmuId(null);
+        String requestBody = objectMapper.writeValueAsString(workflowRequest);
+
+        mvc.perform(buildRequestWithTransactionIdGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL, true))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.toString()))
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("iojAppeal.cmuId")));
         verify(orchestrationService).create(any(WorkflowRequest.class));
     }
 }

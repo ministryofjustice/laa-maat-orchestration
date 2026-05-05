@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealRequest;
 import uk.gov.justice.laa.crime.enums.IojAppealAssessor;
@@ -90,5 +91,17 @@ class IojAppealMapperTest {
                 Arguments.of(IojAppealDecisionResult.FAIL.toString(), false),
                 Arguments.of("", false),
                 Arguments.of(null, false));
+    }
+
+    @Test
+    void givenIojAppealDtoWithNullDecisionDate_whenMappingToCreateRequest_thenMappingSucceeds() {
+        WorkflowRequest req = TestModelDataBuilder.buildWorkFlowRequest();
+        req.getApplicationDTO().getAssessmentDTO().getIojAppeal().setDecisionDate(null);
+
+        assertThatCode(() -> {
+                    ApiCreateIojAppealRequest actual = iojAppealMapper.mapIojAppealDtoToApiCreateIojAppealRequest(req);
+                    assertThat(actual.getIojAppeal().getDecisionDate()).isNull();
+                })
+                .doesNotThrowAnyException();
     }
 }
