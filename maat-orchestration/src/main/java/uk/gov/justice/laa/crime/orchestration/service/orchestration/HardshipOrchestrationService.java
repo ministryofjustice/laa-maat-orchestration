@@ -68,7 +68,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         ApplicationDTO application = request.getApplicationDTO();
 
         ApiPerformHardshipResponse performHardshipResponse = hardshipService.create(request);
-        applicationService.updateDateModified(request, application);
+
         try {
             // Need to refresh from DB as HardshipDetail ids may have changed
             HardshipReviewDTO newHardship = hardshipService.find(performHardshipResponse.getHardshipReviewId());
@@ -93,7 +93,6 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                 }
             }
 
-            applicationService.updateDateModified(request, application);
             // Update assessment summary view - displayed on the application tab
             AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(newHardship, courtType);
             assessmentSummaryService.updateApplication(application, hardshipSummary);
@@ -102,6 +101,8 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             hardshipService.rollback(request);
             Sentry.captureException(ex);
             throw new MaatOrchestrationException(request.getApplicationDTO());
+        } finally {
+            applicationService.updateDateModified(request, application);
         }
 
         return application;
@@ -118,7 +119,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         validate(request, action, repOrderDTO);
 
         hardshipService.update(request);
-        applicationService.updateDateModified(request, request.getApplicationDTO());
+
         try {
             HardshipOverviewDTO hardshipOverviewDTO = request.getApplicationDTO()
                     .getAssessmentDTO()
@@ -136,7 +137,6 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
                 }
             }
 
-            applicationService.updateDateModified(request, request.getApplicationDTO());
             // Update assessment summary view - displayed on the application tab
             AssessmentSummaryDTO hardshipSummary = assessmentSummaryService.getSummary(hardshipReviewDTO, courtType);
             assessmentSummaryService.updateApplication(request.getApplicationDTO(), hardshipSummary);
@@ -145,6 +145,8 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             hardshipService.rollback(request);
             Sentry.captureException(ex);
             throw new MaatOrchestrationException(request.getApplicationDTO());
+        } finally {
+            applicationService.updateDateModified(request, request.getApplicationDTO());
         }
 
         return request.getApplicationDTO();

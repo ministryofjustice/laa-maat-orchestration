@@ -163,7 +163,7 @@ class HardshipOrchestrationServiceTest {
                 .isEqualTo(getHardshipReviewDTO());
 
         verify(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
-        verify(applicationService, times(2)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -188,7 +188,7 @@ class HardshipOrchestrationServiceTest {
         assertThat(expected.getCrownCourtOverviewDTO().getContribution()).isEqualTo(contributionsDTO);
 
         verify(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
-        verify(applicationService, times(2)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -228,7 +228,7 @@ class HardshipOrchestrationServiceTest {
         verify(proceedingsService).updateApplication(workflowRequest, repOrderDTO);
 
         verify(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
-        verify(applicationService, times(2)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -245,7 +245,7 @@ class HardshipOrchestrationServiceTest {
                         .getHardship()
                         .getCrownCourtHardship())
                 .isEqualTo(expected);
-        verify(applicationService, times(2)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -262,7 +262,7 @@ class HardshipOrchestrationServiceTest {
                         .getHardship()
                         .getCrownCourtHardship())
                 .isEqualTo(expected);
-        verify(applicationService, times(2)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -279,7 +279,7 @@ class HardshipOrchestrationServiceTest {
                         .getHardship()
                         .getMagCourtHardship())
                 .isEqualTo(expected);
-        verify(applicationService, times(2)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -296,7 +296,7 @@ class HardshipOrchestrationServiceTest {
                         .getHardship()
                         .getMagCourtHardship())
                 .isEqualTo(expected);
-        verify(applicationService, times(2)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -326,7 +326,7 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(MaatOrchestrationException.class);
-        verify(applicationService, times(2)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -374,7 +374,7 @@ class HardshipOrchestrationServiceTest {
 
         assertThatThrownBy(() -> orchestrationService.create(workflowRequest))
                 .isInstanceOf(MaatOrchestrationException.class);
-        verify(applicationService, times(2)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -402,7 +402,7 @@ class HardshipOrchestrationServiceTest {
 
         verify(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
 
-        verify(applicationService, times(2)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -433,7 +433,7 @@ class HardshipOrchestrationServiceTest {
 
         verify(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
 
-        verify(applicationService, times(2)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -479,7 +479,7 @@ class HardshipOrchestrationServiceTest {
 
         verify(assessmentSummaryService).updateApplication(applicationDTO, assessmentSummaryDTO);
 
-        verify(applicationService, times(2)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -507,7 +507,7 @@ class HardshipOrchestrationServiceTest {
                         .getCrownCourtHardship())
                 .isEqualTo(expected);
 
-        verify(applicationService, times(2)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -534,7 +534,7 @@ class HardshipOrchestrationServiceTest {
                         .getCrownCourtHardship())
                 .isEqualTo(expected);
 
-        verify(applicationService, times(2)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -562,7 +562,7 @@ class HardshipOrchestrationServiceTest {
                         .getMagCourtHardship())
                 .isEqualTo(expected);
 
-        verify(applicationService, times(2)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
@@ -589,7 +589,7 @@ class HardshipOrchestrationServiceTest {
                         .getMagCourtHardship())
                 .isEqualTo(expected);
 
-        verify(applicationService, times(2)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
     }
 
     @Test
