@@ -68,7 +68,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         ApplicationDTO application = request.getApplicationDTO();
 
         ApiPerformHardshipResponse performHardshipResponse = hardshipService.create(request);
-        applicationService.updateDateModified(request, application);
+
         try {
             // Need to refresh from DB as HardshipDetail ids may have changed
             HardshipReviewDTO newHardship = hardshipService.find(performHardshipResponse.getHardshipReviewId());
@@ -101,6 +101,8 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             hardshipService.rollback(request);
             Sentry.captureException(ex);
             throw new MaatOrchestrationException(request.getApplicationDTO());
+        } finally {
+            applicationService.updateDateModified(request, application);
         }
 
         return application;
@@ -117,7 +119,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
         validate(request, action, repOrderDTO);
 
         hardshipService.update(request);
-        applicationService.updateDateModified(request, request.getApplicationDTO());
+
         try {
             HardshipOverviewDTO hardshipOverviewDTO = request.getApplicationDTO()
                     .getAssessmentDTO()
@@ -143,6 +145,8 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
             hardshipService.rollback(request);
             Sentry.captureException(ex);
             throw new MaatOrchestrationException(request.getApplicationDTO());
+        } finally {
+            applicationService.updateDateModified(request, request.getApplicationDTO());
         }
 
         return request.getApplicationDTO();
@@ -155,9 +159,7 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     }
 
     private ApplicationDTO processMagCourtHardshipRules(WorkflowRequest request) {
-        // call assessments.determine_mags_rep_decision stored procedure
-        request.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                request.getApplicationDTO(), request.getUserDTO(), StoredProcedure.DETERMINE_MAGS_REP_DECISION));
+        request.setApplicationDTO(proceedingsService.determineMagsRepDecision(request));
         if (contributionService.isVariationRequired(request.getApplicationDTO())) {
             return contributionService.calculate(request);
         }

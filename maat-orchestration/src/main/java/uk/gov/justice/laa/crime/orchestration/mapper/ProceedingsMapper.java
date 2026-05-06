@@ -35,6 +35,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FullAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipOverviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IncomeEvidenceSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.InitialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.OutcomeDTO;
@@ -69,8 +70,8 @@ public class ProceedingsMapper extends CrownCourtMapper {
                         CaseType.getFrom(applicationDTO.getCaseDetailsDTO().getCaseType()))
                 .withPassportAssessment(applicationDtoToPassportAssessment(applicationDTO))
                 .withIojAppeal(new ApiIOJSummary()
-                        .withDecisionResult(
-                                applicationDTO.getAssessmentDTO().getIojAppeal().getAppealDecisionResult())
+                        .withDecisionResult(getIojDecisionResult(
+                                applicationDTO.getAssessmentDTO().getIojAppeal()))
                         .withIojResult(applicationDTO.getIojResult()))
                 .withFinancialAssessment(applicationDtoToFinancialAssessment(applicationDTO, CourtType.MAGISTRATE))
                 .withUserSession(userMapper.userDtoToUserSession(request.getUserDTO()));
@@ -195,7 +196,7 @@ public class ProceedingsMapper extends CrownCourtMapper {
     private ApiPassportAssessment applicationDtoToPassportAssessment(ApplicationDTO application) {
         PassportedDTO passported = application.getPassportedDTO();
 
-        if (passported.getPassportedId() != null) {
+        if (passported != null && passported.getPassportedId() != null) {
             return new ApiPassportAssessment()
                     .withResult(passported.getResult())
                     .withStatus(CurrentStatus.getFrom(
@@ -340,5 +341,10 @@ public class ProceedingsMapper extends CrownCourtMapper {
 
     CurrentStatus getCurrentStatus(String status) {
         return StringUtils.isNotBlank(status) ? CurrentStatus.getFrom(status) : null;
+    }
+
+    private String getIojDecisionResult(IOJAppealDTO iojAppeal) {
+        String result = iojAppeal.getAppealDecisionResult();
+        return (result == null || result.isBlank()) ? null : result;
     }
 }

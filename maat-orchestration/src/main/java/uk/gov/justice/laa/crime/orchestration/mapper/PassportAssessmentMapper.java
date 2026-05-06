@@ -72,8 +72,6 @@ public class PassportAssessmentMapper {
                 .description(ASSESSMENT_STATUS_DESCRIPTION)
                 .build();
 
-        // TODO: Need to populate passportSummaryEvidenceDTO following completion of LCAM-2002
-        // TODO: Might need to amend mapping of legacy age related values following completion of LCAM-2016
         // Not setting dwpResult and dwpWhoChecked as these are no longer used in MAAT and so can left as null
         PassportedDTO dto = PassportedDTO.builder()
                 .passportedId(Long.valueOf(response.getLegacyAssessmentId()))
