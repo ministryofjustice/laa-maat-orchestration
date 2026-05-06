@@ -53,6 +53,6 @@ class RepOrderServiceTest {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
 
         repOrderService.updateRepOrderDateModified(workflowRequest, LocalDateTime.now());
-        verify(maatCourtDataService).updateRepOrderDateModified(any(), any());
+        verify(maatCourtDataService).updateRepOrder(any(), any());
     }
 }

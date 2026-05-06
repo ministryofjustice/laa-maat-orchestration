@@ -1,11 +1,15 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import io.sentry.Sentry;
+import java.time.LocalDateTime;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -63,6 +67,7 @@ public class PassportAssessmentOrchestrationService {
         workflowPreProcessorService.preProcessPassportRequest(workflowRequest, repOrderDTO, userActionDTO);
 
         String assessmentId = passportAssessmentService.create(workflowRequest);
+        repOrderDTO = repOrderService.updateRepOrderAssessmentDateCompleted(workflowRequest, repOrderDTO, LocalDateTime.now());
 
         try {
             workflowRequest.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
@@ -82,7 +87,6 @@ public class PassportAssessmentOrchestrationService {
                 applicationDTO.getAssessmentDTO().getIojAppeal());
             assessmentSummaryService.updateApplication(applicationDTO, assessmentSummaryDTO);
 
-            // TODO: Need to update the ass date completed by calling patch rep order endpoint (use fin ass data from appDTO)
             applicationService.updateDateModified(workflowRequest, applicationDTO);
 
             ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(
