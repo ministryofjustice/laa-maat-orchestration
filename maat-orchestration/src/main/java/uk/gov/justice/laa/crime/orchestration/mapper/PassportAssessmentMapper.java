@@ -89,8 +89,6 @@ public class PassportAssessmentMapper {
                 .notes(assessment.getNotes())
                 .result(assessment.getAssessmentDecision().getCode())
                 .under18HeardYouthCourt(assessment.getDeclaredUnder18())
-                .passportSummaryEvidenceDTO(
-                        passportEvidenceMapper.apiGetPassportEvidenceResponseToIncomeEvidenceSummaryDTO(evidence))
                 .build();
 
         if (assessment.getUsn() != null) {
@@ -115,6 +113,11 @@ public class PassportAssessmentMapper {
                 case BenefitType.ESA -> dto.setBenefitEmploymentSupport(true);
                 case BenefitType.UC -> dto.setBenefitUniversalCredit(true);
             }
+        }
+
+        if (evidence != null) {
+            dto.setPassportSummaryEvidenceDTO(
+                    passportEvidenceMapper.apiGetPassportEvidenceResponseToIncomeEvidenceSummaryDTO(evidence));
         }
 
         return dto;
