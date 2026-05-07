@@ -1,15 +1,11 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import io.sentry.Sentry;
-import java.time.LocalDateTime;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
-import uk.gov.justice.laa.crime.enums.CaseType;
-import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -27,11 +23,13 @@ import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
 import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
 import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
 import uk.gov.justice.laa.crime.orchestration.service.PassportAssessmentService;
-
-import org.springframework.stereotype.Service;
 import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
 import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
+
+import java.time.LocalDateTime;
+
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -50,7 +48,6 @@ public class PassportAssessmentOrchestrationService {
     private final ApplicationTrackingMapper applicationTrackingMapper;
     private final ApplicationTrackingDataService applicationTrackingDataService;
 
-
     public PassportedDTO find(int id) {
         return passportAssessmentService.find(id);
     }
@@ -67,30 +64,32 @@ public class PassportAssessmentOrchestrationService {
         workflowPreProcessorService.preProcessPassportRequest(workflowRequest, repOrderDTO, userActionDTO);
 
         String assessmentId = passportAssessmentService.create(workflowRequest);
-        repOrderDTO = repOrderService.updateRepOrderAssessmentDateCompleted(workflowRequest, repOrderDTO, LocalDateTime.now());
+        repOrderDTO = repOrderService.updateRepOrderAssessmentDateCompleted(
+                workflowRequest, repOrderDTO, LocalDateTime.now());
 
         try {
             workflowRequest.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                applicationDTO, workflowRequest.getUserDTO(),
-                StoredProcedure.MANAGE_PASSPORT_EVIDENCE));
+                    applicationDTO, workflowRequest.getUserDTO(), StoredProcedure.MANAGE_PASSPORT_EVIDENCE));
             proceedingsService.determineMagsRepDecision(workflowRequest);
             workflowRequest.setApplicationDTO(contributionService.calculate(workflowRequest));
             proceedingsService.updateApplication(workflowRequest, repOrderDTO);
 
-            if (!NewWorkReason.FMA.equals(NewWorkReason.getFrom(applicationDTO.getPassportedDTO().getNewWorkReason().getCode()))) {
+            if (!NewWorkReason.FMA.equals(NewWorkReason.getFrom(
+                    applicationDTO.getPassportedDTO().getNewWorkReason().getCode()))) {
                 workflowRequest.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                    applicationDTO, workflowRequest.getUserDTO(),
-                    StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE));
+                        applicationDTO,
+                        workflowRequest.getUserDTO(),
+                        StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE));
             }
 
             AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(
-                applicationDTO.getAssessmentDTO().getIojAppeal());
+                    applicationDTO.getAssessmentDTO().getIojAppeal());
             assessmentSummaryService.updateApplication(applicationDTO, assessmentSummaryDTO);
 
             applicationService.updateDateModified(workflowRequest, applicationDTO);
 
             ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(
-                workflowRequest, repOrderDTO, AssessmentType.PASSPORT, RequestSource.PASSPORT_IOJ);
+                    workflowRequest, repOrderDTO, AssessmentType.PASSPORT, RequestSource.PASSPORT_IOJ);
             if (null != applicationTrackingOutputResult.getUsn()) {
                 applicationTrackingDataService.sendTrackingOutputResult(applicationTrackingOutputResult);
             }
@@ -98,7 +97,8 @@ public class PassportAssessmentOrchestrationService {
             log.error("Create passport assessment post processing failed, rolling back...", exception);
             Sentry.captureException(exception);
 
-            // TODO: Need to call rollback passport assessment and handle failure when ticket LCAM-1987 and follow on has been completed.
+            // TODO: Need to call rollback passport assessment and handle failure when ticket LCAM-1987 and follow on
+            // has been completed.
 
             throw new MaatOrchestrationException(applicationDTO);
         }

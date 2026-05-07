@@ -60,7 +60,8 @@ public class AssessmentApiService {
         return response;
     }
 
-    public ApiCreatePassportedAssessmentResponse createPassportAssessment(ApiCreatePassportedAssessmentRequest request) {
+    public ApiCreatePassportedAssessmentResponse createPassportAssessment(
+            ApiCreatePassportedAssessmentRequest request) {
         log.debug(REQUEST_STRING, request);
         ApiCreatePassportedAssessmentResponse response = assessmentApiClient.createPassportAssessment(request);
         log.debug(RESPONSE_STRING, response);

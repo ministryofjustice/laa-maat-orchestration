@@ -1,6 +1,5 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.justice.laa.crime.enums.CaseType;
@@ -35,14 +34,20 @@ public class RepOrderService {
         return getRepOrder(workflowRequest);
     }
 
-    public RepOrderDTO updateRepOrderAssessmentDateCompleted(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO, LocalDateTime dateCompleted) {
+    public RepOrderDTO updateRepOrderAssessmentDateCompleted(
+            WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO, LocalDateTime dateCompleted) {
         ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
         CaseType caseType = CaseType.getFrom(applicationDTO.getCaseDetailsDTO().getCaseType());
-        CurrentStatus fullAssessmentStatus = CurrentStatus.getFrom(applicationDTO.getAssessmentDTO()
-            .getFinancialAssessmentDTO().getFull().getAssessmnentStatusDTO().getStatus());
+        CurrentStatus fullAssessmentStatus = CurrentStatus.getFrom(applicationDTO
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .getFull()
+                .getAssessmnentStatusDTO()
+                .getStatus());
 
         if (!CaseType.EITHER_WAY.equals(caseType)
-            || repOrderDTO.getAssessmentDateCompleted() == null && CurrentStatus.COMPLETE.equals(fullAssessmentStatus)) {
+                || repOrderDTO.getAssessmentDateCompleted() == null
+                        && CurrentStatus.COMPLETE.equals(fullAssessmentStatus)) {
             int repId = applicationDTO.getRepId().intValue();
             Map<String, Object> fieldsToUpdate = Map.of("assessmentDateCompleted", dateCompleted);
 

@@ -30,5 +30,6 @@ public interface CrimeAssessmentApiClient {
     ApiGetPassportedAssessmentResponse getPassportAssessment(@PathVariable Integer id);
 
     @PostExchange("/passport")
-    ApiCreatePassportedAssessmentResponse createPassportAssessment(@RequestBody ApiCreatePassportedAssessmentRequest request);
+    ApiCreatePassportedAssessmentResponse createPassportAssessment(
+            @RequestBody ApiCreatePassportedAssessmentRequest request);
 }

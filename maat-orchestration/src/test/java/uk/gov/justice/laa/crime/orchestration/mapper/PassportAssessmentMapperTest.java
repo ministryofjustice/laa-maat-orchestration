@@ -17,7 +17,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 @ExtendWith(SoftAssertionsExtension.class)
 class PassportAssessmentMapperTest {
 
-    PassportAssessmentMapper passportAssessmentMapper = new PassportAssessmentMapper();
+    UserMapper userMapper = new UserMapper();
+    PassportAssessmentMapper passportAssessmentMapper = new PassportAssessmentMapper(userMapper);
 
     @InjectSoftAssertions
     private SoftAssertions softly;

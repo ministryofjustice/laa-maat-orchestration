@@ -40,10 +40,9 @@ public class PassportAssessmentService {
 
     public String create(WorkflowRequest workflowRequest) {
         ApiCreatePassportedAssessmentRequest casRequest =
-            passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(workflowRequest);
+                passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(workflowRequest);
 
-        ApiCreatePassportedAssessmentResponse casResponse =
-            assessmentApiService.createPassportAssessment(casRequest);
+        ApiCreatePassportedAssessmentResponse casResponse = assessmentApiService.createPassportAssessment(casRequest);
 
         String assessmentId = casResponse.getAssessmentId();
         workflowRequest.getApplicationDTO().getPassportedDTO().setPassportedId(Long.valueOf(assessmentId));
