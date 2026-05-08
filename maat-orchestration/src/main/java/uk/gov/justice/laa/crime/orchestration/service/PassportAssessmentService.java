@@ -38,13 +38,13 @@ public class PassportAssessmentService {
         return passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(response, applicantDTO);
     }
 
-    public String create(WorkflowRequest workflowRequest) {
+    public Integer create(WorkflowRequest workflowRequest) {
         ApiCreatePassportedAssessmentRequest casRequest =
                 passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(workflowRequest);
 
         ApiCreatePassportedAssessmentResponse casResponse = assessmentApiService.createPassportAssessment(casRequest);
 
-        String assessmentId = casResponse.getAssessmentId();
+        Integer assessmentId = casResponse.getLegacyAssessmentId();
         workflowRequest.getApplicationDTO().getPassportedDTO().setPassportedId(Long.valueOf(assessmentId));
         return assessmentId;
     }

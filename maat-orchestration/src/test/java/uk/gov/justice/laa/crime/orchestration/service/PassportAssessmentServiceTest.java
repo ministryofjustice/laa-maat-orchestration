@@ -4,9 +4,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAssessmentRequest;
+import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.PassportAssessmentDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.PassportAssessmentMapper;
@@ -65,5 +69,24 @@ class PassportAssessmentServiceTest {
         verifyNoInteractions(maatCourtDataApiService);
         assertThat(passportAssessmentService.find(Constants.PASSPORT_ASSESSMENT_ID))
                 .isEqualTo(passportedDTO);
+    }
+
+    @Test
+    void givenValidRequest_whenCreateIsInvoked_thenPassportAssessmentIdIsReturned() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        ApiCreatePassportedAssessmentRequest casRequest =
+                PassportAssessmentDataBuilder.getApiCreatePassportedAssessmentRequest(Constants.WITHOUT_PARTNER);
+        ApiCreatePassportedAssessmentResponse response =
+                PassportAssessmentDataBuilder.getApiCreatePassportedAssessmentResponse();
+
+        when(passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(workflowRequest))
+                .thenReturn(casRequest);
+        when(assessmentApiService.createPassportAssessment(casRequest)).thenReturn(response);
+
+        Integer assessmentId = passportAssessmentService.create(workflowRequest);
+
+        assertThat(workflowRequest.getApplicationDTO().getPassportedDTO().getPassportedId())
+                .isEqualTo(Long.valueOf(Constants.PASSPORT_ASSESSMENT_ID));
+        assertThat(assessmentId).isEqualTo(Constants.PASSPORT_ASSESSMENT_ID);
     }
 }

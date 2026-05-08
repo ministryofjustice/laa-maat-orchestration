@@ -102,9 +102,9 @@ public class PassportAssessmentDataBuilder {
                 .withNotes(Constants.NOTES);
     }
 
-    public static ApiCreatePassportedAssessmentRequest getApiCreatePassportedAssessmentRequest() {
+    public static ApiCreatePassportedAssessmentRequest getApiCreatePassportedAssessmentRequest(boolean hasPartner) {
         return new ApiCreatePassportedAssessmentRequest()
-                .withPassportedAssessment(getPassportedAssessment(Constants.WITHOUT_PARTNER))
+                .withPassportedAssessment(getPassportedAssessment(hasPartner))
                 .withPassportedAssessmentMetadata(getPassportedAssessmentMetadata());
     }
 

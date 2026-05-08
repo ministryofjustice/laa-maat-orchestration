@@ -63,7 +63,7 @@ public class PassportAssessmentOrchestrationService {
 
         workflowPreProcessorService.preProcessPassportRequest(workflowRequest, repOrderDTO, userActionDTO);
 
-        String assessmentId = passportAssessmentService.create(workflowRequest);
+        Integer assessmentId = passportAssessmentService.create(workflowRequest);
         repOrderDTO = repOrderService.updateRepOrderAssessmentDateCompleted(
                 workflowRequest, repOrderDTO, LocalDateTime.now());
 

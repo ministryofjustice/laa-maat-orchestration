@@ -90,7 +90,7 @@ class AssessmentApiServiceTest {
     @Test
     void givenValidRequest_whenCreatePassportAssessmentIsInvoked_thenResponseIsReturned() {
         ApiCreatePassportedAssessmentRequest request =
-                PassportAssessmentDataBuilder.getApiCreatePassportedAssessmentRequest();
+                PassportAssessmentDataBuilder.getApiCreatePassportedAssessmentRequest(Constants.WITHOUT_PARTNER);
         ApiCreatePassportedAssessmentResponse response =
                 PassportAssessmentDataBuilder.getApiCreatePassportedAssessmentResponse();
 
