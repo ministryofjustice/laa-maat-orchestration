@@ -8,6 +8,8 @@ import static org.mockito.Mockito.when;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealRequest;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiGetIojAppealResponse;
+import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAssessmentRequest;
+import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.client.CrimeAssessmentApiClient;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
@@ -83,5 +85,17 @@ class AssessmentApiServiceTest {
 
         assertThatThrownBy(() -> assessmentApiService.findPassportAssessment(Constants.PASSPORT_ASSESSMENT_ID))
                 .isInstanceOf(WebClientResponseException.class);
+    }
+
+    @Test
+    void givenValidRequest_whenCreatePassportAssessmentIsInvoked_thenResponseIsReturned() {
+        ApiCreatePassportedAssessmentRequest request =
+                PassportAssessmentDataBuilder.getApiCreatePassportedAssessmentRequest();
+        ApiCreatePassportedAssessmentResponse response =
+                PassportAssessmentDataBuilder.getApiCreatePassportedAssessmentResponse();
+
+        when(assessmentApiClient.createPassportAssessment(request)).thenReturn(response);
+
+        assertThat(assessmentApiService.createPassportAssessment(request)).isEqualTo(response);
     }
 }

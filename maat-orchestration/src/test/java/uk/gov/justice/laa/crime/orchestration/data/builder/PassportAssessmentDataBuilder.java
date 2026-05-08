@@ -1,7 +1,11 @@
 package uk.gov.justice.laa.crime.orchestration.data.builder;
 
+import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAssessmentRequest;
+import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.passported.DeclaredBenefit;
+import uk.gov.justice.laa.crime.common.model.passported.PassportedAssessment;
+import uk.gov.justice.laa.crime.common.model.passported.PassportedAssessmentMetadata;
 import uk.gov.justice.laa.crime.enums.BenefitRecipient;
 import uk.gov.justice.laa.crime.enums.BenefitType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
@@ -63,6 +67,25 @@ public class PassportAssessmentDataBuilder {
                 .build();
     }
 
+    private static PassportedAssessment getPassportedAssessment(boolean hasPartner) {
+        return new PassportedAssessment()
+                .withAssessmentDate(Constants.ASSESSMENT_DATETIME)
+                .withAssessmentReason(NewWorkReason.FMA)
+                .withReviewType(ReviewType.ER)
+                .withDeclaredUnder18(false)
+                .withDeclaredBenefit(hasPartner ? getDeclaredPartnerBenefit() : getDeclaredBenefit())
+                .withAssessmentDecision(PassportAssessmentDecision.PASS)
+                .withDecisionReason(PassportAssessmentDecisionReason.DWP_CHECK)
+                .withNotes(Constants.NOTES);
+    }
+
+    private static PassportedAssessmentMetadata getPassportedAssessmentMetadata() {
+        return new PassportedAssessmentMetadata()
+                .withUsn(Constants.USN)
+                .withCaseManagementUnitId(Constants.CASE_MANAGEMENT_UNIT_ID)
+                .withUserSession(TestModelDataBuilder.getApiUserSession());
+    }
+
     public static ApiGetPassportedAssessmentResponse getApiGetPassportedAssessmentResponse(boolean hasPartner) {
         return new ApiGetPassportedAssessmentResponse()
                 .withAssessmentId("deb7a9a4-2ad3-4ac8-95a4-ef0746c52ed0")
@@ -77,6 +100,16 @@ public class PassportAssessmentDataBuilder {
                 .withAssessmentDecision(PassportAssessmentDecision.PASS)
                 .withDecisionReason(PassportAssessmentDecisionReason.DWP_CHECK)
                 .withNotes(Constants.NOTES);
+    }
+
+    public static ApiCreatePassportedAssessmentRequest getApiCreatePassportedAssessmentRequest() {
+        return new ApiCreatePassportedAssessmentRequest()
+                .withPassportedAssessment(getPassportedAssessment(Constants.WITHOUT_PARTNER))
+                .withPassportedAssessmentMetadata(getPassportedAssessmentMetadata());
+    }
+
+    public static ApiCreatePassportedAssessmentResponse getApiCreatePassportedAssessmentResponse() {
+        return new ApiCreatePassportedAssessmentResponse().withLegacyAssessmentId(Constants.PASSPORT_ASSESSMENT_ID);
     }
 
     public static ApplicantDTO getApplicantDTO() {
