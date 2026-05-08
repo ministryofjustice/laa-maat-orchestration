@@ -1,13 +1,18 @@
 package uk.gov.justice.laa.crime.orchestration.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionId;
+import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestWithTransactionIdGivenContent;
 
 import uk.gov.justice.laa.crime.orchestration.config.OrchestrationTestConfiguration;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.PassportAssessmentDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
+import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.service.orchestration.PassportAssessmentOrchestrationService;
 import uk.gov.justice.laa.crime.orchestration.tracing.TraceIdHandler;
@@ -22,6 +27,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @WebMvcTest(PassportAssessmentController.class)
 @Import(OrchestrationTestConfiguration.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -31,6 +38,9 @@ class PassportAssessmentControllerTest {
 
     @Autowired
     private MockMvc mvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockitoBean
     private PassportAssessmentOrchestrationService passportAssessmentOrchestrationService;
@@ -46,14 +56,39 @@ class PassportAssessmentControllerTest {
                 .thenReturn(dto);
 
         mvc.perform(buildRequestWithTransactionId(
-                        HttpMethod.GET, ENDPOINT_URL + "/" + Constants.PASSPORT_ASSESSMENT_ID, Constants.WITHOUT_AUTH))
+                        HttpMethod.GET, ENDPOINT_URL + "/" + Constants.PASSPORT_ASSESSMENT_ID, Constants.WITH_AUTH))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
     void givenInvalidId_whenFindIsInvoked_thenBadRequestResponseIsReturned() throws Exception {
-        mvc.perform(buildRequestWithTransactionId(HttpMethod.GET, ENDPOINT_URL + "/inv4l1d1d", Constants.WITHOUT_AUTH))
+        mvc.perform(buildRequestWithTransactionId(HttpMethod.GET, ENDPOINT_URL + "/inv4l1d1d", Constants.WITH_AUTH))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void givenValidRequest_whenCreateIsInvoked_thenOkResponseIsReturned() throws Exception {
+        ApplicationDTO applicationDTO = TestModelDataBuilder.getApplicationDTO();
+
+        when(passportAssessmentOrchestrationService.create(any(WorkflowRequest.class)))
+                .thenReturn(applicationDTO);
+
+        String requestBody = objectMapper.writeValueAsString(TestModelDataBuilder.buildWorkFlowRequest());
+        mvc.perform(buildRequestWithTransactionIdGivenContent(
+                        HttpMethod.POST, requestBody, ENDPOINT_URL, Constants.WITH_AUTH))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    void givenInvalidRequest_whenCreateIsInvoked_thenBadRequestResponseIsReturned() throws Exception {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.setUserDTO(null);
+
+        String requestBody = objectMapper.writeValueAsString(workflowRequest);
+        mvc.perform(buildRequestWithTransactionIdGivenContent(
+                        HttpMethod.POST, requestBody, ENDPOINT_URL, Constants.WITH_AUTH))
                 .andExpect(status().isBadRequest());
     }
 }

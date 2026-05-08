@@ -42,4 +42,5 @@ public class Constants {
     public static final boolean WITH_PARTNER = true;
     public static final boolean WITHOUT_PARTNER = false;
     public static final boolean WITHOUT_AUTH = false;
+    public static final boolean WITH_AUTH = true;
 }
