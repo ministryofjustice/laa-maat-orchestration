@@ -3,11 +3,17 @@ package uk.gov.justice.laa.crime.orchestration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import uk.gov.justice.laa.crime.enums.CaseType;
+import uk.gov.justice.laa.crime.enums.CurrentStatus;
+import uk.gov.justice.laa.crime.enums.RepOrderStatus;
+import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.util.DateUtil;
 
 import java.time.LocalDateTime;
 
@@ -54,5 +60,40 @@ class RepOrderServiceTest {
 
         repOrderService.updateRepOrderDateModified(workflowRequest, LocalDateTime.now());
         verify(maatCourtDataService).updateRepOrder(any(), any());
+    }
+
+    @Test
+    void givenIndictableCase_whenUpdateAssessmentDateCompletedIsCalled_thenDateIsUpdated() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().getCaseDetailsDTO().setCaseType(CaseType.INDICTABLE.getCaseType());
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
+        LocalDateTime dateCompleted = Constants.ASSESSMENT_COMPLETED_DATETIME;
+        RepOrderDTO updatedRepOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
+        updatedRepOrderDTO.setAssessmentDateCompleted(DateUtil.parseLocalDate(dateCompleted));
+
+        when(maatCourtDataService.findRepOrder(
+                        workflowRequest.getApplicationDTO().getRepId().intValue()))
+                .thenReturn(updatedRepOrderDTO);
+
+        assertThat(repOrderService.updateRepOrderAssessmentDateCompleted(workflowRequest, repOrderDTO, dateCompleted))
+                .isEqualTo(updatedRepOrderDTO);
+    }
+
+    @Test
+    void givenInProgressEitherWayCase_whenUpdateAssessmentDateCompletedIsCalled_thenDateIsNotUpdated() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .getFull()
+                .getAssessmnentStatusDTO()
+                .setStatus(CurrentStatus.IN_PROGRESS.getStatus());
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
+        LocalDateTime dateCompleted = Constants.ASSESSMENT_COMPLETED_DATETIME;
+
+        verifyNoInteractions(maatCourtDataService);
+        assertThat(repOrderService.updateRepOrderAssessmentDateCompleted(workflowRequest, repOrderDTO, dateCompleted))
+                .isEqualTo(repOrderDTO);
     }
 }

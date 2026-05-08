@@ -34,6 +34,7 @@ public class Constants {
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     public static final Integer USN = 123456789;
     public static final LocalDateTime ASSESSMENT_DATETIME = LocalDateTime.of(2022, 9, 3, 0, 0, 0);
+    public static final LocalDateTime ASSESSMENT_COMPLETED_DATETIME = ASSESSMENT_DATETIME.plusDays(2);
     public static final String NOTES = "This is a test note.";
     public static final int PASSPORT_ASSESSMENT_ID = 123;
     public static final int CASE_MANAGEMENT_UNIT_ID = 50;
