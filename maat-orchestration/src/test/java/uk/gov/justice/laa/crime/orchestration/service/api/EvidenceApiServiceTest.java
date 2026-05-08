@@ -6,9 +6,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiGetPassportEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceRequest;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiUpdateIncomeEvidenceResponse;
 import uk.gov.justice.laa.crime.orchestration.client.EvidenceApiClient;
+import uk.gov.justice.laa.crime.orchestration.data.Constants;
+import uk.gov.justice.laa.crime.orchestration.data.builder.EvidenceDataBuilder;
 
 import java.time.LocalDate;
 
@@ -40,6 +43,19 @@ class EvidenceApiServiceTest {
         when(evidenceApiClient.updateEvidence(any(ApiUpdateIncomeEvidenceRequest.class)))
                 .thenReturn(expectedResponse);
         var actualResponse = evidenceApiService.updateEvidence(new ApiUpdateIncomeEvidenceRequest());
+        assertThat(actualResponse).isEqualTo(expectedResponse);
+    }
+
+    @Test
+    void givenValidId_whenGetPassportEvidenceIsInvoked_thenApiGetPassportEvidenceResponseIsReturned() {
+        ApiGetPassportEvidenceResponse expectedResponse =
+                EvidenceDataBuilder.getApiGetPassportEvidenceResponse(Constants.WITH_PARTNER);
+
+        when(evidenceApiClient.findPassportEvidence(Constants.PASSPORT_ASSESSMENT_ID))
+                .thenReturn(expectedResponse);
+
+        ApiGetPassportEvidenceResponse actualResponse =
+                evidenceApiService.getPassportEvidence(Constants.PASSPORT_ASSESSMENT_ID);
         assertThat(actualResponse).isEqualTo(expectedResponse);
     }
 }

@@ -16,6 +16,7 @@ import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpda
 import uk.gov.justice.laa.crime.enums.AssessmentType;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
+import uk.gov.justice.laa.crime.orchestration.data.builder.EvidenceDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.MeansAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -148,9 +149,9 @@ class IncomeEvidenceMapperTest {
         ApplicationDTO applicationDTO = MeansAssessmentDataBuilder.getApplicationDTO();
 
         when(meansAssessmentMapper.getEvidenceDTO(incomeEvidences.get(0)))
-                .thenReturn(MeansAssessmentDataBuilder.getApplicantEvidenceDTO());
+                .thenReturn(EvidenceDataBuilder.getApplicantEvidenceDTO());
         when(meansAssessmentMapper.getEvidenceDTO(incomeEvidences.get(1)))
-                .thenReturn(MeansAssessmentDataBuilder.getPartnerEvidenceDTO());
+                .thenReturn(EvidenceDataBuilder.getPartnerEvidenceDTO());
 
         incomeEvidenceMapper.maatApiAssessmentResponseToApplicationDTO(maatApiAssessmentResponse, applicationDTO);
 
@@ -159,13 +160,13 @@ class IncomeEvidenceMapperTest {
                         .getFinancialAssessmentDTO()
                         .getIncomeEvidence()
                         .getApplicantIncomeEvidenceList())
-                .isEqualTo(List.of(MeansAssessmentDataBuilder.getApplicantEvidenceDTO()));
+                .isEqualTo(List.of(EvidenceDataBuilder.getApplicantEvidenceDTO()));
         softly.assertThat(applicationDTO
                         .getAssessmentDTO()
                         .getFinancialAssessmentDTO()
                         .getIncomeEvidence()
                         .getPartnerIncomeEvidenceList())
-                .isEqualTo(List.of(MeansAssessmentDataBuilder.getPartnerEvidenceDTO()));
+                .isEqualTo(List.of(EvidenceDataBuilder.getPartnerEvidenceDTO()));
         softly.assertAll();
     }
 

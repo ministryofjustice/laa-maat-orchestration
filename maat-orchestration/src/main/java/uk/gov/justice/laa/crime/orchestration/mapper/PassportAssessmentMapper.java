@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
 import lombok.RequiredArgsConstructor;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiGetPassportEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.passported.DeclaredBenefit;
 import uk.gov.justice.laa.crime.enums.BenefitType;
@@ -24,6 +25,8 @@ import org.springframework.stereotype.Component;
 public class PassportAssessmentMapper {
 
     private static final String ASSESSMENT_STATUS_DESCRIPTION = "Complete";
+
+    private final PassportEvidenceMapper passportEvidenceMapper;
 
     private PartnerDTO applicantDTOToPartnerDTO(ApplicantDTO applicant) {
         return PartnerDTO.builder()
@@ -65,7 +68,9 @@ public class PassportAssessmentMapper {
     }
 
     public PassportedDTO apiGetPassportedAssessmentResponseToPassportedDTO(
-            ApiGetPassportedAssessmentResponse response, ApplicantDTO applicantDTO) {
+            ApiGetPassportedAssessmentResponse assessment,
+            ApiGetPassportEvidenceResponse evidence,
+            ApplicantDTO partner) {
 
         AssessmentStatusDTO assessmentStatusDTO = AssessmentStatusDTO.builder()
                 .status(AssessmentStatusDTO.COMPLETE)
@@ -74,31 +79,31 @@ public class PassportAssessmentMapper {
 
         // Not setting dwpResult and dwpWhoChecked as these are no longer used in MAAT and so can left as null
         PassportedDTO dto = PassportedDTO.builder()
-                .passportedId(Long.valueOf(response.getLegacyAssessmentId()))
-                .cmuId(Long.valueOf(response.getCaseManagementUnitId()))
-                .date(DateUtil.toDate(response.getAssessmentDate()))
+                .passportedId(Long.valueOf(assessment.getLegacyAssessmentId()))
+                .cmuId(Long.valueOf(assessment.getCaseManagementUnitId()))
+                .date(DateUtil.toDate(assessment.getAssessmentDate()))
                 .assessementStatusDTO(assessmentStatusDTO)
                 .passportConfirmationDTO(
-                        passportAssessmentDecisionReasonToPassportConfirmationDTO(response.getDecisionReason()))
-                .newWorkReason(newWorkReasonToNewWorkReasonDTO(response.getAssessmentReason()))
-                .notes(response.getNotes())
-                .result(response.getAssessmentDecision().getCode())
-                .under18HeardYouthCourt(response.getDeclaredUnder18())
+                        passportAssessmentDecisionReasonToPassportConfirmationDTO(assessment.getDecisionReason()))
+                .newWorkReason(newWorkReasonToNewWorkReasonDTO(assessment.getAssessmentReason()))
+                .notes(assessment.getNotes())
+                .result(assessment.getAssessmentDecision().getCode())
+                .under18HeardYouthCourt(assessment.getDeclaredUnder18())
                 .build();
 
-        if (response.getUsn() != null) {
-            dto.setUsn(Long.valueOf(response.getUsn()));
+        if (assessment.getUsn() != null) {
+            dto.setUsn(Long.valueOf(assessment.getUsn()));
         }
 
-        if (response.getReviewType() != null) {
-            dto.setReviewType(reviewTypeToReviewTypeDTO(response.getReviewType()));
+        if (assessment.getReviewType() != null) {
+            dto.setReviewType(reviewTypeToReviewTypeDTO(assessment.getReviewType()));
         }
 
-        DeclaredBenefit declaredBenefit = response.getDeclaredBenefit();
+        DeclaredBenefit declaredBenefit = assessment.getDeclaredBenefit();
         if (declaredBenefit != null) {
-            if (applicantDTO != null) {
+            if (partner != null) {
                 dto.setBenefitClaimedByPartner(true);
-                dto.setPartnerDetails(applicantDTOToPartnerDTO(applicantDTO));
+                dto.setPartnerDetails(applicantDTOToPartnerDTO(partner));
             }
 
             switch (declaredBenefit.getBenefitType()) {
@@ -108,6 +113,11 @@ public class PassportAssessmentMapper {
                 case BenefitType.ESA -> dto.setBenefitEmploymentSupport(true);
                 case BenefitType.UC -> dto.setBenefitUniversalCredit(true);
             }
+        }
+
+        if (evidence != null) {
+            dto.setPassportSummaryEvidenceDTO(
+                    passportEvidenceMapper.apiGetPassportEvidenceResponseToIncomeEvidenceSummaryDTO(evidence));
         }
 
         return dto;
