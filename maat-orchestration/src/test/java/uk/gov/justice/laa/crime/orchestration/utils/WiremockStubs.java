@@ -42,6 +42,8 @@ public class WiremockStubs {
     private static final String MAAT_API_ASSESSMENT_URL = "/api/internal/v1/assessment";
     private static final String CMA_ROLLBACK_URL = "/api/internal/v1/assessment/means/rollback/";
     private static final String MAAT_API_USER_URL = "/api/internal/v1/users/summary/";
+    private static final String IOJ_APPEALS_URL = "/api/internal/v1/ioj-appeals";
+    private static final String PASSPORT_URL = "/api/internal/v1/passport";
 
     public static void stubForOAuth() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
@@ -180,28 +182,28 @@ public class WiremockStubs {
     }
 
     public static void stubForFindIojAppeal(String response) {
-        stubFor(get(urlMatching("/api/internal/v1/ioj-appeals/lookup-by-legacy-id/" + LEGACY_APPEAL_ID))
+        stubFor(get(urlMatching(IOJ_APPEALS_URL + "/lookup-by-legacy-id/" + LEGACY_APPEAL_ID))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response)));
     }
 
     public static void stubForFindPassportAssessment(String response) {
-        stubFor(get(urlMatching("/api/internal/v1/passport/lookup-by-legacy-id/" + Constants.PASSPORT_ASSESSMENT_ID))
+        stubFor(get(urlMatching(PASSPORT_URL + "/lookup-by-legacy-id/" + Constants.PASSPORT_ASSESSMENT_ID))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response)));
     }
 
     public static void stubForFindPassportEvidence(String response) {
-        stubFor(get(urlMatching("/api/internal/v1/evidence/passport/" + Constants.PASSPORT_ASSESSMENT_ID))
+        stubFor(get(urlMatching(EVIDENCE_URL + "/passport/" + Constants.PASSPORT_ASSESSMENT_ID))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response)));
     }
 
     public static void stubForCreateEvidence(String response) {
-        stubFor(post(urlMatching("/api/internal/v1/evidence"))
+        stubFor(post(urlMatching(EVIDENCE_URL))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response)));
@@ -212,7 +214,7 @@ public class WiremockStubs {
     }
 
     public static void stubForCreateIojAppeal(String response) {
-        stubFor(post(urlMatching("/api/internal/v1/ioj-appeals"))
+        stubFor(post(urlMatching(IOJ_APPEALS_URL))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response)));
@@ -279,7 +281,7 @@ public class WiremockStubs {
     }
 
     public static void stubForRollbackIojAppeal(String response) {
-        stubFor(post(urlMatching("/api/internal/v1/ioj-appeals/" + APPEAL_ID + "/rollback"))
+        stubFor(post(urlMatching(IOJ_APPEALS_URL + "/" + APPEAL_ID + "/rollback"))
                 .willReturn(WireMock.ok()
                         .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
                         .withBody(response)));
