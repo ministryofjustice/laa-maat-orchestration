@@ -8,10 +8,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.assertj.core.api.InstanceOfAssertFactories;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
-import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
@@ -33,13 +31,12 @@ import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
 import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
 
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -184,7 +181,8 @@ class IojAppealsOrchestrationServiceTest {
         workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal().setCmuId(null);
         workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal().setNewWorkReasonDTO(null);
 
-        IOJAppealDTO iojAppealDTO = workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal();
+        IOJAppealDTO iojAppealDTO =
+                workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO());
         UserActionDTO userActionDTO = TestModelDataBuilder.getUserActionDTO();
         NullPointerException npe = new NullPointerException("We need a triggering exception");
@@ -201,7 +199,6 @@ class IojAppealsOrchestrationServiceTest {
 
         verify(proceedingsService, never()).determineMagsRepDecision(any());
         verify(contributionService, never()).calculate(any());
-        verify(maatCourtDataService, never()).invokeStoredProcedure(any(),any(),any());
+        verify(maatCourtDataService, never()).invokeStoredProcedure(any(), any(), any());
     }
-
 }

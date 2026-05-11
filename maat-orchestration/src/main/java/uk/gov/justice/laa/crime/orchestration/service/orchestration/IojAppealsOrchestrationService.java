@@ -7,7 +7,6 @@ import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputR
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
-import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
@@ -29,8 +28,6 @@ import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
 import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -70,12 +67,17 @@ public class IojAppealsOrchestrationService {
         workflowPreProcessorService.preProcessRequest(request, repOrderDto, userActionDTO);
 
         String appealId;
-        try{
-             appealId = iojAppealService.create(request);
-        } catch (NullPointerException npe){
+        try {
+            appealId = iojAppealService.create(request);
+        } catch (NullPointerException npe) {
             UUID uuid = UUID.randomUUID();
-            log.error("Required iojAppeal fields missing in request: UUID: {},\n Exception: {},\n Request: {}", uuid, npe, request);
-            throw new CrimeValidationException(List.of(String.format("IOJ-Appeal missing required fields, report with %s", uuid)));
+            log.error(
+                    "Required iojAppeal fields missing in request: UUID: {},\n Exception: {},\n Request: {}",
+                    uuid,
+                    npe,
+                    request);
+            throw new CrimeValidationException(
+                    List.of(String.format("IOJ-Appeal missing required fields, report with %s", uuid)));
         }
 
         try {
