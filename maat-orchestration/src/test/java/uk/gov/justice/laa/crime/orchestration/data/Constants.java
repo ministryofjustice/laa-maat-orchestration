@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.data;
 
 import uk.gov.justice.laa.crime.enums.HardshipReviewResult;
+import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -35,10 +36,31 @@ public class Constants {
     public static final Integer USN = 123456789;
     public static final LocalDateTime ASSESSMENT_DATETIME = LocalDateTime.of(2022, 9, 3, 0, 0, 0);
     public static final String NOTES = "This is a test note.";
-    public static final int PASSPORT_ASSESSMENT_ID = 123;
     public static final int CASE_MANAGEMENT_UNIT_ID = 50;
-    public static final LocalDateTime LAST_SIGNON_DATETIME = LocalDateTime.of(2022, 8, 3, 0, 0, 0);
     public static final boolean WITH_PARTNER = true;
     public static final boolean WITHOUT_PARTNER = false;
     public static final boolean WITHOUT_AUTH = false;
+    public static final LocalDateTime DATE_RECEIVED = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
+    public static final LocalDateTime DATE_MODIFIED = DATE_RECEIVED.plusHours(7);
+
+    // Passport
+    public static final int PASSPORT_ASSESSMENT_ID = 123;
+    public static final LocalDateTime LAST_SIGNON_DATETIME = LocalDateTime.of(2022, 8, 3, 0, 0, 0);
+
+    // Evidence
+    public static final LocalDateTime FIRST_REMINDER_DATE = DATE_RECEIVED.plusDays(14);
+    public static final LocalDateTime INCOME_EVIDENCE_RECEIVED_DATE = FIRST_REMINDER_DATE.plusDays(1);
+    public static final LocalDateTime EXTRA_INCOME_EVIDENCE_RECEIVED_DATE = FIRST_REMINDER_DATE.plusDays(1);
+    public static final LocalDateTime SECOND_REMINDER_DATE = FIRST_REMINDER_DATE.plusDays(7);
+    public static final LocalDateTime INCOME_EVIDENCE_DUE_DATE = SECOND_REMINDER_DATE;
+    public static final LocalDateTime INCOME_UPLIFT_APPLY_DATE = SECOND_REMINDER_DATE.plusDays(1);
+    public static final LocalDateTime INCOME_UPLIFT_REMOVE_DATE = INCOME_UPLIFT_APPLY_DATE.plusDays(10);
+    public static final String INCOME_EVIDENCE_DESCRIPTION = IncomeEvidenceType.TAX_RETURN.getDescription();
+    public static final String INCOME_EVIDENCE = IncomeEvidenceType.TAX_RETURN.getName();
+    public static final String EXTRA_INCOME_EVIDENCE_DESCRIPTION = IncomeEvidenceType.OTHER_ADHOC.getDescription();
+    public static final String EXTRA_INCOME_EVIDENCE = IncomeEvidenceType.OTHER_ADHOC.getName();
+    public static final Integer PARTNER_EVIDENCE_ID = 9552473;
+    public static final Integer APPLICANT_EVIDENCE_ID = 552473;
+    public static final Integer EXTRA_EVIDENCE_ID = 52473;
+    public static final String OTHER_DESCRIPTION = "OTHER DESCRIPTION";
 }
