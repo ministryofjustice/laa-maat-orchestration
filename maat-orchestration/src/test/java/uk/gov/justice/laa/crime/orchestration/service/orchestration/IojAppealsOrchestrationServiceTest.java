@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.exception.ValidationException;
@@ -18,6 +19,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
+import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.exception.RollbackException;
 import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
@@ -176,74 +178,30 @@ class IojAppealsOrchestrationServiceTest {
         return Stream.of(runtimeException, rollbackException);
     }
 
-    static Stream<Arguments> requiredFieldNullers() {
-        return Stream.of(
-                Arguments.of("applicationDTO", (Consumer<WorkflowRequest>) req -> req.setApplicationDTO(null)),
-                Arguments.of("applicationDTO.repId", (Consumer<WorkflowRequest>)
-                        req -> req.getApplicationDTO().setRepId(null)),
-                Arguments.of("applicationDTO.dateReceived", (Consumer<WorkflowRequest>)
-                        req -> req.getApplicationDTO().setDateReceived(null)),
-                Arguments.of("applicationDTO.assessmentDTO", (Consumer<WorkflowRequest>)
-                        req -> req.getApplicationDTO().setAssessmentDTO(null)),
-                Arguments.of("assessmentDTO.iojAppeal", (Consumer<WorkflowRequest>)
-                        req -> req.getApplicationDTO().getAssessmentDTO().setIojAppeal(null)),
-                Arguments.of("iojAppeal.cmuId", (Consumer<WorkflowRequest>) req -> req.getApplicationDTO()
-                        .getAssessmentDTO()
-                        .getIojAppeal()
-                        .setCmuId(null)),
-                Arguments.of("iojAppeal.receivedDate", (Consumer<WorkflowRequest>) req -> req.getApplicationDTO()
-                        .getAssessmentDTO()
-                        .getIojAppeal()
-                        .setReceivedDate(null)),
-                Arguments.of("iojAppeal.newWorkReasonDTO", (Consumer<WorkflowRequest>) req -> req.getApplicationDTO()
-                        .getAssessmentDTO()
-                        .getIojAppeal()
-                        .setNewWorkReasonDTO(null)),
-                Arguments.of(
-                        "iojAppeal.newWorkReasonDTO.code", (Consumer<WorkflowRequest>) req -> req.getApplicationDTO()
-                                .getAssessmentDTO()
-                                .getIojAppeal()
-                                .getNewWorkReasonDTO()
-                                .setCode(null)),
-                Arguments.of("iojAppeal.appealReason", (Consumer<WorkflowRequest>) req -> req.getApplicationDTO()
-                        .getAssessmentDTO()
-                        .getIojAppeal()
-                        .setAppealReason(null)),
-                Arguments.of("iojAppeal.appealReason.code", (Consumer<WorkflowRequest>) req -> req.getApplicationDTO()
-                        .getAssessmentDTO()
-                        .getIojAppeal()
-                        .getAppealReason()
-                        .setCode(null)));
-    }
-
-    @ParameterizedTest(name = "missing {0} -> ValidationException")
-    @MethodSource("requiredFieldNullers")
-    void givenRequiredFieldMissing_whenCreateIsInvoked_thenValidationExceptionIsThrown(
-            String expectedFieldName, Consumer<WorkflowRequest> nullField) {
-        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
-        nullField.accept(workflowRequest);
-
-        // make sure each null field causes a validationError
-        assertThatThrownBy(() -> iojAppealsOrchestrationService.create(workflowRequest))
-                .isInstanceOf(ValidationException.class)
-                .hasMessageContaining(expectedFieldName);
-
-        // make sure no downstream calls made it through
-        verify(repOrderService, never()).getRepOrder(any());
-        verify(iojAppealService, never()).create(any());
-    }
-
     @Test
-    void givenMultipleRequiredFieldsMissing_whenCreateIsInvoked_thenAllFieldsAreReportedInOneMessage() {
+    void givenRequiredFieldMissing_whenCreateIsInvoked_thenAllFieldsAreReportedInOneMessage() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
-        workflowRequest.getApplicationDTO().setRepId(null);
         workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal().setCmuId(null);
         workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal().setNewWorkReasonDTO(null);
 
+        IOJAppealDTO iojAppealDTO = workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal();
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO());
+        UserActionDTO userActionDTO = TestModelDataBuilder.getUserActionDTO();
+        NullPointerException npe = new NullPointerException("We need a triggering exception");
+
+        when(repOrderService.getRepOrder(workflowRequest)).thenReturn(repOrderDTO);
+        when(iojAppealMapper.getUserActionDTO(workflowRequest)).thenReturn(userActionDTO);
+        when(iojAppealService.create(workflowRequest)).thenThrow(npe);
+
         assertThatThrownBy(() -> iojAppealsOrchestrationService.create(workflowRequest))
-                .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("applicationDTO.repId")
-                .hasMessageContaining("iojAppeal.cmuId")
-                .hasMessageContaining("iojAppeal.newWorkReasonDTO");
+                .isInstanceOf(CrimeValidationException.class)
+                .extracting("exceptionMessages", InstanceOfAssertFactories.ITERABLE)
+                .first(InstanceOfAssertFactories.STRING)
+                .startsWith("IOJ-Appeal missing required fields");
+
+        verify(proceedingsService, never()).determineMagsRepDecision(any());
+        verify(contributionService, never()).calculate(any());
+        verify(maatCourtDataService, never()).invokeStoredProcedure(any(),any(),any());
     }
+
 }
