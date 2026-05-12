@@ -8,6 +8,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.FinancialAssessmentDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.AssessmentSummaryType;
 
 import java.util.Collection;
@@ -42,6 +43,17 @@ public class AssessmentSummaryService {
                 .result(iojAppealDTO.getAppealDecisionResult())
                 .assessmentDate(iojAppealDTO.getReceivedDate())
                 .build();
+    }
+
+    public AssessmentSummaryDTO getSummary(PassportedDTO passportedDTO) {
+        return AssessmentSummaryDTO.builder()
+            .id(passportedDTO.getPassportedId().intValue())
+            .assessmentDate(passportedDTO.getDate())
+            .type(AssessmentSummaryType.PASSPORT_ASSESSMENT.getName())
+            .reviewType(passportedDTO.getReviewType().getCode())
+            .status(CurrentStatus.getFrom(passportedDTO.getAssessementStatusDTO().getStatus()).getDescription())
+            .result(passportedDTO.getResult())
+            .build();
     }
 
     public void updateApplication(ApplicationDTO application, AssessmentSummaryDTO summaryDTO) {

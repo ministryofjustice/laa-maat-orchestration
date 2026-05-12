@@ -83,7 +83,7 @@ public class PassportAssessmentOrchestrationService {
             }
 
             AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(
-                    applicationDTO.getAssessmentDTO().getIojAppeal());
+                    applicationDTO.getPassportedDTO());
             assessmentSummaryService.updateApplication(applicationDTO, assessmentSummaryDTO);
 
             applicationService.updateDateModified(workflowRequest, applicationDTO);
