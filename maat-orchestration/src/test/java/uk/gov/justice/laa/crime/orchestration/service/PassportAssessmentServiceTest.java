@@ -4,10 +4,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import uk.gov.justice.laa.crime.common.model.evidence.ApiGetPassportEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAssessmentRequest;
 import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
+import uk.gov.justice.laa.crime.orchestration.data.builder.EvidenceDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.PassportAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -15,6 +17,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.PassportAssessmentMapper;
 import uk.gov.justice.laa.crime.orchestration.service.api.AssessmentApiService;
+import uk.gov.justice.laa.crime.orchestration.service.api.EvidenceApiService;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
 import org.junit.jupiter.api.Test;
@@ -30,6 +33,9 @@ class PassportAssessmentServiceTest {
     private AssessmentApiService assessmentApiService;
 
     @Mock
+    private EvidenceApiService evidenceApiService;
+
+    @Mock
     private PassportAssessmentMapper passportAssessmentMapper;
 
     @Mock
@@ -40,15 +46,20 @@ class PassportAssessmentServiceTest {
 
     @Test
     void givenValidIdWithPartner_whenFindIsInvoked_thenPassportedDTOIsReturned() {
-        ApiGetPassportedAssessmentResponse response =
+        ApiGetPassportedAssessmentResponse assessment =
                 PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(Constants.WITH_PARTNER);
-        ApplicantDTO applicantDTO = PassportAssessmentDataBuilder.getApplicantDTO();
+        ApiGetPassportEvidenceResponse evidence =
+                EvidenceDataBuilder.getApiGetPassportEvidenceResponse(Constants.WITH_PARTNER);
+        ApplicantDTO applicant = PassportAssessmentDataBuilder.getApplicantDTO();
         PassportedDTO passportedDTO = PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITH_PARTNER);
 
         when(assessmentApiService.findPassportAssessment(Constants.PASSPORT_ASSESSMENT_ID))
-                .thenReturn(response);
-        when(maatCourtDataApiService.getApplicant(Constants.PARTNER_ID)).thenReturn(applicantDTO);
-        when(passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(response, applicantDTO))
+                .thenReturn(assessment);
+        when(evidenceApiService.getPassportEvidence(Constants.PASSPORT_ASSESSMENT_ID))
+                .thenReturn(evidence);
+        when(maatCourtDataApiService.getApplicant(Constants.PARTNER_ID)).thenReturn(applicant);
+        when(passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(
+                        assessment, evidence, applicant))
                 .thenReturn(passportedDTO);
 
         assertThat(passportAssessmentService.find(Constants.PASSPORT_ASSESSMENT_ID))
@@ -57,13 +68,17 @@ class PassportAssessmentServiceTest {
 
     @Test
     void givenValidId_whenFindIsInvoked_thenPassportDTOIsReturned() {
-        ApiGetPassportedAssessmentResponse response =
+        ApiGetPassportedAssessmentResponse assessment =
                 PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(Constants.WITHOUT_PARTNER);
+        ApiGetPassportEvidenceResponse evidence =
+                EvidenceDataBuilder.getApiGetPassportEvidenceResponse(Constants.WITHOUT_PARTNER);
         PassportedDTO passportedDTO = PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITHOUT_PARTNER);
 
         when(assessmentApiService.findPassportAssessment(Constants.PASSPORT_ASSESSMENT_ID))
-                .thenReturn(response);
-        when(passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(response, null))
+                .thenReturn(assessment);
+        when(evidenceApiService.getPassportEvidence(Constants.PASSPORT_ASSESSMENT_ID))
+                .thenReturn(evidence);
+        when(passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(assessment, evidence, null))
                 .thenReturn(passportedDTO);
 
         verifyNoInteractions(maatCourtDataApiService);

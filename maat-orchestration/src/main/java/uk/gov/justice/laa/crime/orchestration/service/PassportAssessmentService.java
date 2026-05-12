@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
 import lombok.RequiredArgsConstructor;
+import uk.gov.justice.laa.crime.common.model.evidence.ApiGetPassportEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAssessmentRequest;
 import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
@@ -11,6 +12,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.PassportAssessmentMapper;
 import uk.gov.justice.laa.crime.orchestration.service.api.AssessmentApiService;
+import uk.gov.justice.laa.crime.orchestration.service.api.EvidenceApiService;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ public class PassportAssessmentService {
 
     private final AssessmentApiService assessmentApiService;
     private final MaatCourtDataApiService maatCourtDataApiService;
+    private final EvidenceApiService evidenceApiService;
     private final PassportAssessmentMapper passportAssessmentMapper;
 
     private boolean hasPartnerBenefit(DeclaredBenefit declaredBenefit) {
@@ -28,14 +31,17 @@ public class PassportAssessmentService {
     }
 
     public PassportedDTO find(int id) {
-        ApiGetPassportedAssessmentResponse response = assessmentApiService.findPassportAssessment(id);
+        ApiGetPassportedAssessmentResponse assessment = assessmentApiService.findPassportAssessment(id);
 
-        DeclaredBenefit declaredBenefit = response.getDeclaredBenefit();
-        ApplicantDTO applicantDTO = hasPartnerBenefit(declaredBenefit)
+        ApiGetPassportEvidenceResponse evidence = evidenceApiService.getPassportEvidence(id);
+
+        DeclaredBenefit declaredBenefit = assessment.getDeclaredBenefit();
+        ApplicantDTO partner = hasPartnerBenefit(declaredBenefit)
                 ? maatCourtDataApiService.getApplicant(declaredBenefit.getLegacyPartnerId())
                 : null;
 
-        return passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(response, applicantDTO);
+        return passportAssessmentMapper.apiGetPassportedAssessmentResponseToPassportedDTO(
+                assessment, evidence, partner);
     }
 
     public Integer create(WorkflowRequest workflowRequest) {

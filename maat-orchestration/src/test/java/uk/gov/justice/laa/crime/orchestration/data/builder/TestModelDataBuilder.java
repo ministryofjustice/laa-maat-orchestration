@@ -946,10 +946,13 @@ public class TestModelDataBuilder {
                 .offenceDTO(getOffenceDTO())
                 .magsOutcomeDTO(getOutcomeDTO(courtType))
                 .statusDTO(getRepStatusDTO())
+                .repOrderDecision(getRepOrderDecisionDTO())
                 .timestamp(APPLICATION_TIMESTAMP)
                 .assessmentDTO(AssessmentDTO.builder()
                         .financialAssessmentDTO(getFinancialAssessmentDTO(courtType))
+                        .iojAppeal(getIOJAppealDTO())
                         .build())
+                .caseDetailsDTO(getCaseDetailDTO())
                 .build();
     }
 
