@@ -30,7 +30,6 @@ public class PassportAssessmentDataBuilder {
     private static DeclaredBenefit getDeclaredBenefit() {
         return new DeclaredBenefit()
                 .withBenefitType(BenefitType.INCOME_SUPPORT)
-                .withLastSignOnDate(Constants.LAST_SIGNON_DATETIME)
                 .withBenefitRecipient(BenefitRecipient.APPLICANT)
                 .withLegacyPartnerId(null);
     }
@@ -38,7 +37,6 @@ public class PassportAssessmentDataBuilder {
     private static DeclaredBenefit getDeclaredPartnerBenefit() {
         return new DeclaredBenefit()
                 .withBenefitType(BenefitType.INCOME_SUPPORT)
-                .withLastSignOnDate(Constants.LAST_SIGNON_DATETIME)
                 .withBenefitRecipient(BenefitRecipient.PARTNER)
                 .withLegacyPartnerId(Constants.PARTNER_ID);
     }
@@ -81,6 +79,7 @@ public class PassportAssessmentDataBuilder {
 
     private static PassportedAssessmentMetadata getPassportedAssessmentMetadata() {
         return new PassportedAssessmentMetadata()
+                .withLegacyApplicationId(Constants.REP_ID)
                 .withUsn(Constants.USN)
                 .withCaseManagementUnitId(Constants.CASE_MANAGEMENT_UNIT_ID)
                 .withUserSession(TestModelDataBuilder.getApiUserSession());
@@ -146,5 +145,13 @@ public class PassportAssessmentDataBuilder {
                 .under18HeardYouthCourt(false)
                 .passportSummaryEvidenceDTO(EvidenceDataBuilder.getIncomeEvidenceSummaryDTO(hasPartner))
                 .build();
+    }
+
+    public static DeclaredBenefit getDeclaredBenefitJobSeeker() {
+        return new DeclaredBenefit()
+                .withBenefitType(BenefitType.JSA)
+                .withLastSignOnDate(Constants.LAST_SIGNON_DATETIME)
+                .withBenefitRecipient(BenefitRecipient.APPLICANT)
+                .withLegacyPartnerId(null);
     }
 }

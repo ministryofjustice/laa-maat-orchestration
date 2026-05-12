@@ -25,7 +25,7 @@ public class Constants {
             Date.from(Instant.ofEpochSecond(ASSESSMENT_SUMMARY_DATETIME.toEpochSecond(ZoneOffset.UTC)));
     public static final Integer CONTRIBUTIONS_ID = 43;
     public static final Integer APPLICANT_ID = 999;
-    public static final Integer PARTNER_ID = 666;
+    public static final Integer PARTNER_ID = 1234;
     public static final String FIRST_NAME = "Edward";
     public static final String LAST_NAME = "Munson";
     public static final String NI_NUMBER = "JR679802A";
@@ -44,6 +44,7 @@ public class Constants {
     public static final boolean WITH_AUTH = true;
     public static final LocalDateTime DATE_RECEIVED = LocalDateTime.of(2022, 10, 13, 0, 0, 0);
     public static final LocalDateTime DATE_MODIFIED = DATE_RECEIVED.plusHours(7);
+    public static final int REP_ID = 200;
 
     // Passport
     public static final int PASSPORT_ASSESSMENT_ID = 123;
