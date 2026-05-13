@@ -43,7 +43,7 @@ public class CrimeValidationExceptionHandler {
 
     @ExceptionHandler(CrimeValidationException.class)
     public ResponseEntity<ErrorDTO> handleCrimeValidationException(CrimeValidationException ex) {
-        String messages = "\n" + String.join(",\n",ex.getExceptionMessages());
+        String messages = "\n" + String.join(",\n", ex.getExceptionMessages());
         log.error("CrimeValidationException: XXX ", messages, ex);
         return buildErrorResponse(HttpStatus.BAD_REQUEST, new ArrayList<>(ex.getExceptionMessages()));
     }
