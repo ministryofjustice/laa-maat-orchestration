@@ -47,13 +47,15 @@ public class AssessmentSummaryService {
 
     public AssessmentSummaryDTO getSummary(PassportedDTO passportedDTO) {
         return AssessmentSummaryDTO.builder()
-            .id(passportedDTO.getPassportedId().intValue())
-            .assessmentDate(passportedDTO.getDate())
-            .type(AssessmentSummaryType.PASSPORT_ASSESSMENT.getName())
-            .reviewType(passportedDTO.getReviewType().getCode())
-            .status(CurrentStatus.getFrom(passportedDTO.getAssessementStatusDTO().getStatus()).getDescription())
-            .result(passportedDTO.getResult())
-            .build();
+                .id(passportedDTO.getPassportedId().intValue())
+                .assessmentDate(passportedDTO.getDate())
+                .type(AssessmentSummaryType.PASSPORTED_ASSESSMENT.getName())
+                .reviewType(passportedDTO.getReviewType().getCode())
+                .status(CurrentStatus.getFrom(
+                                passportedDTO.getAssessementStatusDTO().getStatus())
+                        .getDescription())
+                .result(passportedDTO.getResult())
+                .build();
     }
 
     public void updateApplication(ApplicationDTO application, AssessmentSummaryDTO summaryDTO) {

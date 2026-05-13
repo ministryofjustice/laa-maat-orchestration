@@ -82,8 +82,8 @@ public class PassportAssessmentOrchestrationService {
                         StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE));
             }
 
-            AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(
-                    applicationDTO.getPassportedDTO());
+            AssessmentSummaryDTO assessmentSummaryDTO =
+                    assessmentSummaryService.getSummary(applicationDTO.getPassportedDTO());
             assessmentSummaryService.updateApplication(applicationDTO, assessmentSummaryDTO);
 
             applicationService.updateDateModified(workflowRequest, applicationDTO);

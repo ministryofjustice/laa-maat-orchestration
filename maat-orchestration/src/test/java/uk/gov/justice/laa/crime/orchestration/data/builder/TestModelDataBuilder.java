@@ -140,6 +140,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.enums.AssessmentSummaryType;
 import uk.gov.justice.laa.crime.proceeding.MagsDecisionResult;
+import uk.gov.justice.laa.crime.util.DateUtil;
 import uk.gov.justice.laa.crime.util.NumberUtils;
 
 import java.math.BigDecimal;
@@ -856,6 +857,16 @@ public class TestModelDataBuilder {
                 .type(AssessmentSummaryType.IOJ_APPEAL.getName())
                 .result(RESULT_PASS)
                 .assessmentDate(receivedDate)
+                .build();
+    }
+
+    public static AssessmentSummaryDTO getAssessmentSummaryDTOFromPassportedDTO() {
+        return AssessmentSummaryDTO.builder()
+                .id(Constants.PASSPORT_ASSESSMENT_ID)
+                .status(CurrentStatus.COMPLETE.getDescription())
+                .type(AssessmentSummaryType.PASSPORTED_ASSESSMENT.getName())
+                .result(RESULT_PASS)
+                .assessmentDate(DateUtil.toDate(Constants.ASSESSMENT_DATETIME))
                 .build();
     }
 

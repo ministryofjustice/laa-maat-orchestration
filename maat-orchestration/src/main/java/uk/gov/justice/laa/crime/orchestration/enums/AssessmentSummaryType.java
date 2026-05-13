@@ -11,7 +11,7 @@ public enum AssessmentSummaryType {
     HARDSHIP_REVIEW_MAGS_COURT("Hardship Review - Magistrate"),
     HARDSHIP_REVIEW_CROWN_COURT("Hardship Review - Crown Court"),
     IOJ_APPEAL("IoJ Appeal"),
-    PASSPORT_ASSESSMENT("Passported");
+    PASSPORTED_ASSESSMENT("Passported");
 
     private final String name;
 }
