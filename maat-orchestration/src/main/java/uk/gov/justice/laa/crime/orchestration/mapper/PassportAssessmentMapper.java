@@ -78,16 +78,16 @@ public class PassportAssessmentMapper {
     }
 
     private BenefitType mapBenefitType(PassportedDTO passportedDTO) {
-        if (passportedDTO.getBenefitEmploymentSupport()) {
+        if (Boolean.TRUE.equals(passportedDTO.getBenefitEmploymentSupport())) {
             return BenefitType.ESA;
-        } else if (passportedDTO.getBenefitIncomeSupport()) {
+        } else if (Boolean.TRUE.equals(passportedDTO.getBenefitIncomeSupport())) {
             return BenefitType.INCOME_SUPPORT;
         } else if (passportedDTO.getBenefitJobSeeker() != null
                 && passportedDTO.getBenefitJobSeeker().getIsJobSeeker()) {
             return BenefitType.JSA;
-        } else if (passportedDTO.getBenefitGaurenteedStatePension()) {
+        } else if (Boolean.TRUE.equals(passportedDTO.getBenefitGaurenteedStatePension())) {
             return BenefitType.GSPC;
-        } else if (passportedDTO.getBenefitUniversalCredit()) {
+        } else if (Boolean.TRUE.equals(passportedDTO.getBenefitUniversalCredit())) {
             return BenefitType.UC;
         } else {
             return null;
@@ -97,7 +97,7 @@ public class PassportAssessmentMapper {
     private DeclaredBenefit mapDeclaredBenefit(ApplicationDTO applicationDTO) {
         PassportedDTO passportedDTO = applicationDTO.getPassportedDTO();
         BenefitType benefitType = mapBenefitType(passportedDTO);
-        BenefitRecipient benefitRecipient = applicationDTO.getPassportedDTO().getBenefitClaimedByPartner()
+        BenefitRecipient benefitRecipient = Boolean.TRUE.equals(applicationDTO.getPassportedDTO().getBenefitClaimedByPartner())
                 ? BenefitRecipient.PARTNER
                 : BenefitRecipient.APPLICANT;
 
