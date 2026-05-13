@@ -97,9 +97,10 @@ public class PassportAssessmentMapper {
     private DeclaredBenefit mapDeclaredBenefit(ApplicationDTO applicationDTO) {
         PassportedDTO passportedDTO = applicationDTO.getPassportedDTO();
         BenefitType benefitType = mapBenefitType(passportedDTO);
-        BenefitRecipient benefitRecipient = Boolean.TRUE.equals(applicationDTO.getPassportedDTO().getBenefitClaimedByPartner())
-                ? BenefitRecipient.PARTNER
-                : BenefitRecipient.APPLICANT;
+        BenefitRecipient benefitRecipient =
+                Boolean.TRUE.equals(applicationDTO.getPassportedDTO().getBenefitClaimedByPartner())
+                        ? BenefitRecipient.PARTNER
+                        : BenefitRecipient.APPLICANT;
 
         return new DeclaredBenefit()
                 .withBenefitType(benefitType)
