@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.function.Function;
 
 import org.springframework.stereotype.Component;
 
@@ -92,6 +93,16 @@ public class IojAppealMapper {
                 .build();
     }
 
+    /**
+     * NullSafe check.
+     * Check input is NOT-NULL before returning value, else null
+     * Useful for fluent interfaces
+     */
+    static <T, R> R nullSafe(T input, Function<T, R> extractor) {
+        if (input == null) return null;
+        return extractor.apply(input);
+    }
+
     public ApiCreateIojAppealRequest mapIojAppealDtoToApiCreateIojAppealRequest(WorkflowRequest request) {
 
         IOJAppealDTO iojAppealDto =
@@ -104,11 +115,10 @@ public class IojAppealMapper {
                 .toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
-        LocalDate decisionDate = iojAppealDto
-                .getDecisionDate()
-                .toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
+
+        LocalDate decisionDate = nullSafe(
+                iojAppealDto.getDecisionDate(),
+                d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 
         IojAppeal iojAppeal = new IojAppeal()
                 .withReceivedDate(receivedDate)
@@ -138,11 +148,12 @@ public class IojAppealMapper {
     }
 
     public UserActionDTO getUserActionDTO(WorkflowRequest request) {
-        NewWorkReason newWorkReason = NewWorkReason.getFrom(request.getApplicationDTO()
+        String code = request.getApplicationDTO()
                 .getAssessmentDTO()
                 .getIojAppeal()
                 .getNewWorkReasonDTO()
-                .getCode());
+                .getCode();
+        NewWorkReason newWorkReason = NewWorkReason.getFrom(code);
 
         return userMapper.getUserActionDTO(request, Action.CREATE_IOJ, newWorkReason);
     }

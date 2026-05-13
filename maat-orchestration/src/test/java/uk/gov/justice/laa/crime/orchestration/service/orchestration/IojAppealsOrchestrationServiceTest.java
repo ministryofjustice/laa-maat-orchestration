@@ -3,6 +3,7 @@ package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,6 +17,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
+import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.exception.RollbackException;
 import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
@@ -31,6 +33,7 @@ import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorServic
 
 import java.util.stream.Stream;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -144,6 +147,7 @@ class IojAppealsOrchestrationServiceTest {
                 .isInstanceOf(MaatOrchestrationException.class);
     }
 
+    // bump commit to rerun circleCI
     @ParameterizedTest
     @MethodSource("exceptions")
     void givenPostProcessingFailure_whenCreateIsInvokedAndRollbackUnsuccessful_thenRollbackExceptionIsThrown(
@@ -170,5 +174,32 @@ class IojAppealsOrchestrationServiceTest {
         RuntimeException runtimeException = new RuntimeException("Runtime Exception on rollback");
         RollbackException rollbackException = new RollbackException(new ApplicationDTO());
         return Stream.of(runtimeException, rollbackException);
+    }
+
+    @Test
+    void givenRequiredFieldMissing_whenCreateIsInvoked_thenAllFieldsAreReportedInOneMessage() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal().setCmuId(null);
+        workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal().setNewWorkReasonDTO(null);
+
+        IOJAppealDTO iojAppealDTO =
+                workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal();
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO());
+        UserActionDTO userActionDTO = TestModelDataBuilder.getUserActionDTO();
+        NullPointerException npe = new NullPointerException("We need a triggering exception");
+
+        when(repOrderService.getRepOrder(workflowRequest)).thenReturn(repOrderDTO);
+        when(iojAppealMapper.getUserActionDTO(workflowRequest)).thenReturn(userActionDTO);
+        when(iojAppealService.create(workflowRequest)).thenThrow(npe);
+
+        assertThatThrownBy(() -> iojAppealsOrchestrationService.create(workflowRequest))
+                .isInstanceOf(CrimeValidationException.class)
+                .extracting("exceptionMessages", InstanceOfAssertFactories.ITERABLE)
+                .first(InstanceOfAssertFactories.STRING)
+                .startsWith("IOJ-Appeal missing required fields");
+
+        verify(proceedingsService, never()).determineMagsRepDecision(any());
+        verify(contributionService, never()).calculate(any());
+        verify(maatCourtDataService, never()).invokeStoredProcedure(any(), any(), any());
     }
 }
