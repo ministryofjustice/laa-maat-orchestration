@@ -63,11 +63,10 @@ public class IojAppealsOrchestrationService {
             throw new MaatOrchestrationException(request.getApplicationDTO());
         }
 
-        UserActionDTO userActionDTO = iojAppealMapper.getUserActionDTO(request);
-        workflowPreProcessorService.preProcessRequest(request, repOrderDto, userActionDTO);
-
         String appealId;
         try {
+            UserActionDTO userActionDTO = iojAppealMapper.getUserActionDTO(request);
+            workflowPreProcessorService.preProcessRequest(request, repOrderDto, userActionDTO);
             appealId = iojAppealService.create(request);
         } catch (NullPointerException npe) {
             UUID uuid = UUID.randomUUID();
