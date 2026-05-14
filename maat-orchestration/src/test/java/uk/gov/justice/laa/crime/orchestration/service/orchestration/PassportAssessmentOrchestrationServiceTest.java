@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
+import uk.gov.justice.laa.crime.enums.RepOrderStatus;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.PassportAssessmentDataBuilder;
@@ -99,14 +100,14 @@ class PassportAssessmentOrchestrationServiceTest {
         workflowRequest
                 .getApplicationDTO()
                 .setPassportedDTO(PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITHOUT_PARTNER));
-        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
         LocalDateTime dateCompleted = Constants.ASSESSMENT_COMPLETED_DATETIME;
-        RepOrderDTO updatedRepOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        RepOrderDTO updatedRepOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
         updatedRepOrderDTO.setAssessmentDateCompleted(DateUtil.parseLocalDate(dateCompleted));
-        ApplicationDTO updatedApplicationDTO = workflowRequest.getApplicationDTO();
-        updatedApplicationDTO.getPassportedDTO().setTimestamp(dateCompleted.atZone(ZoneId.systemDefault()));
-        ApplicationDTO furtherUpdatedApplicationDTO = workflowRequest.getApplicationDTO();
-        furtherUpdatedApplicationDTO
+        ApplicationDTO applicationDTOManagedEvidence = workflowRequest.getApplicationDTO();
+        applicationDTOManagedEvidence.getPassportedDTO().setTimestamp(dateCompleted.atZone(ZoneId.systemDefault()));
+        ApplicationDTO applicationDTOWithContributions = workflowRequest.getApplicationDTO();
+        applicationDTOWithContributions
                 .getCrownCourtOverviewDTO()
                 .setContribution(TestModelDataBuilder.getContributionsDTO());
 
@@ -121,8 +122,8 @@ class PassportAssessmentOrchestrationServiceTest {
                         workflowRequest.getApplicationDTO(),
                         workflowRequest.getUserDTO(),
                         StoredProcedure.MANAGE_PASSPORT_EVIDENCE))
-                .thenReturn(updatedApplicationDTO);
-        when(contributionService.calculate(workflowRequest)).thenReturn(furtherUpdatedApplicationDTO);
+                .thenReturn(applicationDTOManagedEvidence);
+        when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTOWithContributions);
         when(assessmentSummaryService.getSummary(
                         workflowRequest.getApplicationDTO().getPassportedDTO()))
                 .thenReturn(TestModelDataBuilder.getAssessmentSummaryDTOFromPassportedDTO());
@@ -133,8 +134,7 @@ class PassportAssessmentOrchestrationServiceTest {
         ApplicationDTO returnedApplicationDTO = passportAssessmentOrchestrationService.create(workflowRequest);
 
         verify(workflowPreProcessorService)
-                .preProcessPassportRequest(
-                        any(WorkflowRequest.class), any(RepOrderDTO.class), any(UserActionDTO.class));
+                .validatePassportRequest(any(WorkflowRequest.class), any(RepOrderDTO.class), any(UserActionDTO.class));
         verify(proceedingsService).determineMagsRepDecision(any(WorkflowRequest.class));
         verify(proceedingsService).updateApplication(any(WorkflowRequest.class), any(RepOrderDTO.class));
         verify(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
@@ -163,14 +163,14 @@ class PassportAssessmentOrchestrationServiceTest {
     @Test
     void givenWorkReasonNotFMA_whenCreateIsInvoked_thenMatrixAndCorrespondenceStoredProcedureIsCalled() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
-        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
         LocalDateTime dateCompleted = Constants.ASSESSMENT_COMPLETED_DATETIME;
-        RepOrderDTO updatedRepOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        RepOrderDTO updatedRepOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
         updatedRepOrderDTO.setAssessmentDateCompleted(DateUtil.parseLocalDate(dateCompleted));
-        ApplicationDTO updatedApplicationDTO = workflowRequest.getApplicationDTO();
-        updatedApplicationDTO.getPassportedDTO().setTimestamp(dateCompleted.atZone(ZoneId.systemDefault()));
-        ApplicationDTO furtherUpdatedApplicationDTO = workflowRequest.getApplicationDTO();
-        furtherUpdatedApplicationDTO
+        ApplicationDTO applicationDTOManagedEvidence = workflowRequest.getApplicationDTO();
+        applicationDTOManagedEvidence.getPassportedDTO().setTimestamp(dateCompleted.atZone(ZoneId.systemDefault()));
+        ApplicationDTO applicationDTOWithContributions = workflowRequest.getApplicationDTO();
+        applicationDTOWithContributions
                 .getCrownCourtOverviewDTO()
                 .setContribution(TestModelDataBuilder.getContributionsDTO());
 
@@ -185,13 +185,13 @@ class PassportAssessmentOrchestrationServiceTest {
                         workflowRequest.getApplicationDTO(),
                         workflowRequest.getUserDTO(),
                         StoredProcedure.MANAGE_PASSPORT_EVIDENCE))
-                .thenReturn(updatedApplicationDTO);
-        when(contributionService.calculate(workflowRequest)).thenReturn(furtherUpdatedApplicationDTO);
+                .thenReturn(applicationDTOManagedEvidence);
+        when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTOWithContributions);
         when(maatCourtDataService.invokeStoredProcedure(
                         workflowRequest.getApplicationDTO(),
                         workflowRequest.getUserDTO(),
                         StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE))
-                .thenReturn(furtherUpdatedApplicationDTO);
+                .thenReturn(applicationDTOWithContributions);
         when(assessmentSummaryService.getSummary(
                         workflowRequest.getApplicationDTO().getPassportedDTO()))
                 .thenReturn(TestModelDataBuilder.getAssessmentSummaryDTOFromPassportedDTO());
@@ -202,8 +202,7 @@ class PassportAssessmentOrchestrationServiceTest {
         ApplicationDTO returnedApplicationDTO = passportAssessmentOrchestrationService.create(workflowRequest);
 
         verify(workflowPreProcessorService)
-                .preProcessPassportRequest(
-                        any(WorkflowRequest.class), any(RepOrderDTO.class), any(UserActionDTO.class));
+                .validatePassportRequest(any(WorkflowRequest.class), any(RepOrderDTO.class), any(UserActionDTO.class));
         verify(proceedingsService).determineMagsRepDecision(any(WorkflowRequest.class));
         verify(proceedingsService).updateApplication(any(WorkflowRequest.class), any(RepOrderDTO.class));
         verify(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
@@ -225,14 +224,14 @@ class PassportAssessmentOrchestrationServiceTest {
         workflowRequest
                 .getApplicationDTO()
                 .setPassportedDTO(PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITHOUT_PARTNER));
-        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
         LocalDateTime dateCompleted = Constants.ASSESSMENT_COMPLETED_DATETIME;
-        RepOrderDTO updatedRepOrderDTO = TestModelDataBuilder.buildRepOrderDTO("CURR");
+        RepOrderDTO updatedRepOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
         updatedRepOrderDTO.setAssessmentDateCompleted(DateUtil.parseLocalDate(dateCompleted));
-        ApplicationDTO updatedApplicationDTO = workflowRequest.getApplicationDTO();
-        updatedApplicationDTO.getPassportedDTO().setTimestamp(dateCompleted.atZone(ZoneId.systemDefault()));
-        ApplicationDTO furtherUpdatedApplicationDTO = workflowRequest.getApplicationDTO();
-        furtherUpdatedApplicationDTO
+        ApplicationDTO applicationDTOManagedEvidence = workflowRequest.getApplicationDTO();
+        applicationDTOManagedEvidence.getPassportedDTO().setTimestamp(dateCompleted.atZone(ZoneId.systemDefault()));
+        ApplicationDTO applicationDTOWithContributions = workflowRequest.getApplicationDTO();
+        applicationDTOWithContributions
                 .getCrownCourtOverviewDTO()
                 .setContribution(TestModelDataBuilder.getContributionsDTO());
 
@@ -247,8 +246,8 @@ class PassportAssessmentOrchestrationServiceTest {
                         workflowRequest.getApplicationDTO(),
                         workflowRequest.getUserDTO(),
                         StoredProcedure.MANAGE_PASSPORT_EVIDENCE))
-                .thenReturn(updatedApplicationDTO);
-        when(contributionService.calculate(workflowRequest)).thenReturn(furtherUpdatedApplicationDTO);
+                .thenReturn(applicationDTOManagedEvidence);
+        when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTOWithContributions);
         when(assessmentSummaryService.getSummary(
                         workflowRequest.getApplicationDTO().getPassportedDTO()))
                 .thenReturn(TestModelDataBuilder.getAssessmentSummaryDTOFromPassportedDTO());
@@ -259,8 +258,7 @@ class PassportAssessmentOrchestrationServiceTest {
         ApplicationDTO returnedApplicationDTO = passportAssessmentOrchestrationService.create(workflowRequest);
 
         verify(workflowPreProcessorService)
-                .preProcessPassportRequest(
-                        any(WorkflowRequest.class), any(RepOrderDTO.class), any(UserActionDTO.class));
+                .validatePassportRequest(any(WorkflowRequest.class), any(RepOrderDTO.class), any(UserActionDTO.class));
         verify(proceedingsService).determineMagsRepDecision(any(WorkflowRequest.class));
         verify(proceedingsService).updateApplication(any(WorkflowRequest.class), any(RepOrderDTO.class));
         verify(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));

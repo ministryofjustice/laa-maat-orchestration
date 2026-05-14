@@ -170,7 +170,7 @@ class WorkflowPreProcessorServiceTest {
     }
 
     @Test
-    void givenRequestValidationFails_whenPreProcessPassportRequestIsInvoked_thenExceptionIsThrown() {
+    void givenRequestValidationFails_whenValidatePassportRequestIsInvoked_thenExceptionIsThrown() {
         WorkflowRequest workflowRequest = getWorkflowRequestWithCaseType(INDICTABLE.getCaseType());
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
         UserActionDTO userActionDTO = TestModelDataBuilder.getUserActionDTO();
@@ -179,13 +179,13 @@ class WorkflowPreProcessorServiceTest {
                 .when(validationService)
                 .validate(workflowRequest, repOrderDTO);
 
-        assertThatThrownBy(() -> workflowPreProcessorService.preProcessPassportRequest(
+        assertThatThrownBy(() -> workflowPreProcessorService.validatePassportRequest(
                         workflowRequest, repOrderDTO, userActionDTO))
                 .isInstanceOf(ValidationException.class);
     }
 
     @Test
-    void givenUserActionValidationFails_whenPreProcessPassportRequestIsInvoked_thenExceptionIsThrown() {
+    void givenUserActionValidationFails_whenValidatePassportRequestIsInvoked_thenExceptionIsThrown() {
         WorkflowRequest workflowRequest = getWorkflowRequestWithCaseType(INDICTABLE.getCaseType());
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
         UserActionDTO userActionDTO = TestModelDataBuilder.getUserActionDTO();
@@ -198,7 +198,7 @@ class WorkflowPreProcessorServiceTest {
                 .when(validationService)
                 .isUserActionValid(userActionDTO, userSummaryDTO);
 
-        assertThatThrownBy(() -> workflowPreProcessorService.preProcessPassportRequest(
+        assertThatThrownBy(() -> workflowPreProcessorService.validatePassportRequest(
                         workflowRequest, repOrderDTO, userActionDTO))
                 .isInstanceOf(CrimeValidationException.class);
     }

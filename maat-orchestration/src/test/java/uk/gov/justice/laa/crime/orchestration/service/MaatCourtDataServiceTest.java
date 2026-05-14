@@ -67,7 +67,7 @@ class MaatCourtDataServiceTest {
     }
 
     @Test
-    void givenValidReqest_whenUpdateRepOrderIsInvoked_thenApiServiceIsCalled() {
+    void givenValidRequest_whenUpdateRepOrderIsInvoked_thenApiServiceIsCalled() {
         Map<String, Object> fieldsToUpdate = Map.of("dateModified", LocalDateTime.now());
 
         maatCourtDataService.updateRepOrder(1234, fieldsToUpdate);

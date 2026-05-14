@@ -27,17 +27,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class PassportAssessmentDataBuilder {
 
-    private static DeclaredBenefit getDeclaredBenefit() {
+    public static DeclaredBenefit getDeclaredBenefit(BenefitType benefitType) {
         return new DeclaredBenefit()
-                .withBenefitType(BenefitType.INCOME_SUPPORT)
+                .withBenefitType(benefitType)
                 .withBenefitRecipient(BenefitRecipient.APPLICANT)
+                .withLastSignOnDate(BenefitType.JSA.equals(benefitType) ? Constants.LAST_SIGNON_DATETIME : null)
                 .withLegacyPartnerId(null);
     }
 
-    private static DeclaredBenefit getDeclaredPartnerBenefit() {
+    private static DeclaredBenefit getDeclaredPartnerBenefit(BenefitType benefitType) {
         return new DeclaredBenefit()
-                .withBenefitType(BenefitType.INCOME_SUPPORT)
+                .withBenefitType(benefitType)
                 .withBenefitRecipient(BenefitRecipient.PARTNER)
+                .withLastSignOnDate(BenefitType.JSA.equals(benefitType) ? Constants.LAST_SIGNON_DATETIME : null)
                 .withLegacyPartnerId(Constants.PARTNER_ID);
     }
 
@@ -71,7 +73,10 @@ public class PassportAssessmentDataBuilder {
                 .withAssessmentReason(NewWorkReason.FMA)
                 .withReviewType(ReviewType.ER)
                 .withDeclaredUnder18(false)
-                .withDeclaredBenefit(hasPartner ? getDeclaredPartnerBenefit() : getDeclaredBenefit())
+                .withDeclaredBenefit(
+                        hasPartner
+                                ? getDeclaredPartnerBenefit(BenefitType.INCOME_SUPPORT)
+                                : getDeclaredBenefit(BenefitType.INCOME_SUPPORT))
                 .withAssessmentDecision(PassportAssessmentDecision.PASS)
                 .withDecisionReason(PassportAssessmentDecisionReason.DWP_CHECK)
                 .withNotes(Constants.NOTES);
@@ -95,7 +100,10 @@ public class PassportAssessmentDataBuilder {
                 .withAssessmentReason(NewWorkReason.FMA)
                 .withReviewType(ReviewType.ER)
                 .withDeclaredUnder18(false)
-                .withDeclaredBenefit(hasPartner ? getDeclaredPartnerBenefit() : getDeclaredBenefit())
+                .withDeclaredBenefit(
+                        hasPartner
+                                ? getDeclaredPartnerBenefit(BenefitType.INCOME_SUPPORT)
+                                : getDeclaredBenefit(BenefitType.INCOME_SUPPORT))
                 .withAssessmentDecision(PassportAssessmentDecision.PASS)
                 .withDecisionReason(PassportAssessmentDecisionReason.DWP_CHECK)
                 .withNotes(Constants.NOTES);
@@ -145,13 +153,5 @@ public class PassportAssessmentDataBuilder {
                 .under18HeardYouthCourt(false)
                 .passportSummaryEvidenceDTO(EvidenceDataBuilder.getIncomeEvidenceSummaryDTO(hasPartner))
                 .build();
-    }
-
-    public static DeclaredBenefit getDeclaredBenefitJobSeeker() {
-        return new DeclaredBenefit()
-                .withBenefitType(BenefitType.JSA)
-                .withLastSignOnDate(Constants.LAST_SIGNON_DATETIME)
-                .withBenefitRecipient(BenefitRecipient.APPLICANT)
-                .withLegacyPartnerId(null);
     }
 }

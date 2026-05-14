@@ -89,9 +89,9 @@ public class PassportAssessmentMapper {
             return BenefitType.GSPC;
         } else if (Boolean.TRUE.equals(passportedDTO.getBenefitUniversalCredit())) {
             return BenefitType.UC;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     private DeclaredBenefit mapDeclaredBenefit(ApplicationDTO applicationDTO) {

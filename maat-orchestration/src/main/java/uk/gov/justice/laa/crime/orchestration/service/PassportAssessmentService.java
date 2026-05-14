@@ -45,12 +45,13 @@ public class PassportAssessmentService {
     }
 
     public Integer create(WorkflowRequest workflowRequest) {
-        ApiCreatePassportedAssessmentRequest casRequest =
+        ApiCreatePassportedAssessmentRequest createPassportRequest =
                 passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(workflowRequest);
 
-        ApiCreatePassportedAssessmentResponse casResponse = assessmentApiService.createPassportAssessment(casRequest);
+        ApiCreatePassportedAssessmentResponse createPassportResponse =
+                assessmentApiService.createPassportAssessment(createPassportRequest);
 
-        Integer assessmentId = casResponse.getLegacyAssessmentId();
+        Integer assessmentId = createPassportResponse.getLegacyAssessmentId();
         workflowRequest.getApplicationDTO().getPassportedDTO().setPassportedId(Long.valueOf(assessmentId));
         return assessmentId;
     }

@@ -261,7 +261,7 @@ class PassportAssessmentIntegrationTest extends WiremockIntegrationTest {
     }
 
     @Test
-    void givenEmptyOAuthToken_whenCreateIsInvoked_thenFailsUnauthorisedAccess() throws Exception {
+    void givenEmptyOAuthToken_whenCreateIsInvoked_thenFailsWithUnauthorisedAccess() throws Exception {
         mvc.perform(buildRequest(HttpMethod.POST, ENDPOINT_URL, Constants.WITHOUT_AUTH))
                 .andExpect(status().isUnauthorized());
     }

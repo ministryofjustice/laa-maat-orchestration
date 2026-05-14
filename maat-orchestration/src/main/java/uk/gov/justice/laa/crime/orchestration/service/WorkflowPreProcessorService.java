@@ -67,7 +67,7 @@ public class WorkflowPreProcessorService {
         }
     }
 
-    public void preProcessPassportRequest(
+    public void validatePassportRequest(
             WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO, UserActionDTO userActionDTO) {
         validationService.validate(workflowRequest, repOrderDTO);
 

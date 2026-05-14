@@ -14,6 +14,7 @@ import uk.gov.justice.laa.crime.orchestration.data.builder.EvidenceDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.PassportAssessmentDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
@@ -82,7 +83,7 @@ class PassportAssessmentMapperTest {
             case BenefitType.INCOME_SUPPORT -> expected.setBenefitIncomeSupport(true);
             case BenefitType.JSA -> {
                 expected.setBenefitJobSeeker(PassportAssessmentDataBuilder.getJobSeekerDTO());
-                response.setDeclaredBenefit(PassportAssessmentDataBuilder.getDeclaredBenefitJobSeeker());
+                response.setDeclaredBenefit(PassportAssessmentDataBuilder.getDeclaredBenefit(BenefitType.JSA));
             }
             case BenefitType.GSPC -> expected.setBenefitGaurenteedStatePension(true);
             case BenefitType.ESA -> expected.setBenefitEmploymentSupport(true);
@@ -139,21 +140,27 @@ class PassportAssessmentMapperTest {
         softly.assertAll();
     }
 
-    @Test
-    void
-            givenValidWorkflowRequestWithJobSeeker_whenWorkflowRequestToPassportedAssessmentRequestIsInvoked_thenRequestIsReturned() {
+    @ParameterizedTest
+    @EnumSource(BenefitType.class)
+    void givenRequestWithDifferentBenefits_whenWorkflowRequestToPassportedRequestIsInvoked_thenRequestIsReturned(
+            BenefitType benefit) {
         WorkflowRequest request = TestModelDataBuilder.buildWorkFlowRequest();
-        request.getApplicationDTO()
-                .setPassportedDTO(PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITHOUT_PARTNER));
-        request.getApplicationDTO().getPassportedDTO().setBenefitIncomeSupport(false);
-        request.getApplicationDTO()
-                .getPassportedDTO()
-                .setBenefitJobSeeker(PassportAssessmentDataBuilder.getJobSeekerDTO());
+        ApplicationDTO applicationDTO = request.getApplicationDTO();
+        applicationDTO.setPassportedDTO(PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITHOUT_PARTNER));
+        applicationDTO.getPassportedDTO().setBenefitIncomeSupport(false);
         ApiUserSession userSession = TestModelDataBuilder.getApiUserSession();
         ApiCreatePassportedAssessmentRequest expected =
                 PassportAssessmentDataBuilder.getApiCreatePassportedAssessmentRequest(Constants.WITHOUT_PARTNER);
         expected.getPassportedAssessment()
-                .setDeclaredBenefit(PassportAssessmentDataBuilder.getDeclaredBenefitJobSeeker());
+                .setDeclaredBenefit(PassportAssessmentDataBuilder.getDeclaredBenefit(benefit));
+        switch (benefit) {
+            case BenefitType.INCOME_SUPPORT -> applicationDTO.getPassportedDTO().setBenefitIncomeSupport(true);
+            case BenefitType.JSA ->
+                applicationDTO.getPassportedDTO().setBenefitJobSeeker(PassportAssessmentDataBuilder.getJobSeekerDTO());
+            case BenefitType.GSPC -> applicationDTO.getPassportedDTO().setBenefitGaurenteedStatePension(true);
+            case BenefitType.ESA -> applicationDTO.getPassportedDTO().setBenefitEmploymentSupport(true);
+            case BenefitType.UC -> applicationDTO.getPassportedDTO().setBenefitUniversalCredit(true);
+        }
 
         when(userMapper.userDtoToUserSession(request.getUserDTO())).thenReturn(userSession);
 
