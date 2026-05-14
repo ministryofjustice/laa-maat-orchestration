@@ -94,7 +94,7 @@ class PassportAssessmentServiceTest {
         ApiCreatePassportedAssessmentResponse response =
                 PassportAssessmentDataBuilder.getApiCreatePassportedAssessmentResponse();
 
-        when(passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(workflowRequest))
+        when(passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(workflowRequest, null))
                 .thenReturn(casRequest);
         when(assessmentApiService.createPassportAssessment(casRequest)).thenReturn(response);
 

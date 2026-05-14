@@ -128,13 +128,14 @@ class PassportAssessmentMapperTest {
         WorkflowRequest request = TestModelDataBuilder.buildWorkFlowRequest();
         request.getApplicationDTO().setPassportedDTO(PassportAssessmentDataBuilder.getPassportedDTO(hasPartner));
         ApiUserSession userSession = TestModelDataBuilder.getApiUserSession();
+        Integer partnerId = hasPartner ? Constants.PARTNER_ID : null;
         ApiCreatePassportedAssessmentRequest expected =
                 PassportAssessmentDataBuilder.getApiCreatePassportedAssessmentRequest(hasPartner);
 
         when(userMapper.userDtoToUserSession(request.getUserDTO())).thenReturn(userSession);
 
         ApiCreatePassportedAssessmentRequest actual =
-                passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(request);
+                passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(request, partnerId);
 
         softly.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
         softly.assertAll();
@@ -165,7 +166,7 @@ class PassportAssessmentMapperTest {
         when(userMapper.userDtoToUserSession(request.getUserDTO())).thenReturn(userSession);
 
         ApiCreatePassportedAssessmentRequest actual =
-                passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(request);
+                passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(request, null);
 
         softly.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
         softly.assertAll();

@@ -94,13 +94,9 @@ public class PassportAssessmentMapper {
         return null;
     }
 
-    private DeclaredBenefit mapDeclaredBenefit(ApplicationDTO applicationDTO) {
+    private DeclaredBenefit mapDeclaredBenefit(ApplicationDTO applicationDTO, Integer partnerId) {
         PassportedDTO passportedDTO = applicationDTO.getPassportedDTO();
         BenefitType benefitType = mapBenefitType(passportedDTO);
-        BenefitRecipient benefitRecipient =
-                Boolean.TRUE.equals(applicationDTO.getPassportedDTO().getBenefitClaimedByPartner())
-                        ? BenefitRecipient.PARTNER
-                        : BenefitRecipient.APPLICANT;
 
         return new DeclaredBenefit()
                 .withBenefitType(benefitType)
@@ -109,21 +105,12 @@ public class PassportAssessmentMapper {
                                 ? DateUtil.toLocalDateTime(
                                         passportedDTO.getBenefitJobSeeker().getLastSignedOn())
                                 : null)
-                .withBenefitRecipient(benefitRecipient)
-                .withLegacyPartnerId(
-                        BenefitRecipient.PARTNER.equals(benefitRecipient)
-                                ? applicationDTO.getApplicantLinks().stream()
-                                        .filter(applicant -> applicant.getUnlinked() == null)
-                                        .map(applicant -> applicant
-                                                .getPartnerDTO()
-                                                .getId()
-                                                .intValue())
-                                        .findFirst()
-                                        .orElse(null)
-                                : null);
+                .withBenefitRecipient(partnerId == null ? BenefitRecipient.APPLICANT : BenefitRecipient.PARTNER)
+                .withLegacyPartnerId(partnerId);
     }
 
-    private PassportedAssessment applicationDTOToPassportedAssessment(ApplicationDTO applicationDTO) {
+    private PassportedAssessment applicationDTOToPassportedAssessment(
+            ApplicationDTO applicationDTO, Integer partnerId) {
         PassportedDTO passportedDTO = applicationDTO.getPassportedDTO();
 
         return new PassportedAssessment()
@@ -133,7 +120,7 @@ public class PassportAssessmentMapper {
                 .withReviewType(ReviewType.getFrom(passportedDTO.getReviewType().getCode()))
                 .withDeclaredUnder18(
                         passportedDTO.getUnder18HeardMagsCourt() || passportedDTO.getUnder18HeardYouthCourt())
-                .withDeclaredBenefit(mapDeclaredBenefit(applicationDTO))
+                .withDeclaredBenefit(mapDeclaredBenefit(applicationDTO, partnerId))
                 .withAssessmentDecision(PassportAssessmentDecision.getFrom(passportedDTO.getResult()))
                 .withDecisionReason(PassportAssessmentDecisionReason.getFrom(
                         passportedDTO.getPassportConfirmationDTO().getConfirmation()))
@@ -219,9 +206,10 @@ public class PassportAssessmentMapper {
     }
 
     public ApiCreatePassportedAssessmentRequest workflowRequestToApiCreatePassportedAssessmentRequest(
-            WorkflowRequest workflowRequest) {
+            WorkflowRequest workflowRequest, Integer partnerId) {
         return new ApiCreatePassportedAssessmentRequest()
-                .withPassportedAssessment(applicationDTOToPassportedAssessment(workflowRequest.getApplicationDTO()))
+                .withPassportedAssessment(
+                        applicationDTOToPassportedAssessment(workflowRequest.getApplicationDTO(), partnerId))
                 .withPassportedAssessmentMetadata(workflowRequestToPassportedAssessmentMetadata(workflowRequest));
     }
 }
