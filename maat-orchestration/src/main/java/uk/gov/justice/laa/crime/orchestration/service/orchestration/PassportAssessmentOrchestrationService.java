@@ -48,57 +48,81 @@ public class PassportAssessmentOrchestrationService {
     private final ApplicationTrackingMapper applicationTrackingMapper;
     private final ApplicationTrackingDataService applicationTrackingDataService;
 
+    private RepOrderDTO getLatestRepOrder(WorkflowRequest workflowRequest) {
+        RepOrderDTO repOrderDTO = repOrderService.getRepOrder(workflowRequest);
+
+        if (repOrderDTO == null) {
+            log.error("Could not find rep order for request {}", workflowRequest);
+            throw new MaatOrchestrationException(workflowRequest.getApplicationDTO());
+        }
+
+        return repOrderDTO;
+    }
+
+    private void validatePassportRequest(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {
+        UserActionDTO userActionDTO = passportAssessmentMapper.getUserActionDTO(workflowRequest);
+
+        workflowPreProcessorService.validatePassportRequest(workflowRequest, repOrderDTO, userActionDTO);
+    }
+
+    private void updateAssessmentSummary(ApplicationDTO applicationDTO) {
+        AssessmentSummaryDTO assessmentSummaryDTO =
+                assessmentSummaryService.getSummary(applicationDTO.getPassportedDTO());
+
+        assessmentSummaryService.updateApplication(applicationDTO, assessmentSummaryDTO);
+    }
+
+    private void updateApplicationTracking(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {
+        ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(
+                workflowRequest, repOrderDTO, AssessmentType.PASSPORT, RequestSource.PASSPORT_IOJ);
+
+        if (null != applicationTrackingOutputResult.getUsn()) {
+            applicationTrackingDataService.sendTrackingOutputResult(applicationTrackingOutputResult);
+        }
+    }
+
+    private void performPostProcessing(
+            WorkflowRequest workflowRequest, ApplicationDTO applicationDTO, RepOrderDTO repOrderDTO) {
+        workflowRequest.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                applicationDTO, workflowRequest.getUserDTO(), StoredProcedure.MANAGE_PASSPORT_EVIDENCE));
+        proceedingsService.determineMagsRepDecision(workflowRequest);
+        workflowRequest.setApplicationDTO(contributionService.calculate(workflowRequest));
+        proceedingsService.updateApplication(workflowRequest, repOrderDTO);
+
+        if (!NewWorkReason.FMA.equals(NewWorkReason.getFrom(
+                applicationDTO.getPassportedDTO().getNewWorkReason().getCode()))) {
+            workflowRequest.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                    applicationDTO,
+                    workflowRequest.getUserDTO(),
+                    StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE));
+        }
+
+        updateAssessmentSummary(applicationDTO);
+        applicationService.updateDateModified(workflowRequest, applicationDTO);
+        updateApplicationTracking(workflowRequest, repOrderDTO);
+    }
+
     public PassportedDTO find(int id) {
         return passportAssessmentService.find(id);
     }
 
     public ApplicationDTO create(WorkflowRequest workflowRequest) {
         ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
-        RepOrderDTO repOrderDTO = repOrderService.getRepOrder(workflowRequest);
-        if (repOrderDTO == null) {
-            log.error("Could not find rep order for request {}", workflowRequest);
-            throw new MaatOrchestrationException(applicationDTO);
-        }
-        UserActionDTO userActionDTO = passportAssessmentMapper.getUserActionDTO(workflowRequest);
+        RepOrderDTO repOrderDTO = getLatestRepOrder(workflowRequest);
 
-        workflowPreProcessorService.validatePassportRequest(workflowRequest, repOrderDTO, userActionDTO);
+        validatePassportRequest(workflowRequest, repOrderDTO);
 
         Integer assessmentId = passportAssessmentService.create(workflowRequest);
         repOrderDTO = repOrderService.updateRepOrderAssessmentDateCompleted(
                 workflowRequest, repOrderDTO, LocalDateTime.now());
 
         try {
-            workflowRequest.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                    applicationDTO, workflowRequest.getUserDTO(), StoredProcedure.MANAGE_PASSPORT_EVIDENCE));
-            proceedingsService.determineMagsRepDecision(workflowRequest);
-            workflowRequest.setApplicationDTO(contributionService.calculate(workflowRequest));
-            proceedingsService.updateApplication(workflowRequest, repOrderDTO);
-
-            if (!NewWorkReason.FMA.equals(NewWorkReason.getFrom(
-                    applicationDTO.getPassportedDTO().getNewWorkReason().getCode()))) {
-                workflowRequest.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
-                        applicationDTO,
-                        workflowRequest.getUserDTO(),
-                        StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE));
-            }
-
-            AssessmentSummaryDTO assessmentSummaryDTO =
-                    assessmentSummaryService.getSummary(applicationDTO.getPassportedDTO());
-            assessmentSummaryService.updateApplication(applicationDTO, assessmentSummaryDTO);
-
-            applicationService.updateDateModified(workflowRequest, applicationDTO);
-
-            ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(
-                    workflowRequest, repOrderDTO, AssessmentType.PASSPORT, RequestSource.PASSPORT_IOJ);
-            if (null != applicationTrackingOutputResult.getUsn()) {
-                applicationTrackingDataService.sendTrackingOutputResult(applicationTrackingOutputResult);
-            }
+            performPostProcessing(workflowRequest, applicationDTO, repOrderDTO);
         } catch (Exception exception) {
             log.error("Create passport assessment post processing failed, rolling back...", exception);
             Sentry.captureException(exception);
 
-            // TODO: Need to call rollback passport assessment and handle failure when ticket LCAM-1987 and follow on
-            // has been completed.
+            // TODO: Need to call rollback passport assessment and handle failure when ticket LCAM-1987 completed
 
             throw new MaatOrchestrationException(applicationDTO);
         }
