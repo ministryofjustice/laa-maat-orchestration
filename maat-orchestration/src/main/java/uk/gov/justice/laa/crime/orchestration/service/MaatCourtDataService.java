@@ -46,7 +46,7 @@ public class MaatCourtDataService {
         return maatCourtDataApiService.getUserSummary(userName);
     }
 
-    public void updateRepOrderDateModified(Integer repId, Map<String, Object> fieldsToUpdate) {
+    public void updateRepOrder(Integer repId, Map<String, Object> fieldsToUpdate) {
         maatCourtDataApiService.patchRepOrder(repId, fieldsToUpdate);
     }
 }

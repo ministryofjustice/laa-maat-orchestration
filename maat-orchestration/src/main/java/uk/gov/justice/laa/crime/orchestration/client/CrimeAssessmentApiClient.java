@@ -4,6 +4,8 @@ import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealRequest;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiGetIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiRollbackIojAppealResponse;
+import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAssessmentRequest;
+import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,4 +28,8 @@ public interface CrimeAssessmentApiClient {
 
     @GetExchange("/passport/lookup-by-legacy-id/{id}")
     ApiGetPassportedAssessmentResponse getPassportAssessment(@PathVariable Integer id);
+
+    @PostExchange("/passport")
+    ApiCreatePassportedAssessmentResponse createPassportAssessment(
+            @RequestBody ApiCreatePassportedAssessmentRequest request);
 }
