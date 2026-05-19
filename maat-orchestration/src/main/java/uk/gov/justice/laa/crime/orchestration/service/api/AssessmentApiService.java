@@ -6,6 +6,8 @@ import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealRequest;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiCreateIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiGetIojAppealResponse;
 import uk.gov.justice.laa.crime.common.model.ioj.ApiRollbackIojAppealResponse;
+import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAssessmentRequest;
+import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.orchestration.client.CrimeAssessmentApiClient;
 
@@ -55,6 +57,14 @@ public class AssessmentApiService {
 
         log.debug(REQUEST_STRING, response);
 
+        return response;
+    }
+
+    public ApiCreatePassportedAssessmentResponse createPassportAssessment(
+            ApiCreatePassportedAssessmentRequest request) {
+        log.debug(REQUEST_STRING, request);
+        ApiCreatePassportedAssessmentResponse response = assessmentApiClient.createPassportAssessment(request);
+        log.debug(RESPONSE_STRING, response);
         return response;
     }
 

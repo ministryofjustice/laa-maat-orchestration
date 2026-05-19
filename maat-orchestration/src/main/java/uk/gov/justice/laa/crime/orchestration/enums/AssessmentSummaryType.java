@@ -10,7 +10,8 @@ public enum AssessmentSummaryType {
     FULL_MEANS_ASSESSMENT("Full Means Test"),
     HARDSHIP_REVIEW_MAGS_COURT("Hardship Review - Magistrate"),
     HARDSHIP_REVIEW_CROWN_COURT("Hardship Review - Crown Court"),
-    IOJ_APPEAL("IoJ Appeal");
+    IOJ_APPEAL("IoJ Appeal"),
+    PASSPORTED_ASSESSMENT("Passported");
 
     private final String name;
 }
