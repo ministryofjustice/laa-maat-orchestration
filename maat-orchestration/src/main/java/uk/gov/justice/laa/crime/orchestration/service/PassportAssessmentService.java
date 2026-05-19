@@ -7,8 +7,8 @@ import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAsses
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.passported.DeclaredBenefit;
 import uk.gov.justice.laa.crime.enums.BenefitRecipient;
+import uk.gov.justice.laa.crime.orchestration.common.ApplicationUtils;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO;
 import uk.gov.justice.laa.crime.orchestration.mapper.PassportAssessmentMapper;
@@ -31,14 +31,6 @@ public class PassportAssessmentService {
         return declaredBenefit != null && BenefitRecipient.PARTNER.equals(declaredBenefit.getBenefitRecipient());
     }
 
-    private Integer getPartnerId(ApplicationDTO applicationDTO) {
-        return applicationDTO.getApplicantLinks().stream()
-                .filter(applicant -> applicant.getUnlinked() == null)
-                .map(applicant -> applicant.getPartnerDTO().getId().intValue())
-                .findFirst()
-                .orElse(null);
-    }
-
     public PassportedDTO find(int id) {
         ApiGetPassportedAssessmentResponse assessment = assessmentApiService.findPassportAssessment(id);
 
@@ -56,7 +48,7 @@ public class PassportAssessmentService {
     public Integer create(WorkflowRequest workflowRequest) {
         Integer partnerId = Boolean.TRUE.equals(
                         workflowRequest.getApplicationDTO().getPassportedDTO().getBenefitClaimedByPartner())
-                ? getPartnerId(workflowRequest.getApplicationDTO())
+                ? ApplicationUtils.getPartnerId(workflowRequest.getApplicationDTO())
                 : null;
 
         ApiCreatePassportedAssessmentRequest createPassportRequest =
