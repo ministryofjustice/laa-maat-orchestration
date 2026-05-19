@@ -134,7 +134,7 @@ class PassportAssessmentOrchestrationServiceTest {
         ApplicationDTO returnedApplicationDTO = passportAssessmentOrchestrationService.create(workflowRequest);
 
         verify(workflowPreProcessorService)
-                .validatePassportRequest(any(WorkflowRequest.class), any(RepOrderDTO.class), any(UserActionDTO.class));
+                .preProcessRequest(any(WorkflowRequest.class), any(RepOrderDTO.class), any(UserActionDTO.class));
         verify(proceedingsService).determineMagsRepDecision(any(WorkflowRequest.class));
         verify(proceedingsService).updateApplication(any(WorkflowRequest.class), any(RepOrderDTO.class));
         verify(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
@@ -202,7 +202,7 @@ class PassportAssessmentOrchestrationServiceTest {
         ApplicationDTO returnedApplicationDTO = passportAssessmentOrchestrationService.create(workflowRequest);
 
         verify(workflowPreProcessorService)
-                .validatePassportRequest(any(WorkflowRequest.class), any(RepOrderDTO.class), any(UserActionDTO.class));
+                .preProcessRequest(any(WorkflowRequest.class), any(RepOrderDTO.class), any(UserActionDTO.class));
         verify(proceedingsService).determineMagsRepDecision(any(WorkflowRequest.class));
         verify(proceedingsService).updateApplication(any(WorkflowRequest.class), any(RepOrderDTO.class));
         verify(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
@@ -258,7 +258,7 @@ class PassportAssessmentOrchestrationServiceTest {
         ApplicationDTO returnedApplicationDTO = passportAssessmentOrchestrationService.create(workflowRequest);
 
         verify(workflowPreProcessorService)
-                .validatePassportRequest(any(WorkflowRequest.class), any(RepOrderDTO.class), any(UserActionDTO.class));
+                .preProcessRequest(any(WorkflowRequest.class), any(RepOrderDTO.class), any(UserActionDTO.class));
         verify(proceedingsService).determineMagsRepDecision(any(WorkflowRequest.class));
         verify(proceedingsService).updateApplication(any(WorkflowRequest.class), any(RepOrderDTO.class));
         verify(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));

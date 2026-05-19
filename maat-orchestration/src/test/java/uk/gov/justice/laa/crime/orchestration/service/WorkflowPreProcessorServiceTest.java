@@ -2,7 +2,6 @@ package uk.gov.justice.laa.crime.orchestration.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -167,39 +166,5 @@ class WorkflowPreProcessorServiceTest {
 
         assertThatThrownBy(() -> workflowPreProcessorService.preProcessEvidenceRequest(userActionDTO, true))
                 .isInstanceOf(ValidationException.class);
-    }
-
-    @Test
-    void givenRequestValidationFails_whenValidatePassportRequestIsInvoked_thenExceptionIsThrown() {
-        WorkflowRequest workflowRequest = getWorkflowRequestWithCaseType(INDICTABLE.getCaseType());
-        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
-        UserActionDTO userActionDTO = TestModelDataBuilder.getUserActionDTO();
-
-        doThrow(new ValidationException(ValidationService.CANNOT_MODIFY_APPLICATION_ERROR))
-                .when(validationService)
-                .validate(workflowRequest, repOrderDTO);
-
-        assertThatThrownBy(() -> workflowPreProcessorService.validatePassportRequest(
-                        workflowRequest, repOrderDTO, userActionDTO))
-                .isInstanceOf(ValidationException.class);
-    }
-
-    @Test
-    void givenUserActionValidationFails_whenValidatePassportRequestIsInvoked_thenExceptionIsThrown() {
-        WorkflowRequest workflowRequest = getWorkflowRequestWithCaseType(INDICTABLE.getCaseType());
-        RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
-        UserActionDTO userActionDTO = TestModelDataBuilder.getUserActionDTO();
-        UserSummaryDTO userSummaryDTO = TestModelDataBuilder.getUserSummaryDTO();
-
-        doNothing().when(validationService).validate(workflowRequest, repOrderDTO);
-        when(maatCourtDataService.getUserSummary(userActionDTO.getUsername())).thenReturn(userSummaryDTO);
-        doThrow(new CrimeValidationException(
-                        List.of(ValidationService.USER_HAVE_AN_EXISTING_RESERVATION_RESERVATION_NOT_ALLOWED)))
-                .when(validationService)
-                .isUserActionValid(userActionDTO, userSummaryDTO);
-
-        assertThatThrownBy(() -> workflowPreProcessorService.validatePassportRequest(
-                        workflowRequest, repOrderDTO, userActionDTO))
-                .isInstanceOf(CrimeValidationException.class);
     }
 }

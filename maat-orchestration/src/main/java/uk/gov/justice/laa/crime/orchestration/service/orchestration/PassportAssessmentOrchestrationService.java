@@ -59,10 +59,10 @@ public class PassportAssessmentOrchestrationService {
         return repOrderDTO;
     }
 
-    private void validatePassportRequest(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {
+    private void preProcessPassportRequest(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {
         UserActionDTO userActionDTO = passportAssessmentMapper.getUserActionDTO(workflowRequest);
 
-        workflowPreProcessorService.validatePassportRequest(workflowRequest, repOrderDTO, userActionDTO);
+        workflowPreProcessorService.preProcessRequest(workflowRequest, repOrderDTO, userActionDTO);
     }
 
     private void updateAssessmentSummary(ApplicationDTO applicationDTO) {
@@ -110,7 +110,7 @@ public class PassportAssessmentOrchestrationService {
         ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
         RepOrderDTO repOrderDTO = getLatestRepOrder(workflowRequest);
 
-        validatePassportRequest(workflowRequest, repOrderDTO);
+        preProcessPassportRequest(workflowRequest, repOrderDTO);
 
         Integer assessmentId = passportAssessmentService.create(workflowRequest);
         repOrderDTO = repOrderService.updateRepOrderAssessmentDateCompleted(
