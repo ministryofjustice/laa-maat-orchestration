@@ -7,7 +7,7 @@ import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAsses
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.passported.DeclaredBenefit;
 import uk.gov.justice.laa.crime.enums.BenefitRecipient;
-import uk.gov.justice.laa.crime.orchestration.common.ApplicationUtils;
+import uk.gov.justice.laa.crime.orchestration.common.ApplicationDTOUtils;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO;
@@ -48,7 +48,7 @@ public class PassportAssessmentService {
     public Integer create(WorkflowRequest workflowRequest) {
         Integer partnerId = Boolean.TRUE.equals(
                         workflowRequest.getApplicationDTO().getPassportedDTO().getBenefitClaimedByPartner())
-                ? ApplicationUtils.getPartnerId(workflowRequest.getApplicationDTO())
+                ? ApplicationDTOUtils.getPartnerId(workflowRequest.getApplicationDTO())
                 : null;
 
         ApiCreatePassportedAssessmentRequest createPassportRequest =

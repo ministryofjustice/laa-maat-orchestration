@@ -8,7 +8,7 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import java.util.Collection;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ApplicationUtils {
+public class ApplicationDTOUtils {
 
     public static Integer getPartnerId(ApplicationDTO applicationDTO) {
         Collection<ApplicantLinkDTO> applicantLinks = applicationDTO.getApplicantLinks();
