@@ -48,17 +48,6 @@ public class PassportAssessmentOrchestrationService {
     private final ApplicationTrackingMapper applicationTrackingMapper;
     private final ApplicationTrackingDataService applicationTrackingDataService;
 
-    private RepOrderDTO getLatestRepOrder(WorkflowRequest workflowRequest) {
-        RepOrderDTO repOrderDTO = repOrderService.getRepOrder(workflowRequest);
-
-        if (repOrderDTO == null) {
-            log.error("Could not find rep order for request {}", workflowRequest);
-            throw new MaatOrchestrationException(workflowRequest.getApplicationDTO());
-        }
-
-        return repOrderDTO;
-    }
-
     private void preProcessPassportRequest(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {
         UserActionDTO userActionDTO = passportAssessmentMapper.getUserActionDTO(workflowRequest);
 
@@ -116,7 +105,7 @@ public class PassportAssessmentOrchestrationService {
 
     public ApplicationDTO create(WorkflowRequest workflowRequest) {
         ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
-        RepOrderDTO repOrderDTO = getLatestRepOrder(workflowRequest);
+        RepOrderDTO repOrderDTO = repOrderService.getRepOrder(workflowRequest);
 
         preProcessPassportRequest(workflowRequest, repOrderDTO);
 

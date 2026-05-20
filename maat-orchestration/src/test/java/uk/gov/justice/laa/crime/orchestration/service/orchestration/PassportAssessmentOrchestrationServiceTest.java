@@ -1,7 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -22,7 +21,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
-import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.PassportAssessmentMapper;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
@@ -157,16 +155,6 @@ class PassportAssessmentOrchestrationServiceTest {
                 .isEqualTo(Long.valueOf(Constants.CONTRIBUTIONS_ID));
         assertThat(returnedApplicationDTO.getCrownCourtOverviewDTO().getAvailable())
                 .isEqualTo(Boolean.TRUE);
-    }
-
-    @Test
-    void givenNoRepOrderRetrieved_whenCreateIsInvoked_thenExceptionIsThrown() {
-        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
-
-        when(repOrderService.getRepOrder(workflowRequest)).thenReturn(null);
-
-        assertThatThrownBy(() -> passportAssessmentOrchestrationService.create(workflowRequest))
-                .isInstanceOf(MaatOrchestrationException.class);
     }
 
     @Test

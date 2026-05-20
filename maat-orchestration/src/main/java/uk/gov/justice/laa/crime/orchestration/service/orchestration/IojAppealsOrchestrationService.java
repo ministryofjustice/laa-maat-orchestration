@@ -53,11 +53,6 @@ public class IojAppealsOrchestrationService {
     public ApplicationDTO create(WorkflowRequest request) {
         RepOrderDTO repOrderDto = repOrderService.getRepOrder(request);
 
-        if (repOrderDto == null) {
-            log.error("Could not find rep order for request {}", request);
-            throw new MaatOrchestrationException(request.getApplicationDTO());
-        }
-
         UserActionDTO userActionDTO = iojAppealMapper.getUserActionDTO(request);
         workflowPreProcessorService.preProcessRequest(request, repOrderDto, userActionDTO);
 

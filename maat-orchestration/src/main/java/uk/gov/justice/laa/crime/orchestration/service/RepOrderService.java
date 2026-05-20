@@ -7,6 +7,7 @@ import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -22,7 +23,14 @@ public class RepOrderService {
 
     public RepOrderDTO getRepOrder(WorkflowRequest workflowRequest) {
         int repId = workflowRequest.getApplicationDTO().getRepId().intValue();
-        return maatCourtDataService.findRepOrder(repId);
+        RepOrderDTO repOrderDTO = maatCourtDataService.findRepOrder(repId);
+
+        if (repOrderDTO == null) {
+            log.error("Could not find rep order with id: {}", repId);
+            throw new MaatOrchestrationException(workflowRequest.getApplicationDTO());
+        }
+
+        return repOrderDTO;
     }
 
     public RepOrderDTO updateRepOrderDateModified(WorkflowRequest workflowRequest, LocalDateTime dateModified) {
