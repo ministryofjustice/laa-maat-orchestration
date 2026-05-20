@@ -19,6 +19,7 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertS
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForCheckContributionsRule;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForGetContributionsSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForInvokeStoredProcedure;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForPatchRepOrder;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCalculateContributions;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForCheckContributionsRule;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForDetermineMagsRepDecision;
@@ -26,6 +27,7 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubFor
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetContributionsSummaries;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForPatchRepOrder;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequestGivenContent;
 
@@ -115,6 +117,7 @@ class HardshipIntegrationTest extends WiremockIntegrationTest {
         stubForGetUserSummary(objectMapper.writeValueAsString(
                 TestModelDataBuilder.getUserSummaryDTO(CREATE_ROLE_ACTIONS, NewWorkReason.NEW)));
         stubForFindRepOrder(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
+        stubForPatchRepOrder(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
         String requestBody = objectMapper.writeValueAsString(
                 TestModelDataBuilder.buildWorkflowRequestWithHardship(CourtType.MAGISTRATE));
         mvc.perform(buildRequestGivenContent(HttpMethod.POST, requestBody, ENDPOINT_URL))
@@ -272,6 +275,7 @@ class HardshipIntegrationTest extends WiremockIntegrationTest {
         stubForGetUserSummary(objectMapper.writeValueAsString(
                 TestModelDataBuilder.getUserSummaryDTO(UPDATE_ROLE_ACTIONS, NewWorkReason.NEW)));
         stubForFindRepOrder(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
+        stubForPatchRepOrder(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTO(null)));
         stubForOAuth();
     }
 
@@ -305,6 +309,7 @@ class HardshipIntegrationTest extends WiremockIntegrationTest {
         stubForGetUserSummary(objectMapper.writeValueAsString(
                 TestModelDataBuilder.getUserSummaryDTO(CREATE_ROLE_ACTIONS, NewWorkReason.NEW)));
         stubForFindRepOrder(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTOWithAssessorName()));
+        stubForPatchRepOrder(objectMapper.writeValueAsString(TestModelDataBuilder.buildRepOrderDTOWithAssessorName()));
         stubForOAuth();
         if (CourtType.CROWN_COURT.equals(courtType)) {
             wiremock.stubFor(put(urlMatching("/api/internal/v1/proceedings"))
@@ -333,6 +338,7 @@ class HardshipIntegrationTest extends WiremockIntegrationTest {
         verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/hardship")));
         verify(exactly(1), getRequestedFor(urlPathMatching("/api/internal/v1/hardship/.*")));
         assertStubForCalculateContributions(1);
+        assertStubForPatchRepOrder(1);
         assertStubForGetContributionsSummary(1, repId);
         if (CourtType.CROWN_COURT.equals(courtType)) {
             assertStubForInvokeStoredProcedure(4);
@@ -347,6 +353,7 @@ class HardshipIntegrationTest extends WiremockIntegrationTest {
         assertStubForInvokeStoredProcedure(1);
         assertStubForCheckContributionsRule(1);
         assertStubForCalculateContributions(1);
+        assertStubForPatchRepOrder(1);
         assertStubForGetContributionsSummary(1, repId);
     }
 }

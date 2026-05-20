@@ -81,8 +81,10 @@ public class MaatCourtDataApiService {
         return financialAssessmentDTO;
     }
 
-    public void patchRepOrder(int repOrderId, Map<String, Object> fieldsToUpdate) {
+    public RepOrderDTO patchRepOrder(int repOrderId, Map<String, Object> fieldsToUpdate) {
         log.debug(REQUEST_STRING, fieldsToUpdate);
-        maatApiClient.patchRepOrder(repOrderId, fieldsToUpdate);
+        RepOrderDTO repOrderDTO = maatApiClient.patchRepOrder(repOrderId, fieldsToUpdate);
+        log.debug(RESPONSE_STRING, repOrderDTO);
+        return repOrderDTO;
     }
 }

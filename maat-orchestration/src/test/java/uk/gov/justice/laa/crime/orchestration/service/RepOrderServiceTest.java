@@ -3,6 +3,8 @@ package uk.gov.justice.laa.crime.orchestration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -61,7 +63,7 @@ class RepOrderServiceTest {
         int repOrderId = workflowRequest.getApplicationDTO().getRepId().intValue();
         RepOrderDTO updatedRepOrder = RepOrderDTO.builder().id(repOrderId).build();
 
-        when(maatCourtDataService.findRepOrder(repOrderId)).thenReturn(updatedRepOrder);
+        when(maatCourtDataService.updateRepOrder(anyInt(), anyMap())).thenReturn(updatedRepOrder);
 
         RepOrderDTO actualRepOrder = repOrderService.updateRepOrderDateModified(workflowRequest, LocalDateTime.now());
 
@@ -78,9 +80,7 @@ class RepOrderServiceTest {
         RepOrderDTO updatedRepOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
         updatedRepOrderDTO.setAssessmentDateCompleted(DateUtil.parseLocalDate(dateCompleted));
 
-        when(maatCourtDataService.findRepOrder(
-                        workflowRequest.getApplicationDTO().getRepId().intValue()))
-                .thenReturn(updatedRepOrderDTO);
+        when(maatCourtDataService.updateRepOrder(anyInt(), anyMap())).thenReturn(updatedRepOrderDTO);
 
         assertThat(repOrderService.updateRepOrderAssessmentDateCompleted(workflowRequest, repOrderDTO, dateCompleted))
                 .isEqualTo(updatedRepOrderDTO);

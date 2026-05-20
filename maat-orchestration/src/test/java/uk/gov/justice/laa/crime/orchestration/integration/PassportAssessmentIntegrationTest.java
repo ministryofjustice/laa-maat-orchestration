@@ -19,6 +19,7 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubFor
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetApplicant;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForPatchRepOrder;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForSendApplicationTrackingResult;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForUpdateCrownCourtApplication;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
@@ -188,6 +189,7 @@ class PassportAssessmentIntegrationTest extends WiremockIntegrationTest {
                 objectMapper.writeValueAsString(TestModelDataBuilder.getDetermineMagsRepDecisionResponse()));
         stubForCalculateContributions(
                 objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
+        stubForPatchRepOrder(objectMapper.writeValueAsString(repOrderDTO));
         stubForInvokeStoredProcedure(
                 "MANAGE_PASSPORT_EVIDENCE",
                 "PRE_UPDATE_CC_APPLICATION",

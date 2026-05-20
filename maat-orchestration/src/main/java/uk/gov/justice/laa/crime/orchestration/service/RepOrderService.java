@@ -21,6 +21,20 @@ public class RepOrderService {
 
     private final MaatCourtDataService maatCourtDataService;
 
+    private boolean shouldAssessmentBeCompleted(ApplicationDTO applicationDTO, RepOrderDTO repOrderDTO) {
+        CaseType caseType = CaseType.getFrom(applicationDTO.getCaseDetailsDTO().getCaseType());
+        CurrentStatus fullAssessmentStatus = CurrentStatus.getFrom(applicationDTO
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .getFull()
+                .getAssessmnentStatusDTO()
+                .getStatus());
+
+        return !CaseType.EITHER_WAY.equals(caseType)
+                || repOrderDTO.getAssessmentDateCompleted() == null
+                        && CurrentStatus.COMPLETE.equals(fullAssessmentStatus);
+    }
+
     public RepOrderDTO getRepOrder(WorkflowRequest workflowRequest) {
         int repId = workflowRequest.getApplicationDTO().getRepId().intValue();
         RepOrderDTO repOrderDTO = maatCourtDataService.findRepOrder(repId);
@@ -37,30 +51,18 @@ public class RepOrderService {
         int repId = workflowRequest.getApplicationDTO().getRepId().intValue();
         Map<String, Object> fieldsToUpdate = Map.of("dateModified", dateModified);
 
-        maatCourtDataService.updateRepOrder(repId, fieldsToUpdate);
-
-        return getRepOrder(workflowRequest);
+        return maatCourtDataService.updateRepOrder(repId, fieldsToUpdate);
     }
 
     public RepOrderDTO updateRepOrderAssessmentDateCompleted(
             WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO, LocalDateTime dateCompleted) {
         ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
-        CaseType caseType = CaseType.getFrom(applicationDTO.getCaseDetailsDTO().getCaseType());
-        CurrentStatus fullAssessmentStatus = CurrentStatus.getFrom(applicationDTO
-                .getAssessmentDTO()
-                .getFinancialAssessmentDTO()
-                .getFull()
-                .getAssessmnentStatusDTO()
-                .getStatus());
 
-        if (!CaseType.EITHER_WAY.equals(caseType)
-                || repOrderDTO.getAssessmentDateCompleted() == null
-                        && CurrentStatus.COMPLETE.equals(fullAssessmentStatus)) {
+        if (shouldAssessmentBeCompleted(applicationDTO, repOrderDTO)) {
             int repId = applicationDTO.getRepId().intValue();
             Map<String, Object> fieldsToUpdate = Map.of("assessmentDateCompleted", dateCompleted);
 
-            maatCourtDataService.updateRepOrder(repId, fieldsToUpdate);
-            return getRepOrder(workflowRequest);
+            return maatCourtDataService.updateRepOrder(repId, fieldsToUpdate);
         }
 
         return repOrderDTO;

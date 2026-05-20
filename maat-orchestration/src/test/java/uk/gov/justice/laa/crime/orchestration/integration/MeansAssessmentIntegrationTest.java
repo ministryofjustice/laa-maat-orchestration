@@ -13,6 +13,7 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertS
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForDetermineMagsRepDecision;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForGetContributionsSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForInvokeStoredProcedure;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForPatchRepOrder;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForSendApplicationTrackingResult;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForUpdateCrownCourtApplication;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.assertStubForUpdateFinancialAssessment;
@@ -26,6 +27,7 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubFor
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetContributionsSummaries;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForPatchRepOrder;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForRollbackMeansAssessment;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForSendApplicationTrackingResult;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForUpdateCrownCourtApplication;
@@ -159,6 +161,7 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         stubForCreateMeansAssessment(cmaResponse);
         stubForUpdateCrownCourtApplication(ccpResponse);
         stubForCalculateContributions(cccCalculateResponse);
+        stubForPatchRepOrder(repOrderDTO);
         stubForGetContributionsSummaries(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
         stubForFindRepOrder(repOrderDTO);
@@ -177,6 +180,7 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         assertStubForCreateMeansAssessment(1);
         assertStubForUpdateCrownCourtApplication(1);
         assertStubForCalculateContributions(1);
+        assertStubForPatchRepOrder(1);
         assertStubForGetContributionsSummary(1, TestModelDataBuilder.REP_ID);
         assertStubForSendApplicationTrackingResult(1);
         assertStubForInvokeStoredProcedure(4);
@@ -224,6 +228,7 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         stubForUpdateFinancialAssessment(financialAssessmentResponse);
         stubForDetermineMagsRepDecision(magsRepDecisionResponse);
         stubForCalculateContributions(calculateContributionResponse);
+        stubForPatchRepOrder(repOrderResponse);
         stubForSendApplicationTrackingResult();
         stubForUpdateCrownCourtApplication(updateCrownCourtApplicationResponse);
         stubForUpdateSendToCCLF();
@@ -242,6 +247,7 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         assertStubForCreateEvidence(1);
         assertStubForDetermineMagsRepDecision(1);
         assertStubForCalculateContributions(1);
+        assertStubForPatchRepOrder(1);
         assertStubForSendApplicationTrackingResult(1);
         assertStubForUpdateCrownCourtApplication(1);
         assertStubForUpdateSendToCCLF(1);
@@ -302,6 +308,7 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         stubForUpdateMeansAssessment(cmaResponse);
         stubForUpdateCrownCourtApplication(ccpResponse);
         stubForCalculateContributions(cccCalculateResponse);
+        stubForPatchRepOrder(repOrderDTO);
         stubForGetContributionsSummaries(cccSummariesResponse);
         stubForGetUserSummary(userSummaryResponse);
         stubForFindRepOrder(repOrderDTO);
@@ -320,6 +327,7 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         assertStubForUpdateMeansAssessment(1);
         assertStubForUpdateCrownCourtApplication(1);
         assertStubForCalculateContributions(1);
+        assertStubForPatchRepOrder(1);
         assertStubForGetContributionsSummary(1, TestModelDataBuilder.REP_ID);
         assertStubForSendApplicationTrackingResult(1);
         assertStubForInvokeStoredProcedure(4);
@@ -362,6 +370,7 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
 
         stubForDetermineMagsRepDecision(magsRepDecisionResponse);
         stubForCalculateContributions(calculateContributionResponse);
+        stubForPatchRepOrder(repOrderResponse);
         stubForSendApplicationTrackingResult();
         stubForUpdateCrownCourtApplication(updateCrownCourtApplicationResponse);
         stubForUpdateSendToCCLF();
@@ -381,6 +390,7 @@ class MeansAssessmentIntegrationTest extends WiremockIntegrationTest {
         assertStubForUpdateFinancialAssessment(0);
         assertStubForDetermineMagsRepDecision(1);
         assertStubForCalculateContributions(1);
+        assertStubForPatchRepOrder(1);
         assertStubForSendApplicationTrackingResult(1);
         assertStubForUpdateCrownCourtApplication(1);
         assertStubForUpdateSendToCCLF(1);
