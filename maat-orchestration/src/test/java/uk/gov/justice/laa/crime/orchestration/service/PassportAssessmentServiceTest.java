@@ -20,6 +20,8 @@ import uk.gov.justice.laa.crime.orchestration.service.api.AssessmentApiService;
 import uk.gov.justice.laa.crime.orchestration.service.api.EvidenceApiService;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -94,7 +96,8 @@ class PassportAssessmentServiceTest {
         ApiCreatePassportedAssessmentResponse response =
                 PassportAssessmentDataBuilder.getApiCreatePassportedAssessmentResponse();
 
-        when(passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(workflowRequest, null))
+        when(passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(
+                        workflowRequest, Optional.empty()))
                 .thenReturn(casRequest);
         when(assessmentApiService.createPassportAssessment(casRequest)).thenReturn(response);
 

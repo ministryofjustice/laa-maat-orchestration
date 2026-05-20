@@ -16,6 +16,8 @@ import uk.gov.justice.laa.crime.orchestration.service.api.AssessmentApiService;
 import uk.gov.justice.laa.crime.orchestration.service.api.EvidenceApiService;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -46,10 +48,10 @@ public class PassportAssessmentService {
     }
 
     public Integer create(WorkflowRequest workflowRequest) {
-        Integer partnerId = Boolean.TRUE.equals(
+        Optional<Integer> partnerId = Boolean.TRUE.equals(
                         workflowRequest.getApplicationDTO().getPassportedDTO().getBenefitClaimedByPartner())
                 ? ApplicationDTOUtils.getPartnerId(workflowRequest.getApplicationDTO())
-                : null;
+                : Optional.empty();
 
         ApiCreatePassportedAssessmentRequest createPassportRequest =
                 passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(

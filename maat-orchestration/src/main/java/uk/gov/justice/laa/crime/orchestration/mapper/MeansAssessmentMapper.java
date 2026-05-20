@@ -33,6 +33,7 @@ import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.ReviewType;
 import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
+import uk.gov.justice.laa.crime.orchestration.common.ApplicationDTOUtils;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentDetailDTO;
@@ -172,7 +173,7 @@ public class MeansAssessmentMapper {
                         .map(evidenceItem -> mapToApiIncomeEvidence(evidenceItem, applicantId))
                         .toList());
 
-        Optional<Integer> partnerId = getPartnerId(applicationDTO);
+        Optional<Integer> partnerId = ApplicationDTOUtils.getPartnerId(applicationDTO);
         partnerId.ifPresent(id -> incomeEvidence.addAll(incomeEvidenceSummary.getPartnerIncomeEvidenceList().stream()
                 .map(evidenceItem -> mapToApiIncomeEvidence(evidenceItem, id))
                 .toList()));
@@ -182,16 +183,6 @@ public class MeansAssessmentMapper {
                 .toList());
 
         return incomeEvidence;
-    }
-
-    private static Optional<Integer> getPartnerId(ApplicationDTO applicationDTO) {
-        if (applicationDTO.getApplicantLinks() != null) {
-            return applicationDTO.getApplicantLinks().stream()
-                    .filter(link -> link.getUnlinked() == null)
-                    .map(link -> NumberUtils.toInteger(link.getPartnerDTO().getId()))
-                    .findFirst();
-        }
-        return Optional.empty();
     }
 
     private ApiIncomeEvidence mapToApiIncomeEvidence(EvidenceDTO evidenceItem, int applicantId) {

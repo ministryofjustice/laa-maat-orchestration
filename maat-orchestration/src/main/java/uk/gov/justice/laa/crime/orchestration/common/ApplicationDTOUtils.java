@@ -2,25 +2,21 @@ package uk.gov.justice.laa.crime.orchestration.common;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicantLinkDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
+import uk.gov.justice.laa.crime.util.NumberUtils;
 
-import java.util.Collection;
+import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApplicationDTOUtils {
 
-    public static Integer getPartnerId(ApplicationDTO applicationDTO) {
-        Collection<ApplicantLinkDTO> applicantLinks = applicationDTO.getApplicantLinks();
-
-        if (null != applicantLinks && !applicantLinks.isEmpty()) {
-            return applicantLinks.stream()
-                    .filter(applicant -> applicant.getUnlinked() == null)
-                    .map(applicant -> applicant.getPartnerDTO().getId().intValue())
-                    .findFirst()
-                    .orElse(null);
+    public static Optional<Integer> getPartnerId(ApplicationDTO applicationDTO) {
+        if (applicationDTO.getApplicantLinks() != null) {
+            return applicationDTO.getApplicantLinks().stream()
+                    .filter(link -> link.getUnlinked() == null)
+                    .map(link -> NumberUtils.toInteger(link.getPartnerDTO().getId()))
+                    .findFirst();
         }
-
-        return null;
+        return Optional.empty();
     }
 }
