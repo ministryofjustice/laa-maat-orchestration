@@ -65,6 +65,11 @@ public class PassportAssessmentOrchestrationService {
         workflowPreProcessorService.preProcessRequest(workflowRequest, repOrderDTO, userActionDTO);
     }
 
+    private boolean shouldProcessActivityAndGetCorrespondence(ApplicationDTO applicationDTO) {
+        return !NewWorkReason.FMA.equals(NewWorkReason.getFrom(
+                applicationDTO.getPassportedDTO().getNewWorkReason().getCode()));
+    }
+
     private void updateAssessmentSummary(ApplicationDTO applicationDTO) {
         AssessmentSummaryDTO assessmentSummaryDTO =
                 assessmentSummaryService.getSummary(applicationDTO.getPassportedDTO());
@@ -93,8 +98,7 @@ public class PassportAssessmentOrchestrationService {
                 StoredProcedure.PRE_UPDATE_CC_APPLICATION));
         proceedingsService.updateApplication(workflowRequest, repOrderDTO);
 
-        if (!NewWorkReason.FMA.equals(NewWorkReason.getFrom(
-                applicationDTO.getPassportedDTO().getNewWorkReason().getCode()))) {
+        if (shouldProcessActivityAndGetCorrespondence(applicationDTO)) {
             workflowRequest.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
                     applicationDTO,
                     workflowRequest.getUserDTO(),
