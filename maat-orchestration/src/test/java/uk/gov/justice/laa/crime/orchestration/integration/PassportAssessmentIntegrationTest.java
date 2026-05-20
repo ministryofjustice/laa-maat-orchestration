@@ -190,6 +190,10 @@ class PassportAssessmentIntegrationTest extends WiremockIntegrationTest {
                 objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
         stubForInvokeStoredProcedure(
                 "MANAGE_PASSPORT_EVIDENCE",
+                "PRE_UPDATE_CC_APPLICATION",
+                objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO()));
+        stubForInvokeStoredProcedure(
+                "PRE_UPDATE_CC_APPLICATION",
                 "PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE",
                 objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO()));
         stubForUpdateCrownCourtApplication(

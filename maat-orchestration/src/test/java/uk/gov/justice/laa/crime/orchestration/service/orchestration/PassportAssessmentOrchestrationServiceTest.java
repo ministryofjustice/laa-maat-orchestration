@@ -110,6 +110,8 @@ class PassportAssessmentOrchestrationServiceTest {
         applicationDTOWithContributions
                 .getCrownCourtOverviewDTO()
                 .setContribution(TestModelDataBuilder.getContributionsDTO());
+        ApplicationDTO applicationDTOWithCCAvailable = workflowRequest.getApplicationDTO();
+        applicationDTOWithCCAvailable.getCrownCourtOverviewDTO().setAvailable(true);
 
         when(repOrderService.getRepOrder(workflowRequest)).thenReturn(repOrderDTO);
         when(passportAssessmentMapper.getUserActionDTO(workflowRequest))
@@ -124,6 +126,11 @@ class PassportAssessmentOrchestrationServiceTest {
                         StoredProcedure.MANAGE_PASSPORT_EVIDENCE))
                 .thenReturn(applicationDTOManagedEvidence);
         when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTOWithContributions);
+        when(maatCourtDataService.invokeStoredProcedure(
+                        workflowRequest.getApplicationDTO(),
+                        workflowRequest.getUserDTO(),
+                        StoredProcedure.PRE_UPDATE_CC_APPLICATION))
+                .thenReturn(applicationDTOWithCCAvailable);
         when(assessmentSummaryService.getSummary(
                         workflowRequest.getApplicationDTO().getPassportedDTO()))
                 .thenReturn(TestModelDataBuilder.getAssessmentSummaryDTOFromPassportedDTO());
@@ -148,6 +155,8 @@ class PassportAssessmentOrchestrationServiceTest {
                         .getContribution()
                         .getId())
                 .isEqualTo(Long.valueOf(Constants.CONTRIBUTIONS_ID));
+        assertThat(returnedApplicationDTO.getCrownCourtOverviewDTO().getAvailable())
+                .isEqualTo(Boolean.TRUE);
     }
 
     @Test
@@ -173,6 +182,8 @@ class PassportAssessmentOrchestrationServiceTest {
         applicationDTOWithContributions
                 .getCrownCourtOverviewDTO()
                 .setContribution(TestModelDataBuilder.getContributionsDTO());
+        ApplicationDTO applicationDTOWithCCAvailable = workflowRequest.getApplicationDTO();
+        applicationDTOWithCCAvailable.getCrownCourtOverviewDTO().setAvailable(true);
 
         when(repOrderService.getRepOrder(workflowRequest)).thenReturn(repOrderDTO);
         when(passportAssessmentMapper.getUserActionDTO(workflowRequest))
@@ -187,6 +198,11 @@ class PassportAssessmentOrchestrationServiceTest {
                         StoredProcedure.MANAGE_PASSPORT_EVIDENCE))
                 .thenReturn(applicationDTOManagedEvidence);
         when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTOWithContributions);
+        when(maatCourtDataService.invokeStoredProcedure(
+                        workflowRequest.getApplicationDTO(),
+                        workflowRequest.getUserDTO(),
+                        StoredProcedure.PRE_UPDATE_CC_APPLICATION))
+                .thenReturn(applicationDTOWithCCAvailable);
         when(maatCourtDataService.invokeStoredProcedure(
                         workflowRequest.getApplicationDTO(),
                         workflowRequest.getUserDTO(),
@@ -216,6 +232,8 @@ class PassportAssessmentOrchestrationServiceTest {
                         .getContribution()
                         .getId())
                 .isEqualTo(Long.valueOf(Constants.CONTRIBUTIONS_ID));
+        assertThat(returnedApplicationDTO.getCrownCourtOverviewDTO().getAvailable())
+                .isEqualTo(Boolean.TRUE);
     }
 
     @Test
@@ -234,6 +252,8 @@ class PassportAssessmentOrchestrationServiceTest {
         applicationDTOWithContributions
                 .getCrownCourtOverviewDTO()
                 .setContribution(TestModelDataBuilder.getContributionsDTO());
+        ApplicationDTO applicationDTOWithCCAvailable = workflowRequest.getApplicationDTO();
+        applicationDTOWithCCAvailable.getCrownCourtOverviewDTO().setAvailable(true);
 
         when(repOrderService.getRepOrder(workflowRequest)).thenReturn(repOrderDTO);
         when(passportAssessmentMapper.getUserActionDTO(workflowRequest))
@@ -248,6 +268,11 @@ class PassportAssessmentOrchestrationServiceTest {
                         StoredProcedure.MANAGE_PASSPORT_EVIDENCE))
                 .thenReturn(applicationDTOManagedEvidence);
         when(contributionService.calculate(workflowRequest)).thenReturn(applicationDTOWithContributions);
+        when(maatCourtDataService.invokeStoredProcedure(
+                        workflowRequest.getApplicationDTO(),
+                        workflowRequest.getUserDTO(),
+                        StoredProcedure.PRE_UPDATE_CC_APPLICATION))
+                .thenReturn(applicationDTOWithCCAvailable);
         when(assessmentSummaryService.getSummary(
                         workflowRequest.getApplicationDTO().getPassportedDTO()))
                 .thenReturn(TestModelDataBuilder.getAssessmentSummaryDTOFromPassportedDTO());
@@ -272,5 +297,7 @@ class PassportAssessmentOrchestrationServiceTest {
                         .getContribution()
                         .getId())
                 .isEqualTo(Long.valueOf(Constants.CONTRIBUTIONS_ID));
+        assertThat(returnedApplicationDTO.getCrownCourtOverviewDTO().getAvailable())
+                .isEqualTo(Boolean.TRUE);
     }
 }

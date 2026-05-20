@@ -87,6 +87,10 @@ public class PassportAssessmentOrchestrationService {
                 applicationDTO, workflowRequest.getUserDTO(), StoredProcedure.MANAGE_PASSPORT_EVIDENCE));
         proceedingsService.determineMagsRepDecision(workflowRequest);
         workflowRequest.setApplicationDTO(contributionService.calculate(workflowRequest));
+        workflowRequest.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                workflowRequest.getApplicationDTO(),
+                workflowRequest.getUserDTO(),
+                StoredProcedure.PRE_UPDATE_CC_APPLICATION));
         proceedingsService.updateApplication(workflowRequest, repOrderDTO);
 
         if (!NewWorkReason.FMA.equals(NewWorkReason.getFrom(
