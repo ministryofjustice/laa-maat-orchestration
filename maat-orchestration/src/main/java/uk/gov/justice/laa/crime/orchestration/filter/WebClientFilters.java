@@ -14,13 +14,26 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 public class WebClientFilters {
     public static ExchangeFilterFunction logResponse() {
         return ExchangeFilterFunction.ofResponseProcessor(response -> {
+            String method = response.request().getMethod().name();
+            String url = response.request().getURI().getHost()
+                    + response.request().getURI().getPath();
+
             if (response.statusCode().is2xxSuccessful() || response.statusCode().isSameCodeAs(HttpStatus.NOT_FOUND)) {
                 log.info("✅ Response status: {}", response.statusCode());
             } else if (response.statusCode().is4xxClientError()
                     || response.statusCode().is5xxServerError()) {
                 log.error("❌  Response status: {}", response.statusCode());
             }
-            return Mono.just(response);
+
+            return response.bodyToMono(String.class).defaultIfEmpty("").map(body -> {
+                log.debug("Response from {} {}: {}", method, url, body);
+
+                return ClientResponse.create(response.statusCode())
+                        .headers(headers -> headers.addAll(response.headers().asHttpHeaders()))
+                        .cookies(cookies -> cookies.addAll(response.cookies()))
+                        .body(body)
+                        .build();
+            });
         });
     }
 
