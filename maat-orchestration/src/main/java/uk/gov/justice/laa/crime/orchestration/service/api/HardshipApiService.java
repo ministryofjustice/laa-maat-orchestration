@@ -15,28 +15,21 @@ import org.springframework.stereotype.Service;
 public class HardshipApiService {
 
     private final HardshipApiClient hardshipApiClient;
-    private static final String RESPONSE_STRING = "Response from Hardship Service: {}";
     private static final String REQUEST_STRING = "Request to Hardship Service: {}";
 
     public ApiFindHardshipResponse find(Integer hardshipReviewId) {
         log.info(REQUEST_STRING, hardshipReviewId);
-        ApiFindHardshipResponse response = hardshipApiClient.getHardshipReview(hardshipReviewId);
-        log.debug(RESPONSE_STRING, response);
-        return response;
+        return hardshipApiClient.getHardshipReview(hardshipReviewId);
     }
 
     public ApiPerformHardshipResponse create(ApiPerformHardshipRequest request) {
         log.debug(REQUEST_STRING, request);
-        ApiPerformHardshipResponse response = hardshipApiClient.createHardshipReview(request);
-        log.debug(RESPONSE_STRING, response);
-        return response;
+        return hardshipApiClient.createHardshipReview(request);
     }
 
     public ApiPerformHardshipResponse update(ApiPerformHardshipRequest request) {
         log.debug(REQUEST_STRING, request);
-        ApiPerformHardshipResponse response = hardshipApiClient.updateHardshipReview(request);
-        log.debug(RESPONSE_STRING, response);
-        return response;
+        return hardshipApiClient.updateHardshipReview(request);
     }
 
     public void rollback(Integer hardshipReviewId) {

@@ -23,7 +23,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 public class AssessmentApiService {
 
     private static final String REQUEST_STRING = "Request to Assessment Service: {}";
-    private static final String RESPONSE_STRING = "Response from Assessment Service: {}";
 
     private final CrimeAssessmentApiClient assessmentApiClient;
 
@@ -32,46 +31,32 @@ public class AssessmentApiService {
 
         // 404s are intercepted by the WebClientFilters, so we re-throw the exception here to be
         // caught by our DefaultExceptionHandler
-        ApiGetIojAppealResponse apiGetIojAppealResponse = Optional.ofNullable(
-                        assessmentApiClient.getIojAppeal(appealId))
+        return Optional.ofNullable(assessmentApiClient.getIojAppeal(appealId))
                 .orElseThrow(() ->
                         new WebClientResponseException(HttpStatus.NOT_FOUND.value(), "Not found", null, null, null));
-
-        log.debug(RESPONSE_STRING, apiGetIojAppealResponse);
-        return apiGetIojAppealResponse;
     }
 
     public ApiCreateIojAppealResponse createIojAppeal(ApiCreateIojAppealRequest request) {
         log.debug(REQUEST_STRING, request);
-        ApiCreateIojAppealResponse response = assessmentApiClient.createIojAppeal(request);
-        log.debug(RESPONSE_STRING, response);
-        return response;
+        return assessmentApiClient.createIojAppeal(request);
     }
 
     public ApiGetPassportedAssessmentResponse findPassportAssessment(int id) {
         log.debug("Request to Assessment Service to retrieve Passport Assessment: {}", id);
 
-        ApiGetPassportedAssessmentResponse response = Optional.ofNullable(assessmentApiClient.getPassportAssessment(id))
+        return Optional.ofNullable(assessmentApiClient.getPassportAssessment(id))
                 .orElseThrow(() ->
                         new WebClientResponseException(HttpStatus.NOT_FOUND.value(), "Not found", null, null, null));
-
-        log.debug(REQUEST_STRING, response);
-
-        return response;
     }
 
     public ApiCreatePassportedAssessmentResponse createPassportAssessment(
             ApiCreatePassportedAssessmentRequest request) {
         log.debug(REQUEST_STRING, request);
-        ApiCreatePassportedAssessmentResponse response = assessmentApiClient.createPassportAssessment(request);
-        log.debug(RESPONSE_STRING, response);
-        return response;
+        return assessmentApiClient.createPassportAssessment(request);
     }
 
     public ApiRollbackIojAppealResponse rollback(String appealId) {
         log.debug(REQUEST_STRING, appealId);
-        ApiRollbackIojAppealResponse response = assessmentApiClient.rollback(appealId);
-        log.debug(RESPONSE_STRING, response);
-        return response;
+        return assessmentApiClient.rollback(appealId);
     }
 }
