@@ -110,6 +110,8 @@ public class PassportAssessmentOrchestrationService {
         preProcessPassportRequest(workflowRequest, repOrderDTO);
 
         Integer assessmentId = passportAssessmentService.create(workflowRequest);
+        applicationDTO.getPassportedDTO().setPassportedId(Long.valueOf(assessmentId));
+
         repOrderDTO = repOrderService.updateRepOrderAssessmentDateCompleted(
                 workflowRequest, repOrderDTO, LocalDateTime.now());
 

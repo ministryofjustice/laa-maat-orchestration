@@ -103,8 +103,6 @@ class PassportAssessmentServiceTest {
 
         Integer assessmentId = passportAssessmentService.create(workflowRequest);
 
-        assertThat(workflowRequest.getApplicationDTO().getPassportedDTO().getPassportedId())
-                .isEqualTo(Long.valueOf(Constants.PASSPORT_ASSESSMENT_ID));
         assertThat(assessmentId).isEqualTo(Constants.PASSPORT_ASSESSMENT_ID);
     }
 }

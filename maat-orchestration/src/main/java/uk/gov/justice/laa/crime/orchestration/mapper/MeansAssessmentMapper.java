@@ -33,7 +33,7 @@ import uk.gov.justice.laa.crime.enums.NewWorkReason;
 import uk.gov.justice.laa.crime.enums.ReviewType;
 import uk.gov.justice.laa.crime.enums.evidence.IncomeEvidenceType;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
-import uk.gov.justice.laa.crime.orchestration.common.ApplicationDTOUtils;
+import uk.gov.justice.laa.crime.orchestration.common.PartnerResolver;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentDetailDTO;
@@ -173,7 +173,7 @@ public class MeansAssessmentMapper {
                         .map(evidenceItem -> mapToApiIncomeEvidence(evidenceItem, applicantId))
                         .toList());
 
-        Optional<Integer> partnerId = ApplicationDTOUtils.getPartnerId(applicationDTO);
+        Optional<Integer> partnerId = PartnerResolver.getPartnerId(applicationDTO);
         partnerId.ifPresent(id -> incomeEvidence.addAll(incomeEvidenceSummary.getPartnerIncomeEvidenceList().stream()
                 .map(evidenceItem -> mapToApiIncomeEvidence(evidenceItem, id))
                 .toList()));

@@ -8,7 +8,7 @@ import uk.gov.justice.laa.crime.util.NumberUtils;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ApplicationDTOUtils {
+public class PartnerResolver {
 
     public static Optional<Integer> getPartnerId(ApplicationDTO applicationDTO) {
         if (applicationDTO.getApplicantLinks() != null) {
