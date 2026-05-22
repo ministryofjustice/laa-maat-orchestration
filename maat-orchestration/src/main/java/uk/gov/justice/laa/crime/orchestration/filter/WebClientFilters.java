@@ -12,6 +12,15 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 @Slf4j
 @UtilityClass
 public class WebClientFilters {
+
+    private static ClientResponse rebuildResponse(ClientResponse response, String body) {
+        return ClientResponse.create(response.statusCode())
+                .headers(headers -> headers.addAll(response.headers().asHttpHeaders()))
+                .cookies(cookies -> cookies.addAll(response.cookies()))
+                .body(body)
+                .build();
+    }
+
     public static ExchangeFilterFunction logResponse() {
         return ExchangeFilterFunction.ofResponseProcessor(response -> {
             String method = response.request().getMethod().name();
@@ -25,15 +34,14 @@ public class WebClientFilters {
                 log.error("❌  Response status: {}", response.statusCode());
             }
 
-            return response.bodyToMono(String.class).defaultIfEmpty("").map(body -> {
-                log.debug("Response from {} {}: {}", method, url, body);
+            if (log.isDebugEnabled()) {
+                return response.bodyToMono(String.class).defaultIfEmpty("").map(body -> {
+                    log.debug("Response from {} {}: {}", method, url, body);
+                    return rebuildResponse(response, body);
+                });
+            }
 
-                return ClientResponse.create(response.statusCode())
-                        .headers(headers -> headers.addAll(response.headers().asHttpHeaders()))
-                        .cookies(cookies -> cookies.addAll(response.cookies()))
-                        .body(body)
-                        .build();
-            });
+            return Mono.just(response);
         });
     }
 
