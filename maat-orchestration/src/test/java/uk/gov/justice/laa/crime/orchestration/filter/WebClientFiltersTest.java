@@ -3,14 +3,18 @@ package uk.gov.justice.laa.crime.orchestration.filter;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.ClientRequest;
@@ -22,6 +26,12 @@ class WebClientFiltersTest {
     public static final ClientRequest CLIENT_REQUEST = ClientRequest.create(
                     HttpMethod.GET, URI.create("https://example.com"))
             .build();
+
+    @BeforeEach
+    void setupLogging() {
+        Logger logger = (Logger) LoggerFactory.getLogger(WebClientFilters.class);
+        logger.setLevel(Level.DEBUG);
+    }
 
     @Test
     void givenRequestWithHeaders_whenLogRequestHeadersFilterApplied_thenResponseIsPassedThrough() {
