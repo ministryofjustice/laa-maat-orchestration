@@ -31,6 +31,7 @@ import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
 import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -182,21 +183,20 @@ class IojAppealsOrchestrationServiceTest {
         workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal().setCmuId(null);
         workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal().setNewWorkReasonDTO(null);
 
-        IOJAppealDTO iojAppealDTO =
-                workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal();
+        String msg = "We need a triggering exception";
         RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO());
         UserActionDTO userActionDTO = TestModelDataBuilder.getUserActionDTO();
-        NullPointerException npe = new NullPointerException("We need a triggering exception");
+        CrimeValidationException cve = new CrimeValidationException(List.of(msg));
 
         when(repOrderService.getRepOrder(workflowRequest)).thenReturn(repOrderDTO);
         when(iojAppealMapper.getUserActionDTO(workflowRequest)).thenReturn(userActionDTO);
-        when(iojAppealService.create(workflowRequest)).thenThrow(npe);
+        when(iojAppealService.create(workflowRequest)).thenThrow(cve);
 
         assertThatThrownBy(() -> iojAppealsOrchestrationService.create(workflowRequest))
                 .isInstanceOf(CrimeValidationException.class)
                 .extracting("exceptionMessages", InstanceOfAssertFactories.ITERABLE)
                 .first(InstanceOfAssertFactories.STRING)
-                .startsWith("IOJ-Appeal missing required fields");
+                .startsWith(msg);
 
         verify(proceedingsService, never()).determineMagsRepDecision(any());
         verify(contributionService, never()).calculate(any());

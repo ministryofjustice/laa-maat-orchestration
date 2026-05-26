@@ -9,10 +9,12 @@ import uk.gov.justice.laa.crime.common.model.ioj.ApiRollbackIojAppealResponse;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.ApplicationDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
+import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.RollbackException;
 import uk.gov.justice.laa.crime.orchestration.mapper.IojAppealMapper;
-import uk.gov.justice.laa.crime.orchestration.mapper.UserMapper;
 import uk.gov.justice.laa.crime.orchestration.service.api.AssessmentApiService;
+
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -23,7 +25,6 @@ public class IojAppealService {
 
     private final AssessmentApiService assessmentApiService;
     private final IojAppealMapper iojAppealMapper;
-    private final UserMapper userMapper;
 
     public IOJAppealDTO find(int appealId) {
         ApiGetIojAppealResponse response = assessmentApiService.findIojAppeal(appealId);
@@ -34,14 +35,19 @@ public class IojAppealService {
     public String create(WorkflowRequest request) {
         ApplicationDTO applicationDTO = request.getApplicationDTO();
         IOJAppealDTO iojAppealDto = applicationDTO.getAssessmentDTO().getIojAppeal();
-
-        ApiCreateIojAppealRequest iojAppealRequest =
-                iojAppealMapper.mapIojAppealDtoToApiCreateIojAppealRequest(request);
+        ApiCreateIojAppealRequest iojAppealRequest = mapCreateRequest(request);
         ApiCreateIojAppealResponse iojAppealResponse = assessmentApiService.createIojAppeal(iojAppealRequest);
-
         iojAppealDto.setIojId(iojAppealResponse.getLegacyAppealId().longValue());
-
         return iojAppealResponse.getAppealId();
+    }
+
+    private ApiCreateIojAppealRequest mapCreateRequest(WorkflowRequest request) {
+        try {
+            return iojAppealMapper.mapIojAppealDtoToApiCreateIojAppealRequest(request);
+        } catch (NullPointerException | IllegalArgumentException ex) {
+            log.error("Failed to map IOJ appeal create request.\nRequest: {}", request, ex);
+            throw new CrimeValidationException(List.of("IOJ appeal request is missing required fields"));
+        }
     }
 
     public void rollback(String appealId, WorkflowRequest request) {

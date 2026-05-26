@@ -13,7 +13,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.AssessmentSummaryDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.IOJAppealDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
-import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.exception.RollbackException;
 import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
@@ -27,9 +26,6 @@ import uk.gov.justice.laa.crime.orchestration.service.MaatCourtDataService;
 import uk.gov.justice.laa.crime.orchestration.service.ProceedingsService;
 import uk.gov.justice.laa.crime.orchestration.service.RepOrderService;
 import uk.gov.justice.laa.crime.orchestration.service.WorkflowPreProcessorService;
-
-import java.util.List;
-import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -63,21 +59,9 @@ public class IojAppealsOrchestrationService {
             throw new MaatOrchestrationException(request.getApplicationDTO());
         }
 
-        String appealId;
-        try {
-            UserActionDTO userActionDTO = iojAppealMapper.getUserActionDTO(request);
-            workflowPreProcessorService.preProcessRequest(request, repOrderDto, userActionDTO);
-            appealId = iojAppealService.create(request);
-        } catch (NullPointerException npe) {
-            UUID uuid = UUID.randomUUID();
-            log.error(
-                    "Required iojAppeal fields missing in request: UUID: {},\n Exception: {},\n Request: {}",
-                    uuid,
-                    npe,
-                    request);
-            throw new CrimeValidationException(
-                    List.of(String.format("IOJ-Appeal missing required fields, report with %s", uuid)));
-        }
+        UserActionDTO userActionDTO = iojAppealMapper.getUserActionDTO(request);
+        workflowPreProcessorService.preProcessRequest(request, repOrderDto, userActionDTO);
+        String appealId = iojAppealService.create(request);
 
         try {
             proceedingsService.determineMagsRepDecision(request);

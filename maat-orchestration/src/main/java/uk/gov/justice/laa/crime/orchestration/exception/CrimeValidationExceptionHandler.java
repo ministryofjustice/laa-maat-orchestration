@@ -21,10 +21,12 @@ public class CrimeValidationExceptionHandler {
 
     private final TraceIdHandler traceIdHandler;
 
-    private static ResponseEntity<ErrorDTO> buildErrorResponse(HttpStatus status, List<String> errorMessage) {
+    private static ResponseEntity<ErrorDTO> buildErrorResponse(
+            HttpStatus status, List<String> errorMessage, String traceId) {
         return new ResponseEntity<>(
                 ErrorDTO.builder()
                         .code(status.toString())
+                        .traceId(traceId)
                         .messageList(errorMessage)
                         .build(),
                 status);
@@ -43,9 +45,12 @@ public class CrimeValidationExceptionHandler {
 
     @ExceptionHandler(CrimeValidationException.class)
     public ResponseEntity<ErrorDTO> handleCrimeValidationException(CrimeValidationException ex) {
-        String messages = "\n" + String.join(",\n", ex.getExceptionMessages());
-        log.error("CrimeValidationException: XXX ", messages, ex);
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, new ArrayList<>(ex.getExceptionMessages()));
+        log.error(
+                "CrimeValidationException with errors:\nMessages: {}",
+                String.join("\n", ex.getExceptionMessages()),
+                ex);
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST, new ArrayList<>(ex.getExceptionMessages()), traceIdHandler.getTraceId());
     }
 
     @ExceptionHandler(ValidationException.class)
