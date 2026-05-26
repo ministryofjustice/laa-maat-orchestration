@@ -106,8 +106,7 @@ class PassportAssessmentServiceTest {
         ApiCreatePassportedAssessmentResponse response =
                 PassportAssessmentDataBuilder.getApiCreatePassportedAssessmentResponse();
 
-        when(passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(
-                        workflowRequest, partnerId))
+        when(passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(workflowRequest, partnerId))
                 .thenReturn(casRequest);
         when(assessmentApiService.createPassportAssessment(casRequest)).thenReturn(response);
 
@@ -118,8 +117,6 @@ class PassportAssessmentServiceTest {
     }
 
     private static Stream<Arguments> partnerIdArguments() {
-        return Stream.of(
-                Arguments.of(Boolean.FALSE, null),
-                Arguments.of(Boolean.TRUE, Constants.PARTNER_ID));
+        return Stream.of(Arguments.of(Boolean.FALSE, null), Arguments.of(Boolean.TRUE, Constants.PARTNER_ID));
     }
 }
