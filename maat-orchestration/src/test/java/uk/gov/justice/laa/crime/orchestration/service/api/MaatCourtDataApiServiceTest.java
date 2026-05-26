@@ -1,15 +1,20 @@
 package uk.gov.justice.laa.crime.orchestration.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
 import uk.gov.justice.laa.crime.orchestration.client.MaatCourtDataApiClient;
+import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.dto.StoredProcedureRequest;
+import uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.SendToCCLFDTO;
 
 import java.time.LocalDateTime;
@@ -20,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @ExtendWith(MockitoExtension.class)
 class MaatCourtDataApiServiceTest {
@@ -46,6 +52,24 @@ class MaatCourtDataApiServiceTest {
     void givenValidRequest_whenGetUserSummaryIsInvoked_thenUserSummaryDTOIsReturned() {
         maatCourtDataApiService.getUserSummary("test");
         verify(maatCourtDataApiClient).getUserSummary(anyString());
+    }
+
+    @Test
+    void givenValidApplicantId_whenGetApplicantIsInvoked_thenApplicantDTOIsReturned() {
+        ApplicantDTO expected = new ApplicantDTO();
+        when(maatCourtDataApiClient.getApplicant(Constants.APPLICANT_ID)).thenReturn(expected);
+
+        ApplicantDTO actual = maatCourtDataApiService.getApplicant(Constants.APPLICANT_ID);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void givenInvalidApplicantId_whenGetApplicantIsInvoked_thenExceptionIsThrown() {
+        when(maatCourtDataApiClient.getApplicant(Constants.APPLICANT_ID)).thenReturn(null);
+
+        assertThatThrownBy(() -> maatCourtDataApiService.getApplicant(Constants.APPLICANT_ID))
+                .isInstanceOf(WebClientResponseException.class);
     }
 
     @Test

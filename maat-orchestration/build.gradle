@@ -4,7 +4,7 @@ plugins {
 	id "org.sonarqube" version "7.2.3.7755"
 	id "com.diffplug.spotless" version "8.0.0"
 	id "info.solidsoft.pitest" version "1.19.0"
-	id "org.springframework.boot" version "3.5.13"
+	id "org.springframework.boot" version "3.5.14"
 	id "io.spring.dependency-management" version "1.1.7"
 }
 
@@ -21,7 +21,7 @@ def versions = [
 		sentry					: "8.36.0",
 		springdocVersion        : "2.8.14",
 		commonsModSchemas       : "1.51.1",
-		crimeCommonsClasses     : "4.35.0",
+		crimeCommonsClasses     : "4.38.0",
 		wiremock				: "4.0.8",
 		resilience4jVersion     : "2.4.0",
 		commonsLang3Version		: "3.20.0",
@@ -72,6 +72,9 @@ dependencies {
 	compileOnly "org.projectlombok:lombok"
 	annotationProcessor "org.projectlombok:lombok"
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+	// ---- Pinned to Resolve Vulnerability CVE-2026-43512 ---
+	implementation "org.apache.tomcat.embed:tomcat-embed-core:10.1.55"
 
 	// ---- Testing ----
 	testImplementation "org.springframework.boot:spring-boot-starter-test"
