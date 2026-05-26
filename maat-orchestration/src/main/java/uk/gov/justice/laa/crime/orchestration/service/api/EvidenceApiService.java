@@ -1,7 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service.api;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceRequest;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiCreateIncomeEvidenceResponse;
 import uk.gov.justice.laa.crime.common.model.evidence.ApiGetPassportEvidenceResponse;
@@ -11,38 +10,23 @@ import uk.gov.justice.laa.crime.orchestration.client.EvidenceApiClient;
 
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EvidenceApiService {
-
-    private static final String REQUEST_STRING = "Request to evidence service: {}";
-    private static final String RESPONSE_STRING = "Response from evidence service: {}";
 
     private final EvidenceApiClient evidenceApiClient;
 
     public ApiCreateIncomeEvidenceResponse createEvidence(
             ApiCreateIncomeEvidenceRequest apiCreateIncomeEvidenceRequest) {
-        log.debug(REQUEST_STRING, apiCreateIncomeEvidenceRequest);
-        ApiCreateIncomeEvidenceResponse apiCreateIncomeEvidenceResponse =
-                evidenceApiClient.createEvidence(apiCreateIncomeEvidenceRequest);
-        log.debug(RESPONSE_STRING, apiCreateIncomeEvidenceResponse);
-        return apiCreateIncomeEvidenceResponse;
+        return evidenceApiClient.createEvidence(apiCreateIncomeEvidenceRequest);
     }
 
     public ApiUpdateIncomeEvidenceResponse updateEvidence(
             ApiUpdateIncomeEvidenceRequest apiUpdateIncomeEvidenceRequest) {
-        log.debug(REQUEST_STRING, apiUpdateIncomeEvidenceRequest);
-        ApiUpdateIncomeEvidenceResponse apiUpdateIncomeEvidenceResponse =
-                evidenceApiClient.updateEvidence(apiUpdateIncomeEvidenceRequest);
-        log.debug(RESPONSE_STRING, apiUpdateIncomeEvidenceResponse);
-        return apiUpdateIncomeEvidenceResponse;
+        return evidenceApiClient.updateEvidence(apiUpdateIncomeEvidenceRequest);
     }
 
     public ApiGetPassportEvidenceResponse getPassportEvidence(int passportAssessmentId) {
-        log.debug("Request to evidence service to retrieve evidence for passport assessment: {}", passportAssessmentId);
-        ApiGetPassportEvidenceResponse response = evidenceApiClient.findPassportEvidence(passportAssessmentId);
-        log.debug(RESPONSE_STRING, response);
-        return response;
+        return evidenceApiClient.findPassportEvidence(passportAssessmentId);
     }
 }

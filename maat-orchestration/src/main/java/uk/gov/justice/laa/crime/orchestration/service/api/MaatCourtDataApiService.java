@@ -1,7 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.service.api;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.meansassessment.maatapi.MaatApiUpdateAssessment;
 import uk.gov.justice.laa.crime.orchestration.client.MaatCourtDataApiClient;
@@ -14,77 +13,49 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.SendToCCLFDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserSummaryDTO;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MaatCourtDataApiService {
 
-    private static final String RESPONSE_STRING = "Response from MAAT Court Data Service: {}";
-    private static final String REQUEST_STRING = "Request to MAAT Court Data Service: {}";
     private final MaatCourtDataApiClient maatApiClient;
 
     public ApplicationDTO executeStoredProcedure(StoredProcedureRequest request) {
-        log.debug(REQUEST_STRING, request);
-        ApplicationDTO response = maatApiClient.executeStoredProcedure(request);
-        log.debug(RESPONSE_STRING, response);
-        return response;
+        return maatApiClient.executeStoredProcedure(request);
     }
 
     public RepOrderDTO getRepOrderByRepId(Integer repId) {
-        log.info(REQUEST_STRING, repId);
-        RepOrderDTO response = maatApiClient.getRepOrderByRepId(repId);
-        log.debug(RESPONSE_STRING, response);
-        return response;
+        return maatApiClient.getRepOrderByRepId(repId);
     }
 
     public UserSummaryDTO getUserSummary(String username) {
-        log.info(REQUEST_STRING, username);
-        UserSummaryDTO userSummaryDTO = maatApiClient.getUserSummary(username);
-        log.debug(RESPONSE_STRING, userSummaryDTO);
-        return userSummaryDTO;
+        return maatApiClient.getUserSummary(username);
     }
 
     public ApplicantDTO getApplicant(int applicantId) {
-        log.debug(REQUEST_STRING, applicantId);
-
-        ApplicantDTO response = maatApiClient.getApplicant(applicantId);
-        if (response == null) {
-            throw new WebClientResponseException(HttpStatus.NOT_FOUND.value(), "Not found", null, null, null);
-        }
-
-        log.debug(RESPONSE_STRING, response);
-        return response;
+        return Optional.ofNullable(maatApiClient.getApplicant(applicantId))
+                .orElseThrow(() ->
+                        new WebClientResponseException(HttpStatus.NOT_FOUND.value(), "Not found", null, null, null));
     }
 
     public void updateSendToCCLF(SendToCCLFDTO sendToCCLFDTO) {
-        log.debug(REQUEST_STRING, sendToCCLFDTO);
         maatApiClient.updateSendToCCLF(sendToCCLFDTO);
     }
 
     public FinancialAssessmentDTO getFinancialAssessment(int financialAssessmentId) {
-        log.info(REQUEST_STRING, financialAssessmentId);
-        FinancialAssessmentDTO financialAssessmentDTO = maatApiClient.getFinancialAssessment(financialAssessmentId);
-        log.debug(RESPONSE_STRING, financialAssessmentDTO);
-        return financialAssessmentDTO;
+        return maatApiClient.getFinancialAssessment(financialAssessmentId);
     }
 
     public MaatApiAssessmentResponse updateFinancialAssessment(MaatApiUpdateAssessment maatApiUpdateAssessment) {
-        log.debug(REQUEST_STRING, maatApiUpdateAssessment);
-        MaatApiAssessmentResponse financialAssessmentDTO =
-                maatApiClient.updateFinancialAssessment(maatApiUpdateAssessment);
-        log.debug(RESPONSE_STRING, financialAssessmentDTO);
-        return financialAssessmentDTO;
+        return maatApiClient.updateFinancialAssessment(maatApiUpdateAssessment);
     }
 
     public RepOrderDTO patchRepOrder(int repOrderId, Map<String, Object> fieldsToUpdate) {
-        log.debug(REQUEST_STRING, fieldsToUpdate);
-        RepOrderDTO repOrderDTO = maatApiClient.patchRepOrder(repOrderId, fieldsToUpdate);
-        log.debug(RESPONSE_STRING, repOrderDTO);
-        return repOrderDTO;
+        return maatApiClient.patchRepOrder(repOrderId, fieldsToUpdate);
     }
 }

@@ -3,6 +3,8 @@ package uk.gov.justice.laa.crime.orchestration.filter;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -11,8 +13,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
+import org.springframework.mock.http.client.MockClientHttpRequest;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -22,6 +30,46 @@ class WebClientFiltersTest {
     public static final ClientRequest CLIENT_REQUEST = ClientRequest.create(
                     HttpMethod.GET, URI.create("https://example.com"))
             .build();
+
+    @Test
+    void givenDebugLoggingEnabled_whenLogResponseFilterApplied_thenResponseIsRebuiltWithBody() {
+        // given
+        Logger logger = (Logger) LoggerFactory.getLogger(WebClientFilters.class);
+        Level originalLevel = logger.getLevel();
+
+        try {
+            logger.setLevel(Level.DEBUG);
+
+            HttpRequest request = new MockClientHttpRequest(HttpMethod.GET, URI.create("https://example.com/test"));
+
+            ClientResponse originalResponse = ClientResponse.create(HttpStatus.OK)
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .cookie("SESSION", "abc-123")
+                    .request(request)
+                    .body("{\"message\":\"success\"}")
+                    .build();
+
+            // when
+            ClientResponse rebuiltResponse = WebClientFilters.logResponse()
+                    .filter(CLIENT_REQUEST, ignored -> Mono.just(originalResponse))
+                    .block();
+
+            // then
+            assertThat(rebuiltResponse).isNotNull();
+            assertThat(rebuiltResponse).isNotSameAs(originalResponse);
+            assertThat(rebuiltResponse.statusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(rebuiltResponse.headers().contentType()).contains(MediaType.APPLICATION_JSON);
+
+            assertThat(rebuiltResponse.cookies().getFirst("SESSION"))
+                    .extracting(ResponseCookie::getValue)
+                    .isEqualTo("abc-123");
+
+            assertThat(rebuiltResponse.bodyToMono(String.class).block()).isEqualTo("{\"message\":\"success\"}");
+
+        } finally {
+            logger.setLevel(originalLevel);
+        }
+    }
 
     @Test
     void givenRequestWithHeaders_whenLogRequestHeadersFilterApplied_thenResponseIsPassedThrough() {
