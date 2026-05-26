@@ -96,8 +96,9 @@ class PassportAssessmentServiceTest {
     @ParameterizedTest
     @MethodSource("partnerIdArguments")
     void givenBenefitClaimedByPartnerFlag_whenCreateIsInvoked_thenExpectedPartnerIdIsPassed(
-            Boolean benefitClaimedByPartner, Optional<Integer> expectedPartnerId) {
+            Boolean benefitClaimedByPartner, Integer expectedPartnerId) {
 
+        Optional<Integer> partnerId = Optional.ofNullable(expectedPartnerId);
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         workflowRequest.getApplicationDTO().getPassportedDTO().setBenefitClaimedByPartner(benefitClaimedByPartner);
         ApiCreatePassportedAssessmentRequest casRequest =
@@ -106,19 +107,19 @@ class PassportAssessmentServiceTest {
                 PassportAssessmentDataBuilder.getApiCreatePassportedAssessmentResponse();
 
         when(passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(
-                        workflowRequest, expectedPartnerId))
+                        workflowRequest, partnerId))
                 .thenReturn(casRequest);
         when(assessmentApiService.createPassportAssessment(casRequest)).thenReturn(response);
 
         passportAssessmentService.create(workflowRequest);
 
         verify(passportAssessmentMapper)
-                .workflowRequestToApiCreatePassportedAssessmentRequest(workflowRequest, expectedPartnerId);
+                .workflowRequestToApiCreatePassportedAssessmentRequest(workflowRequest, partnerId);
     }
 
     private static Stream<Arguments> partnerIdArguments() {
         return Stream.of(
-                Arguments.of(Boolean.FALSE, Optional.empty()),
-                Arguments.of(Boolean.TRUE, Optional.of(Constants.PARTNER_ID)));
+                Arguments.of(Boolean.FALSE, null),
+                Arguments.of(Boolean.TRUE, Constants.PARTNER_ID));
     }
 }
