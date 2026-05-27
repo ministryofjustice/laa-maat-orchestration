@@ -245,6 +245,13 @@ public class WiremockStubs {
                         .withBody(response)));
     }
 
+    public static void stubForPatchRepOrder(String response) {
+        stubFor(patch(urlMatching(MAAT_API_ASSESSMENT_URL + "/rep-orders/" + REP_ID))
+                .willReturn(WireMock.ok()
+                        .withHeader("Content-Type", String.valueOf(MediaType.APPLICATION_JSON))
+                        .withBody(response)));
+    }
+
     public static void assertStubForPatchRepOrder(int times) {
         verify(exactly(times), patchRequestedFor(urlPathMatching(MAAT_API_ASSESSMENT_URL + "/rep-orders/" + REP_ID)));
     }

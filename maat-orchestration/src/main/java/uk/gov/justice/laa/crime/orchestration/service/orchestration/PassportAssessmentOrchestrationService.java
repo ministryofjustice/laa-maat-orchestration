@@ -48,21 +48,15 @@ public class PassportAssessmentOrchestrationService {
     private final ApplicationTrackingMapper applicationTrackingMapper;
     private final ApplicationTrackingDataService applicationTrackingDataService;
 
-    private RepOrderDTO getLatestRepOrder(WorkflowRequest workflowRequest) {
-        RepOrderDTO repOrderDTO = repOrderService.getRepOrder(workflowRequest);
-
-        if (repOrderDTO == null) {
-            log.error("Could not find rep order for request {}", workflowRequest);
-            throw new MaatOrchestrationException(workflowRequest.getApplicationDTO());
-        }
-
-        return repOrderDTO;
-    }
-
-    private void validatePassportRequest(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {
+    private void preProcessPassportRequest(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {
         UserActionDTO userActionDTO = passportAssessmentMapper.getUserActionDTO(workflowRequest);
 
-        workflowPreProcessorService.validatePassportRequest(workflowRequest, repOrderDTO, userActionDTO);
+        workflowPreProcessorService.preProcessRequest(workflowRequest, repOrderDTO, userActionDTO);
+    }
+
+    private boolean shouldProcessActivityAndGetCorrespondence(ApplicationDTO applicationDTO) {
+        return !NewWorkReason.FMA.equals(NewWorkReason.getFrom(
+                applicationDTO.getPassportedDTO().getNewWorkReason().getCode()));
     }
 
     private void updateAssessmentSummary(ApplicationDTO applicationDTO) {
@@ -87,10 +81,13 @@ public class PassportAssessmentOrchestrationService {
                 applicationDTO, workflowRequest.getUserDTO(), StoredProcedure.MANAGE_PASSPORT_EVIDENCE));
         proceedingsService.determineMagsRepDecision(workflowRequest);
         workflowRequest.setApplicationDTO(contributionService.calculate(workflowRequest));
+        workflowRequest.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
+                workflowRequest.getApplicationDTO(),
+                workflowRequest.getUserDTO(),
+                StoredProcedure.PRE_UPDATE_CC_APPLICATION));
         proceedingsService.updateApplication(workflowRequest, repOrderDTO);
 
-        if (!NewWorkReason.FMA.equals(NewWorkReason.getFrom(
-                applicationDTO.getPassportedDTO().getNewWorkReason().getCode()))) {
+        if (shouldProcessActivityAndGetCorrespondence(applicationDTO)) {
             workflowRequest.setApplicationDTO(maatCourtDataService.invokeStoredProcedure(
                     applicationDTO,
                     workflowRequest.getUserDTO(),
@@ -108,11 +105,13 @@ public class PassportAssessmentOrchestrationService {
 
     public ApplicationDTO create(WorkflowRequest workflowRequest) {
         ApplicationDTO applicationDTO = workflowRequest.getApplicationDTO();
-        RepOrderDTO repOrderDTO = getLatestRepOrder(workflowRequest);
+        RepOrderDTO repOrderDTO = repOrderService.getRepOrder(workflowRequest);
 
-        validatePassportRequest(workflowRequest, repOrderDTO);
+        preProcessPassportRequest(workflowRequest, repOrderDTO);
 
         Integer assessmentId = passportAssessmentService.create(workflowRequest);
+        applicationDTO.getPassportedDTO().setPassportedId(Long.valueOf(assessmentId));
+
         repOrderDTO = repOrderService.updateRepOrderAssessmentDateCompleted(
                 workflowRequest, repOrderDTO, LocalDateTime.now());
 

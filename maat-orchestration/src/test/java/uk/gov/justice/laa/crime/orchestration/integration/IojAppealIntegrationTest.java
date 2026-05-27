@@ -20,6 +20,7 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubFor
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetContributionsSummaries;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForPatchRepOrder;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForRollbackIojAppeal;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForSendApplicationTrackingResult;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForUpdateCrownCourtApplication;
@@ -135,6 +136,7 @@ class IojAppealIntegrationTest extends WiremockIntegrationTest {
                 objectMapper.writeValueAsString(TestModelDataBuilder.getDetermineMagsRepDecisionResponse()));
         stubForCalculateContributions(
                 objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
+        stubForPatchRepOrder(objectMapper.writeValueAsString(repOrderDTO));
         stubForGetContributionsSummaries(
                 objectMapper.writeValueAsString(List.of(TestModelDataBuilder.getApiContributionSummary())));
         stubForInvokeStoredProcedure(
@@ -183,6 +185,7 @@ class IojAppealIntegrationTest extends WiremockIntegrationTest {
 
         verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/ioj-appeals")));
 
+        assertStubForPatchRepOrder(1);
         assertStubForPatchRepOrder(1);
         assertStubForSendApplicationTrackingResult(1);
     }

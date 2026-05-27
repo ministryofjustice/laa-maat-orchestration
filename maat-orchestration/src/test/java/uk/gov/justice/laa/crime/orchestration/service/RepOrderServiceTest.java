@@ -1,7 +1,10 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -13,6 +16,7 @@ import uk.gov.justice.laa.crime.orchestration.data.Constants;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
+import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.util.DateUtil;
 
 import java.time.LocalDateTime;
@@ -32,13 +36,12 @@ class RepOrderServiceTest {
     private RepOrderService repOrderService;
 
     @Test
-    void givenUnknownRepOrder_whenGetRepOrderIsInvoked_thenNoRepOrderIsReturned() {
+    void givenUnknownRepOrder_whenGetRepOrderIsInvoked_thenExceptionIsThrown() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         when(maatCourtDataService.findRepOrder(any(Integer.class))).thenReturn(null);
 
-        RepOrderDTO actualRepOrder = repOrderService.getRepOrder(workflowRequest);
-
-        assertThat(actualRepOrder).isNull();
+        assertThatThrownBy(() -> repOrderService.getRepOrder(workflowRequest))
+                .isInstanceOf(MaatOrchestrationException.class);
     }
 
     @Test
@@ -57,8 +60,14 @@ class RepOrderServiceTest {
     @Test
     void givenValidDateModified_whenUpdateRepOrderDateModified_thenRepOrderIsUpdated() {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        int repOrderId = workflowRequest.getApplicationDTO().getRepId().intValue();
+        RepOrderDTO updatedRepOrder = RepOrderDTO.builder().id(repOrderId).build();
 
-        repOrderService.updateRepOrderDateModified(workflowRequest, LocalDateTime.now());
+        when(maatCourtDataService.updateRepOrder(anyInt(), anyMap())).thenReturn(updatedRepOrder);
+
+        RepOrderDTO actualRepOrder = repOrderService.updateRepOrderDateModified(workflowRequest, LocalDateTime.now());
+
+        assertThat(actualRepOrder).isEqualTo(updatedRepOrder);
         verify(maatCourtDataService).updateRepOrder(any(), any());
     }
 
@@ -71,9 +80,7 @@ class RepOrderServiceTest {
         RepOrderDTO updatedRepOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
         updatedRepOrderDTO.setAssessmentDateCompleted(DateUtil.parseLocalDate(dateCompleted));
 
-        when(maatCourtDataService.findRepOrder(
-                        workflowRequest.getApplicationDTO().getRepId().intValue()))
-                .thenReturn(updatedRepOrderDTO);
+        when(maatCourtDataService.updateRepOrder(anyInt(), anyMap())).thenReturn(updatedRepOrderDTO);
 
         assertThat(repOrderService.updateRepOrderAssessmentDateCompleted(workflowRequest, repOrderDTO, dateCompleted))
                 .isEqualTo(updatedRepOrderDTO);

@@ -19,6 +19,8 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 
+import java.util.Optional;
+
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
@@ -128,7 +130,7 @@ class PassportAssessmentMapperTest {
         WorkflowRequest request = TestModelDataBuilder.buildWorkFlowRequest();
         request.getApplicationDTO().setPassportedDTO(PassportAssessmentDataBuilder.getPassportedDTO(hasPartner));
         ApiUserSession userSession = TestModelDataBuilder.getApiUserSession();
-        Integer partnerId = hasPartner ? Constants.PARTNER_ID : null;
+        Optional<Integer> partnerId = hasPartner ? Optional.of(Constants.PARTNER_ID) : Optional.empty();
         ApiCreatePassportedAssessmentRequest expected =
                 PassportAssessmentDataBuilder.getApiCreatePassportedAssessmentRequest(hasPartner);
 
@@ -166,7 +168,8 @@ class PassportAssessmentMapperTest {
         when(userMapper.userDtoToUserSession(request.getUserDTO())).thenReturn(userSession);
 
         ApiCreatePassportedAssessmentRequest actual =
-                passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(request, null);
+                passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(
+                        request, Optional.empty());
 
         softly.assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
         softly.assertAll();

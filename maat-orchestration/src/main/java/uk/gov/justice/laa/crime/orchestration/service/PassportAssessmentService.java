@@ -7,7 +7,7 @@ import uk.gov.justice.laa.crime.common.model.passported.ApiCreatePassportedAsses
 import uk.gov.justice.laa.crime.common.model.passported.ApiGetPassportedAssessmentResponse;
 import uk.gov.justice.laa.crime.common.model.passported.DeclaredBenefit;
 import uk.gov.justice.laa.crime.enums.BenefitRecipient;
-import uk.gov.justice.laa.crime.orchestration.common.ApplicationDTOUtils;
+import uk.gov.justice.laa.crime.orchestration.common.PartnerResolver;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
 import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO;
@@ -15,6 +15,8 @@ import uk.gov.justice.laa.crime.orchestration.mapper.PassportAssessmentMapper;
 import uk.gov.justice.laa.crime.orchestration.service.api.AssessmentApiService;
 import uk.gov.justice.laa.crime.orchestration.service.api.EvidenceApiService;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
+
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -46,10 +48,10 @@ public class PassportAssessmentService {
     }
 
     public Integer create(WorkflowRequest workflowRequest) {
-        Integer partnerId = Boolean.TRUE.equals(
+        Optional<Integer> partnerId = Boolean.TRUE.equals(
                         workflowRequest.getApplicationDTO().getPassportedDTO().getBenefitClaimedByPartner())
-                ? ApplicationDTOUtils.getPartnerId(workflowRequest.getApplicationDTO())
-                : null;
+                ? PartnerResolver.getPartnerId(workflowRequest.getApplicationDTO())
+                : Optional.empty();
 
         ApiCreatePassportedAssessmentRequest createPassportRequest =
                 passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(
@@ -58,8 +60,6 @@ public class PassportAssessmentService {
         ApiCreatePassportedAssessmentResponse createPassportResponse =
                 assessmentApiService.createPassportAssessment(createPassportRequest);
 
-        Integer assessmentId = createPassportResponse.getLegacyAssessmentId();
-        workflowRequest.getApplicationDTO().getPassportedDTO().setPassportedId(Long.valueOf(assessmentId));
-        return assessmentId;
+        return createPassportResponse.getLegacyAssessmentId();
     }
 }

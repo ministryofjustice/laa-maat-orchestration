@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -20,8 +21,14 @@ import uk.gov.justice.laa.crime.orchestration.service.api.AssessmentApiService;
 import uk.gov.justice.laa.crime.orchestration.service.api.EvidenceApiService;
 import uk.gov.justice.laa.crime.orchestration.service.api.MaatCourtDataApiService;
 
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -86,22 +93,30 @@ class PassportAssessmentServiceTest {
                 .isEqualTo(passportedDTO);
     }
 
-    @Test
-    void givenValidRequest_whenCreateIsInvoked_thenPassportAssessmentIdIsReturned() {
+    @ParameterizedTest
+    @MethodSource("partnerIdArguments")
+    void givenBenefitClaimedByPartnerFlag_whenCreateIsInvoked_thenExpectedPartnerIdIsPassed(
+            Boolean benefitClaimedByPartner, Integer expectedPartnerId) {
+
+        Optional<Integer> partnerId = Optional.ofNullable(expectedPartnerId);
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().getPassportedDTO().setBenefitClaimedByPartner(benefitClaimedByPartner);
         ApiCreatePassportedAssessmentRequest casRequest =
                 PassportAssessmentDataBuilder.getApiCreatePassportedAssessmentRequest(Constants.WITHOUT_PARTNER);
         ApiCreatePassportedAssessmentResponse response =
                 PassportAssessmentDataBuilder.getApiCreatePassportedAssessmentResponse();
 
-        when(passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(workflowRequest, null))
+        when(passportAssessmentMapper.workflowRequestToApiCreatePassportedAssessmentRequest(workflowRequest, partnerId))
                 .thenReturn(casRequest);
         when(assessmentApiService.createPassportAssessment(casRequest)).thenReturn(response);
 
-        Integer assessmentId = passportAssessmentService.create(workflowRequest);
+        passportAssessmentService.create(workflowRequest);
 
-        assertThat(workflowRequest.getApplicationDTO().getPassportedDTO().getPassportedId())
-                .isEqualTo(Long.valueOf(Constants.PASSPORT_ASSESSMENT_ID));
-        assertThat(assessmentId).isEqualTo(Constants.PASSPORT_ASSESSMENT_ID);
+        verify(passportAssessmentMapper)
+                .workflowRequestToApiCreatePassportedAssessmentRequest(workflowRequest, partnerId);
+    }
+
+    private static Stream<Arguments> partnerIdArguments() {
+        return Stream.of(Arguments.of(Boolean.FALSE, null), Arguments.of(Boolean.TRUE, Constants.PARTNER_ID));
     }
 }

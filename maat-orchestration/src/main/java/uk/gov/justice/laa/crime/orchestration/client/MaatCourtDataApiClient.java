@@ -45,5 +45,5 @@ public interface MaatCourtDataApiClient {
     MaatApiAssessmentResponse updateFinancialAssessment(@RequestBody MaatApiUpdateAssessment request);
 
     @PatchExchange("/assessment/rep-orders/{repId}")
-    void patchRepOrder(@PathVariable int repId, @RequestBody Map<String, Object> fieldsToUpdate);
+    RepOrderDTO patchRepOrder(@PathVariable int repId, @RequestBody Map<String, Object> fieldsToUpdate);
 }

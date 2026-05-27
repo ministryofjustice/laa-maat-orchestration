@@ -27,6 +27,8 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.ApplicantDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.util.DateUtil;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -94,7 +96,7 @@ public class PassportAssessmentMapper {
         return null;
     }
 
-    private DeclaredBenefit mapDeclaredBenefit(ApplicationDTO applicationDTO, Integer partnerId) {
+    private DeclaredBenefit mapDeclaredBenefit(ApplicationDTO applicationDTO, Optional<Integer> partnerId) {
         PassportedDTO passportedDTO = applicationDTO.getPassportedDTO();
         BenefitType benefitType = mapBenefitType(passportedDTO);
 
@@ -105,12 +107,12 @@ public class PassportAssessmentMapper {
                                 ? DateUtil.toLocalDateTime(
                                         passportedDTO.getBenefitJobSeeker().getLastSignedOn())
                                 : null)
-                .withBenefitRecipient(partnerId == null ? BenefitRecipient.APPLICANT : BenefitRecipient.PARTNER)
-                .withLegacyPartnerId(partnerId);
+                .withBenefitRecipient(partnerId.isPresent() ? BenefitRecipient.PARTNER : BenefitRecipient.APPLICANT)
+                .withLegacyPartnerId(partnerId.orElse(null));
     }
 
     private PassportedAssessment applicationDTOToPassportedAssessment(
-            ApplicationDTO applicationDTO, Integer partnerId) {
+            ApplicationDTO applicationDTO, Optional<Integer> partnerId) {
         PassportedDTO passportedDTO = applicationDTO.getPassportedDTO();
 
         return new PassportedAssessment()
@@ -206,7 +208,7 @@ public class PassportAssessmentMapper {
     }
 
     public ApiCreatePassportedAssessmentRequest workflowRequestToApiCreatePassportedAssessmentRequest(
-            WorkflowRequest workflowRequest, Integer partnerId) {
+            WorkflowRequest workflowRequest, Optional<Integer> partnerId) {
         return new ApiCreatePassportedAssessmentRequest()
                 .withPassportedAssessment(
                         applicationDTOToPassportedAssessment(workflowRequest.getApplicationDTO(), partnerId))

@@ -19,6 +19,7 @@ import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubFor
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetApplicant;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForGetUserSummary;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForInvokeStoredProcedure;
+import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForPatchRepOrder;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForSendApplicationTrackingResult;
 import static uk.gov.justice.laa.crime.orchestration.utils.WiremockStubs.stubForUpdateCrownCourtApplication;
 import static uk.gov.justice.laa.crime.util.RequestBuilderUtils.buildRequest;
@@ -51,11 +52,11 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.stubbing.Scenario;
 
 class PassportAssessmentIntegrationTest extends WiremockIntegrationTest {
 
     private static final String ENDPOINT_URL = "/api/internal/v1/orchestration/passport";
+    private static final String MAAT_API_ASSESSMENT_URL = "/api/internal/v1/assessment";
 
     private MockMvc mvc;
 
@@ -180,18 +181,12 @@ class PassportAssessmentIntegrationTest extends WiremockIntegrationTest {
                 List.of(Action.CREATE_PASSPORT_ASSESSMENT.getCode()), NewWorkReason.FMA)));
         stubForCreatePassportAssessment(objectMapper.writeValueAsString(
                 PassportAssessmentDataBuilder.getApiGetPassportedAssessmentResponse(Constants.WITHOUT_PARTNER)));
-        stubForInvokeStoredProcedure(
-                Scenario.STARTED,
-                "MANAGE_PASSPORT_EVIDENCE",
-                objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO()));
+        stubForInvokeStoredProcedure(objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO()));
         stubForDetermineMagsRepDecision(
                 objectMapper.writeValueAsString(TestModelDataBuilder.getDetermineMagsRepDecisionResponse()));
         stubForCalculateContributions(
                 objectMapper.writeValueAsString(TestModelDataBuilder.getApiMaatCalculateContributionResponse()));
-        stubForInvokeStoredProcedure(
-                "MANAGE_PASSPORT_EVIDENCE",
-                "PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE",
-                objectMapper.writeValueAsString(TestModelDataBuilder.getApplicationDTO()));
+        stubForPatchRepOrder(objectMapper.writeValueAsString(repOrderDTO));
         stubForUpdateCrownCourtApplication(
                 objectMapper.writeValueAsString(MeansAssessmentDataBuilder.getApiUpdateApplicationResponse()));
         stubForSendApplicationTrackingResult();
@@ -258,6 +253,7 @@ class PassportAssessmentIntegrationTest extends WiremockIntegrationTest {
                 .andExpect(jsonPath("$.passportedDTO.whoDwpChecked").value(expected.getWhoDwpChecked()));
 
         verify(exactly(1), postRequestedFor(urlPathMatching("/api/internal/v1/passport")));
+        verify(exactly(3), postRequestedFor(urlMatching(MAAT_API_ASSESSMENT_URL + "/execute-stored-procedure")));
     }
 
     @Test
