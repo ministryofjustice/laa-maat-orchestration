@@ -51,11 +51,11 @@ public class IojAppealsOrchestrationService {
     }
 
     public ApplicationDTO create(WorkflowRequest request) {
+
         RepOrderDTO repOrderDto = repOrderService.getRepOrder(request);
 
         UserActionDTO userActionDTO = iojAppealMapper.getUserActionDTO(request);
         workflowPreProcessorService.preProcessRequest(request, repOrderDto, userActionDTO);
-
         String appealId = iojAppealService.create(request);
 
         try {
