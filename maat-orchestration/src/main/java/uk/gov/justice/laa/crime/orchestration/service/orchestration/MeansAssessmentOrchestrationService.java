@@ -6,7 +6,6 @@ import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_RE
 import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
@@ -170,12 +169,8 @@ public class MeansAssessmentOrchestrationService {
                 ? AssessmentType.MEANS_FULL
                 : AssessmentType.MEANS_INIT;
 
-        ApplicationTrackingOutputResult applicationTrackingOutputResult =
-                applicationTrackingMapper.build(request, repOrderDTO, assessmentType, RequestSource.MEANS_ASSESSMENT);
-
-        if (applicationTrackingOutputResult.getUsn() != null) {
-            applicationTrackingDataService.sendTrackingOutputResult(applicationTrackingOutputResult);
-        }
+        applicationTrackingDataService.sendTrackingOutputResult(
+                request, repOrderDTO, assessmentType, RequestSource.MEANS_ASSESSMENT);
 
         AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(
                 request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO());

@@ -3,7 +3,6 @@ package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
@@ -67,12 +66,8 @@ public class PassportAssessmentOrchestrationService {
     }
 
     private void updateApplicationTracking(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {
-        ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(
+        applicationTrackingDataService.sendTrackingOutputResult(
                 workflowRequest, repOrderDTO, AssessmentType.PASSPORT, RequestSource.PASSPORT_IOJ);
-
-        if (null != applicationTrackingOutputResult.getUsn()) {
-            applicationTrackingDataService.sendTrackingOutputResult(applicationTrackingOutputResult);
-        }
     }
 
     private void performPostProcessing(

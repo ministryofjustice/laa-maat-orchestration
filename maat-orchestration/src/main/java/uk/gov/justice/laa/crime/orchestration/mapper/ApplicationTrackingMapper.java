@@ -43,7 +43,8 @@ public class ApplicationTrackingMapper {
             WorkflowRequest workflowRequest,
             RepOrderDTO repOrderDTO,
             AssessmentType assessmentType,
-            RequestSource requestSource) {
+            RequestSource requestSource,
+            Long usn) {
 
         ApplicationTrackingOutputResult request = new ApplicationTrackingOutputResult();
         ApplicationDTO application = workflowRequest.getApplicationDTO();
@@ -54,10 +55,7 @@ public class ApplicationTrackingMapper {
         CrownCourtOverviewDTO crownCourtOverviewDTO = application.getCrownCourtOverviewDTO();
         CrownCourtSummaryDTO crownCourtSummaryDTO = crownCourtOverviewDTO.getCrownCourtSummaryDTO();
 
-        request.setUsn(
-                financialAssessmentDTO.getUsn() != null
-                        ? financialAssessmentDTO.getUsn().intValue()
-                        : null);
+        request.setUsn(usn.intValue());
         request.setMaatRef(application.getRepId().intValue());
         request.setActionKeyId(financialAssessmentDTO.getId());
         request.setCaseId(application.getCaseId());

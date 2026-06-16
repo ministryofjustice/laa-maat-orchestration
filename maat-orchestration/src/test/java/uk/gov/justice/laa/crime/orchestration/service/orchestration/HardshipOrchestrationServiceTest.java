@@ -18,7 +18,8 @@ import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataB
 import static uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder.getHardshipReviewDTO;
 
 import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipResponse;
-import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
 import uk.gov.justice.laa.crime.enums.CourtType;
 import uk.gov.justice.laa.crime.enums.CurrentStatus;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
@@ -211,8 +212,6 @@ class HardshipOrchestrationServiceTest {
                         any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
                 .thenReturn(applicationDTO);
 
-        when(applicationTrackingMapper.build(any(), any(), any(), any()))
-                .thenReturn(new ApplicationTrackingOutputResult().withUsn(12345));
         when(repOrderService.getRepOrder(any())).thenReturn(repOrderDTO);
 
         ApplicationDTO expected = orchestrationService.create(workflowRequest);
@@ -229,6 +228,9 @@ class HardshipOrchestrationServiceTest {
 
         verify(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
         verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
+        verify(applicationTrackingDataService, times(1))
+                .sendTrackingOutputResult(
+                        workflowRequest, repOrderDTO, AssessmentType.CCHARDSHIP, RequestSource.HARDSHIP);
     }
 
     @Test
@@ -461,8 +463,6 @@ class HardshipOrchestrationServiceTest {
                 .thenReturn(assessmentSummaryDTO);
         when(hardshipMapper.getUserActionDTO(any(), any()))
                 .thenReturn(UserActionDTO.builder().username("mock-u").build());
-        when(applicationTrackingMapper.build(any(), any(), any(), any()))
-                .thenReturn(new ApplicationTrackingOutputResult().withUsn(12345));
         when(repOrderService.getRepOrder(any())).thenReturn(repOrderDTO);
 
         ApplicationDTO expected = orchestrationService.update(workflowRequest);
@@ -480,6 +480,10 @@ class HardshipOrchestrationServiceTest {
         verify(assessmentSummaryService).updateApplication(applicationDTO, assessmentSummaryDTO);
 
         verify(applicationService, times(1)).updateDateModified(eq(workflowRequest), any());
+
+        verify(applicationTrackingDataService, times(1))
+                .sendTrackingOutputResult(
+                        workflowRequest, repOrderDTO, AssessmentType.CCHARDSHIP, RequestSource.HARDSHIP);
     }
 
     @Test

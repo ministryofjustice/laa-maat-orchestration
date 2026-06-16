@@ -3,7 +3,6 @@ package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
@@ -78,11 +77,9 @@ public class IojAppealsOrchestrationService {
             applicationService.updateDateModified(request, request.getApplicationDTO());
 
             // Call Application Tracking Service endpoint
-            ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(
+            applicationTrackingDataService.sendTrackingOutputResult(
                     request, repOrderDto, AssessmentType.IOJ, RequestSource.PASSPORT_IOJ);
-            if (null != applicationTrackingOutputResult.getUsn()) {
-                applicationTrackingDataService.sendTrackingOutputResult(applicationTrackingOutputResult);
-            }
+
         } catch (Exception ex) {
             log.error("IoJ Appeal Post Processing failed, rolling back create IoJ Appeal", ex);
             Sentry.captureException(ex);

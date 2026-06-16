@@ -50,8 +50,12 @@ class ApplicationTrackingMapperTest {
         WorkflowRequest workflowRequest =
                 TestModelDataBuilder.buildWorkflowRequestWithCCHardship(CourtType.CROWN_COURT);
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTOWithAssessorName();
-        ApplicationTrackingOutputResult request =
-                mapper.build(workflowRequest, repOrderDTO, AssessmentType.CCHARDSHIP, RequestSource.HARDSHIP);
+        ApplicationTrackingOutputResult request = mapper.build(
+                workflowRequest,
+                repOrderDTO,
+                AssessmentType.CCHARDSHIP,
+                RequestSource.HARDSHIP,
+                Long.valueOf(TestModelDataBuilder.USN));
 
         softly.assertThat(request.getUsn()).isEqualTo(USN.longValue());
         softly.assertThat(request.getMaatRef()).isEqualTo(TestModelDataBuilder.REP_ID.intValue());
@@ -89,9 +93,13 @@ class ApplicationTrackingMapperTest {
                 .setRepOrderDecision(null);
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTOWithAssessorName();
 
-        ApplicationTrackingOutputResult request =
-                mapper.build(workflowRequest, repOrderDTO, AssessmentType.CCHARDSHIP, RequestSource.HARDSHIP);
-        softly.assertThat(request.getUsn()).isEqualTo(TestModelDataBuilder.REP_ID.intValue());
+        ApplicationTrackingOutputResult request = mapper.build(
+                workflowRequest,
+                repOrderDTO,
+                AssessmentType.CCHARDSHIP,
+                RequestSource.HARDSHIP,
+                Long.valueOf(TestModelDataBuilder.USN));
+        softly.assertThat(request.getUsn()).isEqualTo(TestModelDataBuilder.USN.intValue());
         softly.assertThat(request.getMaatRef()).isEqualTo(TestModelDataBuilder.REP_ID.intValue());
         softly.assertThat(request.getActionKeyId()).isEqualTo(Constants.FINANCIAL_ASSESSMENT_ID);
         softly.assertThat(request.getCaseId())
