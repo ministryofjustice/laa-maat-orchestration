@@ -136,7 +136,9 @@ public class PassportAssessmentMapper {
 
         return new PassportedAssessmentMetadata()
                 .withLegacyApplicationId(applicationDTO.getRepId().intValue())
-                .withUsn(passportedDTO.getUsn().intValue())
+                .withUsn(Optional.ofNullable(passportedDTO.getUsn())
+                        .map(Long::intValue)
+                        .orElse(null))
                 .withCaseManagementUnitId(passportedDTO.getCmuId().intValue())
                 .withUserSession(userMapper.userDtoToUserSession(workflowRequest.getUserDTO()));
     }
