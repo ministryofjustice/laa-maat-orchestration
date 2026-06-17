@@ -26,8 +26,9 @@ public class ApplicationTrackingDataService {
             AssessmentType assessmentType,
             RequestSource requestSource) {
 
+        log.info("TESTING: STARTING APPLICATION TRACKING");
         Long usn = workflowRequest.getApplicationDTO().getUsn();
-
+        log.info("TESTING: USN FROM APPLICATIONDTO: " + usn);
         // Use the USN from the financialAssessment if there isn't one on the applicationDTO
         if (usn == null
                 && workflowRequest.getApplicationDTO().getAssessmentDTO() != null
@@ -43,15 +44,19 @@ public class ApplicationTrackingDataService {
                     .getAssessmentDTO()
                     .getFinancialAssessmentDTO()
                     .getUsn();
+
+            log.info("TESTING: USN FROM FINANCIAL ASSESSMENT: " + usn);
         }
 
         if (usn == null) {
             return;
         }
 
+        log.info("TESTING: BUILDING APPLICATION TRACKING");
         ApplicationTrackingOutputResult request =
                 applicationTrackingMapper.build(workflowRequest, repOrderDTO, assessmentType, requestSource, usn);
 
+        log.info("TESTING: CALLING APPLICATION TRACKING");
         service.sendTrackingOutputResult(request);
     }
 }
