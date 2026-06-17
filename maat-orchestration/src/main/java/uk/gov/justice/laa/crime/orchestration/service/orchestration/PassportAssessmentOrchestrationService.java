@@ -14,7 +14,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
-import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.PassportAssessmentMapper;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationTrackingDataService;
@@ -44,7 +43,6 @@ public class PassportAssessmentOrchestrationService {
     private final MaatCourtDataService maatCourtDataService;
     private final AssessmentSummaryService assessmentSummaryService;
     private final ApplicationService applicationService;
-    private final ApplicationTrackingMapper applicationTrackingMapper;
     private final ApplicationTrackingDataService applicationTrackingDataService;
 
     private void preProcessPassportRequest(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {

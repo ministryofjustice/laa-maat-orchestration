@@ -14,7 +14,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.exception.RollbackException;
-import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.IojAppealMapper;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationTrackingDataService;
@@ -41,7 +40,6 @@ public class IojAppealsOrchestrationService {
     private final ProceedingsService proceedingsService;
     private final RepOrderService repOrderService;
     private final WorkflowPreProcessorService workflowPreProcessorService;
-    private final ApplicationTrackingMapper applicationTrackingMapper;
     private final ApplicationTrackingDataService applicationTrackingDataService;
     private final ApplicationService applicationService;
 

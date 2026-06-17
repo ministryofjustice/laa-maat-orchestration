@@ -20,7 +20,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.exception.StoredProcedureValidationException;
-import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationTrackingDataService;
@@ -53,7 +52,6 @@ public class MeansAssessmentOrchestrationService {
     private final WorkflowPreProcessorService workflowPreProcessorService;
     private final IncomeEvidenceService incomeEvidenceService;
     private final ApplicationTrackingDataService applicationTrackingDataService;
-    private final ApplicationTrackingMapper applicationTrackingMapper;
     private final MeansAssessmentMapper meansAssessmentMapper;
     private final MaatCourtDataApiService maatCourtDataApiService;
 

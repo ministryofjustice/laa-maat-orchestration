@@ -19,7 +19,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.HardshipReviewDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
-import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.HardshipMapper;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationTrackingDataService;
@@ -47,7 +46,6 @@ public class HardshipOrchestrationService implements AssessmentOrchestrator<Hard
     private final RepOrderService repOrderService;
     private final ApplicationService applicationService;
 
-    private final ApplicationTrackingMapper applicationTrackingMapper;
     private final ApplicationTrackingDataService applicationTrackingDataService;
 
     public HardshipReviewDTO find(int hardshipReviewId) {
