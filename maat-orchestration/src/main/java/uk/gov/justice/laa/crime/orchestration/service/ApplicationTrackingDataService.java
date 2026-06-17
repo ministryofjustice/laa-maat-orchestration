@@ -26,23 +26,17 @@ public class ApplicationTrackingDataService {
             AssessmentType assessmentType,
             RequestSource requestSource) {
 
-        Long usn = workflowRequest.getApplicationDTO().getUsn();
+        Long usn;
 
-        // Use the USN from the financialAssessment if there isn't one on the applicationDTO
-        if (usn == null
-                && workflowRequest.getApplicationDTO().getAssessmentDTO() != null
-                && workflowRequest.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO() != null
-                && workflowRequest
-                                .getApplicationDTO()
-                                .getAssessmentDTO()
-                                .getFinancialAssessmentDTO()
-                                .getUsn()
-                        != null) {
-            usn = workflowRequest
-                    .getApplicationDTO()
-                    .getAssessmentDTO()
-                    .getFinancialAssessmentDTO()
-                    .getUsn();
+        switch (requestSource) {
+            case HARDSHIP, MEANS_ASSESSMENT ->
+                usn = workflowRequest
+                        .getApplicationDTO()
+                        .getAssessmentDTO()
+                        .getFinancialAssessmentDTO()
+                        .getUsn();
+            case PASSPORT_IOJ -> usn = workflowRequest.getApplicationDTO().getUsn();
+            default -> throw new IllegalStateException("Unknown request source " + requestSource);
         }
 
         if (usn == null) {
