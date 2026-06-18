@@ -1,6 +1,7 @@
 package uk.gov.justice.laa.crime.orchestration.service;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -124,11 +125,6 @@ class ApplicationTrackingDataServiceTest {
                 .getAssessmentDTO()
                 .getFinancialAssessmentDTO()
                 .setUsn(FINANCIAL_ASSESSMENT_USN);
-        workflowRequest
-                .getApplicationDTO()
-                .getAssessmentDTO()
-                .getFinancialAssessmentDTO()
-                .setUsn(FINANCIAL_ASSESSMENT_USN);
         RepOrderDTO repOrderDTO = new RepOrderDTO();
         AssessmentType assessmentType = AssessmentType.IOJ;
         RequestSource requestSource = RequestSource.PASSPORT_IOJ;
@@ -143,5 +139,25 @@ class ApplicationTrackingDataServiceTest {
                         assessmentType,
                         requestSource,
                         workflowRequest.getApplicationDTO().getUsn());
+    }
+
+    @Test
+    void givenNoUsn_whenSendTrackingOutputResult_thenNoTrackingInformationIsMappedOrSent() {
+        WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
+        workflowRequest.getApplicationDTO().setUsn(null);
+        workflowRequest
+                .getApplicationDTO()
+                .getAssessmentDTO()
+                .getFinancialAssessmentDTO()
+                .setUsn(null);
+        RepOrderDTO repOrderDTO = new RepOrderDTO();
+        AssessmentType assessmentType = AssessmentType.IOJ;
+        RequestSource requestSource = RequestSource.PASSPORT_IOJ;
+
+        applicationTrackingDataService.sendTrackingOutputResult(
+                workflowRequest, repOrderDTO, assessmentType, requestSource);
+
+        verify(applicationTrackingMapper, never()).build(any(), any(), any(), any(), any());
+        verify(applicationTrackingApiService, never()).sendTrackingOutputResult(any());
     }
 }
