@@ -28,6 +28,7 @@ public class ApplicationTrackingDataService {
 
         Long usn;
 
+        log.info("TESTING: STARTING TRACKING");
         switch (requestSource) {
             case HARDSHIP, MEANS_ASSESSMENT ->
                 usn = workflowRequest
@@ -39,6 +40,7 @@ public class ApplicationTrackingDataService {
             default -> throw new IllegalStateException("Unknown request source " + requestSource);
         }
 
+        log.info("USN: " + usn);
         if (usn == null) {
             return;
         }
@@ -46,6 +48,7 @@ public class ApplicationTrackingDataService {
         ApplicationTrackingOutputResult request =
                 applicationTrackingMapper.build(workflowRequest, repOrderDTO, assessmentType, requestSource, usn);
 
+        log.info("TESTING: SENDING TRACKING");
         service.sendTrackingOutputResult(request);
     }
 }
