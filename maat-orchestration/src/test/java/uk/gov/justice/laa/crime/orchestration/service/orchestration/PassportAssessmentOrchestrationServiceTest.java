@@ -3,11 +3,11 @@ package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
 import uk.gov.justice.laa.crime.enums.RepOrderStatus;
@@ -133,6 +133,12 @@ class PassportAssessmentOrchestrationServiceTest {
 
         verify(assessmentSummaryService).updateApplication(any(ApplicationDTO.class), any(AssessmentSummaryDTO.class));
         verify(applicationService).updateDateModified(any(WorkflowRequest.class), any(ApplicationDTO.class));
+        verify(applicationTrackingDataService, times(1))
+                .sendTrackingOutputResult(
+                        any(WorkflowRequest.class),
+                        any(RepOrderDTO.class),
+                        eq(AssessmentType.PASSPORT),
+                        eq(RequestSource.PASSPORT_IOJ));
     }
 
     @Test
@@ -153,10 +159,6 @@ class PassportAssessmentOrchestrationServiceTest {
                 .setPassportedDTO(PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITHOUT_PARTNER));
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
         stubCommonCreateInteractions(workflowRequest, repOrderDTO);
-        when(applicationTrackingMapper.build(
-                        workflowRequest, repOrderDTO, AssessmentType.PASSPORT, RequestSource.PASSPORT_IOJ))
-                .thenReturn(TestModelDataBuilder.getApplicationTrackingOutputResult());
-
         ApplicationDTO applicationDTO = passportAssessmentOrchestrationService.create(workflowRequest);
 
         assertThat(applicationDTO).isEqualTo(workflowRequest.getApplicationDTO());
@@ -168,9 +170,6 @@ class PassportAssessmentOrchestrationServiceTest {
         WorkflowRequest workflowRequest = TestModelDataBuilder.buildWorkFlowRequest();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
         stubCommonCreateInteractions(workflowRequest, repOrderDTO);
-        when(applicationTrackingMapper.build(
-                        workflowRequest, repOrderDTO, AssessmentType.PASSPORT, RequestSource.PASSPORT_IOJ))
-                .thenReturn(TestModelDataBuilder.getApplicationTrackingOutputResult());
         when(maatCourtDataService.invokeStoredProcedure(
                         any(ApplicationDTO.class),
                         eq(workflowRequest.getUserDTO()),
@@ -196,14 +195,11 @@ class PassportAssessmentOrchestrationServiceTest {
                 .setPassportedDTO(PassportAssessmentDataBuilder.getPassportedDTO(Constants.WITHOUT_PARTNER));
         RepOrderDTO repOrderDTO = TestModelDataBuilder.buildRepOrderDTO(RepOrderStatus.CURR.getCode());
         stubCommonCreateInteractions(workflowRequest, repOrderDTO);
-        when(applicationTrackingMapper.build(
-                        workflowRequest, repOrderDTO, AssessmentType.PASSPORT, RequestSource.PASSPORT_IOJ))
-                .thenReturn(new ApplicationTrackingOutputResult());
 
         ApplicationDTO applicationDTO = passportAssessmentOrchestrationService.create(workflowRequest);
 
         assertThat(applicationDTO).isEqualTo(workflowRequest.getApplicationDTO());
         verifyCommonCreateInteractions();
-        verifyNoInteractions(applicationTrackingDataService);
+        verifyNoInteractions(applicationTrackingMapper);
     }
 }

@@ -6,7 +6,6 @@ import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_RE
 import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
 import uk.gov.justice.laa.crime.enums.orchestration.Action;
@@ -21,7 +20,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.exception.StoredProcedureValidationException;
-import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.MeansAssessmentMapper;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationTrackingDataService;
@@ -54,7 +52,6 @@ public class MeansAssessmentOrchestrationService {
     private final WorkflowPreProcessorService workflowPreProcessorService;
     private final IncomeEvidenceService incomeEvidenceService;
     private final ApplicationTrackingDataService applicationTrackingDataService;
-    private final ApplicationTrackingMapper applicationTrackingMapper;
     private final MeansAssessmentMapper meansAssessmentMapper;
     private final MaatCourtDataApiService maatCourtDataApiService;
 
@@ -170,12 +167,8 @@ public class MeansAssessmentOrchestrationService {
                 ? AssessmentType.MEANS_FULL
                 : AssessmentType.MEANS_INIT;
 
-        ApplicationTrackingOutputResult applicationTrackingOutputResult =
-                applicationTrackingMapper.build(request, repOrderDTO, assessmentType, RequestSource.MEANS_ASSESSMENT);
-
-        if (applicationTrackingOutputResult.getUsn() != null) {
-            applicationTrackingDataService.sendTrackingOutputResult(applicationTrackingOutputResult);
-        }
+        applicationTrackingDataService.sendTrackingOutputResult(
+                request, repOrderDTO, assessmentType, RequestSource.MEANS_ASSESSMENT);
 
         AssessmentSummaryDTO assessmentSummaryDTO = assessmentSummaryService.getSummary(
                 request.getApplicationDTO().getAssessmentDTO().getFinancialAssessmentDTO());

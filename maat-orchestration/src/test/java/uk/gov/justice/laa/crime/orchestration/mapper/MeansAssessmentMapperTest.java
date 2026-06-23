@@ -282,7 +282,8 @@ class MeansAssessmentMapperTest {
         AssessmentDTO assessmentDTO = applicationDTO.getAssessmentDTO();
         FinancialAssessmentDTO financialAssessmentDTO = assessmentDTO.getFinancialAssessmentDTO();
         InitialAssessmentDTO initialAssessmentDTO = financialAssessmentDTO.getInitial();
-        softly.assertThat(apiCreateMeansAssessmentRequest.getUsn()).isEqualTo(applicationDTO.getUsn());
+        softly.assertThat(apiCreateMeansAssessmentRequest.getUsn())
+                .isEqualTo(applicationDTO.getUsn().intValue());
         softly.assertThat(apiCreateMeansAssessmentRequest.getReviewType().getCode())
                 .isEqualTo(initialAssessmentDTO.getReviewType().getCode());
     }

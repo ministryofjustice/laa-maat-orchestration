@@ -8,7 +8,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
+import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.orchestration.data.builder.TestModelDataBuilder;
 import uk.gov.justice.laa.crime.orchestration.dto.WorkflowRequest;
@@ -20,9 +21,9 @@ import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.CrimeValidationException;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.exception.RollbackException;
-import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.IojAppealMapper;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
+import uk.gov.justice.laa.crime.orchestration.service.ApplicationTrackingDataService;
 import uk.gov.justice.laa.crime.orchestration.service.AssessmentSummaryService;
 import uk.gov.justice.laa.crime.orchestration.service.ContributionService;
 import uk.gov.justice.laa.crime.orchestration.service.IojAppealService;
@@ -76,7 +77,7 @@ class IojAppealsOrchestrationServiceTest {
     private WorkflowPreProcessorService workflowPreProcessorService;
 
     @Mock
-    private ApplicationTrackingMapper applicationTrackingMapper;
+    private ApplicationTrackingDataService applicationTrackingDataService;
 
     @InjectMocks
     private IojAppealsOrchestrationService iojAppealsOrchestrationService;
@@ -95,7 +96,6 @@ class IojAppealsOrchestrationServiceTest {
                 workflowRequest.getApplicationDTO().getAssessmentDTO().getIojAppeal();
         RepOrderDTO repOrderDTO = TestModelDataBuilder.getTestRepOrderDTO(workflowRequest.getApplicationDTO());
         UserActionDTO userActionDTO = TestModelDataBuilder.getUserActionDTO();
-        ApplicationTrackingOutputResult applicationTrackingOutputResult = new ApplicationTrackingOutputResult();
 
         when(repOrderService.getRepOrder(workflowRequest)).thenReturn(repOrderDTO);
         when(iojAppealMapper.getUserActionDTO(workflowRequest)).thenReturn(userActionDTO);
@@ -104,7 +104,6 @@ class IojAppealsOrchestrationServiceTest {
         when(contributionService.calculate(workflowRequest)).thenReturn(workflowRequest.getApplicationDTO());
         when(maatCourtDataService.invokeStoredProcedure(any(), any(), any()))
                 .thenReturn(workflowRequest.getApplicationDTO());
-        when(applicationTrackingMapper.build(any(), any(), any(), any())).thenReturn(applicationTrackingOutputResult);
 
         AssessmentSummaryDTO assessmentSummaryDTO = TestModelDataBuilder.getAssessmentSummaryDTOFromIojAppealDTO();
         when(assessmentSummaryService.getSummary(iojAppealDTO)).thenReturn(assessmentSummaryDTO);
@@ -131,6 +130,8 @@ class IojAppealsOrchestrationServiceTest {
 
         verify(assessmentSummaryService, times(1)).getSummary(iojAppealDTO);
         verify(assessmentSummaryService).updateApplication(workflowRequest.getApplicationDTO(), assessmentSummaryDTO);
+        verify(applicationTrackingDataService, times(1))
+                .sendTrackingOutputResult(workflowRequest, repOrderDTO, AssessmentType.IOJ, RequestSource.PASSPORT_IOJ);
     }
 
     @Test

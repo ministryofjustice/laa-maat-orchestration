@@ -3,7 +3,6 @@ package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
@@ -15,7 +14,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
 import uk.gov.justice.laa.crime.orchestration.exception.RollbackException;
-import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.IojAppealMapper;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationTrackingDataService;
@@ -42,7 +40,6 @@ public class IojAppealsOrchestrationService {
     private final ProceedingsService proceedingsService;
     private final RepOrderService repOrderService;
     private final WorkflowPreProcessorService workflowPreProcessorService;
-    private final ApplicationTrackingMapper applicationTrackingMapper;
     private final ApplicationTrackingDataService applicationTrackingDataService;
     private final ApplicationService applicationService;
 
@@ -78,11 +75,9 @@ public class IojAppealsOrchestrationService {
             applicationService.updateDateModified(request, request.getApplicationDTO());
 
             // Call Application Tracking Service endpoint
-            ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(
+            applicationTrackingDataService.sendTrackingOutputResult(
                     request, repOrderDto, AssessmentType.IOJ, RequestSource.PASSPORT_IOJ);
-            if (null != applicationTrackingOutputResult.getUsn()) {
-                applicationTrackingDataService.sendTrackingOutputResult(applicationTrackingOutputResult);
-            }
+
         } catch (Exception ex) {
             log.error("IoJ Appeal Post Processing failed, rolling back create IoJ Appeal", ex);
             Sentry.captureException(ex);

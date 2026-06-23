@@ -3,7 +3,6 @@ package uk.gov.justice.laa.crime.orchestration.service.orchestration;
 import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.AssessmentType;
 import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult.RequestSource;
 import uk.gov.justice.laa.crime.enums.NewWorkReason;
@@ -15,7 +14,6 @@ import uk.gov.justice.laa.crime.orchestration.dto.maat.PassportedDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.maat_api.RepOrderDTO;
 import uk.gov.justice.laa.crime.orchestration.dto.validation.UserActionDTO;
 import uk.gov.justice.laa.crime.orchestration.exception.MaatOrchestrationException;
-import uk.gov.justice.laa.crime.orchestration.mapper.ApplicationTrackingMapper;
 import uk.gov.justice.laa.crime.orchestration.mapper.PassportAssessmentMapper;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationService;
 import uk.gov.justice.laa.crime.orchestration.service.ApplicationTrackingDataService;
@@ -45,7 +43,6 @@ public class PassportAssessmentOrchestrationService {
     private final MaatCourtDataService maatCourtDataService;
     private final AssessmentSummaryService assessmentSummaryService;
     private final ApplicationService applicationService;
-    private final ApplicationTrackingMapper applicationTrackingMapper;
     private final ApplicationTrackingDataService applicationTrackingDataService;
 
     private void preProcessPassportRequest(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {
@@ -67,12 +64,8 @@ public class PassportAssessmentOrchestrationService {
     }
 
     private void updateApplicationTracking(WorkflowRequest workflowRequest, RepOrderDTO repOrderDTO) {
-        ApplicationTrackingOutputResult applicationTrackingOutputResult = applicationTrackingMapper.build(
+        applicationTrackingDataService.sendTrackingOutputResult(
                 workflowRequest, repOrderDTO, AssessmentType.PASSPORT, RequestSource.PASSPORT_IOJ);
-
-        if (null != applicationTrackingOutputResult.getUsn()) {
-            applicationTrackingDataService.sendTrackingOutputResult(applicationTrackingOutputResult);
-        }
     }
 
     private void performPostProcessing(

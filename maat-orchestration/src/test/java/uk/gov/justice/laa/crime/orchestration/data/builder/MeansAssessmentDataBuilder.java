@@ -426,6 +426,7 @@ public class MeansAssessmentDataBuilder {
                 .passportedDTO(getPassportedDTO())
                 .repOrderDecision(getRepOrderDecisionDTO())
                 .iojResult(RESULT_PASS)
+                .usn(Long.valueOf(USN))
                 .build();
     }
 

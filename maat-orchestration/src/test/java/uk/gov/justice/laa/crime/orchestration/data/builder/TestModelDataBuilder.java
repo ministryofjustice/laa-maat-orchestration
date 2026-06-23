@@ -712,6 +712,7 @@ public class TestModelDataBuilder {
                 .iojResult(RESULT_PASS)
                 .assessmentSummary(Collections.emptyList())
                 .applicantLinks(getApplicantLinks())
+                .usn(Long.valueOf(USN))
                 .build();
     }
 

@@ -14,7 +14,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_INCOMPLETE_ASSESSMENT;
 import static uk.gov.justice.laa.crime.orchestration.common.Constants.WRN_MSG_REASSESSMENT;
 
-import uk.gov.justice.laa.crime.common.model.tracking.ApplicationTrackingOutputResult;
 import uk.gov.justice.laa.crime.enums.orchestration.StoredProcedure;
 import uk.gov.justice.laa.crime.exception.ValidationException;
 import uk.gov.justice.laa.crime.orchestration.data.Constants;
@@ -132,8 +131,6 @@ class MeansAssessmentOrchestrationServiceTest {
                         any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
                 .thenReturn(applicationDTO);
         when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
-        when(applicationTrackingMapper.build(any(), any(), any(), any()))
-                .thenReturn(new ApplicationTrackingOutputResult().withUsn(123));
 
         ApplicationDTO actual = orchestrationService.create(workflowRequest);
 
@@ -151,7 +148,7 @@ class MeansAssessmentOrchestrationServiceTest {
                         workflowRequest.getUserDTO(),
                         StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE);
         verify(assessmentSummaryService, times(1)).getSummary(any(FinancialAssessmentDTO.class));
-        verify(applicationTrackingDataService, times(1)).sendTrackingOutputResult(any());
+        verify(applicationTrackingDataService, times(1)).sendTrackingOutputResult(any(), any(), any(), any());
         verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 
@@ -162,8 +159,6 @@ class MeansAssessmentOrchestrationServiceTest {
                         any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
                 .thenReturn(applicationDTO);
         when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
-        when(applicationTrackingMapper.build(any(), any(), any(), any()))
-                .thenReturn(new ApplicationTrackingOutputResult().withUsn(123));
 
         ApplicationDTO actual = orchestrationService.update(workflowRequest);
 
@@ -183,7 +178,7 @@ class MeansAssessmentOrchestrationServiceTest {
                         workflowRequest.getUserDTO(),
                         StoredProcedure.PROCESS_ACTIVITY_AND_GET_CORRESPONDENCE);
         verify(assessmentSummaryService, times(1)).getSummary(any(FinancialAssessmentDTO.class));
-        verify(applicationTrackingDataService, times(1)).sendTrackingOutputResult(any());
+        verify(applicationTrackingDataService, times(1)).sendTrackingOutputResult(any(), any(), any(), any());
         verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 
@@ -195,8 +190,6 @@ class MeansAssessmentOrchestrationServiceTest {
                 .thenReturn(applicationDTO);
         when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest))
                 .thenReturn(false);
-        when(applicationTrackingMapper.build(any(), any(), any(), any()))
-                .thenReturn(new ApplicationTrackingOutputResult().withUsn(123));
 
         orchestrationService.create(workflowRequest);
 
@@ -213,7 +206,7 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(workflowPreProcessorService, never()).preProcessRequest(any(), any(), any());
         verify(incomeEvidenceService, never()).createEvidence(any(), any());
         verify(proceedingsService, never()).determineMagsRepDecision(any());
-        verify(applicationTrackingDataService, times(1)).sendTrackingOutputResult(any());
+        verify(applicationTrackingDataService, times(1)).sendTrackingOutputResult(any(), any(), any(), any());
 
         verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
@@ -226,8 +219,6 @@ class MeansAssessmentOrchestrationServiceTest {
                 .thenReturn(workflowRequest.getApplicationDTO());
         when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest))
                 .thenReturn(true);
-        when(applicationTrackingMapper.build(any(), any(), any(), any()))
-                .thenReturn(new ApplicationTrackingOutputResult().withUsn(123));
 
         orchestrationService.create(workflowRequest);
 
@@ -247,7 +238,7 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(incomeEvidenceService, times(1)).createEvidence(any(), any());
         verify(proceedingsService, times(1)).determineMagsRepDecision(any());
         verify(contributionService, times(1)).calculate(any());
-        verify(applicationTrackingDataService, times(1)).sendTrackingOutputResult(any());
+        verify(applicationTrackingDataService, times(1)).sendTrackingOutputResult(any(), any(), any(), any());
 
         verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
@@ -260,8 +251,6 @@ class MeansAssessmentOrchestrationServiceTest {
                 .thenReturn(applicationDTO);
         when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest))
                 .thenReturn(false);
-        when(applicationTrackingMapper.build(any(), any(), any(), any()))
-                .thenReturn(new ApplicationTrackingOutputResult().withUsn(123));
 
         orchestrationService.update(workflowRequest);
 
@@ -272,7 +261,7 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(workflowPreProcessorService, never()).preProcessRequest(any(), any(), any());
         verify(incomeEvidenceService, never()).createEvidence(any(), any());
         verify(proceedingsService, never()).determineMagsRepDecision(any());
-        verify(applicationTrackingDataService, times(1)).sendTrackingOutputResult(any());
+        verify(applicationTrackingDataService, times(1)).sendTrackingOutputResult(any(), any(), any(), any());
 
         verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
@@ -285,8 +274,6 @@ class MeansAssessmentOrchestrationServiceTest {
                 .thenReturn(workflowRequest.getApplicationDTO());
         when(featureDecisionService.isMaatPostAssessmentProcessingEnabled(workflowRequest))
                 .thenReturn(true);
-        when(applicationTrackingMapper.build(any(), any(), any(), any()))
-                .thenReturn(new ApplicationTrackingOutputResult().withUsn(123));
 
         orchestrationService.update(workflowRequest);
         verify(maatCourtDataService, never())
@@ -299,7 +286,7 @@ class MeansAssessmentOrchestrationServiceTest {
         verify(incomeEvidenceService, never()).createEvidence(any(), any());
         verify(proceedingsService, times(1)).determineMagsRepDecision(any());
         verify(contributionService, times(1)).calculate(any());
-        verify(applicationTrackingDataService, times(1)).sendTrackingOutputResult(any());
+        verify(applicationTrackingDataService, times(1)).sendTrackingOutputResult(any(), any(), any(), any());
 
         verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
@@ -406,14 +393,12 @@ class MeansAssessmentOrchestrationServiceTest {
                         any(ApplicationDTO.class), any(UserDTO.class), any(StoredProcedure.class)))
                 .thenReturn(workflowRequest.getApplicationDTO());
         when(maatCourtDataApiService.getRepOrderByRepId(anyInt())).thenReturn(repOrderDTO);
-        when(applicationTrackingMapper.build(any(), any(), any(), any()))
-                .thenReturn(new ApplicationTrackingOutputResult().withUsn(123));
 
         orchestrationService.create(workflowRequest);
 
         verify(proceedingsService, times(1)).updateApplication(workflowRequest, repOrderDTO);
         verify(meansAssessmentService, times(0)).rollback(any());
-        verify(applicationTrackingDataService, times(1)).sendTrackingOutputResult(any());
+        verify(applicationTrackingDataService, times(1)).sendTrackingOutputResult(any(), any(), any(), any());
         verify(applicationService).updateDateModified(eq(workflowRequest), any());
     }
 }
