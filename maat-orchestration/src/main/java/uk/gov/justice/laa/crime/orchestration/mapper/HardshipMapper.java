@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -179,7 +180,7 @@ public class HardshipMapper {
     public HardshipReviewDTO findHardshipResponseToHardshipDto(ApiFindHardshipResponse response) {
         return HardshipReviewDTO.builder()
                 .id(response.getId())
-                .reviewResult(response.getReviewResult().toString())
+                .reviewResult(getReviewResult(response))
                 .cmuId(response.getCmuId().longValue())
                 .notes(response.getNotes())
                 .decisionNotes(response.getDecisionNotes())
@@ -191,6 +192,12 @@ public class HardshipMapper {
                 .asessmentStatus(hardshipReviewStatusToAssessmentStatusDto(response.getStatus()))
                 .section(hardshipDetailsToHrSectionDTOs(response.getReviewDetails()))
                 .build();
+    }
+
+    private static @Nullable String getReviewResult(ApiFindHardshipResponse response) {
+        return response.getReviewResult() == null
+                ? null
+                : response.getReviewResult().toString();
     }
 
     private List<HRSectionDTO> hardshipDetailsToHrSectionDTOs(List<ApiHardshipDetail> reviewDetails) {
