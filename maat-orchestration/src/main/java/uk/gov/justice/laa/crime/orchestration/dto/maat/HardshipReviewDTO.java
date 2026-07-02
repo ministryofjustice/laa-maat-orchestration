@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 
+import org.springframework.lang.Nullable;
+
 @Data
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
@@ -19,7 +21,10 @@ public class HardshipReviewDTO extends GenericDTO {
     private SupplierDTO supplier;
     private NewWorkReasonDTO newWorkReason;
     private Long cmuId;
+
+    @Nullable
     private String reviewResult;
+
     private Date reviewDate;
     private String notes;
     private String decisionNotes;

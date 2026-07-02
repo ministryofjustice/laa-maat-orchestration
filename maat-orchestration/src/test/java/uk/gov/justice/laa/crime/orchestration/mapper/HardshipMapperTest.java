@@ -1,5 +1,6 @@
 package uk.gov.justice.laa.crime.orchestration.mapper;
 
+import uk.gov.justice.laa.crime.common.model.hardship.ApiFindHardshipResponse;
 import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipRequest;
 import uk.gov.justice.laa.crime.common.model.hardship.ApiPerformHardshipResponse;
 import uk.gov.justice.laa.crime.common.model.hardship.DeniedIncome;
@@ -40,6 +41,18 @@ class HardshipMapperTest {
                 .usingRecursiveComparison()
                 .ignoringCollectionOrder()
                 .isEqualTo(expected);
+    }
+
+    @Test
+    void
+            givenApiFindHardshipResponseWithNullReviewResult_whenFindHardshipResponseToHardshipDTOIsInvoked_thenMappingIsCorrect() {
+        // given - a response where the review result is null
+        ApiFindHardshipResponse apiResponse = TestModelDataBuilder.getApiFindHardshipResponse();
+        apiResponse.setReviewResult(null);
+        // when - the response is mapped to a DTO
+        HardshipReviewDTO actual = hardshipMapper.findHardshipResponseToHardshipDto(apiResponse);
+        // then - the review result set to null
+        softly.assertThat(actual.getReviewResult()).isNull();
     }
 
     @Test
